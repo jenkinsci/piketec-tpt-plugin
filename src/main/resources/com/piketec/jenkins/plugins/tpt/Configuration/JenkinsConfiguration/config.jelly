@@ -1,0 +1,37 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+>
+
+	<!-- exentds repeatable part in ValidationSuite jelly -->
+	<f:entry field="enableTest" title="Enable test">
+		<f:checkbox value="${instance.enableTest}" default="${descriptor.defaultEnableTest}" />
+	</f:entry>
+
+	<f:entry field="tptFile" title="TPT file">
+		<f:textbox value="${instance.tptFile}" />
+	</f:entry>
+
+	<f:entry field="configuration" title="Execution configuration"
+		help="/plugin/tpt-jenkins/configuration.html"
+	>
+		<f:textbox value="${instance.configuration}" />
+	</f:entry>
+
+	<f:entry field="testdataDir" title="Test data directory"
+		help="/plugin/tpt-jenkins/testdatadir.html"
+	>
+		<f:textbox value="${instance.testdataDir}" />
+	</f:entry>
+
+	<f:entry field="reportDir" title="Report directory"
+		help="/plugin/tpt-jenkins/reportdir.html"
+	>
+		<f:textbox value="${instance.reportDir}" />
+	</f:entry>
+
+	<f:entry title="">
+		<div align="right">
+			<f:repeatableDeleteButton />
+		</div>
+	</f:entry>
+</j:jelly>
