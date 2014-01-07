@@ -128,18 +128,18 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    *          Relative or absolute path.
    * @return A absolute path, but it can be a nonexisting file system object or not a directory.
    */
-  public static File getDirectory(File workspaceDir, File path) {
-    File directory = workspaceDir;
+  public static File getAbsolutePath(File workspaceDir, File path) {
+    File absPath = workspaceDir;
 
     if (path == null) {
-      directory = (workspaceDir == null) ? new File("") : workspaceDir;
+      absPath = (workspaceDir == null) ? new File("") : workspaceDir;
     } else if (path.isAbsolute()) {
-      directory = path;
+      absPath = path;
     } else {
-      directory = (workspaceDir == null) ? path : new File(workspaceDir, path.toString());
+      absPath = (workspaceDir == null) ? path : new File(workspaceDir, path.toString());
     }
 
-    return directory.isAbsolute() ? directory : directory.getAbsoluteFile();
+    return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
   }
 
   /**
@@ -150,7 +150,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
     public static FormValidation doCheckTptFile(@QueryParameter File tptFile) {
 
-      if (tptFile.exists()) {
+      if ((tptFile != null) && (tptFile.getName().trim().length() > 0)) {
         return FormValidation.ok();
       } else {
         return FormValidation.error("Set the path of the TPT file.");

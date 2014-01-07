@@ -89,14 +89,15 @@ public final class Publish {
   // //
   // -------------------------------------------------------------------------------------------------------------
 
-  public static void publishJUnitResults(File reportFolder, JenkinsConfiguration ex,
-                                         String pattern, TptLogger logger) throws IOException {
+  public static void publishJUnitResults(File workspaceDir, File reportFolder,
+                                         JenkinsConfiguration ex, String pattern, TptLogger logger)
+      throws IOException {
     XmlStreamWriter xmlPub = null;
 
     try {
       String classname = ex.getClassname();
       File reportFile = new File(reportFolder, ex.getReportName());
-      File testDataDir = ex.getTestdataDir();
+      File testDataDir = JenkinsConfiguration.getAbsolutePath(workspaceDir, ex.getTestdataDir());
       StringBuilder errors = new StringBuilder();
       List<Testcase> testdata;
       xmlPub = new XmlStreamWriter();

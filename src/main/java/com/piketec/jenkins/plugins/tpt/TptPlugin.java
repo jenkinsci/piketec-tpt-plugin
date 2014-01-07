@@ -117,13 +117,14 @@ public class TptPlugin extends Builder implements TptLogger {
     for (JenkinsConfiguration ec : executionConfiguration) {
 
       if (ec.isEnableTest()) {
-        File dataDir = JenkinsConfiguration.getDirectory(workspaceDir, ec.getTestdataDir());
-        File reportDir = JenkinsConfiguration.getDirectory(workspaceDir, ec.getReportDir());
+        File dataDir = JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getTestdataDir());
+        File reportDir = JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getReportDir());
+        File tptFile = JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getTptFile());
         info("*** Running TPT-File \"" + ec.getTptFileName() + //
             "\" with configuration \"" + ec.getConfiguration() + "\" now. ***");
 
         if (createParentDir(dataDir) && createParentDir(reportDir)) {
-          String cmd = buildCommand(dataDir, reportDir, ec);
+          String cmd = buildCommand(tptFile, dataDir, reportDir, ec);
 
           try {
             // run the test...
@@ -153,12 +154,11 @@ public class TptPlugin extends Builder implements TptLogger {
    * @param ec
    * @return
    */
-  private String buildCommand(File dataDir, File reportDir, JenkinsConfiguration ec) {
+  private String buildCommand(File tptFile, File dataDir, File reportDir, JenkinsConfiguration ec) {
     StringBuilder cmd = new StringBuilder();
-    cmd.append('"').append(exe).append("\" ").append(arguments).append(" \"")
-        .append(ec.getTptFile()).append("\" \"").append(ec.getConfiguration())
-        .append("\" --dataDir \"").append(dataDir).append("\" --reportDir \"").append(reportDir)
-        .append('"');
+    cmd.append('"').append(exe).append("\" ").append(arguments).append(" \"").append(tptFile)
+        .append("\" \"").append(ec.getConfiguration()).append("\" --dataDir \"").append(dataDir)
+        .append("\" --reportDir \"").append(reportDir).append('"');
 
     return cmd.toString();
   }
@@ -192,12 +192,13 @@ public class TptPlugin extends Builder implements TptLogger {
   }
 
   private void publishResults(FilePath workspace, JenkinsConfiguration ec) throws IOException {
-    File reportDir = new File(getWorkspaceDir(workspace), report);
+    File workspaceDir = getWorkspaceDir(workspace);
+    File reportDir = new File(workspaceDir, report);
 
     if (!(reportDir.isDirectory() || reportDir.mkdirs())) {
       throw new IOException("Could not create report directory \"" + reportDir + "\"");
     }
-    Publish.publishJUnitResults(reportDir, ec, "testcase_information.xml", this);
+    Publish.publishJUnitResults(workspaceDir, reportDir, ec, "testcase_information.xml", this);
   }
 
   @Override
