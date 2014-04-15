@@ -1,9 +1,8 @@
 package com.piketec.jenkins.plugins.tpt;
 
+import hudson.FilePath;
+
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -22,9 +21,9 @@ public class XmlStreamWriter {
 
   private BufferedOutputStream bos;
 
-  public void initalize(File file) throws XMLStreamException, FactoryConfigurationError,
-      FileNotFoundException {
-    os = new FileOutputStream(file);
+  public void initalize(FilePath file) throws XMLStreamException, FactoryConfigurationError,
+      IOException, InterruptedException {
+    os = file.write();
     bos = new BufferedOutputStream(os);
     writer =
         new IndentingXMLStreamWriter(XMLOutputFactory.newInstance().createXMLStreamWriter(bos,

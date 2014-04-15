@@ -1,5 +1,7 @@
 package com.piketec.jenkins.plugins.tpt;
 
+import hudson.FilePath;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -89,21 +91,23 @@ public final class Publish {
   // //
   // -------------------------------------------------------------------------------------------------------------
 
-  public static void publishJUnitResults(File workspaceDir, File reportFolder,
+  public static void publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
                                          JenkinsConfiguration ex, String pattern, TptLogger logger)
       throws IOException {
     XmlStreamWriter xmlPub = null;
 
     try {
       String classname = ex.getClassname();
-      File reportFile = new File(reportFolder, ex.getReportName());
-      File testDataDir = JenkinsConfiguration.getAbsolutePath(workspaceDir, ex.getTestdataDir());
-      StringBuilder errors = new StringBuilder();
+      FilePath reportFile = new FilePath(reportFolder, ex.getReportName());
+      File testDataText = ex.getTestdataDir();
+      FilePath testDataDir =
+          ((testDataText == null) || testDataText.toString().trim().isEmpty()) ? workspaceDir
+              : new FilePath(workspaceDir, testDataText.toString());
       List<Testcase> testdata;
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(reportFile);
       xmlPub.writeTestsuite(classname);
-      testdata = getTestcases(testDataDir, errors);
+      testdata = getTestcases(testDataDir, logger);
 
       if (!testdata.isEmpty()) {
         removeOlderResults(testdata);
@@ -122,6 +126,8 @@ public final class Publish {
       throw new IOException("XML stream error: " + e.getMessage());
     } catch (FactoryConfigurationError e) {
       throw new IOException("XML configuration error: " + e.getMessage());
+    } catch (InterruptedException ie) {
+      throw new IOException("traverse test data directory failed: " + ie.getMessage());
     } finally {
 
       if (xmlPub != null) {
@@ -172,20 +178,24 @@ public final class Publish {
    * ermittelt alle Testfaelle aus den "testcase_information.xml" files unterhalb des Ordners
    * "rootdir" rekursiv. Wurden Files gefunden, die nicht geladen werden koennen, wird dies als
    * Fehler in "errors" eingetragen. Die Methode liefert selbst nie einen Fehler.
+   * 
+   * @throws InterruptedException
+   * @throws IOException
    */
-  private static List<Testcase> getTestcases(File rootdir, StringBuilder errors) {
-    Collection<File> files = new HashSet<File>();
+  private static List<Testcase> getTestcases(FilePath rootdir, TptLogger logger)
+      throws IOException, InterruptedException {
+    Collection<FilePath> files = new HashSet<FilePath>();
     List<Testcase> testcases;
-    find(rootdir, "testcase_information.xml", files, errors);
+    find(rootdir, "testcase_information.xml", files);
     testcases = new ArrayList<Testcase>(files.size());
 
-    for (File f : files) {
+    for (FilePath f : files) {
 
       try {
         Testcase tc = TestcaseParser.parseXml(f);
         testcases.add(tc);
       } catch (IOException e) {
-        errors.append("[Error]: File \"" + f + "\": " + e.getMessage() + "\n\r");
+        logger.error("[Error]: File \"" + f + "\": " + e.getMessage() + "\n\r");
       }
     }
 
@@ -195,20 +205,24 @@ public final class Publish {
   /**
    * find all files in directory "root" with file name "pattern" and stores them in collection
    * "files"
+   * 
+   * @throws InterruptedException
+   * @throws IOException
    */
-  private static void find(File rootdir, String pattern, Collection<File> files,
-                           StringBuilder errors) {
+  private static void find(FilePath rootdir, String pattern, Collection<FilePath> files)
+      throws IOException, InterruptedException {
 
     if (rootdir.isDirectory()) {
-      File[] children = rootdir.listFiles();
+      List<FilePath> children = rootdir.list();
 
       if (children != null) {
 
-        for (File child : children) {
-          find(child, pattern, files, errors);
+        for (FilePath child : children) {
+          find(child, pattern, files);
         }
       }
-    } else if (rootdir.isFile() && rootdir.getName().equalsIgnoreCase(pattern)) {
+    } else if (rootdir.exists() && (!rootdir.isDirectory())
+        && rootdir.getName().equalsIgnoreCase(pattern)) {
       files.add(rootdir);
     }
   }

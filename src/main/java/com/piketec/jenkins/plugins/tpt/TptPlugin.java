@@ -192,13 +192,22 @@ public class TptPlugin extends Builder implements TptLogger {
   }
 
   private void publishResults(FilePath workspace, JenkinsConfiguration ec) throws IOException {
-    File workspaceDir = getWorkspaceDir(workspace);
-    File reportDir = new File(workspaceDir, report);
+    FilePath reportPath =
+        ((report == null) || report.trim().isEmpty()) ? workspace : new FilePath(workspace, report);
 
-    if (!(reportDir.isDirectory() || reportDir.mkdirs())) {
-      throw new IOException("Could not create report directory \"" + reportDir + "\"");
+    try {
+
+      if (!reportPath.isDirectory()) {
+        reportPath.mkdirs();
+
+        if (!reportPath.isDirectory()) {
+          throw new IOException("Could not create report directory \"" + reportPath + "\"");
+        }
+      }
+    } catch (InterruptedException ie) {
+      throw new IOException("failed to get the directory: " + reportPath, ie);
     }
-    Publish.publishJUnitResults(workspaceDir, reportDir, ec, "testcase_information.xml", this);
+    Publish.publishJUnitResults(workspace, reportPath, ec, "testcase_information.xml", this);
   }
 
   @Override

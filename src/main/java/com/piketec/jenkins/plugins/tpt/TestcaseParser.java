@@ -1,6 +1,7 @@
 package com.piketec.jenkins.plugins.tpt;
 
-import java.io.File;
+import hudson.FilePath;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,10 +36,10 @@ public class TestcaseParser extends DefaultHandler {
    * @throws IOException
    *           if the xml file cannot be read or has a wrong format
    */
-  public static Testcase parseXml(File xmlFile) throws IOException {
+  public static Testcase parseXml(FilePath xmlFile) throws IOException {
     try {
       TestcaseParser parser = new TestcaseParser();
-      SAXParserFactory.newInstance().newSAXParser().parse(xmlFile, parser);
+      SAXParserFactory.newInstance().newSAXParser().parse(xmlFile.read(), parser);
       if (parser.ti == null) {
         throw new IOException("XML file " + xmlFile + " does not contain tag <testcaseinformation>");
       }
