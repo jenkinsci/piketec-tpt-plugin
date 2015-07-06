@@ -7,9 +7,26 @@
   </parent>
 
   <groupId>com.piketec.jenkins.plugins</groupId>
-  <artifactId>tpt-jenkins</artifactId>
+  <artifactId>piketec-tpt</artifactId>
   <version>6.0</version>
   <packaging>hpi</packaging>
+  
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+      <comments>All source code is under the MIT license.</comments>
+    </license>
+  </licenses>
+    
+  <developers>
+    <developer>
+      <id>piketec</id>
+      <name>Joachim Kuhnert</name>
+      <email>joachim.kuhnert@piketec.com</email>
+    </developer>
+  </developers>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
   <repositories>
@@ -63,4 +80,8 @@
     </plugins>
   </build>
   
+  <organization>
+  	<name>PikeTec GmbH</name>
+  	<url>https://www.piketec.com/</url>
+  </organization>
 </project>

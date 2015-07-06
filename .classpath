@@ -507,7 +507,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/org/jvnet/hudson/xstream/1.4.4-jenkins-3/xstream-1.4.4-jenkins-3.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_31"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/stax-utils-20070216/stax-utils.jar"/>
 	<classpathentry kind="output" path="target/eclipse-classes"/>
 </classpath>
