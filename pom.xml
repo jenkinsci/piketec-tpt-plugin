@@ -84,4 +84,11 @@
   	<name>PikeTec GmbH</name>
   	<url>https://www.piketec.com/</url>
   </organization>
+  
+  <scm>
+  	<url>https://github.com/jenkinsci/piketec-tpt-plugin</url>
+  	<connection>scm:git:ssh://github.com/jenkinsci/piketec-tpt-plugin.git</connection>
+  	<developerConnection>scm:git:ssh://github.com/jenkinsci/piketec-tpt-plugin.git</developerConnection>
+  </scm>
+  <url>https://wiki.jenkins-ci.org/display/JENKINS/PikeTec+TPT+Plugin</url>
 </project>
