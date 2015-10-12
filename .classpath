@@ -79,7 +79,7 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/hjuerges.PIKETEC/.m2/repository/com/infradna/tool/bridge-method-annotation/1.4/bridge-method-annotation-1.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/cli/1.509.1/cli-1.509.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/cli/1.632/cli-1.632.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-beanutils/commons-beanutils/1.8.3/commons-beanutils-1.8.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar">
 		<attributes>
@@ -195,9 +195,9 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/hjuerges.PIKETEC/.m2/repository/jfree/jcommon/1.0.12/jcommon-1.0.12-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/jenkins-core/1.509.1/jenkins-core-1.509.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/jenkins-test-harness/1.509.1/jenkins-test-harness-1.509.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/jenkins-war/1.509.1/jenkins-war-1.509.1-war-for-test.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/jenkins-core/1.632/jenkins-core-1.632.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/jenkins-test-harness/1.632/jenkins-test-harness-1.632.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/jenkins-war/1.632/jenkins-war-1.632-war-for-test.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar" sourcepath="M2_REPO/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/hjuerges.PIKETEC/.m2/repository/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26-javadoc.jar!/"/>
@@ -285,7 +285,6 @@
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-model/3.0.5/maven-model-3.0.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-model-builder/3.0.5/maven-model-builder-3.0.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/maven-plugin/1.509.1/maven-plugin-1.509.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-plugin-api/3.0.5/maven-plugin-api-3.0.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0.jar" sourcepath="M2_REPO/org/apache/maven/reporting/maven-reporting-api/3.0/maven-reporting-api-3.0-sources.jar">
 		<attributes>
@@ -463,7 +462,6 @@
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/trilead-ssh2/build214-jenkins-2/trilead-ssh2-build214-jenkins-2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/sun/xml/txw2/txw2/20110809/txw2-20110809.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/ui-samples-plugin/1.509.1/ui-samples-plugin-1.509.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/modules/upstart-slave-installer/1.1/upstart-slave-installer-1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/version-number/1.1/version-number-1.1.jar" sourcepath="M2_REPO/org/jenkins-ci/version-number/1.1/version-number-1.1-sources.jar">
 		<attributes>

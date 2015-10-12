@@ -70,7 +70,9 @@ public class TestcaseParser extends DefaultHandler {
       throw new IOException("SAX error: " + e.getMessage());
     } catch (IOException e) {
       throw new IOException("I/O error: " + e.getMessage());
-    }
+    } catch (InterruptedException e) {
+		throw new IOException("Interrupted reading XML File: " + e.getMessage(), e);
+	}
   }
 
   // -------------------------------------
