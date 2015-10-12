@@ -23,12 +23,12 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.509.1</version><!-- which version of Jenkins is this plugin built against? -->
+    <version>1.579</version><!-- which version of Jenkins is this plugin built against? -->
   </parent>
 
   <groupId>com.piketec.jenkins.plugins</groupId>
   <artifactId>piketec-tpt</artifactId>
-  <version>6.0</version>
+  <version>6.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
   
   <licenses>
@@ -42,7 +42,7 @@
     
   <developers>
     <developer>
-      <id>piketec</id>
+      <id>PikeTec</id>
       <name>Joachim Kuhnert</name>
       <email>joachim.kuhnert@piketec.com</email>
     </developer>
@@ -106,9 +106,9 @@
   </organization>
   
   <scm>
-  	<url>https://github.com/jenkinsci/piketec-tpt-plugin</url>
-  	<connection>scm:git:ssh://github.com/jenkinsci/piketec-tpt-plugin.git</connection>
-  	<developerConnection>scm:git:ssh://github.com/jenkinsci/piketec-tpt-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/piketec-tpt-plugin</url>
+    <connection>scm:git:ssh://github.com/jenkinsci/piketec-tpt-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/piketec-tpt-plugin.git</developerConnection>
   </scm>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/PikeTec+TPT+Plugin</url>
 </project>
