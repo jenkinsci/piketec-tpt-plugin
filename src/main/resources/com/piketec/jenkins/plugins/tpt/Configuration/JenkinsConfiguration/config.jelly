@@ -32,19 +32,19 @@
 	</f:entry>
 
 	<f:entry field="configuration" title="Execution configuration"
-		help="/plugin/tpt-jenkins/configuration.html"
+		help="/plugin/piketec-tpt/configuration.html"
 	>
 		<f:textbox value="${instance.configuration}" />
 	</f:entry>
 
 	<f:entry field="testdataDir" title="Test data directory"
-		help="/plugin/tpt-jenkins/testdatadir.html"
+		help="/plugin/piketec-tpt/testdatadir.html"
 	>
 		<f:textbox value="${instance.testdataDir}" />
 	</f:entry>
 
 	<f:entry field="reportDir" title="Report directory"
-		help="/plugin/tpt-jenkins/reportdir.html"
+		help="/plugin/piketec-tpt/reportdir.html"
 	>
 		<f:textbox value="${instance.reportDir}" />
 	</f:entry>

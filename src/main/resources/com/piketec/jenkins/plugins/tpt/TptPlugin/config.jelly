@@ -23,23 +23,23 @@
 >
 
 	<!-- TPT Configuration -->
-	<f:entry field="exe" title="Path to tpt.exe" help="/plugin/tpt-jenkins/exe.html">
+	<f:entry field="exe" title="Path to tpt.exe" help="/plugin/piketec-tpt/exe.html">
 		<f:textbox value="${instance.exe}" />
 	</f:entry>
 
 	<f:entry field="arguments" title="Arguments"
-		help="/plugin/tpt-jenkins/arguments.html"
+		help="/plugin/piketec-tpt/arguments.html"
 	>
 		<f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
 	</f:entry>
 
-	<f:entry field="report" title="JUnit XML directory" help="/plugin/tpt-jenkins/report.html">
+	<f:entry field="report" title="JUnit XML directory" help="/plugin/piketec-tpt/report.html">
 		<f:textbox value="${instance.report}" default="${descriptor.defaultReport}" />
 	</f:entry>
 
 	<!-- Validation Suite Configuration -->
 	<f:section title="TPT files and configuration">
-		<f:entry help="/plugin/tpt-jenkins/executionConfiguration.html">
+		<f:entry help="/plugin/piketec-tpt/executionConfiguration.html">
 			<f:repeatableProperty field="executionConfiguration"
 				minimum="1" header="Validation-Set" noAddButton="false" />
 		</f:entry>

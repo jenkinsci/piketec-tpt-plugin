@@ -20,10 +20,12 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Proc;
+import hudson.Util;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -72,15 +74,6 @@ public class TptPlugin extends Builder implements TptLogger {
     }
     this.report = report;
     this.listener = null;
-  }
-
-  /**
-   * Tpt exe path.
-   * 
-   * @return The path to the tpt.exe.
-   */
-  public File getExe() {
-    return exe;
   }
 
   /**
@@ -133,18 +126,35 @@ public class TptPlugin extends Builder implements TptLogger {
     boolean success = true;
     FilePath workspace = build.getWorkspace();
     File workspaceDir = getWorkspaceDir(workspace);
+    EnvVars environment;
+    try {
+      environment = build.getEnvironment(launch.getListener());
+    } catch (IOException e1) {
+      environment = new EnvVars();
+      error(e1.getLocalizedMessage());
+    } catch (InterruptedException e1) {
+      interrupt(e1.getLocalizedMessage());
+      return false;
+    }
+    File exeFile = new File(Util.replaceMacro(exe.toString(), environment));
+    String arguments = Util.replaceMacro(this.arguments, environment);
 
     for (JenkinsConfiguration ec : executionConfiguration) {
 
       if (ec.isEnableTest()) {
-        File dataDir = JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getTestdataDir());
-        File reportDir = JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getReportDir());
-        File tptFile = JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getTptFile());
-        info("*** Running TPT-File \"" + ec.getTptFileName() + //
-            "\" with configuration \"" + ec.getConfiguration() + "\" now. ***");
+        File dataDir =
+            JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getTestdataDir(), environment);
+        File reportDir =
+            JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getReportDir(), environment);
+        File tptFile =
+            JenkinsConfiguration.getAbsolutePath(workspaceDir, ec.getTptFile(), environment);
+        String configurationName = Util.replaceMacro(ec.getConfiguration(), environment);
+        info("*** Running TPT-File \"" + tptFile + //
+            "\" with configuration \"" + configurationName + "\" now. ***");
 
         if (createParentDir(dataDir) && createParentDir(reportDir)) {
-          String cmd = buildCommand(tptFile, dataDir, reportDir, ec);
+          String cmd =
+              buildCommand(exeFile, arguments, tptFile, dataDir, reportDir, configurationName);
 
           try {
             // run the test...
@@ -174,11 +184,58 @@ public class TptPlugin extends Builder implements TptLogger {
    * @param ec
    * @return
    */
-  private String buildCommand(File tptFile, File dataDir, File reportDir, JenkinsConfiguration ec) {
+  private String buildCommand(File exeFile, String arguments, File tptFile, File dataDir,
+                              File reportDir, String configurationName) {
     StringBuilder cmd = new StringBuilder();
-    cmd.append('"').append(exe).append("\" ").append(arguments).append(" \"").append(tptFile)
-        .append("\" \"").append(ec.getConfiguration()).append("\" --dataDir \"").append(dataDir)
-        .append("\" --reportDir \"").append(reportDir).append('"');
+    String exeString = exeFile.toString();
+    if (!exeString.startsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(exeString);
+    if (!exeString.endsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(' ');
+    cmd.append(arguments);
+    cmd.append(' ');
+
+    String tptFileString = tptFile.toString();
+    if (!tptFileString.startsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(tptFileString);
+    if (!tptFileString.endsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(' ');
+
+    if (!configurationName.startsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(configurationName);
+    if (!configurationName.endsWith("\"")) {
+      cmd.append('"');
+    }
+
+    cmd.append(" --dataDir ");
+    String dataDirString = dataDir.toString();
+    if (!dataDirString.startsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(dataDirString);
+    if (!dataDirString.endsWith("\"")) {
+      cmd.append('"');
+    }
+
+    cmd.append(" --reportDir ");
+    String reportDirString = reportDir.toString();
+    if (!reportDirString.startsWith("\"")) {
+      cmd.append('"');
+    }
+    cmd.append(reportDirString);
+    if (!reportDirString.endsWith("\"")) {
+      cmd.append('"');
+    }
 
     return cmd.toString();
   }
@@ -194,7 +251,8 @@ public class TptPlugin extends Builder implements TptLogger {
       tpt = starter.start();
       // allow 6h maximum
       int exitcode = tpt.joinWithTimeout(6, TimeUnit.HOURS, listener);
-      // int exitcode = tpt.joinWithTimeout(1, TimeUnit.MINUTES, listener);
+      // int exitcode = tpt.joinWithTimeout(1, TimeUnit.MINUTES,
+      // listener);
       if (exitcode != 0) {
         error("TPT process stops with exit code " + exitcode);
       }

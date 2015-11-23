@@ -38,79 +38,6 @@ import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 public final class Publish {
 
-  //
-  // private static final SimpleDateFormat DDMMYY_HHMMSS = new SimpleDateFormat("yyMMdd_HHmmss");
-  //
-  // public static void publishHTML(File testdir, File refdir, File reportdir, PrintStream logger)
-  // throws IOException {
-  // StringBuilder errors = new StringBuilder();
-  // Map<Integer, Testcase> refdata = getIndexedTestcases(refdir, errors);
-  // List<Testcase> testdata = getTestcases(testdir, errors);
-  // int refdataSize = refdata.size();
-  // int testdataSize = testdata.size();
-  // Date now = new Date();
-  // int errorcounter = 0;
-  // HtmlWriter writer = new HtmlWriter();
-  // writer.appendHtmlHeader(refdir.getParentFile().getName());
-  // try {
-  // if (!refdir.exists()) {
-  // throw new IOException("Reference directory " + refdir + " does not exist");
-  // }
-  // if (!testdir.exists()) {
-  // throw new IOException("Test data directory " + testdir + " does not exist");
-  // }
-  // if (refdata.isEmpty()) {
-  // throw new IOException("No reference data found in " + refdir);
-  // }
-  // if (testdata.isEmpty()) {
-  // throw new IOException("No test data found in " + testdir);
-  // }
-  // if (errors.length() > 0) {
-  // throw new IOException("Error while reading testcase_information.xml files:\n" + errors);
-  // }
-  // for (Testcase tc : testdata) {
-  // if (tc.getExecDate() != null) {
-  // now = tc.getExecDate();
-  // }
-  // Testcase ref = refdata.get(tc.getID());
-  // if (ref == null) {
-  // writer.appendError(tc.getFilesystemPath(), tc.getFilesystemPath(),
-  // "No matching REFERENCE data for test case with ID=" + tc.getID() + " found.");
-  // errorcounter++;
-  // } else if (!tc.equalTestcases(ref)) {
-  // writer.appendTableLine(ref, tc);
-  // errorcounter++;
-  // } else {
-  // // fine! not necessary to report something...
-  // }
-  // refdata.remove(tc.getID());
-  // }
-  // for (Testcase ref : refdata.values()) {
-  // writer.appendError(ref.getFilesystemPath(), ref.getFilesystemPath(),
-  // "No matching TEST data for test case with ID=" + ref.getID() + " found.");
-  // errorcounter++;
-  // }
-  // writer.appendTableHeader(testdataSize, refdataSize, errorcounter);
-  // } catch (IOException e) {
-  // writer.appendTableHeader(0, 0, 0);
-  // writer.appendError(refdir, testdir, e.getMessage());
-  // errorcounter++;
-  // }
-  // writer.appendHtmlEnd();
-  // if (errorcounter > 0) {
-  // writer.toFile(new File(reportdir, testdir.getName() + "_" + DDMMYY_HHMMSS.format(now)
-  // + "_Failure.html"));
-  // logger.println("Failed with " + errorcounter + " errors.");
-  // } else {
-  // writer.toFile(new File(reportdir, testdir.getName() + "_" + DDMMYY_HHMMSS.format(now)
-  // + "_Success.html"));
-  // logger.println("Comparison successful without deviations.");
-  // }
-  // }
-  //
-  // //
-  // -------------------------------------------------------------------------------------------------------------
-
   public static void publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
                                          JenkinsConfiguration ex, String pattern, TptLogger logger)
       throws IOException {
@@ -178,21 +105,6 @@ public final class Publish {
   }
 
   // -------------------------------------------------------------------------------------------------------------
-
-  // /**
-  // * ermittelt alle Testfaelle aus den "testcase_information.xml" files unterhalb des Ordners
-  // * "rootdir" rekursiv als indizierte Map (index ist die ID des jeweiligen Testfalls). Wurden
-  // Files
-  // * gefunden, die nicht geladen werden koennen, wird dies als Fehler in "errors" eingetragen. Die
-  // * Methode liefert selbst nie einen Fehler.
-  // */
-  // private static Map<Integer, Testcase> getIndexedTestcases(File rootdir, StringBuilder errors) {
-  // Map<Integer, Testcase> res = new HashMap<Integer, Testcase>();
-  // for (Testcase t : getTestcases(rootdir, errors)) {
-  // res.put(t.getID(), t);
-  // }
-  // return res;
-  // }
 
   /**
    * ermittelt alle Testfaelle aus den "testcase_information.xml" files unterhalb des Ordners

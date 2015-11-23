@@ -20,7 +20,9 @@
  */
 package com.piketec.jenkins.plugins.tpt.Configuration;
 
+import hudson.EnvVars;
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
@@ -146,17 +148,30 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    *          Current workspace for the build.
    * @param path
    *          Relative or absolute path.
+   * @param environment
    * @return A absolute path, but it can be a nonexisting file system object or not a directory.
    */
-  public static File getAbsolutePath(File workspaceDir, File path) {
+  public static File getAbsolutePath(File workspaceDir, File path, EnvVars environment) {
     File absPath = workspaceDir;
 
     if (path == null) {
       absPath = (workspaceDir == null) ? new File("") : workspaceDir;
-    } else if (path.isAbsolute()) {
-      absPath = path;
     } else {
-      absPath = (workspaceDir == null) ? path : new File(workspaceDir, path.toString());
+      String pathAsString = path.toString();
+      // remove quotes if the user entered some
+      if (pathAsString.startsWith("\"")) {
+        pathAsString = pathAsString.substring(1);
+      }
+      if (pathAsString.endsWith("\"")) {
+        pathAsString = pathAsString.substring(0, pathAsString.length());
+      }
+      // replace ${...} variables
+      path = new File(Util.replaceMacro(pathAsString, environment));
+      if (path.isAbsolute()) {
+        absPath = path;
+      } else {
+        absPath = (workspaceDir == null) ? path : new File(workspaceDir, path.toString());
+      }
     }
 
     return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();

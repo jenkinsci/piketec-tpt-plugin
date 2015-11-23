@@ -22,5 +22,5 @@
 <div>
 	Time Partition Testing Jenkins Plugin.
 	<br />
-	Automates the run of Tpt and publish afterwards the results in Jenkins.
+	Automates the run of TPT and publishs afterwards the results in Jenkins.
 </div>
