@@ -77,6 +77,15 @@ public class TptPlugin extends Builder implements TptLogger {
   }
 
   /**
+   * Tpt exe path.
+   * 
+   * @return The path to the tpt.exe.
+   */
+  public File getExe() {
+    return exe;
+  }
+
+  /**
    * Common command line opts. Delimiter between the options is one or more spaces. Inside
    * doublequotes spaces have no special meaning.
    * 
