@@ -100,7 +100,7 @@ public class TptPlugin extends Builder implements TptLogger {
       if (b.length() > 0) {
         b.append(", ");
       }
-      b.append(f);
+      b.append(f.trim());
     }
     return b.toString();
   }
