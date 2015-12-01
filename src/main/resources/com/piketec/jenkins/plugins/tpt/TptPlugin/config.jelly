@@ -24,7 +24,7 @@
 
 	<!-- TPT Configuration -->
 	<f:entry field="exe" title="Path to tpt.exe" help="/plugin/piketec-tpt/exe.html">
-		<f:textbox value="${instance.exe}" />
+		<f:textbox value="${instance.exePaths}" />
 	</f:entry>
 
 	<f:entry field="arguments" title="Arguments"

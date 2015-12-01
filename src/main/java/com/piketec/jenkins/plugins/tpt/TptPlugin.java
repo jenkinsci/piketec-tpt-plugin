@@ -52,7 +52,9 @@ public class TptPlugin extends Builder implements TptLogger {
 
   private static final SimpleDateFormat DDMMYYHHMMSS = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 
-  private final File exe;
+  private transient File exe;
+
+  private String[] exePaths;
 
   private final String arguments;
 
@@ -63,9 +65,13 @@ public class TptPlugin extends Builder implements TptLogger {
   private transient BuildListener listener;
 
   @DataBoundConstructor
-  public TptPlugin(File exe, String arguments,
+  public TptPlugin(String exe, String arguments,
                    ArrayList<JenkinsConfiguration> executionConfiguration, String report) {
-    this.exe = exe;
+    if (exe != null && !exe.isEmpty()) {
+      this.exePaths = exe.split("[,;]");
+    } else {
+      this.exePaths = new String[0];
+    }
     this.arguments = arguments;
     this.executionConfiguration = new ArrayList<JenkinsConfiguration>();
 
@@ -76,13 +82,27 @@ public class TptPlugin extends Builder implements TptLogger {
     this.listener = null;
   }
 
+  protected Object readResolve() {
+    if (exe != null) {
+      exePaths = new String[] { exe.getPath() };
+    }
+    return this;
+  }
+
   /**
    * Tpt exe path.
    * 
    * @return The path to the tpt.exe.
    */
-  public File getExe() {
-    return exe;
+  public String getExePaths() {
+    StringBuilder b = new StringBuilder();
+    for (String f : exePaths) {
+      if (b.length() > 0) {
+        b.append(", ");
+      }
+      b.append(f);
+    }
+    return b.toString();
   }
 
   /**
@@ -145,7 +165,33 @@ public class TptPlugin extends Builder implements TptLogger {
       interrupt(e1.getLocalizedMessage());
       return false;
     }
-    File exeFile = new File(Util.replaceMacro(exe.toString(), environment));
+    FilePath exeFile = null;
+    for (String f : exePaths) {
+      exeFile =
+          new FilePath(build.getBuiltOn().getChannel(), Util.replaceMacro(f.trim(), environment));
+      try {
+        if (exeFile.exists()) {
+          break;
+        }
+      } catch (IOException e) {
+        // NOP, just try next file
+      } catch (InterruptedException e) {
+        error("Interrupted");
+        return false;
+      }
+    }
+    try {
+      if (exeFile == null || !exeFile.exists()) {
+        error("No TPT installation found");
+        return false;
+      }
+    } catch (IOException e) {
+      error("No TPT installation found");
+      return false;
+    } catch (InterruptedException e) {
+      error("Interrupted");
+      return false;
+    }
     String arguments = Util.replaceMacro(this.arguments, environment);
 
     for (JenkinsConfiguration ec : executionConfiguration) {
@@ -193,10 +239,10 @@ public class TptPlugin extends Builder implements TptLogger {
    * @param ec
    * @return
    */
-  private String buildCommand(File exeFile, String arguments, File tptFile, File dataDir,
+  private String buildCommand(FilePath exeFile, String arguments, File tptFile, File dataDir,
                               File reportDir, String configurationName) {
     StringBuilder cmd = new StringBuilder();
-    String exeString = exeFile.toString();
+    String exeString = exeFile.getRemote();
     if (!exeString.startsWith("\"")) {
       cmd.append('"');
     }
@@ -336,15 +382,6 @@ public class TptPlugin extends Builder implements TptLogger {
 
     public static String getDefaultReport() {
       return "";
-    }
-
-    // file tests
-    public static FormValidation doCheckExe(@QueryParameter File exe) {
-      if (!exe.exists()) {
-        return FormValidation.error("Set the path of the tpt.exe file."
-            + " If the path contains spaces, the path must be enclosed by double quotation marks.");
-      }
-      return FormValidation.ok();
     }
 
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {
