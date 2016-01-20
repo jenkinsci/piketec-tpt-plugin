@@ -64,6 +64,8 @@ public class TptPlugin extends Builder implements TptLogger {
 
   private transient BuildListener listener;
 
+  private transient boolean onlyNullExitCode = true;
+
   @DataBoundConstructor
   public TptPlugin(String exe, String arguments,
                    ArrayList<JenkinsConfiguration> executionConfiguration, String report) {
@@ -153,6 +155,7 @@ public class TptPlugin extends Builder implements TptLogger {
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launch, BuildListener listener) {
     this.listener = listener;
     boolean success = true;
+    onlyNullExitCode = true;
     FilePath workspace = build.getWorkspace();
     File workspaceDir = getWorkspaceDir(workspace);
     EnvVars environment;
@@ -213,7 +216,7 @@ public class TptPlugin extends Builder implements TptLogger {
 
           try {
             // run the test...
-            launchTPT(launch, cmd);
+            launchTPT(launch, cmd, ec.getTimeout());
             // jetzt veroeffentlichen der Ergebnisse
             info("*** Publishing results now ***");
             publishResults(workspace, ec);
@@ -232,7 +235,7 @@ public class TptPlugin extends Builder implements TptLogger {
       }
     }
 
-    return success;
+    return success && onlyNullExitCode;
   }
 
   /**
@@ -295,7 +298,8 @@ public class TptPlugin extends Builder implements TptLogger {
     return cmd.toString();
   }
 
-  private void launchTPT(Launcher launcher, String cmd) throws InterruptedException, IOException {
+  private void launchTPT(Launcher launcher, String cmd, long timeout) throws InterruptedException,
+      IOException {
     info("Launching \"" + cmd + "\"");
     Launcher.ProcStarter starter = launcher.new ProcStarter();
     starter.cmdAsSingleString(cmd);
@@ -304,12 +308,14 @@ public class TptPlugin extends Builder implements TptLogger {
     Proc tpt = null;
     try {
       tpt = starter.start();
-      // allow 6h maximum
-      int exitcode = tpt.joinWithTimeout(6, TimeUnit.HOURS, listener);
-      // int exitcode = tpt.joinWithTimeout(1, TimeUnit.MINUTES,
-      // listener);
+      if (timeout <= 0) {
+        timeout = JenkinsConfiguration.DescriptorImpl.getDefaultTimeout();
+      }
+      info("Waiting for TPT to complete. Timeout: " + timeout + "h");
+      int exitcode = tpt.joinWithTimeout(timeout, TimeUnit.HOURS, listener);
       if (exitcode != 0) {
         error("TPT process stops with exit code " + exitcode);
+        onlyNullExitCode = false;
       }
     } catch (IOException e) {
       throw new IOException("TPT launch error: " + e.getMessage());

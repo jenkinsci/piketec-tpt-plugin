@@ -19,17 +19,14 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
->
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
 	<!-- TPT Configuration -->
 	<f:entry field="exe" title="Path to tpt.exe" help="/plugin/piketec-tpt/exe.html">
 		<f:textbox value="${instance.exePaths}" />
 	</f:entry>
 
-	<f:entry field="arguments" title="Arguments"
-		help="/plugin/piketec-tpt/arguments.html"
-	>
+	<f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
 		<f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
 	</f:entry>
 

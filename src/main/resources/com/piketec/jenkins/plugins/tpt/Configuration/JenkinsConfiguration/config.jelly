@@ -26,14 +26,16 @@
 	<f:entry field="enableTest" title="Enable test">
 		<f:checkbox value="${instance.enableTest}" default="${descriptor.defaultEnableTest}" />
 	</f:entry>
+	
+	 <f:entry field="timeout" title="Timeout [h]" help="/plugin/piketec-tpt/timeout.html">
+    <f:number value="${instance.timeout}" default="${descriptor.defaultTimeout}"/>
+  </f:entry>
 
 	<f:entry field="tptFile" title="TPT file">
 		<f:textbox value="${instance.tptFile}" />
 	</f:entry>
 
-	<f:entry field="configuration" title="Execution configuration"
-		help="/plugin/piketec-tpt/configuration.html"
-	>
+	<f:entry field="configuration" title="Execution configuration" help="/plugin/piketec-tpt/configuration.html">
 		<f:textbox value="${instance.configuration}" />
 	</f:entry>
 
@@ -43,9 +45,7 @@
 		<f:textbox value="${instance.testdataDir}" />
 	</f:entry>
 
-	<f:entry field="reportDir" title="Report directory"
-		help="/plugin/piketec-tpt/reportdir.html"
-	>
+	<f:entry field="reportDir" title="Report directory"	help="/plugin/piketec-tpt/reportdir.html">
 		<f:textbox value="${instance.reportDir}" />
 	</f:entry>
 

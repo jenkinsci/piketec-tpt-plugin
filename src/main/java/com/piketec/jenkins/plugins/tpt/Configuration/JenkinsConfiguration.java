@@ -37,6 +37,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   private final boolean enableTest;
 
+  private long timeout;
+
   private final File tptFile;
 
   private final String configuration;
@@ -62,16 +64,28 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   @DataBoundConstructor
   public JenkinsConfiguration(File tptFile, String configuration, File testdataDir, File reportDir,
-                              boolean enableTest) {
+                              boolean enableTest, long timeout) {
     this.tptFile = tptFile;
     this.configuration = configuration;
     this.testdataDir = testdataDir;
     this.reportDir = reportDir;
     this.enableTest = enableTest;
+    this.timeout = timeout;
+  }
+
+  protected Object readResolve() {
+    if (timeout <= 0) {
+      timeout = 6;
+    }
+    return this;
   }
 
   public boolean isEnableTest() {
     return enableTest;
+  }
+
+  public long getTimeout() {
+    return timeout;
   }
 
   public File getTptFile() {
@@ -199,6 +213,10 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
     public static boolean getDefaultEnableTest() {
       return true;
+    }
+
+    public static long getDefaultTimeout() {
+      return 6;
     }
 
     @Override
