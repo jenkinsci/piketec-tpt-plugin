@@ -210,7 +210,7 @@ public class TptPlugin extends Builder implements TptLogger {
         info("*** Running TPT-File \"" + tptFile + //
             "\" with configuration \"" + configurationName + "\" now. ***");
 
-        if (createParentDir(dataDir) && createParentDir(reportDir)) {
+        if (createParentDir(dataDir, workspace) && createParentDir(reportDir, workspace)) {
           String cmd =
               buildCommand(exeFile, arguments, tptFile, dataDir, reportDir, configurationName);
 
@@ -373,10 +373,22 @@ public class TptPlugin extends Builder implements TptLogger {
     return workspaceDir;
   }
 
-  private boolean createParentDir(File directory) {
+  private boolean createParentDir(File directory, FilePath workspace) {
     File parentDir = directory.getParentFile();
 
-    return ((parentDir == null) || parentDir.isDirectory() || parentDir.mkdirs());
+    if (parentDir == null) {
+      return true;
+    }
+
+    try {
+      new FilePath(workspace, parentDir.getPath()).mkdirs();
+      return new FilePath(workspace, parentDir.getPath()).isDirectory();
+    } catch (IOException e) {
+      // NOP
+    } catch (InterruptedException e) {
+      // NOP
+    }
+    return false;
   }
 
   @Extension
