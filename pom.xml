@@ -28,7 +28,7 @@
 
   <groupId>com.piketec.jenkins.plugins</groupId>
   <artifactId>piketec-tpt</artifactId>
-  <version>6.8-SNAPSHOT</version>
+  <version>7.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
   
   <licenses>
