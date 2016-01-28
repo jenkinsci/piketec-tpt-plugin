@@ -1,0 +1,14 @@
+<div>
+  The "Execute TPT test cases" build step can run in two modes.
+  <ul>
+    <li>Just execute the tests within this Job. The given values will be used to create a command
+        that will be executed. This command could be typed into the command line and would work.
+    </li>
+    <li>Use this Job as a Master. In this mode the TPT RMI API is used to read the test cases that
+        must be executed. For every test case a slave job is started and parameters are provided
+        that can be used by the "Execute TPT tests slave" build step. The slaves copy their reults
+        back to the master and the master will aggregate the test results.
+    </li>
+  </ul>
+  The master mode can be activated and configured by clicking on the "Advanced" button.
+</div>

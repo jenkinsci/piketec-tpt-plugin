@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 PikeTec GmbH
+ * Copyright (c) 2016 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,7 +22,13 @@ package com.piketec.jenkins.plugins.tpt;
 
 import java.io.PrintStream;
 
-public interface TptLogger {
+public class TptLogger {
+
+  PrintStream logger;
+
+  public TptLogger(PrintStream logger) {
+    this.logger = logger;
+  }
 
   /**
    * Report an info message.
@@ -30,7 +36,9 @@ public interface TptLogger {
    * @param msg
    *          Message to show.
    */
-  public void info(String msg);
+  public void info(String msg) {
+    logger.println("[Info " + Utils.getCurrentDateString() + "]: " + msg);
+  }
 
   /**
    * Report an error message
@@ -38,7 +46,9 @@ public interface TptLogger {
    * @param msg
    *          Message to show.
    */
-  public void error(String msg);
+  public void error(String msg) {
+    logger.println("[Error " + Utils.getCurrentDateString() + "]: " + msg);
+  }
 
   /**
    * Report an interrupt message
@@ -46,12 +56,16 @@ public interface TptLogger {
    * @param msg
    *          Message to show.
    */
-  public void interrupt(String msg);
+  public void interrupt(String msg) {
+    logger.println("[Interrupt " + Utils.getCurrentDateString() + "]: " + msg);
+  }
 
   /**
    * get access to the underlying message stream
    * 
    * @return Underlying stream from the logger.
    */
-  public PrintStream getLogger();
+  public PrintStream getLogger() {
+    return logger;
+  }
 }

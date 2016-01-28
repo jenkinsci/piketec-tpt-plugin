@@ -19,8 +19,7 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
->
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
 	<!-- exentds repeatable part in ValidationSuite jelly -->
 	<f:entry field="enableTest" title="Enable test">
@@ -31,7 +30,7 @@
     <f:number value="${instance.timeout}" default="${descriptor.defaultTimeout}"/>
   </f:entry>
 
-	<f:entry field="tptFile" title="TPT file">
+	<f:entry field="tptFile" title="TPT file" help="/plugin/piketec-tpt/tptFile.html">
 		<f:textbox value="${instance.tptFile}" />
 	</f:entry>
 
@@ -39,9 +38,7 @@
 		<f:textbox value="${instance.configuration}" />
 	</f:entry>
 
-	<f:entry field="testdataDir" title="Test data directory"
-		help="/plugin/piketec-tpt/testdatadir.html"
-	>
+	<f:entry field="testdataDir" title="Test data directory" help="/plugin/piketec-tpt/testdatadir.html">
 		<f:textbox value="${instance.testdataDir}" />
 	</f:entry>
 

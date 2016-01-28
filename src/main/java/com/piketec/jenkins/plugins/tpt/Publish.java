@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 PikeTec GmbH
+ * Copyright (c) 2016 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,9 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -38,8 +36,8 @@ import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 public final class Publish {
 
-  public static void publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
-                                         JenkinsConfiguration ex, String pattern, TptLogger logger)
+  public static int publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
+                                        JenkinsConfiguration ex, TptLogger logger)
       throws IOException {
     XmlStreamWriter xmlPub = null;
 
@@ -55,10 +53,9 @@ public final class Publish {
       xmlPub.initalize(reportFile);
       xmlPub.writeTestsuite(classname);
       testdata = getTestcases(testDataDir, logger);
+      logger.info("Found " + testdata.size() + " test results.");
 
       if (!testdata.isEmpty()) {
-        removeOlderResults(testdata);
-
         for (Testcase tc : testdata) {
 
           if (tc.getErrors().isEmpty() && "SUCCESS".equals(tc.getResult())) {
@@ -69,6 +66,7 @@ public final class Publish {
           }
         }
       }
+      return testdata.size();
     } catch (XMLStreamException e) {
       throw new IOException("XML stream error: " + e.getMessage());
     } catch (FactoryConfigurationError e) {
@@ -83,33 +81,11 @@ public final class Publish {
     }
   }
 
-  private static void removeOlderResults(List<Testcase> testcases) {
-    Date latestDate = testcases.get(0).getExecDate();
-    Iterator<Testcase> testcaseIterator;
-
-    for (Testcase testcase : testcases) {
-      Date execDate = testcase.getExecDate();
-
-      if (execDate.after(latestDate)) {
-        latestDate = execDate;
-      }
-    }
-    testcaseIterator = testcases.iterator();
-
-    while (testcaseIterator.hasNext()) {
-
-      if (testcaseIterator.next().getExecDate().before(latestDate)) {
-        testcaseIterator.remove();
-      }
-    }
-  }
-
   // -------------------------------------------------------------------------------------------------------------
 
   /**
-   * ermittelt alle Testfaelle aus den "testcase_information.xml" files unterhalb des Ordners
-   * "rootdir" rekursiv. Wurden Files gefunden, die nicht geladen werden koennen, wird dies als
-   * Fehler in "errors" eingetragen. Die Methode liefert selbst nie einen Fehler.
+   * Collects recursively all test cases by searching for "testcase_information.xml" files in
+   * "rootdir". If a file could not be loaded, an error message will be printed.
    * 
    * @throws InterruptedException
    * @throws IOException
@@ -127,7 +103,7 @@ public final class Publish {
         Testcase tc = TestcaseParser.parseXml(f);
         testcases.add(tc);
       } catch (IOException e) {
-        logger.error("[Error]: File \"" + f + "\": " + e.getMessage() + "\n\r");
+        logger.error("File \"" + f + "\": " + e.getMessage() + "\n\r");
       }
     }
 

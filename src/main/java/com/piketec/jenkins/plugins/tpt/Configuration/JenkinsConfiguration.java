@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 PikeTec GmbH
+ * Copyright (c) 2016 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,10 +25,11 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
-import hudson.model.Hudson;
 import hudson.util.FormValidation;
 
 import java.io.File;
+
+import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -134,7 +135,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   @Override
   public Descriptor<JenkinsConfiguration> getDescriptor() {
     @SuppressWarnings("unchecked")
-    Descriptor<JenkinsConfiguration> descriptor = Hudson.getInstance().getDescriptor(getClass());
+    Descriptor<JenkinsConfiguration> descriptor = Jenkins.getInstance().getDescriptor(getClass());
 
     return descriptor;
   }
@@ -147,48 +148,23 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return testdataDir;
   }
 
-  /**
-   * Builds a absolute path from the workspace directory and the given path.
-   * <ul>
-   * <li>If both are <code>null</code>, the current working directory will returned - hopefully it
-   * is inside the workspace.</li>
-   * <li>If the workspace is <code>null</code>, the path will returned.</li>
-   * <li>If the path is <code>null</code>, the workspace will returned.</li>
-   * <li>If the path is absolute, the path will returned.</li>
-   * <li>If the path is relative, the path will append to the workspace and returned.</li>
-   * </ul>
-   * 
-   * @param workspaceDir
-   *          Current workspace for the build.
-   * @param path
-   *          Relative or absolute path.
-   * @param environment
-   * @return A absolute path, but it can be a nonexisting file system object or not a directory.
-   */
-  public static File getAbsolutePath(File workspaceDir, File path, EnvVars environment) {
-    File absPath = workspaceDir;
+  public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
+    return new JenkinsConfiguration(tptFile, Util.replaceMacro(configuration, environment),
+        normalizePath(testdataDir, environment), normalizePath(reportDir, environment), enableTest,
+        timeout);
+  }
 
-    if (path == null) {
-      absPath = (workspaceDir == null) ? new File("") : workspaceDir;
-    } else {
-      String pathAsString = path.toString();
-      // remove quotes if the user entered some
-      if (pathAsString.startsWith("\"")) {
-        pathAsString = pathAsString.substring(1);
-      }
-      if (pathAsString.endsWith("\"")) {
-        pathAsString = pathAsString.substring(0, pathAsString.length());
-      }
-      // replace ${...} variables
-      path = new File(Util.replaceMacro(pathAsString, environment));
-      if (path.isAbsolute()) {
-        absPath = path;
-      } else {
-        absPath = (workspaceDir == null) ? path : new File(workspaceDir, path.toString());
-      }
+  private File normalizePath(File f, EnvVars environment) {
+    // replace ${...} variables
+    String pathAsString = Util.replaceMacro(f.getPath(), environment);
+    // remove quotes if the user entered some
+    if (pathAsString.startsWith("\"")) {
+      pathAsString = pathAsString.substring(1);
     }
-
-    return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
+    if (pathAsString.endsWith("\"")) {
+      pathAsString = pathAsString.substring(0, pathAsString.length());
+    }
+    return new File(pathAsString);
   }
 
   /**

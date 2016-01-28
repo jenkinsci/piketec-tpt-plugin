@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2015 PikeTec GmbH
+ * Copyright (c) 2016 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -71,8 +71,8 @@ public class TestcaseParser extends DefaultHandler {
     } catch (IOException e) {
       throw new IOException("I/O error: " + e.getMessage());
     } catch (InterruptedException e) {
-		throw new IOException("Interrupted reading XML File: " + e.getMessage(), e);
-	}
+      throw new IOException("Interrupted reading XML File: " + e.getMessage(), e);
+    }
   }
 
   // -------------------------------------
@@ -138,10 +138,12 @@ public class TestcaseParser extends DefaultHandler {
 
   private Date parseDate(String value) throws SAXException {
     if (value != null) {
-      try {
-        return sdf.parse(value);
-      } catch (ParseException e) {
-        throw new SAXException("Can't parse date format \"" + value + "\"");
+      synchronized (sdf) {
+        try {
+          return sdf.parse(value);
+        } catch (ParseException e) {
+          throw new SAXException("Can't parse date format \"" + value + "\"");
+        }
       }
     } else {
       return null;
