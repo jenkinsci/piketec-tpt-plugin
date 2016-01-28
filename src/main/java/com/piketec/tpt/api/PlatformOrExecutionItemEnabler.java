@@ -21,7 +21,7 @@
 package com.piketec.tpt.api;
 
 /**
- * Manche Assesslets sollen zusammen mit bestimmten {@link Platform Platforms} oder
+ * Manche Assesslets sollen zusammen mit bestimmten {@link PlatformConfiguration Platforms} oder
  * {@link ExecutionConfigurationItem ExecutionConfigurationItems} ausgefuehrt werden. Dazu dient
  * dieses gemeinsame Interface.
  */

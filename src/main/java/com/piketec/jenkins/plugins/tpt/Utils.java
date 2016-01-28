@@ -34,8 +34,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.TptApi;
@@ -238,7 +236,6 @@ public class Utils {
    *          Current workspace for the build.
    * @param path
    *          Relative or absolute path.
-   * @param environment
    * @return A absolute path, but it can be a nonexisting file system object or not a directory.
    */
   public static File getAbsolutePath(File workspaceDir, File path) {
