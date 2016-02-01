@@ -42,9 +42,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.apache.commons.lang.StringUtils;
-
 import jenkins.model.Jenkins.MasterComputer;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.google.common.collect.ListMultimap;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
@@ -127,6 +127,7 @@ public class TptPluginMasterJobExecutor {
       return false;
     }
     TptApi api = null;
+    String executionId = Double.toString(Math.random());
     try {
       api =
           Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
@@ -169,6 +170,10 @@ public class TptPluginMasterJobExecutor {
 
       try {
         OpenResult openProject = api.openProject(ec.getTptFile());
+        if (openProject.getProject() == null) {
+          logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
+          return false;
+        }
         executionConfig = getExecutionConfigByName(openProject.getProject(), ec.getConfiguration());
         if (executionConfig == null) {
           logger.error("Could not find config");
@@ -200,12 +205,16 @@ public class TptPluginMasterJobExecutor {
                 + "="
                 + ec.getTptFile().getPath().replace("\\", "\\\\")
                 + "\n" //
-                + this.exePathsVarName + "="
+                + this.exePathsVarName
+                + "="
                 + exePathsAsSingleString().replace("\\", "\\\\")
                 + "\n" //
                 + this.testDataDirVarName + "="
-                + ec.getTestdataDir().getPath().replace("\\", "\\\\") + "\n" //
-                + this.reportDirVarName + "=" + ec.getReportDir().getPath().replace("\\", "\\\\") //
+                + ec.getTestdataDir().getPath().replace("\\", "\\\\")
+                + "\n" //
+                + this.reportDirVarName + "=" + ec.getReportDir().getPath().replace("\\", "\\\\")
+                + "\n" //
+                + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId//
             );
 
         ArrayList<AbstractBuildParameters> configs = new ArrayList<AbstractBuildParameters>();
@@ -229,13 +238,13 @@ public class TptPluginMasterJobExecutor {
         }
       }
       logger.info("Waiting for completion of child jobs");
-      for (Future future : futures) {
+      for (Future<Run> future : futures) {
         try {
           future.get();
         } catch (InterruptedException e) {
           logger.interrupt(e.getMessage());
           logger.info("Stopping slave jobs.");
-          for (Future future2 : futures) {
+          for (Future<Run> future2 : futures) {
             future2.cancel(true);
           }
           return false;
@@ -281,6 +290,12 @@ public class TptPluginMasterJobExecutor {
       } catch (IOException e) {
         logger.error("Could not publish result: " + e.getMessage());
         return false;
+      } finally {
+        if (!CleanUpTask.cleanUp(executionId)) {
+          logger.error("Could not close all open TPT files. "
+              + "There is no guarantee next run will be be done with correct file version.");
+          return false;
+        }
       }
     }
     return true;

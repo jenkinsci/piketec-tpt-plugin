@@ -81,11 +81,13 @@ public class TptPluginSlaveExecutor {
 
   private long tptStartupWaitTime;
 
+  private String executionId;
+
   public TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build,
                                 BuildListener listener, FilePath[] exePaths, int tptPort,
                                 String tptBindingName, File tptFile, String execCfg,
                                 String testDataDir, String reportDir, String testcaseName,
-                                long tptStartupWaitTime) {
+                                long tptStartupWaitTime, String executionId) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -99,6 +101,7 @@ public class TptPluginSlaveExecutor {
     this.reportDir = reportDir;
     this.testcaseName = testcaseName;
     this.tptStartupWaitTime = tptStartupWaitTime;
+    this.executionId = executionId;
   }
 
   public boolean execute() {
@@ -119,6 +122,11 @@ public class TptPluginSlaveExecutor {
       }
       // open TPT File
       OpenResult openProject = api.openProject(tptFile);
+      if (openProject.getProject() == null) {
+        logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
+        return false;
+      }
+      new CleanUpTask(openProject.getProject(), executionId);
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
           openProject.getProject().getExecutionConfigurations().getItems();
@@ -183,17 +191,25 @@ public class TptPluginSlaveExecutor {
       logger.info("Setting report directory to " + path.getRemote());
       config.setReportDir(new File(path.getRemote()));
 
-      String tmpTestSezName = "JENKINS Exec";
-      logger.info("Create test set \"" + tmpTestSezName + "\" for execution of \"" + testcaseName
+      String tmpTestSetName = "JENKINS Exec";
+      logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \"" + testcaseName
           + "\"");
-      TestSet testSet = openProject.getProject().createTestSet(tmpTestSezName);
+      TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
       testSet.addTestCase(foundSceneario);
 
       ArrayList<TestSet> oldTestSets = new ArrayList<TestSet>();
+      ArrayList<ExecutionConfigurationItem> deactivated =
+          new ArrayList<ExecutionConfigurationItem>();
       for (ExecutionConfigurationItem item : config.getItems()) {
-        // TODO_jkuhnert (until_27.01.2016): Testset.contains Scenario?
         oldTestSets.add(item.getTestSet());
-        item.setTestSet(testSet);
+        if (testSetContains(item.getTestSet(), foundSceneario)) {
+          item.setTestSet(testSet);
+        } else {
+          if (item.isActive()) {
+            deactivated.add(item);
+            item.setActive(false);
+          }
+        }
       }
       // execute test
       ExecutionStatus execStatus = api.run(config);
@@ -237,6 +253,10 @@ public class TptPluginSlaveExecutor {
       config.setReportDir(oldReportDir);
       logger.info("delete temporary test set \"" + testSet.getName() + "\"");
       openProject.getProject().getTestSets().delete(testSet);
+      logger.info("Reactivate temporary deactivated execution config items.");
+      for (ExecutionConfigurationItem item : deactivated) {
+        item.setActive(true);
+      }
     } catch (RemoteException e) {
       logger.error(e.getLocalizedMessage());
       e.printStackTrace(logger.getLogger());
@@ -247,6 +267,16 @@ public class TptPluginSlaveExecutor {
       return false;
     }
     return true;
+  }
+
+  private boolean testSetContains(TestSet testSet, Scenario foundSceneario) throws RemoteException,
+      ApiException {
+    for (Scenario scen : testSet.getTestCases().getItems()) {
+      if (scen.getName().equals(foundSceneario.getName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private Scenario find(Collection<ScenarioOrGroup> sogs, String name) throws RemoteException,

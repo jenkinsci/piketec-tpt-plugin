@@ -161,11 +161,12 @@ public class TptPluginSlave extends Builder {
     String expandedTestDataDir = environment.expand(testDataDir);
     String expandedReportDir = environment.expand(reportDir);
     String expandedTestcaseName = environment.expand("${" + Utils.TPT_TEST_CASE_NAME_VAR + "}");
+    String expandedExecutionId = environment.expand("${" + Utils.TPT_EXECUTION_ID_VAR_NAME + "}");
     TptPluginSlaveExecutor executor =
         new TptPluginSlaveExecutor(launcher, build, listener, expandedExePaths, expandedTptPort,
             expandedTptBindingName, new File(expandedTptFile), expandedExecConfig,
             expandedTestDataDir, expandedReportDir, expandedTestcaseName,
-            expandedTptStartupWaitTime);
+            expandedTptStartupWaitTime, expandedExecutionId);
     return executor.execute();
   }
 

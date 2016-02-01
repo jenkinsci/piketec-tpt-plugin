@@ -33,6 +33,7 @@ import java.rmi.registry.Registry;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
@@ -51,6 +52,8 @@ public class Utils {
   public static final String TPT_TEST_DATA_DIR_VAR_NAME = "PIKETEC_TPT_TESTDATA_DIR";
 
   public static final String TPT_REPORT_DIR_VAR_NAME = "PIKETEC_TPT_REPORT_DIR";
+
+  public static final String TPT_EXECUTION_ID_VAR_NAME = "PIKETEC_TPT_EXECUTION_ID";
 
   public static final int DEFAULT_TPT_PORT = 1099;
 
@@ -253,4 +256,14 @@ public class Utils {
     return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
   }
 
+  public static <T> String toString(List<T> list, String delimeter) {
+    StringBuilder sb = new StringBuilder();
+    for (T obj : list) {
+      if (sb.length() > 0 && delimeter != null) {
+        sb.append(delimeter);
+      }
+      sb.append(obj);
+    }
+    return sb.toString();
+  }
 }
