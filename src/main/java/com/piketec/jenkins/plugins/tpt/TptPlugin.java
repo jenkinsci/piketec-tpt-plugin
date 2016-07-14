@@ -81,7 +81,9 @@ public class TptPlugin extends Builder {
                    ArrayList<JenkinsConfiguration> executionConfiguration, String report,
                    String tptStartUpWaitTime) {
     this.exePaths = exe;
-    this.exePaths = exePaths;
+    if (exePaths != null) {
+      this.exePaths = exePaths;
+    }
     this.arguments = arguments;
     this.report = report;
     this.isTptMaster = isTptMaster;
