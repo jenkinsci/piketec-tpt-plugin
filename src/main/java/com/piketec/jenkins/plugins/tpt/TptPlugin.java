@@ -106,6 +106,9 @@ public class TptPlugin extends Builder {
     if (tptPort == null || tptPort.trim().isEmpty()) {
       tptPort = Integer.toString(DescriptorImpl.getDefaultTptPort());
     }
+    if (exe != null) {
+      this.exePaths = exe;
+    }
     return this;
   }
 
