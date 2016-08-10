@@ -20,6 +20,11 @@
  */
 package com.piketec.jenkins.plugins.tpt.Configuration;
 
+import java.io.File;
+
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
+
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Util;
@@ -149,9 +154,9 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
-    return new JenkinsConfiguration(tptFile, Util.replaceMacro(configuration, environment),
-        normalizePath(testdataDir, environment), normalizePath(reportDir, environment), enableTest,
-        timeout);
+    return new JenkinsConfiguration(normalizePath(tptFile, environment),
+        Util.replaceMacro(configuration, environment), normalizePath(testdataDir, environment),
+        normalizePath(reportDir, environment), enableTest, timeout);
   }
 
   private File normalizePath(File f, EnvVars environment) {
@@ -183,8 +188,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     }
 
     public static FormValidation doCheckConfiguration(@QueryParameter String configuration) {
-      return ((configuration == null) || (configuration.trim().length() == 0)) ? FormValidation
-          .error("Enter a configuration name.") : FormValidation.ok();
+      return ((configuration == null) || (configuration.trim().length() == 0))
+          ? FormValidation.error("Enter a configuration name.") : FormValidation.ok();
     }
 
     public static boolean getDefaultEnableTest() {
