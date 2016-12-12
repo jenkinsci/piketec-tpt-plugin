@@ -20,8 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.FilePath;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +32,8 @@ import javax.xml.stream.XMLStreamException;
 
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.FilePath;
+
 public final class Publish {
 
   public static int publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
@@ -45,9 +45,8 @@ public final class Publish {
       String classname = ex.getClassname();
       FilePath reportFile = new FilePath(reportFolder, ex.getReportName());
       File testDataText = ex.getTestdataDir();
-      FilePath testDataDir =
-          ((testDataText == null) || testDataText.toString().trim().isEmpty()) ? workspaceDir
-              : new FilePath(workspaceDir, testDataText.toString());
+      FilePath testDataDir = ((testDataText == null) || testDataText.toString().trim().isEmpty())
+          ? workspaceDir : new FilePath(workspaceDir, testDataText.toString());
       List<Testcase> testdata;
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(reportFile);
@@ -61,8 +60,8 @@ public final class Publish {
           if (tc.getErrors().isEmpty() && "SUCCESS".equals(tc.getResult())) {
             xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
           } else {
-            xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(), tc
-                .getLogEntries().toString());
+            xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
+                tc.getLogEntries().toString());
           }
         }
       }

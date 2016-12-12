@@ -34,8 +34,8 @@ public interface Testlet<E extends Scenario> extends NamedObject, IdentifiableRe
    *          Die Gruppe in der das neue Scenario eingefuegt werden soll oder NULL wenn das neue
    *          Scenario unter dem Testlet haengen soll.
    */
-  public E createVariant(String name, ScenarioGroup groupOrNull) throws ApiException,
-      RemoteException;
+  public E createVariant(String name, ScenarioGroup groupOrNull)
+      throws ApiException, RemoteException;
 
   /**
    * Erzeugt eine neue ScenarioOrGroup und haengt diese unter die angegebene Gruppe oder direkt
@@ -55,7 +55,7 @@ public interface Testlet<E extends Scenario> extends NamedObject, IdentifiableRe
    * @throws ApiException
    * @throws RemoteException
    */
-  public RemoteList<ScenarioOrGroup> getTopLevelScenarioOrGroup() throws ApiException,
-      RemoteException;
+  public RemoteList<ScenarioOrGroup> getTopLevelScenarioOrGroup()
+      throws ApiException, RemoteException;
 
 }

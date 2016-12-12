@@ -20,20 +20,20 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.EnvVars;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.Builder;
-
 import java.io.File;
 import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
 
 /**
  * Plugin executes a single given TPT test case. Intended to be used in the job started by
@@ -162,11 +162,10 @@ public class TptPluginSlave extends Builder {
     String expandedReportDir = environment.expand(reportDir);
     String expandedTestcaseName = environment.expand("${" + Utils.TPT_TEST_CASE_NAME_VAR + "}");
     String expandedExecutionId = environment.expand("${" + Utils.TPT_EXECUTION_ID_VAR_NAME + "}");
-    TptPluginSlaveExecutor executor =
-        new TptPluginSlaveExecutor(launcher, build, listener, expandedExePaths, expandedTptPort,
-            expandedTptBindingName, new File(expandedTptFile), expandedExecConfig,
-            expandedTestDataDir, expandedReportDir, expandedTestcaseName,
-            expandedTptStartupWaitTime, expandedExecutionId);
+    TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
+        expandedExePaths, expandedTptPort, expandedTptBindingName, new File(expandedTptFile),
+        expandedExecConfig, expandedTestDataDir, expandedReportDir, expandedTestcaseName,
+        expandedTptStartupWaitTime, expandedExecutionId);
     return executor.execute();
   }
 

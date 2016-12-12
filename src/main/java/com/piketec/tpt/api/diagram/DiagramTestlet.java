@@ -82,8 +82,8 @@ public interface DiagramTestlet extends Testlet<DiagramScenario> {
    *           Wenn <code>from</code> oder <code>to</code> nicht von der angesprochenen TPT-Instanz
    *           stammen.
    */
-  public Transition createTransition(DiagramNode from, DiagramNode to) throws ApiException,
-      RemoteException;
+  public Transition createTransition(DiagramNode from, DiagramNode to)
+      throws ApiException, RemoteException;
 
   /**
    * Erzeugt eine neue horizontale Linie auf Hoehe <code>y</code>

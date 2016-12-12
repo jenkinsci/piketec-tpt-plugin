@@ -77,8 +77,8 @@ public interface DiagramScenario extends Scenario {
    *           Wenn <code>state</code> oder <code>variant</code> kein Remoteobjekt ist, dass vond er
    *           angesprochen TPT-Instanz stammt.
    */
-  public void setSelectedVariant(State state, Scenario variant) throws ApiException,
-      RemoteException;
+  public void setSelectedVariant(State state, Scenario variant)
+      throws ApiException, RemoteException;
 
   /**
    * Die fuer eine Transition gewaehlt Transitionsspezifikation oder <code>null</code>.
@@ -87,8 +87,8 @@ public interface DiagramScenario extends Scenario {
    *          Die Transition, zu der die gewaehlte Transitionsspezifikation gesucht wird oder
    *          <code>null</code>, wenn bisher keine gesetzt wurde.
    */
-  public TransitionSpec getSelectedTransitionSpec(Transition transition) throws ApiException,
-      RemoteException;
+  public TransitionSpec getSelectedTransitionSpec(Transition transition)
+      throws ApiException, RemoteException;
 
   /**
    * Setzt die Transitionsspezifikation fuer die Transition.

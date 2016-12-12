@@ -25,7 +25,7 @@ import com.piketec.tpt.api.RemoteList;
 /**
  * Eine Gruppe, die mehrer {@link TransitionSpec} und {@link TransitionSpecGroup} enthalten kann.
  */
-public interface TransitionSpecGroup extends RemoteList<TransitionSpecOrGroup>,
-    TransitionSpecOrGroup {
+public interface TransitionSpecGroup
+    extends RemoteList<TransitionSpecOrGroup>, TransitionSpecOrGroup {
 
 }

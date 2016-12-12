@@ -33,8 +33,8 @@ import java.util.Map;
  * koennen. Die Beschreibung kann aus dem allgemeinen Users Guide entnommen werden.
  */
 @SuppressWarnings("unused")
-public interface ExecutionConfiguration extends Remote, IdentifiableRemote, NamedObject,
-    RemoteList<ExecutionConfigurationItem> {
+public interface ExecutionConfiguration
+    extends Remote, IdentifiableRemote, NamedObject, RemoteList<ExecutionConfigurationItem> {
 
   /**
    * Das Ausgabeformat des Reports.
@@ -61,8 +61,8 @@ public interface ExecutionConfiguration extends Remote, IdentifiableRemote, Name
    * @return Das neuerzeugte ExecutionConfigurationItem
    * 
    */
-  public ExecutionConfigurationItem createExecutionConfigurationItem() throws ApiException,
-      RemoteException;
+  public ExecutionConfigurationItem createExecutionConfigurationItem()
+      throws ApiException, RemoteException;
 
   /**
    * @return Das Datenverzeichnis

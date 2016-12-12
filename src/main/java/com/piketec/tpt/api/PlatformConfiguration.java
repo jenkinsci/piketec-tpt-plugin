@@ -107,7 +107,7 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * @throws ApiException
    *           Wenn die Parameter nicht den Erwartungen entsprechen oder die Funktion unbekannt ist.
    */
-  public void invoke(String functionName, PropertyMap parameterOrNull) throws ApiException,
-      RemoteException;
+  public void invoke(String functionName, PropertyMap parameterOrNull)
+      throws ApiException, RemoteException;
 
 }

@@ -20,13 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.Computer;
-import hudson.slaves.SlaveComputer;
-
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -46,6 +39,13 @@ import com.piketec.tpt.api.ScenarioGroup;
 import com.piketec.tpt.api.ScenarioOrGroup;
 import com.piketec.tpt.api.TestSet;
 import com.piketec.tpt.api.TptApi;
+
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
+import hudson.model.Computer;
+import hudson.slaves.SlaveComputer;
 
 /**
  * Executes one test case via TPT API.
@@ -110,9 +110,8 @@ public class TptPluginSlaveExecutor {
       // start tpt and recieve API
       TptApi api;
       try {
-        api =
-            Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
-                tptStartupWaitTime);
+        api = Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
+            tptStartupWaitTime);
       } catch (InterruptedException e) {
         logger.interrupt(e.getMessage());
         return false;
@@ -145,9 +144,9 @@ public class TptPluginSlaveExecutor {
       File oldReportDir = config.getReportDir();
       File oldTestDataDir = config.getDataDir();
 
-      Scenario foundSceneario =
-          find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup()
-              .getItems(), testcaseName);
+      Scenario foundSceneario = find(
+          openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
+          testcaseName);
       if (foundSceneario == null) {
         logger.error("Could not find testcase " + testcaseName);
         return false;
@@ -192,8 +191,8 @@ public class TptPluginSlaveExecutor {
       config.setReportDir(new File(path.getRemote()));
 
       String tmpTestSetName = "JENKINS Exec";
-      logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \"" + testcaseName
-          + "\"");
+      logger.info(
+          "Create test set \"" + tmpTestSetName + "\" for execution of \"" + testcaseName + "\"");
       TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
       testSet.addTestCase(foundSceneario);
 
@@ -227,15 +226,12 @@ public class TptPluginSlaveExecutor {
         item.setTestSet(oldTestSets.remove(0));
       }
       try {
-        String includes =
-            !StringUtils.isBlank(testDataDir) ? testDataDir : new File(tptFile.getParent(),
-                oldTestDataDir.getPath()).getAbsolutePath();
+        String includes = !StringUtils.isBlank(testDataDir) ? testDataDir
+            : new File(tptFile.getParent(), oldTestDataDir.getPath()).getAbsolutePath();
         includes += "\\**\\*.*";
         if (!StringUtils.isBlank(reportDir) || StringUtils.isBlank(oldReportDir.getPath())) {
-          includes +=
-              ","
-                  + (!StringUtils.isBlank(reportDir) ? reportDir : new File(tptFile.getParent(),
-                      oldReportDir.getPath()).getAbsolutePath());
+          includes += "," + (!StringUtils.isBlank(reportDir) ? reportDir
+              : new File(tptFile.getParent(), oldReportDir.getPath()).getAbsolutePath());
           includes += "\\**\\*.*";
         }
         CopyToMasterNotifier copyToMaster =
@@ -269,8 +265,8 @@ public class TptPluginSlaveExecutor {
     return true;
   }
 
-  private boolean testSetContains(TestSet testSet, Scenario foundSceneario) throws RemoteException,
-      ApiException {
+  private boolean testSetContains(TestSet testSet, Scenario foundSceneario)
+      throws RemoteException, ApiException {
     for (Scenario scen : testSet.getTestCases().getItems()) {
       if (scen.getName().equals(foundSceneario.getName())) {
         return true;
@@ -279,8 +275,8 @@ public class TptPluginSlaveExecutor {
     return false;
   }
 
-  private Scenario find(Collection<ScenarioOrGroup> sogs, String name) throws RemoteException,
-      ApiException {
+  private Scenario find(Collection<ScenarioOrGroup> sogs, String name)
+      throws RemoteException, ApiException {
     for (ScenarioOrGroup sog : sogs) {
       if (sog instanceof Scenario) {
         if (sog.getName().equals(name)) {

@@ -80,8 +80,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * @param pc
    *          Die Platformkonfiguration
    */
-  public void setPlatformConfiguration(PlatformConfiguration pc) throws ApiException,
-      RemoteException;
+  public void setPlatformConfiguration(PlatformConfiguration pc)
+      throws ApiException, RemoteException;
 
   /**
    * Setzt das Parameter-File oder loescht den Eintrag, wenn <code>f==null</code>

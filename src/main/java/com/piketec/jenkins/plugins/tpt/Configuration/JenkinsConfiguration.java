@@ -31,13 +31,7 @@ import hudson.Util;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
-
-import java.io.File;
-
 import jenkins.model.Jenkins;
-
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.QueryParameter;
 
 public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 

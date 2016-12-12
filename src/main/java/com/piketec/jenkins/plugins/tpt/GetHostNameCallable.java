@@ -20,12 +20,12 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.remoting.Callable;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.jenkinsci.remoting.RoleChecker;
+
+import hudson.remoting.Callable;
 
 /**
  * A callable to get the host name of a jenkins node.

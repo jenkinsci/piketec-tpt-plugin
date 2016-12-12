@@ -20,8 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.FilePath;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +31,8 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import hudson.FilePath;
 
 public class TestcaseParser extends DefaultHandler {
 
@@ -61,7 +61,8 @@ public class TestcaseParser extends DefaultHandler {
       TestcaseParser parser = new TestcaseParser();
       SAXParserFactory.newInstance().newSAXParser().parse(xmlFile.read(), parser);
       if (parser.ti == null) {
-        throw new IOException("XML file " + xmlFile + " does not contain tag <testcaseinformation>");
+        throw new IOException(
+            "XML file " + xmlFile + " does not contain tag <testcaseinformation>");
       }
       return parser.ti;
     } catch (ParserConfigurationException e) {

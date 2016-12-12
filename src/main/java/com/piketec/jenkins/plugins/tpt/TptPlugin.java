@@ -20,17 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.EnvVars;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.tasks.BuildStepDescriptor;
-import hudson.tasks.Builder;
-import hudson.util.FormValidation;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +29,17 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
+
+import hudson.EnvVars;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.BuildListener;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Builder;
+import hudson.util.FormValidation;
 
 /**
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
@@ -235,9 +235,8 @@ public class TptPlugin extends Builder {
     String expandedArguments = environment.expand(this.arguments);
     String jUnitXmlPath = environment.expand(report);
     // start execution
-    TptPluginSingleJobExecutor executor =
-        new TptPluginSingleJobExecutor(build, launch, listener, expandedExePaths,
-            expandedArguments, jUnitXmlPath, normalizedConfigs);
+    TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launch, listener,
+        expandedExePaths, expandedArguments, jUnitXmlPath, normalizedConfigs);
     return executor.execute();
   }
 
@@ -288,12 +287,11 @@ public class TptPlugin extends Builder {
     // expand other variables
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
-    TptPluginMasterJobExecutor executor =
-        new TptPluginMasterJobExecutor(build, launcher, listener, expandedExePaths, jUnitXmlPath,
-            normalizedConfigs, expandedTptPort, expandedTptBindingName, expandedSlaveJobName,
-            Utils.TPT_TEST_CASE_NAME_VAR, Utils.TPT_EXECUTION_CONFIG_VAR, Utils.TPT_FILE_VAR,
-            Utils.TPT_EXE_VAR, Utils.TPT_TEST_DATA_DIR_VAR_NAME, Utils.TPT_REPORT_DIR_VAR_NAME,
-            expandedTptStartupWaitTime);
+    TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
+        expandedExePaths, jUnitXmlPath, normalizedConfigs, expandedTptPort, expandedTptBindingName,
+        expandedSlaveJobName, Utils.TPT_TEST_CASE_NAME_VAR, Utils.TPT_EXECUTION_CONFIG_VAR,
+        Utils.TPT_FILE_VAR, Utils.TPT_EXE_VAR, Utils.TPT_TEST_DATA_DIR_VAR_NAME,
+        Utils.TPT_REPORT_DIR_VAR_NAME, expandedTptStartupWaitTime);
     return executor.execute();
   }
 

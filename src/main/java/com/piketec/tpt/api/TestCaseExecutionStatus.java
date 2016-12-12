@@ -62,8 +62,8 @@ public interface TestCaseExecutionStatus extends Remote {
    * @param comment
    *          Erklaerung zur Reklassifizierung.
    */
-  public void reclassify(boolean success, String userName, String comment) throws ApiException,
-      RemoteException;
+  public void reclassify(boolean success, String userName, String comment)
+      throws ApiException, RemoteException;
 
   /**
    * @return Das {@link ExecutionConfigurationItem}, zu dem die Testausfuehrung gehoert.

@@ -79,8 +79,8 @@ public interface Project extends IdentifiableRemote {
   /**
    * @return Die Menge aller <code>ExecutionConfigurations</code> von diesem Projekt.
    */
-  public RemoteCollection<ExecutionConfiguration> getExecutionConfigurations() throws ApiException,
-      RemoteException;
+  public RemoteCollection<ExecutionConfiguration> getExecutionConfigurations()
+      throws ApiException, RemoteException;
 
   /**
    * @return Die Menge aller <code>TestSets</code> von diesem Projekt.
@@ -90,15 +90,15 @@ public interface Project extends IdentifiableRemote {
   /**
    * @return Die Menge aller <code>PlatformConfigurations</code> von diesem Projekt.
    */
-  public RemoteCollection<PlatformConfiguration> getPlatformConfigurations() throws ApiException,
-      RemoteException;
+  public RemoteCollection<PlatformConfiguration> getPlatformConfigurations()
+      throws ApiException, RemoteException;
 
   /**
    * @return Die Menge aller <code>Assessments</code> und <code>AssessmentGroups</code> von diesem
    *         Projekt, die direkt unter diesem Projekt haengen.
    */
-  public RemoteList<AssessmentOrGroup> getTopLevelAssessments() throws ApiException,
-      RemoteException;
+  public RemoteList<AssessmentOrGroup> getTopLevelAssessments()
+      throws ApiException, RemoteException;
 
   /**
    * Erstellt ein neues <code>TestSet</code> mit dem angegeben Namen.
@@ -116,8 +116,8 @@ public interface Project extends IdentifiableRemote {
    *          Der Name des neuen ExecutionConfiguration.
    * @return Das neuerstellte ExecutionConfiguration
    */
-  public ExecutionConfiguration createExecutionConfiguration(String name) throws ApiException,
-      RemoteException;
+  public ExecutionConfiguration createExecutionConfiguration(String name)
+      throws ApiException, RemoteException;
 
   /**
    * Erstellt ein neues <code>PlatformConfiguration</code> mit dem angegeben Namen.

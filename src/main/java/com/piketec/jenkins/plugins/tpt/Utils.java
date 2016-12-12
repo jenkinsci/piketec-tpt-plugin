@@ -20,10 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.AbstractBuild;
-
 import java.io.File;
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -38,6 +34,10 @@ import java.util.List;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.TptApi;
+
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
 
 public class Utils {
 
@@ -111,9 +111,9 @@ public class Utils {
     return workspaceDir;
   }
 
-  private static boolean startTpt(AbstractBuild< ? , ? > build, Launcher launcher,
-                                  TptLogger logger, FilePath[] exePaths, int port,
-                                  String bindingName, long startupWaitTime)
+  private static boolean startTpt(AbstractBuild< ? , ? > build, Launcher launcher, TptLogger logger,
+                                  FilePath[] exePaths, int port, String bindingName,
+                                  long startupWaitTime)
       throws InterruptedException {
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
@@ -151,7 +151,8 @@ public class Utils {
 
   public static TptApi getTptApi(AbstractBuild< ? , ? > build, Launcher launcher, TptLogger logger,
                                  FilePath[] exePaths, int tptPort, String tptBindingName,
-                                 long startupWaitTime) throws InterruptedException {
+                                 long startupWaitTime)
+      throws InterruptedException {
     Registry registry;
     String hostName = null;
     try {
@@ -204,10 +205,10 @@ public class Utils {
   }
 
   public static int publishResults(FilePath workspace, JenkinsConfiguration ec, String jUnitXml,
-                                   TptLogger logger) throws IOException {
-    FilePath reportPath =
-        ((jUnitXml == null) || jUnitXml.trim().isEmpty()) ? workspace : new FilePath(workspace,
-            jUnitXml);
+                                   TptLogger logger)
+      throws IOException {
+    FilePath reportPath = ((jUnitXml == null) || jUnitXml.trim().isEmpty()) ? workspace
+        : new FilePath(workspace, jUnitXml);
 
     try {
 

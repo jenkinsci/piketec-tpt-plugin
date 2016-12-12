@@ -20,18 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
-import hudson.model.Computer;
-import hudson.model.Job;
-import hudson.model.Run;
-import hudson.plugins.parameterizedtrigger.AbstractBuildParameters;
-import hudson.plugins.parameterizedtrigger.CurrentBuildParameters;
-import hudson.plugins.parameterizedtrigger.PredefinedBuildParameters;
-import hudson.plugins.parameterizedtrigger.ResultCondition;
-
 import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
@@ -41,8 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
-import jenkins.model.Jenkins.MasterComputer;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -56,6 +42,19 @@ import com.piketec.tpt.api.OpenResult;
 import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.Scenario;
 import com.piketec.tpt.api.TptApi;
+
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
+import hudson.model.Computer;
+import hudson.model.Job;
+import hudson.model.Run;
+import hudson.plugins.parameterizedtrigger.AbstractBuildParameters;
+import hudson.plugins.parameterizedtrigger.CurrentBuildParameters;
+import hudson.plugins.parameterizedtrigger.PredefinedBuildParameters;
+import hudson.plugins.parameterizedtrigger.ResultCondition;
+import jenkins.model.Jenkins.MasterComputer;
 
 public class TptPluginMasterJobExecutor {
 
@@ -129,9 +128,8 @@ public class TptPluginMasterJobExecutor {
     TptApi api = null;
     String executionId = Double.toString(Math.random());
     try {
-      api =
-          Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
-              tptStartupWaitTime);
+      api = Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
+          tptStartupWaitTime);
     } catch (InterruptedException e) {
       logger.error(e.getMessage());
       return false;
@@ -193,25 +191,12 @@ public class TptPluginMasterJobExecutor {
       for (String testCase : testCases) {
         logger.info("Create job for \"" + testCase + "\"");
         PredefinedBuildParameters predefinedBuildParameters =
-            new PredefinedBuildParameters(this.testcaseVarName
-                + "="
-                + testCase
-                + "\n" //
-                + this.execCfgVarName
-                + "="
-                + ec.getConfiguration()
-                + "\n" //
-                + this.tptFileVarName
-                + "="
-                + ec.getTptFile().getPath().replace("\\", "\\\\")
-                + "\n" //
-                + this.exePathsVarName
-                + "="
-                + exePathsAsSingleString().replace("\\", "\\\\")
-                + "\n" //
+            new PredefinedBuildParameters(this.testcaseVarName + "=" + testCase + "\n" //
+                + this.execCfgVarName + "=" + ec.getConfiguration() + "\n" //
+                + this.tptFileVarName + "=" + ec.getTptFile().getPath().replace("\\", "\\\\") + "\n" //
+                + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
                 + this.testDataDirVarName + "="
-                + ec.getTestdataDir().getPath().replace("\\", "\\\\")
-                + "\n" //
+                + ec.getTestdataDir().getPath().replace("\\", "\\\\") + "\n" //
                 + this.reportDirVarName + "=" + ec.getReportDir().getPath().replace("\\", "\\\\")
                 + "\n" //
                 + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId//

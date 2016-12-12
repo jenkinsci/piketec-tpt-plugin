@@ -71,8 +71,8 @@ public interface Assessment extends AssessmentOrGroup {
    *
    * @return die Liste der TestCases
    */
-  public RemoteCollection<ScenarioOrGroup> getEnabledTestCases() throws ApiException,
-      RemoteException;
+  public RemoteCollection<ScenarioOrGroup> getEnabledTestCases()
+      throws ApiException, RemoteException;
 
   /**
    * Aktiviert das Assessment fuer einen TestCase oder TestCases-Gruppe.
@@ -97,8 +97,8 @@ public interface Assessment extends AssessmentOrGroup {
    * @param pc
    *          die Platformkonfiguration, fuer diese Assessment aktiviert werden soll
    */
-  public void enableForPlatformConfiguration(PlatformConfiguration pc) throws ApiException,
-      RemoteException;
+  public void enableForPlatformConfiguration(PlatformConfiguration pc)
+      throws ApiException, RemoteException;
 
   /**
    * Aktiviert das Assessment fuer einen Eintrag einer Ausfuehrungskonfiguration.

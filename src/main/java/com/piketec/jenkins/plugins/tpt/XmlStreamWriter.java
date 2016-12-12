@@ -20,18 +20,17 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import hudson.FilePath;
-
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import javanet.staxutils.IndentingXMLStreamWriter;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import hudson.FilePath;
+import javanet.staxutils.IndentingXMLStreamWriter;
 
 public class XmlStreamWriter {
 
@@ -41,13 +40,12 @@ public class XmlStreamWriter {
 
   private BufferedOutputStream bos;
 
-  public void initalize(FilePath file) throws XMLStreamException, FactoryConfigurationError,
-      IOException, InterruptedException {
+  public void initalize(FilePath file)
+      throws XMLStreamException, FactoryConfigurationError, IOException, InterruptedException {
     os = file.write();
     bos = new BufferedOutputStream(os);
-    writer =
-        new IndentingXMLStreamWriter(XMLOutputFactory.newInstance().createXMLStreamWriter(bos,
-            "UTF-8"));
+    writer = new IndentingXMLStreamWriter(
+        XMLOutputFactory.newInstance().createXMLStreamWriter(bos, "UTF-8"));
     writer.writeStartDocument("UTF-8", "1.0");
   }
 
