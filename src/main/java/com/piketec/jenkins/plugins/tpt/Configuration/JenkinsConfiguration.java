@@ -133,9 +133,12 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   @Override
   public Descriptor<JenkinsConfiguration> getDescriptor() {
+    Jenkins instance = Jenkins.getInstance();
+    if (instance == null) {
+      return null;
+    }
     @SuppressWarnings("unchecked")
-    Descriptor<JenkinsConfiguration> descriptor = Jenkins.getInstance().getDescriptor(getClass());
-
+    Descriptor<JenkinsConfiguration> descriptor = instance.getDescriptor(getClass());
     return descriptor;
   }
 

@@ -46,9 +46,7 @@ public class Testcase {
   /** ordered set of variables (ordered by name) */
   private final Set<AssessmentVariable> variables;
 
-  private String configuration;
-
-  public Testcase() {
+  Testcase() {
     errors = new ArrayList<String>();
     log = new ArrayList<String>();
     variables = new HashSet<AssessmentVariable>();
@@ -56,84 +54,79 @@ public class Testcase {
     result = "";
     name = "";
     id = 0;
-    configuration = "";
   }
 
-  public String getName() {
+  String getName() {
     return name;
   }
 
-  public void setName(String name) {
+  void setName(String name) {
     this.name = name;
   }
 
-  public Set<AssessmentVariable> getVariables() {
+  Set<AssessmentVariable> getVariables() {
     return Collections.unmodifiableSet(variables);
   }
 
-  public void addAssessmentVariable(AssessmentVariable assessmentVar) {
+  void addAssessmentVariable(AssessmentVariable assessmentVar) {
     variables.add(assessmentVar);
   }
 
-  public int getID() {
+  int getID() {
     return id;
   }
 
-  public void setID(int id) {
+  void setID(int id) {
     this.id = id;
   }
 
-  public List<String> getErrors() {
+  List<String> getErrors() {
     return Collections.unmodifiableList(errors);
   }
 
-  public void addErrors(String error) {
+  void addErrors(String error) {
     error = error.replaceAll("address=0x[0-9a-fA-F]{4}", "address=0x%%%%");
     error = error.replaceAll("(heap size: \\d+, required heap size: \\d+)", "");
     this.errors.add(error);
   }
 
-  public void setConfiguration(String configuration) {
-    this.configuration = configuration;
-  }
-
-  public void setExecDate(Date execDate) {
+  void setExecDate(Date execDate) {
     this.execDate = execDate;
   }
 
-  public Date getExecDate() {
+  Date getExecDate() {
     return execDate;
   }
 
-  public void setExecDuration(String time) {
+  void setExecDuration(String time) {
     this.execDuration = time;
   }
 
-  public String getExecDuration() {
+  String getExecDuration() {
     return execDuration;
   }
 
-  public void setResult(String result) {
+  void setResult(String result) {
     this.result = result;
   }
 
-  public String getResult() {
+  String getResult() {
     return result;
   }
 
-  public void addLogEntry(String entry) {
+  void addLogEntry(String entry) {
     this.log.add(entry);
     this.log.add("\n");
   }
 
-  public List<String> getLogEntries() {
+  List<String> getLogEntries() {
     return log;
   }
 
   /**
    * @return the testcase name concatinated with the id
    */
-  public String getQualifiedName() {
+  String getQualifiedName() {
     return name + "_" + id;
   }
 

@@ -89,7 +89,6 @@ public class TestcaseParser extends DefaultHandler {
       ti = new Testcase();
       ti.setName(attributes.getValue("ScenarioName"));
       ti.setID(Integer.parseInt(attributes.getValue("ScenarioId")));
-      ti.setConfiguration(attributes.getValue("PlatformName"));
       ti.setExecDuration(attributes.getValue("ExecutionDuration"));
       ti.setResult(attributes.getValue("Result"));
       ti.setExecDate(parseDate(attributes.getValue("ExecDate")));

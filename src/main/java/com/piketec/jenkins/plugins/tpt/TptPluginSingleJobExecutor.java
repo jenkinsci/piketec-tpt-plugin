@@ -36,7 +36,7 @@ import hudson.model.BuildListener;
 /**
  * Executes the TPT test cases via command line on a single node.
  */
-public class TptPluginSingleJobExecutor {
+class TptPluginSingleJobExecutor {
 
   private boolean onlyNullExitCode = true; // have all TPT processes terminated with exit code == 0?
 
@@ -56,10 +56,9 @@ public class TptPluginSingleJobExecutor {
 
   private List<JenkinsConfiguration> executionConfigs;
 
-  public TptPluginSingleJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
-                                    BuildListener listener, FilePath[] exePaths, String arguments,
-                                    String jUnitXmlPath,
-                                    List<JenkinsConfiguration> executionConfigs) {
+  TptPluginSingleJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
+                             BuildListener listener, FilePath[] exePaths, String arguments,
+                             String jUnitXmlPath, List<JenkinsConfiguration> executionConfigs) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;

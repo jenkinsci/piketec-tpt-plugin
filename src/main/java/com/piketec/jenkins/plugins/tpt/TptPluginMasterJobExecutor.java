@@ -56,7 +56,7 @@ import hudson.plugins.parameterizedtrigger.PredefinedBuildParameters;
 import hudson.plugins.parameterizedtrigger.ResultCondition;
 import jenkins.model.Jenkins.MasterComputer;
 
-public class TptPluginMasterJobExecutor {
+class TptPluginMasterJobExecutor {
 
   private TptLogger logger;
 
@@ -92,15 +92,13 @@ public class TptPluginMasterJobExecutor {
 
   private long tptStartupWaitTime;
 
-  public TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
-                                    BuildListener listener, FilePath[] exePaths,
-                                    String jUnitXmlPath,
-                                    List<JenkinsConfiguration> executionConfigs, int tptPort,
-                                    String tptBindingName, String slaveJobName,
-                                    String testcaseVarName, String execCfgVarName,
-                                    String tptFileVarName, String exePathsVarName,
-                                    String testDataDirVarName, String reportDirVarName,
-                                    long tptStartupWaitTime) {
+  TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
+                             BuildListener listener, FilePath[] exePaths, String jUnitXmlPath,
+                             List<JenkinsConfiguration> executionConfigs, int tptPort,
+                             String tptBindingName, String slaveJobName, String testcaseVarName,
+                             String execCfgVarName, String tptFileVarName, String exePathsVarName,
+                             String testDataDirVarName, String reportDirVarName,
+                             long tptStartupWaitTime) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -120,7 +118,7 @@ public class TptPluginMasterJobExecutor {
     this.tptStartupWaitTime = tptStartupWaitTime;
   }
 
-  public boolean execute() {
+  boolean execute() {
     if (!(Computer.currentComputer() instanceof MasterComputer)) {
       logger.error("TPT master has to run on master node");
       return false;

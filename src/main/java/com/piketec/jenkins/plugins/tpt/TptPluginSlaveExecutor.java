@@ -53,7 +53,7 @@ import hudson.slaves.SlaveComputer;
  * @author jkuhnert, PikeTec GmbH
  *
  */
-public class TptPluginSlaveExecutor {
+class TptPluginSlaveExecutor {
 
   private TptLogger logger;
 
@@ -83,11 +83,10 @@ public class TptPluginSlaveExecutor {
 
   private String executionId;
 
-  public TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build,
-                                BuildListener listener, FilePath[] exePaths, int tptPort,
-                                String tptBindingName, File tptFile, String execCfg,
-                                String testDataDir, String reportDir, String testcaseName,
-                                long tptStartupWaitTime, String executionId) {
+  TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
+                         FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
+                         String execCfg, String testDataDir, String reportDir, String testcaseName,
+                         long tptStartupWaitTime, String executionId) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
