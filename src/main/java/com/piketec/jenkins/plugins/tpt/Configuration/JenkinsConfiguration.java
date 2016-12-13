@@ -197,6 +197,10 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
       return 6;
     }
 
+    public static int getDefaultSlaveJobCount() {
+      return 0;
+    }
+
     @Override
     public String getDisplayName() {
       return "";

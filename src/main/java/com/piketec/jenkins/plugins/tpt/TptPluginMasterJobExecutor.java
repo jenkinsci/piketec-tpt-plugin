@@ -26,6 +26,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -92,13 +93,15 @@ class TptPluginMasterJobExecutor {
 
   private long tptStartupWaitTime;
 
+  private int slaveJobCount;
+
   TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
                              BuildListener listener, FilePath[] exePaths, String jUnitXmlPath,
                              List<JenkinsConfiguration> executionConfigs, int tptPort,
                              String tptBindingName, String slaveJobName, String testcaseVarName,
                              String execCfgVarName, String tptFileVarName, String exePathsVarName,
                              String testDataDirVarName, String reportDirVarName,
-                             long tptStartupWaitTime) {
+                             long tptStartupWaitTime, int slaveJobCount) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -116,6 +119,7 @@ class TptPluginMasterJobExecutor {
     this.testDataDirVarName = testDataDirVarName;
     this.reportDirVarName = reportDirVarName;
     this.tptStartupWaitTime = tptStartupWaitTime;
+    this.slaveJobCount = slaveJobCount;
   }
 
   boolean execute() {
@@ -185,20 +189,51 @@ class TptPluginMasterJobExecutor {
       }
       CurrentBuildParameters currentBuildParameters = new CurrentBuildParameters();
       ArrayList<Future<Run>> futures = new ArrayList<Future<Run>>();
-      // start a slave job for every test case and publish the result
-      for (String testCase : testCases) {
+      // create test sets for slave jobs
+      int slaveJobSize;
+      int remainer;
+      if (slaveJobCount > 1) {
+        slaveJobSize = testCases.size() / slaveJobCount;
+        remainer = testCases.size() % slaveJobCount;
+      } else {
+        slaveJobSize = testCases.size();
+        remainer = 0;
+      }
+      ArrayList<String> testSets = new ArrayList<>();
+      ArrayList<String> currentTestSet = new ArrayList<>();
+      Iterator<String> iterator = testCases.iterator();
+      while (iterator.hasNext()) {
+        currentTestSet.add(iterator.next());
+        if (currentTestSet.size() == slaveJobSize) {
+          if (remainer > 0) {
+            assert iterator.hasNext();
+            // distribute remainer evenly
+            if (iterator.hasNext()) {
+              currentTestSet.add(iterator.next());
+            }
+            remainer--;
+          }
+          testSets.add(Utils.escapeTestCaseNames(currentTestSet));
+          currentTestSet.clear();
+        }
+      }
+      if (!currentTestSet.isEmpty()) {
+        testSets.add(Utils.escapeTestCaseNames(currentTestSet));
+      }
+      // start one job for every test set
+      String predefinedBuildParametersString = this.execCfgVarName + "=" + ec.getConfiguration()
+          + "\n" //
+          + this.tptFileVarName + "=" + ec.getTptFile().getPath().replace("\\", "\\\\") + "\n" //
+          + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
+          + this.testDataDirVarName + "=" + ec.getTestdataDir().getPath().replace("\\", "\\\\")
+          + "\n" //
+          + this.reportDirVarName + "=" + ec.getReportDir().getPath().replace("\\", "\\\\") + "\n"//
+          + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId;//
+      for (String testCase : testSets) {
         logger.info("Create job for \"" + testCase + "\"");
-        PredefinedBuildParameters predefinedBuildParameters =
-            new PredefinedBuildParameters(this.testcaseVarName + "=" + testCase + "\n" //
-                + this.execCfgVarName + "=" + ec.getConfiguration() + "\n" //
-                + this.tptFileVarName + "=" + ec.getTptFile().getPath().replace("\\", "\\\\") + "\n" //
-                + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
-                + this.testDataDirVarName + "="
-                + ec.getTestdataDir().getPath().replace("\\", "\\\\") + "\n" //
-                + this.reportDirVarName + "=" + ec.getReportDir().getPath().replace("\\", "\\\\")
-                + "\n" //
-                + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId//
-            );
+        PredefinedBuildParameters predefinedBuildParameters = new PredefinedBuildParameters(
+            this.testcaseVarName + "=" + testCase.replace("\\", "\\\\") + "\n" //
+                + predefinedBuildParametersString);
 
         ArrayList<AbstractBuildParameters> configs = new ArrayList<AbstractBuildParameters>();
         configs.add(currentBuildParameters);

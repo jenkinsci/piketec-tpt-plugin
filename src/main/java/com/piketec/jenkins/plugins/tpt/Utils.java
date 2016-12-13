@@ -28,8 +28,10 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
@@ -39,42 +41,42 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 
-public class Utils {
+class Utils {
 
-  public static final String TPT_EXE_VAR = "PIKETEC_TPT_EXE";
+  static final String TPT_EXE_VAR = "PIKETEC_TPT_EXE";
 
-  public static final String TPT_FILE_VAR = "PIKETEC_TPT_FILE";
+  static final String TPT_FILE_VAR = "PIKETEC_TPT_FILE";
 
-  public static final String TPT_EXECUTION_CONFIG_VAR = "PIKETEC_TPT_EXEC_CFG";
+  static final String TPT_EXECUTION_CONFIG_VAR = "PIKETEC_TPT_EXEC_CFG";
 
-  public static final String TPT_TEST_CASE_NAME_VAR = "PIKETEC_TPT_TEST_CASE";
+  static final String TPT_TEST_CASE_NAME_VAR = "PIKETEC_TPT_TEST_CASE";
 
-  public static final String TPT_TEST_DATA_DIR_VAR_NAME = "PIKETEC_TPT_TESTDATA_DIR";
+  static final String TPT_TEST_DATA_DIR_VAR_NAME = "PIKETEC_TPT_TESTDATA_DIR";
 
-  public static final String TPT_REPORT_DIR_VAR_NAME = "PIKETEC_TPT_REPORT_DIR";
+  static final String TPT_REPORT_DIR_VAR_NAME = "PIKETEC_TPT_REPORT_DIR";
 
-  public static final String TPT_EXECUTION_ID_VAR_NAME = "PIKETEC_TPT_EXECUTION_ID";
+  static final String TPT_EXECUTION_ID_VAR_NAME = "PIKETEC_TPT_EXECUTION_ID";
 
-  public static final int DEFAULT_TPT_PORT = 1099;
+  static final int DEFAULT_TPT_PORT = 1099;
 
-  public static final String DEFAULT_TPT_BINDING_NAME = "TptApi";
+  static final String DEFAULT_TPT_BINDING_NAME = "TptApi";
 
-  public static final int DEFAULT_STARTUP_WAIT_TIME = 60;
+  static final int DEFAULT_STARTUP_WAIT_TIME = 60;
 
   private static final SimpleDateFormat DDMMYYHHMMSS = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 
-  public static String getCurrentDateString() {
+  static String getCurrentDateString() {
     Date date = new Date(); // acquire date before waiting for lock
     return formatDate(DDMMYYHHMMSS, date);
   }
 
-  public static String formatDate(DateFormat format, Date date) {
+  static String formatDate(DateFormat format, Date date) {
     synchronized (format) {
       return format.format(date);
     }
   }
 
-  public static boolean createParentDir(File directory, FilePath workspace) {
+  static boolean createParentDir(File directory, FilePath workspace) {
     File parentDir = directory.getParentFile();
 
     if (parentDir == null) {
@@ -92,7 +94,7 @@ public class Utils {
     return false;
   }
 
-  public static File getWorkspaceDir(FilePath workspace, TptLogger logger) {
+  static File getWorkspaceDir(FilePath workspace, TptLogger logger) {
     File workspaceDir = null;
 
     if (workspace == null) {
@@ -204,8 +206,8 @@ public class Utils {
     }
   }
 
-  public static int publishResults(FilePath workspace, JenkinsConfiguration ec, String jUnitXml,
-                                   TptLogger logger)
+  static int publishResults(FilePath workspace, JenkinsConfiguration ec, String jUnitXml,
+                            TptLogger logger)
       throws IOException {
     FilePath reportPath = ((jUnitXml == null) || jUnitXml.trim().isEmpty()) ? workspace
         : new FilePath(workspace, jUnitXml);
@@ -257,7 +259,7 @@ public class Utils {
     return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
   }
 
-  public static <T> String toString(List<T> list, String delimeter) {
+  static <T> String toString(Collection<T> list, String delimeter) {
     StringBuilder sb = new StringBuilder();
     for (T obj : list) {
       if (sb.length() > 0 && delimeter != null) {
@@ -267,4 +269,57 @@ public class Utils {
     }
     return sb.toString();
   }
+
+  static String escapeTestCaseNames(Collection<String> testCases) {
+    StringBuilder sb = new StringBuilder();
+    for (String testCase : testCases) {
+      if (testCase == null || testCase.isEmpty()) {
+        continue;
+      }
+      if (sb.length() > 0) {
+        sb.append(';');
+      }
+      sb.append(testCase.replace("\\", "\\\\").replace(";", "\\;"));
+    }
+    return sb.toString();
+  }
+
+  static Set<String> unescapeTestcaseNames(String testCases) {
+    Set<String> result = new HashSet<>();
+    StringBuilder currentTestCaseName = new StringBuilder();
+    boolean escapeCharRead = false;
+    for (char c : testCases.toCharArray()) {
+      switch (c) {
+        case '\\':
+          if (escapeCharRead) {
+            currentTestCaseName.append(c);
+            escapeCharRead = false;
+          } else {
+            escapeCharRead = true;
+          }
+          break;
+        case ';':
+          if (escapeCharRead) {
+            currentTestCaseName.append(c);
+            escapeCharRead = false;
+          } else {
+            if (currentTestCaseName.length() > 0) {
+              result.add(currentTestCaseName.toString());
+              currentTestCaseName.setLength(0);
+            }
+            escapeCharRead = false;
+          }
+          break;
+        default:
+          assert escapeCharRead == false;
+          currentTestCaseName.append(c);
+          escapeCharRead = false;
+      }
+    }
+    if (currentTestCaseName.length() > 0) {
+      result.add(currentTestCaseName.toString());
+    }
+    return result;
+  }
+
 }

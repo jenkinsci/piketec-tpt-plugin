@@ -39,8 +39,11 @@
   	<f:entry  help="/plugin/piketec-tpt/masterMode.html">
   	  <f:checkbox title="Distribute work to TPT slave jobs" checked="${instance.isTptMaster}" field="isTptMaster"/>
   	</f:entry>
-    <f:entry field="slaveJob" title="Slave Job" help="/plugin/piketec-tpt/slaveJob.html">
+    <f:entry field="slaveJob" title="Slave job" help="/plugin/piketec-tpt/slaveJob.html">
       <f:textbox value="${instance.slaveJob}"/>
+    </f:entry>
+    <f:entry field="slaveJobCount" title="Number of slave jobs" help="/plugin/piketec-tpt/slaveJobCount.html">
+      <f:textbox value="${instance.slaveJobCount}"/>
     </f:entry>
     <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
       <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>

@@ -25,6 +25,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -77,7 +80,7 @@ class TptPluginSlaveExecutor {
 
   private String reportDir;
 
-  private String testcaseName;
+  private Set<String> testSetString;
 
   private long tptStartupWaitTime;
 
@@ -85,7 +88,7 @@ class TptPluginSlaveExecutor {
 
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
-                         String execCfg, String testDataDir, String reportDir, String testcaseName,
+                         String execCfg, String testDataDir, String reportDir, String testSet,
                          long tptStartupWaitTime, String executionId) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
@@ -98,7 +101,7 @@ class TptPluginSlaveExecutor {
     this.execCfg = execCfg;
     this.testDataDir = testDataDir;
     this.reportDir = reportDir;
-    this.testcaseName = testcaseName;
+    this.testSetString = Utils.unescapeTestcaseNames(testSet);
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.executionId = executionId;
   }
@@ -143,11 +146,12 @@ class TptPluginSlaveExecutor {
       File oldReportDir = config.getReportDir();
       File oldTestDataDir = config.getDataDir();
 
-      Scenario foundSceneario = find(
-          openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
-          testcaseName);
-      if (foundSceneario == null) {
-        logger.error("Could not find testcase " + testcaseName);
+      Collection<Scenario> foundScenearios = new HashSet<>();
+      find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
+          testSetString, foundScenearios);
+      if (foundScenearios.size() != testSetString.size()) {
+        logger.error(
+            "Could only find " + foundScenearios.size() + " of " + testSetString.size() + ".");
         return false;
       }
 
@@ -189,26 +193,35 @@ class TptPluginSlaveExecutor {
       logger.info("Setting report directory to " + path.getRemote());
       config.setReportDir(new File(path.getRemote()));
 
-      String tmpTestSetName = "JENKINS Exec";
-      logger.info(
-          "Create test set \"" + tmpTestSetName + "\" for execution of \"" + testcaseName + "\"");
-      TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
-      testSet.addTestCase(foundSceneario);
-
-      ArrayList<TestSet> oldTestSets = new ArrayList<TestSet>();
-      ArrayList<ExecutionConfigurationItem> deactivated =
-          new ArrayList<ExecutionConfigurationItem>();
+      // store information to undo changes
+      List<TestSet> oldTestSets = new ArrayList<>();
+      List<TestSet> newTestSets = new ArrayList<>();
+      List<ExecutionConfigurationItem> deactivated = new ArrayList<>();
+      int i = 0;
       for (ExecutionConfigurationItem item : config.getItems()) {
         oldTestSets.add(item.getTestSet());
-        if (testSetContains(item.getTestSet(), foundSceneario)) {
-          item.setTestSet(testSet);
-        } else {
-          if (item.isActive()) {
-            deactivated.add(item);
+        if (item.isActive()) {
+          Collection<Scenario> intersectionSet =
+              intersectByHash(item.getTestSet().getTestCases().getItems(), foundScenearios);
+          if (intersectionSet.isEmpty()) {
             item.setActive(false);
+            deactivated.add(item);
+          } else {
+            String tmpTestSetName = "JENKINS Exec " + i;
+            i++;
+            logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
+                + Utils.toString(intersectionSet, ", ") + "\"");
+            TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+            newTestSets.add(testSet);
+            for (Scenario scen : intersectionSet) {
+              testSet.addTestCase(scen);
+            }
+            item.setTestSet(testSet);
           }
         }
+
       }
+
       // execute test
       ExecutionStatus execStatus = api.run(config);
       while (execStatus.isRunning() || execStatus.isPending()) {
@@ -221,6 +234,7 @@ class TptPluginSlaveExecutor {
         }
       }
       // undo changes
+      logger.info("Set test sets in execution config to old values.");
       for (ExecutionConfigurationItem item : config.getItems()) {
         item.setTestSet(oldTestSets.remove(0));
       }
@@ -246,8 +260,10 @@ class TptPluginSlaveExecutor {
           + oldReportDir.getPath());
       config.setDataDir(oldTestDataDir);
       config.setReportDir(oldReportDir);
-      logger.info("delete temporary test set \"" + testSet.getName() + "\"");
-      openProject.getProject().getTestSets().delete(testSet);
+      for (TestSet testSet : newTestSets) {
+        logger.info("delete temporary test set \"" + testSet.getName() + "\"");
+        openProject.getProject().getTestSets().delete(testSet);
+      }
       logger.info("Reactivate temporary deactivated execution config items.");
       for (ExecutionConfigurationItem item : deactivated) {
         item.setActive(true);
@@ -264,31 +280,34 @@ class TptPluginSlaveExecutor {
     return true;
   }
 
-  private boolean testSetContains(TestSet testSet, Scenario foundSceneario)
-      throws RemoteException, ApiException {
-    for (Scenario scen : testSet.getTestCases().getItems()) {
-      if (scen.getName().equals(foundSceneario.getName())) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private Scenario find(Collection<ScenarioOrGroup> sogs, String name)
+  private void find(Collection<ScenarioOrGroup> sogs, Collection<String> names,
+                    Collection<Scenario> result)
       throws RemoteException, ApiException {
     for (ScenarioOrGroup sog : sogs) {
       if (sog instanceof Scenario) {
-        if (sog.getName().equals(name)) {
-          return (Scenario)sog;
+        if (names.contains(sog.getName())) {
+          result.add((Scenario)sog);
         }
       } else {
-        Scenario result = find(((ScenarioGroup)sog).getItems(), name);
-        if (result != null) {
-          return result;
-        }
+        find(((ScenarioGroup)sog).getItems(), names, result);
       }
     }
-    return null;
+  }
+
+  static Collection<Scenario> intersectByHash(Collection<Scenario> scenColl1,
+                                              Collection<Scenario> scenCol2)
+      throws RemoteException, ApiException {
+    Set<String> scenCol1Names = new HashSet<>();
+    ArrayList<Scenario> result = new ArrayList<>();
+    for (Scenario scen : scenColl1) {
+      scenCol1Names.add(scen.getName());
+    }
+    for (Scenario scen : scenCol2) {
+      if (scenCol1Names.contains(scen.getName())) {
+        result.add(scen);
+      }
+    }
+    return result;
   }
 
 }

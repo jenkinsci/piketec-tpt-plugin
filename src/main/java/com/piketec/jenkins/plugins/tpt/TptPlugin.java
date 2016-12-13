@@ -61,6 +61,8 @@ public class TptPlugin extends Builder {
 
   private String slaveJob;
 
+  private String slaveJobCount;
+
   private String tptBindingName;
 
   private String tptPort;
@@ -77,7 +79,7 @@ public class TptPlugin extends Builder {
 
   @DataBoundConstructor
   public TptPlugin(String exe, String exePaths, String arguments, boolean isTptMaster,
-                   String slaveJob, String tptBindingName, String tptPort,
+                   String slaveJob, String slaveJobCount, String tptBindingName, String tptPort,
                    ArrayList<JenkinsConfiguration> executionConfiguration, String report,
                    String tptStartUpWaitTime) {
     this.exePaths = exe;
@@ -88,6 +90,7 @@ public class TptPlugin extends Builder {
     this.report = report;
     this.isTptMaster = isTptMaster;
     this.slaveJob = slaveJob;
+    this.slaveJobCount = slaveJobCount;
     this.tptBindingName = tptBindingName;
     this.tptPort = tptPort;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
@@ -108,6 +111,9 @@ public class TptPlugin extends Builder {
     }
     if (exe != null) {
       this.exePaths = exe;
+    }
+    if (slaveJobCount == null) {
+      slaveJobCount = "0";
     }
     return this;
   }
@@ -138,6 +144,14 @@ public class TptPlugin extends Builder {
    */
   public String getSlaveJob() {
     return slaveJob;
+  }
+
+  /**
+   * @return The number of slave job the plugin will run in master mode. A value below 1 means every
+   *         test case will be started in its own job.
+   */
+  public String getSlaveJobCount() {
+    return slaveJobCount;
   }
 
   /**
@@ -277,12 +291,23 @@ public class TptPlugin extends Builder {
         expandedTptStartupWaitTime =
             Integer.parseInt(environment.expand(tptStartUpWaitTime)) * 1000;
       } catch (NumberFormatException e) {
-        logger.error("The given TPT startup waiting time " + environment.expand(tptStartUpWaitTime)
-            + " is not an integer. Using default value.");
+        logger
+            .error("The given TPT startup waiting time \"" + environment.expand(tptStartUpWaitTime)
+                + "\" is not an integer. Using default value.");
         expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
       }
     } else {
       expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
+    }
+    // expand slaveJobCount
+    int parsedSlaveJobCount = 0;
+    if (slaveJobCount != null && !slaveJobCount.isEmpty()) {
+      try {
+        parsedSlaveJobCount = Integer.parseInt(environment.expand(slaveJobCount));
+      } catch (NumberFormatException e) {
+        logger.error("The given number of slave jobs to start \""
+            + environment.expand(slaveJobCount) + "\" is not an integer. Using default value.");
+      }
     }
     // expand other variables
     String expandedSlaveJobName = environment.expand(slaveJob);
@@ -291,7 +316,7 @@ public class TptPlugin extends Builder {
         expandedExePaths, jUnitXmlPath, normalizedConfigs, expandedTptPort, expandedTptBindingName,
         expandedSlaveJobName, Utils.TPT_TEST_CASE_NAME_VAR, Utils.TPT_EXECUTION_CONFIG_VAR,
         Utils.TPT_FILE_VAR, Utils.TPT_EXE_VAR, Utils.TPT_TEST_DATA_DIR_VAR_NAME,
-        Utils.TPT_REPORT_DIR_VAR_NAME, expandedTptStartupWaitTime);
+        Utils.TPT_REPORT_DIR_VAR_NAME, expandedTptStartupWaitTime, parsedSlaveJobCount);
     return executor.execute();
   }
 
