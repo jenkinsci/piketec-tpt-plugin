@@ -19,7 +19,8 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
 <div>
-The number of slave jobs the plugin will schedule and distribute the work to. A value below 1 means
-every test case will be started in its own job. A value greater or equal 1 will shedule the
-specified number of jobs and the test cases will be distributed evenly.
+If the execution of a slave job fails it could be reasonable to try to run the job again. If this
+number is greater than one a failed slave job will be scheduled again until it succeedes or it was
+executed the number of times specified here. Any number less or equal one will run the slave jobs
+exactly once.
 </div>

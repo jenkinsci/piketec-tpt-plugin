@@ -45,6 +45,9 @@
     <f:entry field="slaveJobCount" title="Number of slave jobs" help="/plugin/piketec-tpt/slaveJobCount.html">
       <f:textbox value="${instance.slaveJobCount}"/>
     </f:entry>
+        <f:entry field="slaveJobTries" title="Number of slave jobs execution tries" help="/plugin/piketec-tpt/slaveJobTries.html">
+      <f:textbox value="${instance.slaveJobTries}"/>
+    </f:entry>
     <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
       <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>
     </f:entry>

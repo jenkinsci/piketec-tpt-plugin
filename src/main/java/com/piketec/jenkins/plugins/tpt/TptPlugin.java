@@ -63,6 +63,8 @@ public class TptPlugin extends Builder {
 
   private String slaveJobCount;
 
+  private String slaveJobTries;
+
   private String tptBindingName;
 
   private String tptPort;
@@ -79,7 +81,8 @@ public class TptPlugin extends Builder {
 
   @DataBoundConstructor
   public TptPlugin(String exe, String exePaths, String arguments, boolean isTptMaster,
-                   String slaveJob, String slaveJobCount, String tptBindingName, String tptPort,
+                   String slaveJob, String slaveJobCount, String slaveJobTries,
+                   String tptBindingName, String tptPort,
                    ArrayList<JenkinsConfiguration> executionConfiguration, String report,
                    String tptStartUpWaitTime) {
     this.exePaths = exe;
@@ -91,6 +94,7 @@ public class TptPlugin extends Builder {
     this.isTptMaster = isTptMaster;
     this.slaveJob = slaveJob;
     this.slaveJobCount = slaveJobCount;
+    this.slaveJobTries = slaveJobTries;
     this.tptBindingName = tptBindingName;
     this.tptPort = tptPort;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
@@ -114,6 +118,9 @@ public class TptPlugin extends Builder {
     }
     if (slaveJobCount == null) {
       slaveJobCount = "0";
+    }
+    if (slaveJobTries == null) {
+      slaveJobTries = "1";
     }
     return this;
   }
@@ -152,6 +159,14 @@ public class TptPlugin extends Builder {
    */
   public String getSlaveJobCount() {
     return slaveJobCount;
+  }
+
+  /**
+   * @return If the execution of a slave job fails it is possible to reschedule the job for another
+   *         try. This is the maximal number of tries.
+   */
+  public String getSlaveJobTries() {
+    return slaveJobTries;
   }
 
   /**
@@ -309,14 +324,25 @@ public class TptPlugin extends Builder {
             + environment.expand(slaveJobCount) + "\" is not an integer. Using default value.");
       }
     }
+    // expand slaveJobTries
+    int parsedSlaveJobTries = 1;
+    if (slaveJobTries != null && !slaveJobTries.isEmpty()) {
+      try {
+        parsedSlaveJobTries = Integer.parseInt(environment.expand(slaveJobTries));
+      } catch (NumberFormatException e) {
+        logger.error("The given number of tries to execute a slave jobs \""
+            + environment.expand(slaveJobCount) + "\" is not an integer. Using default value.");
+      }
+    }
     // expand other variables
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
-    TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
-        expandedExePaths, jUnitXmlPath, normalizedConfigs, expandedTptPort, expandedTptBindingName,
-        expandedSlaveJobName, Utils.TPT_TEST_CASE_NAME_VAR, Utils.TPT_EXECUTION_CONFIG_VAR,
-        Utils.TPT_FILE_VAR, Utils.TPT_EXE_VAR, Utils.TPT_TEST_DATA_DIR_VAR_NAME,
-        Utils.TPT_REPORT_DIR_VAR_NAME, expandedTptStartupWaitTime, parsedSlaveJobCount);
+    TptPluginMasterJobExecutor executor =
+        new TptPluginMasterJobExecutor(build, launcher, listener, expandedExePaths, jUnitXmlPath,
+            normalizedConfigs, expandedTptPort, expandedTptBindingName, expandedSlaveJobName,
+            Utils.TPT_TEST_CASE_NAME_VAR, Utils.TPT_EXECUTION_CONFIG_VAR, Utils.TPT_FILE_VAR,
+            Utils.TPT_EXE_VAR, Utils.TPT_TEST_DATA_DIR_VAR_NAME, Utils.TPT_REPORT_DIR_VAR_NAME,
+            expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries);
     return executor.execute();
   }
 

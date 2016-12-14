@@ -28,12 +28,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.google.common.collect.ListMultimap;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
@@ -49,8 +46,6 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
-import hudson.model.Job;
-import hudson.model.Run;
 import hudson.plugins.parameterizedtrigger.AbstractBuildParameters;
 import hudson.plugins.parameterizedtrigger.CurrentBuildParameters;
 import hudson.plugins.parameterizedtrigger.PredefinedBuildParameters;
@@ -95,13 +90,15 @@ class TptPluginMasterJobExecutor {
 
   private int slaveJobCount;
 
+  private int slaveJobTries;
+
   TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
                              BuildListener listener, FilePath[] exePaths, String jUnitXmlPath,
                              List<JenkinsConfiguration> executionConfigs, int tptPort,
                              String tptBindingName, String slaveJobName, String testcaseVarName,
                              String execCfgVarName, String tptFileVarName, String exePathsVarName,
                              String testDataDirVarName, String reportDirVarName,
-                             long tptStartupWaitTime, int slaveJobCount) {
+                             long tptStartupWaitTime, int slaveJobCount, int slaveJobTries) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -120,6 +117,7 @@ class TptPluginMasterJobExecutor {
     this.reportDirVarName = reportDirVarName;
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.slaveJobCount = slaveJobCount;
+    this.slaveJobTries = slaveJobTries;
   }
 
   boolean execute() {
@@ -188,7 +186,7 @@ class TptPluginMasterJobExecutor {
         return false;
       }
       CurrentBuildParameters currentBuildParameters = new CurrentBuildParameters();
-      ArrayList<Future<Run>> futures = new ArrayList<Future<Run>>();
+      ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
       // create test sets for slave jobs
       int slaveJobSize;
       int remainer;
@@ -242,32 +240,21 @@ class TptPluginMasterJobExecutor {
         hudson.plugins.parameterizedtrigger.BuildTriggerConfig cfg =
             new hudson.plugins.parameterizedtrigger.BuildTriggerConfig(slaveJobName,
                 ResultCondition.ALWAYS, false, null, configs);
-        try {
-          ListMultimap<Job, Future<Run>> perform3 = cfg.perform3(build, launcher, listener);
-          futures.addAll(perform3.values());
-        } catch (InterruptedException e) {
-          logger.interrupt(e.getMessage());
-          for (Future future : futures) {
-            future.cancel(true);
-          }
-          return false;
-        } catch (IOException e) {
-          logger.error(e.getMessage());
-        }
+        RetryableJob retryableJob = new RetryableJob(slaveJobTries, logger, cfg);
+        retryableJob.perform(build, launcher, listener);
+        retryableJobs.add(retryableJob);
       }
       logger.info("Waiting for completion of child jobs");
-      for (Future<Run> future : futures) {
+      for (RetryableJob retryableJob : retryableJobs) {
         try {
-          future.get();
+          retryableJob.join();
         } catch (InterruptedException e) {
           logger.interrupt(e.getMessage());
           logger.info("Stopping slave jobs.");
-          for (Future<Run> future2 : futures) {
-            future2.cancel(true);
+          for (RetryableJob retryableJobToCancle : retryableJobs) {
+            retryableJobToCancle.cancel();
           }
           return false;
-        } catch (ExecutionException e) {
-          // NOP, job has been cancled but we do not need the result
         }
       }
       // now combine the reports of the different test executions

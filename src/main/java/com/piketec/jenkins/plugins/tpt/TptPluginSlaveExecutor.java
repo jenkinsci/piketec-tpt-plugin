@@ -210,7 +210,7 @@ class TptPluginSlaveExecutor {
             String tmpTestSetName = "JENKINS Exec " + i;
             i++;
             logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
-                + Utils.toString(intersectionSet, ", ") + "\"");
+                + remoteScenarioSetToString(intersectionSet) + "\"");
             TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
             newTestSets.add(testSet);
             for (Scenario scen : intersectionSet) {
@@ -308,6 +308,18 @@ class TptPluginSlaveExecutor {
       }
     }
     return result;
+  }
+
+  private String remoteScenarioSetToString(Collection<Scenario> intersectionSet)
+      throws RemoteException, ApiException {
+    StringBuilder sb = new StringBuilder();
+    for (Scenario scen : intersectionSet) {
+      if (sb.length() > 0) {
+        sb.append(", ");
+      }
+      sb.append(scen.getName());
+    }
+    return sb.toString();
   }
 
 }
