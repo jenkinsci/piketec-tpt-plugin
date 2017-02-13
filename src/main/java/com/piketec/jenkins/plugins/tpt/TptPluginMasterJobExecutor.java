@@ -147,8 +147,7 @@ class TptPluginMasterJobExecutor {
       FilePath reportPath = new FilePath(build.getWorkspace(), ec.getReportDir().getPath());
       try {
         logger.info("Create and/or clear test data directory " + testDataPath.getRemote());
-        testDataPath.mkdirs();
-        testDataPath.deleteContents();
+        Utils.deleteFiles(testDataPath);
         logger.info("Create and/or clear report directory " + reportPath.getRemote());
         reportPath.mkdirs();
         reportPath.deleteContents();
@@ -172,6 +171,8 @@ class TptPluginMasterJobExecutor {
           logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
           return false;
         }
+        new CleanUpTask(openProject.getProject(), executionId);
+
         executionConfig = getExecutionConfigByName(openProject.getProject(), ec.getConfiguration());
         if (executionConfig == null) {
           logger.error("Could not find config");
@@ -244,7 +245,7 @@ class TptPluginMasterJobExecutor {
         retryableJob.perform(build, launcher, listener);
         retryableJobs.add(retryableJob);
       }
-      logger.info("Waiting for completion of child jobs");
+      logger.info("Waiting for completion of child jobs.");
       for (RetryableJob retryableJob : retryableJobs) {
         try {
           retryableJob.join();
@@ -296,6 +297,7 @@ class TptPluginMasterJobExecutor {
         logger.error("Could not publish result: " + e.getMessage());
         return false;
       } finally {
+        logger.info("Close open TPT project on master and slaves.");
         if (!CleanUpTask.cleanUp(executionId)) {
           logger.error("Could not close all open TPT files. "
               + "There is no guarantee next run will be be done with correct file version.");

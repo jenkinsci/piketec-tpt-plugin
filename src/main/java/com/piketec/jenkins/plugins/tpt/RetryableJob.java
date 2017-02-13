@@ -8,8 +8,8 @@ import java.util.concurrent.Future;
 
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
-import hudson.model.BallColor;
 import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.plugins.parameterizedtrigger.BuildTriggerConfig;
 
@@ -48,8 +48,13 @@ class RetryableJob {
             for (Future<Run> future : futures) {
               Run run = future.get();
               // retry if cancled or failed
-              success =
-                  run.getIconColor() != BallColor.BLUE && run.getIconColor() != BallColor.YELLOW;
+              Result result = run.getResult();
+              if (result != null) {
+                success = result.isBetterOrEqualTo(Result.UNSTABLE);
+              } else {
+                assert false : "Build should not be running since we used future.get()";
+                success = true;
+              }
               if (future.isCancelled()) {
                 tries = 0;
               }

@@ -160,11 +160,10 @@ class TptPluginSlaveExecutor {
         path = new FilePath(build.getWorkspace(), testDataDir).absolutize();
         if (Computer.currentComputer() instanceof SlaveComputer) {
           logger.info("Creating and/or cleaning test data directory");
-          path.mkdirs();
-          path.deleteContents();
+          Utils.deleteFiles(path);
         }
       } catch (IOException e) {
-        logger.error("Could not create test data dir");
+        logger.error("Could not create or clear test data dir");
         return false;
       } catch (InterruptedException e) {
         logger.interrupt(e.getMessage());

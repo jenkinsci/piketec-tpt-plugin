@@ -322,4 +322,35 @@ class Utils {
     return result;
   }
 
+  /**
+   * TPT changes its workind directory during execution, fails to set it back correctly after
+   * multicore execution and prevents the deletion of test data directory. This method only deletes
+   * the files in a directory recursively if {@link FilePath#path.deleteContents()} fails.
+   */
+  static void deleteFiles(FilePath path) throws IOException, InterruptedException {
+    if (path.exists()) {
+      if (path.isDirectory()) {
+        try {
+          path.deleteContents();
+        } catch (IOException e) {
+          deleteFilesRecursive(path);
+        }
+      } else {
+        path.delete();
+      }
+    } else {
+      path.mkdirs();
+    }
+  }
+
+  private static void deleteFilesRecursive(FilePath path) throws IOException, InterruptedException {
+    for (FilePath subPath : path.list()) {
+      if (subPath.isDirectory()) {
+        deleteFilesRecursive(subPath);
+      } else {
+        subPath.delete();
+      }
+    }
+  }
+
 }
