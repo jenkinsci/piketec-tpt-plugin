@@ -28,6 +28,7 @@ import java.util.List;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.EnvVars;
@@ -40,6 +41,7 @@ import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 
 /**
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
@@ -69,7 +71,9 @@ public class TptPlugin extends Builder {
 
   private String tptPort;
 
-  private String report;
+  private String report; // JUnit Report!
+
+  private LogLevel jUnitLogLevel;
 
   private String tptStartUpWaitTime;
 
@@ -84,13 +88,14 @@ public class TptPlugin extends Builder {
                    String slaveJob, String slaveJobCount, String slaveJobTries,
                    String tptBindingName, String tptPort,
                    ArrayList<JenkinsConfiguration> executionConfiguration, String report,
-                   String tptStartUpWaitTime) {
+                   LogLevel jUnitLogLevel, String tptStartUpWaitTime) {
     this.exePaths = exe;
     if (exePaths != null) {
       this.exePaths = exePaths;
     }
     this.arguments = arguments;
     this.report = report;
+    this.jUnitLogLevel = jUnitLogLevel;
     this.isTptMaster = isTptMaster;
     this.slaveJob = slaveJob;
     this.slaveJobCount = slaveJobCount;
@@ -203,6 +208,15 @@ public class TptPlugin extends Builder {
   }
 
   /**
+   * The severity level of TPT log messages that will be written to failed JUnit tests.
+   * 
+   * @return The severity level of TPT log messages that will be written to failed JUnit tests.
+   */
+  public LogLevel getJUnitLogLevel() {
+    return jUnitLogLevel;
+  }
+
+  /**
    * @return The time waited before trying to get the API handle after starting TPT
    */
   public String getTptStartUpWaitTime() {
@@ -265,7 +279,7 @@ public class TptPlugin extends Builder {
     String jUnitXmlPath = environment.expand(report);
     // start execution
     TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launch, listener,
-        expandedExePaths, expandedArguments, jUnitXmlPath, normalizedConfigs);
+        expandedExePaths, expandedArguments, jUnitXmlPath, jUnitLogLevel, normalizedConfigs);
     return executor.execute();
   }
 
@@ -337,12 +351,12 @@ public class TptPlugin extends Builder {
     // expand other variables
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
-    TptPluginMasterJobExecutor executor =
-        new TptPluginMasterJobExecutor(build, launcher, listener, expandedExePaths, jUnitXmlPath,
-            normalizedConfigs, expandedTptPort, expandedTptBindingName, expandedSlaveJobName,
-            Utils.TPT_TEST_CASE_NAME_VAR, Utils.TPT_EXECUTION_CONFIG_VAR, Utils.TPT_FILE_VAR,
-            Utils.TPT_EXE_VAR, Utils.TPT_TEST_DATA_DIR_VAR_NAME, Utils.TPT_REPORT_DIR_VAR_NAME,
-            expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries);
+    TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
+        expandedExePaths, jUnitXmlPath, jUnitLogLevel, normalizedConfigs, expandedTptPort,
+        expandedTptBindingName, expandedSlaveJobName, Utils.TPT_TEST_CASE_NAME_VAR,
+        Utils.TPT_EXECUTION_CONFIG_VAR, Utils.TPT_FILE_VAR, Utils.TPT_EXE_VAR,
+        Utils.TPT_TEST_DATA_DIR_VAR_NAME, Utils.TPT_REPORT_DIR_VAR_NAME, expandedTptStartupWaitTime,
+        parsedSlaveJobCount, parsedSlaveJobTries);
     return executor.execute();
   }
 
@@ -368,6 +382,10 @@ public class TptPlugin extends Builder {
       return false;
     }
 
+    public static LogLevel getDefaultJUnitLogLevel() {
+      return LogLevel.INFO;
+    }
+
     public static int getDefaultTptPort() {
       return Utils.DEFAULT_TPT_PORT;
     }
@@ -378,6 +396,14 @@ public class TptPlugin extends Builder {
 
     public static int getDefaultTptStartUpWaitTime() {
       return Utils.DEFAULT_STARTUP_WAIT_TIME;
+    }
+
+    public ListBoxModel doFillJUnitLogLevelItems() {
+      ListBoxModel items = new ListBoxModel();
+      for (LogLevel goal : LogLevel.values()) {
+        items.add(goal.name());
+      }
+      return items;
     }
 
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {

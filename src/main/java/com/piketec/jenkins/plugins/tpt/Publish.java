@@ -30,6 +30,8 @@ import java.util.List;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogEntry;
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.FilePath;
@@ -37,7 +39,8 @@ import hudson.FilePath;
 public final class Publish {
 
   public static int publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
-                                        JenkinsConfiguration ex, TptLogger logger)
+                                        JenkinsConfiguration ex, TptLogger logger,
+                                        LogLevel logLevel)
       throws IOException {
     XmlStreamWriter xmlPub = null;
 
@@ -57,11 +60,18 @@ public final class Publish {
       if (!testdata.isEmpty()) {
         for (Testcase tc : testdata) {
 
-          if (tc.getErrors().isEmpty() && "SUCCESS".equals(tc.getResult())) {
+          if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
             xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
           } else {
+            StringBuilder log = new StringBuilder();
+            for (LogEntry entry : tc.getLogEntries(logLevel)) {
+              if (log.length() > 0) {
+                log.append('\n');
+              }
+              log.append('[').append(entry.level.name()).append("] ").append(entry.message);
+            }
             xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
-                tc.getLogEntries().toString());
+                log.toString());
           }
         }
       }

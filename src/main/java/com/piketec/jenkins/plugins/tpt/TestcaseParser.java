@@ -32,6 +32,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
+
 import hudson.FilePath;
 
 public class TestcaseParser extends DefaultHandler {
@@ -40,7 +42,7 @@ public class TestcaseParser extends DefaultHandler {
 
   private Testcase ti = null;
 
-  private StringBuffer errorString = null;
+  private LogLevel type = null;
 
   private StringBuffer logString = null;
 
@@ -66,7 +68,7 @@ public class TestcaseParser extends DefaultHandler {
       }
       return parser.ti;
     } catch (ParserConfigurationException e) {
-      throw new IOException("XML parser config error:" + e.getMessage());
+      throw new IOException("XML parser config error: " + e.getMessage());
     } catch (SAXException e) {
       throw new IOException("SAX error: " + e.getMessage());
     } catch (IOException e) {
@@ -96,8 +98,17 @@ public class TestcaseParser extends DefaultHandler {
     } else if (elementName.equalsIgnoreCase("Log")) {
       logString = new StringBuffer();
       String type = attributes.getValue("Type");
-      if (type.equalsIgnoreCase("error")) {
-        errorString = new StringBuffer();
+      if (type == null) {
+        this.type = LogLevel.ALL;
+      } else if (type.equalsIgnoreCase("info") || type.equalsIgnoreCase("customoutput")
+          || type.equalsIgnoreCase("section")) {
+        this.type = LogLevel.INFO;
+      } else if (type.equalsIgnoreCase("warning")) {
+        this.type = LogLevel.WARNING;
+      } else if (type.equalsIgnoreCase("error")) {
+        this.type = LogLevel.ERROR;
+      } else if (!type.equalsIgnoreCase("invisible")) {
+        this.type = LogLevel.ALL;
       }
     } else if (elementName.equalsIgnoreCase("AssessmentVariable")) {
       String name = attributes.getValue("Name");
@@ -111,12 +122,8 @@ public class TestcaseParser extends DefaultHandler {
   @Override
   public void endElement(String uri, String localName, String qName) throws SAXException {
     if (qName.equalsIgnoreCase("log")) {
-      ti.addLogEntry(logString.toString());
-      if (errorString != null) {
-        ti.addErrors(errorString.toString());
-      }
+      ti.addLogEntry(logString.toString(), type);
       logString = null;
-      errorString = null;
     } else if (qName.equalsIgnoreCase("AssessmentVariable")) {
       ti.addAssessmentVariable(assessmentVariable);
       assessmentVariable = null;
@@ -127,9 +134,6 @@ public class TestcaseParser extends DefaultHandler {
   public void characters(char[] ac, int i, int j) throws SAXException {
     if (logString != null) {
       logString.append(ac, i, j);
-    }
-    if (errorString != null) {
-      errorString.append(ac, i, j);
     }
     if (assessmentVariable != null) {
       assessmentVariable.appendMessage(new String(ac, i, j));

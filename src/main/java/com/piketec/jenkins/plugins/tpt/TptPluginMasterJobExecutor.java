@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
@@ -66,6 +67,8 @@ class TptPluginMasterJobExecutor {
 
   private String jUnitXmlPath;
 
+  private LogLevel jUnitLogLevel;
+
   private List<JenkinsConfiguration> executionConfigs;
 
   private int tptPort;
@@ -94,17 +97,19 @@ class TptPluginMasterJobExecutor {
 
   TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
                              BuildListener listener, FilePath[] exePaths, String jUnitXmlPath,
-                             List<JenkinsConfiguration> executionConfigs, int tptPort,
-                             String tptBindingName, String slaveJobName, String testcaseVarName,
-                             String execCfgVarName, String tptFileVarName, String exePathsVarName,
-                             String testDataDirVarName, String reportDirVarName,
-                             long tptStartupWaitTime, int slaveJobCount, int slaveJobTries) {
+                             LogLevel jUnitLogLevel, List<JenkinsConfiguration> executionConfigs,
+                             int tptPort, String tptBindingName, String slaveJobName,
+                             String testcaseVarName, String execCfgVarName, String tptFileVarName,
+                             String exePathsVarName, String testDataDirVarName,
+                             String reportDirVarName, long tptStartupWaitTime, int slaveJobCount,
+                             int slaveJobTries) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
     this.listener = listener;
     this.exePaths = exePaths;
     this.jUnitXmlPath = jUnitXmlPath;
+    this.jUnitLogLevel = jUnitLogLevel;
     this.executionConfigs = executionConfigs;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
@@ -281,7 +286,8 @@ class TptPluginMasterJobExecutor {
         }
         executionConfig.setDataDir(oldTestDataFile);
         executionConfig.setReportDir(oldReportDir);
-        int foundTestData = Utils.publishResults(build.getWorkspace(), ec, jUnitXmlPath, logger);
+        int foundTestData =
+            Utils.publishResults(build.getWorkspace(), ec, jUnitXmlPath, jUnitLogLevel, logger);
         if (foundTestData != testCases.size()) {
           logger
               .error("Found only " + foundTestData + " of " + testCases.size() + " test results.");

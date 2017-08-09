@@ -20,12 +20,14 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.piketec.jenkins.plugins.tpt.TptLog.LogEntry;
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 
 public class Testcase {
 
@@ -39,16 +41,13 @@ public class Testcase {
 
   private String execDuration;
 
-  private final List<String> errors;
-
-  private final List<String> log;
+  private TptLog log;
 
   /** ordered set of variables (ordered by name) */
   private final Set<AssessmentVariable> variables;
 
   Testcase() {
-    errors = new ArrayList<String>();
-    log = new ArrayList<String>();
+    log = new TptLog();
     variables = new HashSet<AssessmentVariable>();
     execDuration = "0";
     result = "";
@@ -80,16 +79,6 @@ public class Testcase {
     this.id = id;
   }
 
-  List<String> getErrors() {
-    return Collections.unmodifiableList(errors);
-  }
-
-  void addErrors(String error) {
-    error = error.replaceAll("address=0x[0-9a-fA-F]{4}", "address=0x%%%%");
-    error = error.replaceAll("(heap size: \\d+, required heap size: \\d+)", "");
-    this.errors.add(error);
-  }
-
   void setExecDate(Date execDate) {
     this.execDate = execDate;
   }
@@ -114,13 +103,16 @@ public class Testcase {
     return result;
   }
 
-  void addLogEntry(String entry) {
-    this.log.add(entry);
-    this.log.add("\n");
+  void addLogEntry(String entry, LogLevel level) {
+    if (level == LogLevel.ERROR) {
+      entry = entry.replaceAll("address=0x[0-9a-fA-F]{4}", "address=0x%%%%");
+      entry = entry.replaceAll("(heap size: \\d+, required heap size: \\d+)", "");
+    }
+    log.log(level, entry);
   }
 
-  List<String> getLogEntries() {
-    return log;
+  List<LogEntry> getLogEntries(LogLevel level) {
+    return log.getLog(level);
   }
 
   /**
@@ -128,14 +120,5 @@ public class Testcase {
    */
   String getQualifiedName() {
     return name + "_" + id;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (String s : errors) {
-      sb.append(s).append("\n");
-    }
-    return sb.toString().trim();
   }
 }

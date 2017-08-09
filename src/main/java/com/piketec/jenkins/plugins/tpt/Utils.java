@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.TptApi;
@@ -207,7 +208,7 @@ class Utils {
   }
 
   static int publishResults(FilePath workspace, JenkinsConfiguration ec, String jUnitXml,
-                            TptLogger logger)
+                            LogLevel jUnitLogLevel, TptLogger logger)
       throws IOException {
     FilePath reportPath = ((jUnitXml == null) || jUnitXml.trim().isEmpty()) ? workspace
         : new FilePath(workspace, jUnitXml);
@@ -224,7 +225,7 @@ class Utils {
     } catch (InterruptedException ie) {
       throw new IOException("Failed to get the directory: " + reportPath, ie);
     }
-    return Publish.publishJUnitResults(workspace, reportPath, ec, logger);
+    return Publish.publishJUnitResults(workspace, reportPath, ec, logger, jUnitLogLevel);
   }
 
   /**

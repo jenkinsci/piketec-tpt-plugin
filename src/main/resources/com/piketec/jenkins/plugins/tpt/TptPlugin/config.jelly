@@ -20,25 +20,29 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-	<!-- TPT Configuration -->
-	<f:entry field="exePaths" title="Path to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
-		<f:textbox value="${instance.exePaths}" />
-	</f:entry>
+  <!-- TPT Configuration -->
+  <f:entry field="exePaths" title="Path to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
+    <f:textbox value="${instance.exePaths}" />
+  </f:entry>
 
-	<f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
-		<f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
-	</f:entry>
+  <f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
+    <f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
+  </f:entry>
 
-	<f:entry field="report" title="JUnit XML directory" help="/plugin/piketec-tpt/report.html">
-		<f:textbox value="${instance.report}" default="${descriptor.defaultReport}" />
-	</f:entry>
-	
-	<f:advanced>
-  	<f:entry  help="/plugin/piketec-tpt/masterMode.html">
-  	  <f:checkbox title="Distribute work to TPT slave jobs" checked="${instance.isTptMaster}" field="isTptMaster"/>
-  	</f:entry>
+  <f:entry field="report" title="JUnit XML directory" help="/plugin/piketec-tpt/report.html">
+    <f:textbox value="${instance.report}" default="${descriptor.defaultReport}" />
+  </f:entry>
+  
+  <f:entry field="jUnitLogLevel" title="JUnit Log Level" help="/plugin/piketec-tpt/loglevel.html">
+    <f:select default="${descriptor.defaultJUnitLogLevel}"/>
+  </f:entry>
+  
+  <f:advanced>
+    <f:entry  help="/plugin/piketec-tpt/masterMode.html">
+      <f:checkbox title="Distribute work to TPT slave jobs" checked="${instance.isTptMaster}" field="isTptMaster"/>
+    </f:entry>
     <f:entry field="slaveJob" title="Slave job" help="/plugin/piketec-tpt/slaveJob.html">
       <f:textbox value="${instance.slaveJob}"/>
     </f:entry>
@@ -59,11 +63,11 @@
     </f:entry>
   </f:advanced>
 
-	<!-- Validation Suite Configuration -->
-	<f:section title="TPT files and configuration">
-		<f:entry help="/plugin/piketec-tpt/executionConfiguration.html">
-			<f:repeatableProperty field="executionConfiguration"
-				minimum="1" header="Validation-Set" noAddButton="false" />
-		</f:entry>
-	</f:section>
+  <!-- Validation Suite Configuration -->
+  <f:section title="TPT files and configuration">
+    <f:entry help="/plugin/piketec-tpt/executionConfiguration.html">
+      <f:repeatableProperty field="executionConfiguration"
+        minimum="1" header="Validation-Set" noAddButton="false" />
+    </f:entry>
+  </f:section>
 </j:jelly>
