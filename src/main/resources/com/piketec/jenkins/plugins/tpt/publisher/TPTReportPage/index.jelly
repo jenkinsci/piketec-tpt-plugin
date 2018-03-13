@@ -1,0 +1,227 @@
+<!-- ~ The MIT License (MIT) ~ ~ Copyright (c) 2015 PikeTec GmbH ~ ~ Permission 
+  is hereby granted, free of charge, to any person obtaining a copy of this 
+  software and ~ associated documentation files (the "Software"), to deal in 
+  the Software without restriction, ~ including without limitation the rights 
+  to use, copy, modify, merge, publish, distribute, ~ sublicense, and/or sell 
+  copies of the Software, and to permit persons to whom the Software is ~ furnished 
+  to do so, subject to the following conditions: ~ ~ The above copyright notice 
+  and this permission notice shall be included in all copies or ~ substantial 
+  portions of the Software. ~ ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+  OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT ~ NOT LIMITED TO THE WARRANTIES 
+  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND ~ NONINFRINGEMENT. 
+  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+  ~ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+  ARISING FROM, ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+  DEALINGS IN THE SOFTWARE. -->
+  
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:securityPermisson="/lib/hudson/securityPermisson" >
+
+	<l:layout title="${it.run} test">
+
+		<l:side-panel>
+			<l:tasks>
+
+				<st:include page="sidepanel.jelly" it="${it.run}"
+					optional="true" />
+
+
+
+			</l:tasks>
+		</l:side-panel>
+		<l:main-panel>
+			<style>
+				a {
+				text-decoration: none !important;
+				}
+				#fehl {
+				text-align: left;
+				}
+
+				#customers {
+				font-family: "Trebuchet
+				MS",
+				Arial, Helvetica,
+				sans-serif;
+				border-collapse: collapse;
+				width:
+				100%;
+				}
+				
+				td a {
+				display: block;
+				}
+
+				#customers td,
+				#customers th {
+				border: 1px solid #ddd;
+				padding:
+				8px;
+				}
+
+				#customers
+				tr:nth-child(even){background-color: #f2f2f2;}
+
+				#customers
+				tr:hover
+				{background-color: #ddd;}
+
+				#customers th {
+				padding-top: 12px;
+				padding-bottom: 12px;
+				text-align: left;
+
+				}
+				#whiteT{
+				background-color:
+				white;
+				}
+				#passed{
+				background-color: #4CAF50;
+				}
+				#inconclused{
+				background-color: #e1ed09;
+				}
+				#failed{
+				background-color:#f22424;
+				}
+				#executionE{
+				background-color:#a32525;
+				}
+			</style>
+
+			<h1>TPT Report</h1>
+
+			<h2>All Tests</h2>
+			
+			
+			<j:if test="${it.getStaticValue()}">
+     
+   
+			<table class="pane sortable bigtable stripped" id="customers">
+				<tr>
+					<th class="pane-header" id="whiteT">${%TPT File}</th>
+					<th class="pane-header" id="whiteT">${%Execution Configuration}</th>
+					<th class="pane-header" id="passed">${%Passed}</th>
+					<th class="pane-header" id="inconclused">${%Inconclusive}</th>
+					<th class="pane-header" id="failed">${%Failed}</th>
+					<th class="pane-header" id="executionE">${%Execution Error}</th>
+					<th class="pane-header" id="whiteT">${%Total}</th>
+				</tr>
+				<j:forEach items="${it.tptFiles}" var="file">
+					<tr>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.fileName}</a></td>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.configuration}</a></td>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.passed}</a></td>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.inconclusive}</a></td>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.failed}</a></td>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.executionError}</a></td>
+						<td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${file.fileName}${file.configuration}/index.html">${file.total}</a></td>
+
+					</tr>
+				</j:forEach>
+			</table>
+			<h2 align="middle">Result from Build</h2>
+
+			<p style="text-align:center;">
+				<img
+					src="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/Images/pieChart.png"
+					width="616" height="308" align="middle" />
+			</p>
+			<h3>All Failed Tests</h3>
+			<table class="pane sortable bigtable stripped" id="customers">
+				<tr>
+					<th class="pane-header" >${%ID}</th>
+					<th class="pane-header" >${%Test Case}</th>
+					<th class="pane-header" >${%Result}</th>
+					<th class="pane-header" >${%Failed Since}</th>
+					<th class="pane-header" >${%File}</th>
+					<th class="pane-header" >${%Execution Configuration}</th>
+					<th class="pane-header" >${%Execution Date}</th>
+				</tr>
+				<j:forEach items="${it.failedTests}" var="failedTests">
+					<tr>
+						
+							<!-- <a href="${it.rootUrl}/job/${it.build.getProject().getName()}/ws/Builds/${it.build.getNumber()}/${failedTests.reportFile}/${failedTests.}">${failedTests.id}</a> -->
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.id}</a></td>
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.testCaseName}</a></td>
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.result}</a></td>
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.getNumberFromHistory(failedTests.buildHistoy)}/TPT_Report">${failedTests.buildHistoy}</a></td>
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.fileName}</a></td>
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.executionConfiguration}</a></td>
+							<td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.executionDate}</a></td>
+							
+					
+					</tr>
+
+				</j:forEach>
+			</table>
+			
+			</j:if>
+			
+			<j:if test="${!it.getStaticValue()}">
+			
+			     <table class="pane sortable bigtable stripped" id="customers">
+        <tr>
+          <th class="pane-header" id="whiteT">${%TPT File}</th>
+          <th class="pane-header" id="whiteT">${%Execution Configuration}</th>
+          <th class="pane-header" id="passed">${%Passed}</th>
+          <th class="pane-header" id="inconclused">${%Inconclusive}</th>
+          <th class="pane-header" id="failed">${%Failed}</th>
+          <th class="pane-header" id="executionE">${%Execution Error}</th>
+          <th class="pane-header" id="whiteT">${%Total}</th>
+        </tr>
+        <j:forEach items="${it.tptFiles}" var="file">
+          <tr>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.fileName}</a></td>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.configuration}</a></td>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.passed}</a></td>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.inconclusive}</a></td>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.failed}</a></td>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.executionError}</a></td>
+            <td class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${file.total}</a></td>
+
+          </tr>
+        </j:forEach>
+      </table>
+      <h2 align="middle">Result from Build</h2>
+
+      <p style="text-align:center;">
+        <img
+          src="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/Images/pieChart.png"
+          width="616" height="308" align="middle" />
+      </p>
+      <h3>All Failed Tests</h3>
+      <table class="pane sortable bigtable stripped" id="customers">
+        <tr>
+          <th class="pane-header" >${%ID}</th>
+          <th class="pane-header" >${%Test Case}</th>
+          <th class="pane-header" >${%Result}</th>
+          <th class="pane-header" >${%Failed Since}</th>
+          <th class="pane-header" >${%File}</th>
+          <th class="pane-header" >${%Execution Configuration}</th>
+          <th class="pane-header" >${%Execution Date}</th>
+        </tr>
+        <j:forEach items="${it.failedTests}" var="failedTests">
+          <tr>
+            
+              <!-- <a href="${it.rootUrl}/job/${it.build.getProject().getName()}/ws/Builds/${it.build.getNumber()}/${failedTests.reportFile}/${failedTests.}">${failedTests.id}</a> -->
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${failedTests.id}</a></td>
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${failedTests.testCaseName}</a></td>
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${failedTests.result}</a></td>
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.getNumberFromHistory(failedTests.buildHistoy)}/TPT_Report">${failedTests.buildHistoy}</a></td>
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${failedTests.fileName}</a></td>
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${failedTests.executionConfiguration}</a></td>
+              <td  class="pane" ><a href="${it.rootUrl}/job/${it.build.getProject().getName()}/${it.build.getNumber()}/TPT_Report/SecurityError">${failedTests.executionDate}</a></td>
+              
+          
+          </tr>
+
+        </j:forEach>
+      </table>
+  
+    </j:if>
+
+		</l:main-panel>
+	</l:layout>
+</j:jelly>

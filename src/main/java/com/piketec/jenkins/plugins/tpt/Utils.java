@@ -22,6 +22,8 @@ package com.piketec.jenkins.plugins.tpt;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -33,6 +35,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.io.FilenameUtils;
+
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
@@ -41,8 +45,9 @@ import com.piketec.tpt.api.TptApi;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import jenkins.model.Jenkins;
 
-class Utils {
+public class Utils {
 
   static final String TPT_EXE_VAR = "PIKETEC_TPT_EXE";
 
@@ -95,7 +100,7 @@ class Utils {
     return false;
   }
 
-  static File getWorkspaceDir(FilePath workspace, TptLogger logger) {
+  public static File getWorkspaceDir(FilePath workspace, TptLogger logger) {
     File workspaceDir = null;
 
     if (workspace == null) {
@@ -112,6 +117,28 @@ class Utils {
     }
 
     return workspaceDir;
+  }
+
+  public static String getGeneratedTestDataDir(JenkinsConfiguration ec) {
+    if (ec.getTestdataDir() == null || ec.getTestdataDir().trim().isEmpty()) {
+      return "Piketec/" + FilenameUtils.getBaseName(ec.getTptFile()) + "/" + ec.getConfiguration()
+          + "/testdata";
+    } else {
+      return ec.getTestdataDir();
+    }
+  }
+
+  public static String getGeneratedReportDir(JenkinsConfiguration ec) {
+    if (ec.getReportDir() == null || ec.getReportDir().trim().isEmpty()) {
+      return "Piketec/" + FilenameUtils.getBaseName(ec.getTptFile()) + "/" + ec.getConfiguration()
+          + "/report";
+    } else {
+      return ec.getReportDir();
+    }
+  }
+
+  public static File getTptPluginRootDir() {
+    return new File(Jenkins.getInstance().getRootDir(), "plugins\\piketec-tpt");
   }
 
   private static boolean startTpt(AbstractBuild< ? , ? > build, Launcher launcher, TptLogger logger,
@@ -258,6 +285,16 @@ class Utils {
       }
     }
     return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
+  }
+
+  public static String readFilePathToString(FilePath path, Charset encoding)
+      throws IOException, InterruptedException {
+    InputStream inputStream = path.read();
+    try {
+      return org.apache.commons.io.IOUtils.toString(inputStream, encoding);
+    } finally {
+      org.apache.commons.io.IOUtils.closeQuietly(inputStream);
+    }
   }
 
   static <T> String toString(Collection<T> list, String delimeter) {

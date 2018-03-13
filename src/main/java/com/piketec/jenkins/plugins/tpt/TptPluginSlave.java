@@ -67,6 +67,7 @@ public class TptPluginSlave extends Builder {
     this.testDataDir = testDataDir;
     this.reportDir = reportDir;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
+
   }
 
   public String getExePaths() {

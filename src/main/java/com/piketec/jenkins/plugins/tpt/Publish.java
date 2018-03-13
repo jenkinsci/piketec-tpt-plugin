@@ -20,7 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +28,8 @@ import java.util.List;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
+
+import org.apache.commons.io.FilenameUtils;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogEntry;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
@@ -45,11 +46,12 @@ public final class Publish {
     XmlStreamWriter xmlPub = null;
 
     try {
-      String classname = ex.getClassname();
-      FilePath reportFile = new FilePath(reportFolder, ex.getReportName());
-      File testDataText = ex.getTestdataDir();
-      FilePath testDataDir = ((testDataText == null) || testDataText.toString().trim().isEmpty())
-          ? workspaceDir : new FilePath(workspaceDir, testDataText.toString());
+      String classname = FilenameUtils.getBaseName(ex.getTptFile());
+      FilePath reportFile = new FilePath(reportFolder,
+          classname + "." + ex.getConfigurationWithUnderscore() + ".xml");
+      String testDataText = Utils.getGeneratedTestDataDir(ex);
+      FilePath testDataDir = ((testDataText == null) || testDataText.trim().isEmpty())
+          ? workspaceDir : new FilePath(workspaceDir, testDataText);
       List<Testcase> testdata;
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(reportFile);

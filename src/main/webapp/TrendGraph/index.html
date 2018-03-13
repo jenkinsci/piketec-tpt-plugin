@@ -1,0 +1,254 @@
+<!doctype html>
+<!-- Copyright 2018 MIT
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.-->
+<html>
+
+<head>
+    <title>Line Chart</title>
+   
+	<script src="http://www.chartjs.org/dist/2.7.1/Chart.bundle.js"></script>
+	
+	<script id="data" type="application/json" >toReplace</script>
+    <script src="utils.js"></script>
+    <style>
+    canvas{
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+		text-align: right;
+		align: center;
+    }
+	html{
+		text-align: center;
+	}
+	.btn-group .button {
+     border: 0px;
+	border-radius: 10px;
+    color: solid black;
+    padding: 5px 22px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-group{
+	 text-align: center;
+	  margin: auto;
+	  width: 100%;
+}
+.btn-group .button:not(:last-child) {
+    border-right: none; /* Prevent double borders */
+}
+.btn-group .button:hover {
+    opacity: 0.7;
+}
+    </style>
+</head>
+
+<body>
+    <div  style="display: inline-block; text-align: right; width: 40%">
+        <canvas id="canvas"></canvas>
+		<div class="btn-group" >
+  <button class="button" onClick="update(0)" style="background-color:#36a2eb">Total</button>
+  <button class="button" onClick="update(1)" style="background-color:#4CAF50">Passed</button>
+  <button class="button" onClick="update(2)" style="background-color:#e1ed09;">Inconclusive</button>
+  <button class="button" onClick="update(3)" style="background-color:#a32525">Error</button>
+  <button class="button" onClick="update(4)" style="background-color:#f22424">Failed</button>
+</div>
+    </div>
+    <br>
+	
+    <br>
+   <!-- <button id="randomizeData">Randomize Data</button>
+    <button id="addDataset">Add Dataset</button>
+    <button id="removeDataset">Remove Dataset</button>
+    <button id="addData">Add Data</button>
+    <button id="removeData">Remove Data</button> -->
+	
+    <script>
+		//0 buildNummer
+		// 1 total
+		// 2 failed
+		// 3 inconclusive
+		// 4 error
+		// 5 passed Test
+		var dataD = document.getElementById('data').innerHTML
+		var builds = JSON.parse(dataD);
+		
+
+        var BUILDS = [];
+		var wieVieleBuilds = 10; //User Input
+		
+		var PassedTest = []; //Get from Java
+		var InconclusiveTest = []; //Get from Java
+		var FailedTest = []; //Get from Java
+		var ErrorTest = []; //Get from Java
+		var TotalTest = [];
+		
+		//TotalTest.push(builds[0].total);
+		//temporaer , spaeter nur de Werte von Java
+		for(var i = builds.data.length-1; i >=  0; i--){
+		BUILDS.push(builds.data[i][0].buildNummer);
+		PassedTest.push(builds.data[i][5].passed);
+		InconclusiveTest.push(builds.data[i][3].inconclusive);
+		FailedTest.push(builds.data[i][2].failed);
+		ErrorTest.push(builds.data[i][4].error);
+		TotalTest.push(builds.data[i][1].total);
+		}
+		
+		var obereGrenze = Math.max(...TotalTest);
+		var skala = 0;
+		if(obereGrenze > 50){
+			obereGrenze = Math.ceil(obereGrenze/100)*100;
+		    skala = obereGrenze % 10;
+		}else if (obereGrenze > 20){
+			obereGrenze = 50;
+			skala = 5;
+		}else if(obereGrenze > 10){
+			obereGrenze = 20;
+			skala = 2;
+		}else{
+			obereGrenze = 10;
+			skala = 1;
+		}
+		
+        var config = {
+            type: 'line',
+            data: {
+                labels: BUILDS,
+                datasets: [{
+                    label: "Total Tests",
+					lineTension: 0,
+                    backgroundColor: window.chartColors.blue,
+                    borderColor: window.chartColors.blue,
+                    data: TotalTest,
+                    fill: false,
+					hidden: false,
+                }, {
+                    label: "Passed Tests",
+                    fill: false,
+					lineTension: 0,
+                    backgroundColor: "#4CAF50",
+                    borderColor: "#4CAF50",
+                    data: PassedTest,
+					hidden: false,
+                },{
+                    label: "Inconclusive Tests",
+                    fill: false,
+					lineTension: 0,
+                    backgroundColor: "#e1ed09",
+                    borderColor: "#e1ed09",
+                    data: InconclusiveTest,
+					hidden: false,
+                },
+				
+				{
+                    label: "Error Tests",
+                    fill: false,
+					lineTension: 0,
+                    backgroundColor: "#a32525",
+                    borderColor: "#a32525",
+                    data: ErrorTest,
+					hidden: false,
+                },
+				
+				{
+                    label: "Failed Tests",
+					lineTension: 0,
+                    fill: false,
+                    backgroundColor: "#f22424",
+                    borderColor: "#f22424",
+                    data: FailedTest,
+					hidden: false,
+                }
+				
+				
+				
+				]
+            },
+            options: {
+				
+                responsive: true,
+				legend:{
+					onClick: "",
+				},
+                title:{
+                    display:true,
+                    text:'Trend Graph from Builds'
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                hover: {
+                    mode: 'nearest',
+                    intersect: true
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Build Number'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Test Results'
+							
+                        },
+						 ticks: {
+                max: obereGrenze, //Set depending on max Value Total Tests
+                min: 0, // Set depending on Min Value TOtal TEst
+                stepSize: skala //Set depending two above
+            }
+
+						
+						
+                    }]
+                },
+				 onClick: handleClick
+            }
+        };
+        window.onload = function() {
+            var ctx = document.getElementById("canvas").getContext("2d");
+            window.myLine = new Chart(ctx, config);
+			
+        };
+		
+		
+		function update(index){
+	var indexInArray = index;
+			var chart = this.myLine;
+			config.data.datasets[indexInArray].hidden = !config.data.datasets[indexInArray].hidden;
+			chart.update();
+	
+	
+	}
+		
+		function handleClick(evt)
+     {
+    var activeElement = myLine.getElementsAtXAxis(evt);
+	var link = window.location.href;
+	var replacedLink = link.replace("TPTtrendResults/index.html","");
+	window.open(
+   replacedLink+BUILDS[activeElement[0]._index]+ '/TPT_Report/',
+  '_blank' 
+);
+	};
+		
+        
+       
+    </script>
+</body>
+
+</html>

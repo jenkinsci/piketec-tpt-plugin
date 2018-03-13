@@ -67,7 +67,7 @@
   <f:section title="TPT files and configuration">
     <f:entry help="/plugin/piketec-tpt/executionConfiguration.html">
       <f:repeatableProperty field="executionConfiguration"
-        minimum="1" header="Validation-Set" noAddButton="false" />
+        minimum="1" header="Validation-Set" noAddButton="false"  />
     </f:entry>
   </f:section>
 </j:jelly>

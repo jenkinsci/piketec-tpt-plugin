@@ -45,7 +45,7 @@ import hudson.util.ListBoxModel;
 
 /**
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
- * If you use this Jenkins plugin you have two Options to run TPT-Test. The first option is yust to
+ * If you use this Jenkins plugin you have two Options to run TPT-Test. The first option is just to
  * run TPT via command line and execute the tests. The second option is to execute the tests via
  * API. In this case for every testcase a single slave job will be started. This slvae job must have
  * a proper configured TptPluginSlave Build step. Master-slave execution was was introduced in the
@@ -108,7 +108,9 @@ public class TptPlugin extends Builder {
 
     if (executionConfiguration != null) {
       this.executionConfiguration.addAll(executionConfiguration);
+
     }
+
   }
 
   protected Object readResolve() {

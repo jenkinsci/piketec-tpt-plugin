@@ -22,12 +22,14 @@ package com.piketec.jenkins.plugins.tpt.Configuration;
 
 import java.io.File;
 
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Util;
+import hudson.model.AbstractProject;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
@@ -39,13 +41,13 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   private long timeout;
 
-  private final File tptFile;
+  private final String tptFile;
 
   private final String configuration;
 
-  private final File testdataDir;
+  private final String testdataDir;
 
-  private final File reportDir;
+  private final String reportDir;
 
   /**
    * the execution configuration is used by tpt to determine which file and which arguments is used.
@@ -63,14 +65,15 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    *          - true if you want to skip this configuration
    */
   @DataBoundConstructor
-  public JenkinsConfiguration(File tptFile, String configuration, File testdataDir, File reportDir,
-                              boolean enableTest, long timeout) {
+  public JenkinsConfiguration(String tptFile, String configuration, String testdataDir,
+                              String reportDir, boolean enableTest, long timeout) {
     this.tptFile = tptFile;
     this.configuration = configuration;
     this.testdataDir = testdataDir;
     this.reportDir = reportDir;
     this.enableTest = enableTest;
     this.timeout = timeout;
+
   }
 
   protected Object readResolve() {
@@ -88,21 +91,21 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return timeout;
   }
 
-  public File getTptFile() {
+  public String getTptFile() {
     return tptFile;
   }
 
-  /**
-   * @return the tpt filename without ".tpt"
-   */
-  public String getTptFileName() {
-    int end = tptFile.getName().lastIndexOf(".");
-    return tptFile.getName().substring(0, end);
-  }
-
-  public String getReportName() {
-    return getTptFileName() + "." + getConfigurationWithUnderscore() + ".xml";
-  }
+  // /**
+  // * @return the tpt filename without ".tpt"
+  // */
+  // public String getTptFileName() {
+  // int end = tptFile.getName().lastIndexOf(".");
+  // return tptFile.getName().substring(0, end);
+  // }
+  //
+  // public String getReportName() {
+  // return getTptFileName() + "." + getConfigurationWithUnderscore() + ".xml";
+  // }
 
   /**
    * @return the configuration with replaced whitespace. <code> " " -&gt; "_"</code>
@@ -111,13 +114,13 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return configuration.replace(" ", "_");
   }
 
-  /**
-   * 
-   * @return the tpt filename with a dot and the configuration with underscores as spaces
-   */
-  public String getClassname() {
-    return getTptFileName() + "." + getConfigurationWithUnderscore();
-  }
+  // /**
+  // *
+  // * @return the tpt filename with a dot and the configuration with underscores as spaces
+  // */
+  // public String getClassname() {
+  // return getTptFileName() + "." + getConfigurationWithUnderscore();
+  // }
 
   /**
    * @return the whole configuration string defined in the jenkins conf
@@ -142,31 +145,18 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return descriptor;
   }
 
-  public File getReportDir() {
+  public String getReportDir() {
     return reportDir;
   }
 
-  public File getTestdataDir() {
+  public String getTestdataDir() {
     return testdataDir;
   }
 
   public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
-    return new JenkinsConfiguration(normalizePath(tptFile, environment),
-        Util.replaceMacro(configuration, environment), normalizePath(testdataDir, environment),
-        normalizePath(reportDir, environment), enableTest, timeout);
-  }
-
-  private File normalizePath(File f, EnvVars environment) {
-    // replace ${...} variables
-    String pathAsString = Util.replaceMacro(f.getPath(), environment);
-    // remove quotes if the user entered some
-    if (pathAsString.startsWith("\"")) {
-      pathAsString = pathAsString.substring(1);
-    }
-    if (pathAsString.endsWith("\"")) {
-      pathAsString = pathAsString.substring(0, pathAsString.length());
-    }
-    return new File(pathAsString);
+    return new JenkinsConfiguration(Util.replaceMacro(tptFile, environment),
+        Util.replaceMacro(configuration, environment), Util.replaceMacro(testdataDir, environment),
+        Util.replaceMacro(reportDir, environment), enableTest, timeout);
   }
 
   /**
@@ -184,9 +174,27 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
       }
     }
 
-    public static FormValidation doCheckConfiguration(@QueryParameter String configuration) {
-      return ((configuration == null) || (configuration.trim().length() == 0))
-          ? FormValidation.error("Enter a configuration name.") : FormValidation.ok();
+    public static FormValidation doCheckConfiguration(@QueryParameter String configuration,
+                                                      @AncestorInPath AbstractProject project) {
+      // Project< ? , ? > proj = (Project< ? , ? >)project;
+      // HashMap<String, String> nameAndConfig = new HashMap<>();
+      // for (Builder builder : proj.getBuilders()) {
+      // if (builder instanceof TptPlugin) {
+      // TptPlugin tptPlugin = (TptPlugin)builder;
+      // for (JenkinsConfiguration cfg : tptPlugin.getExecutionConfiguration()) {
+      // if (nameAndConfig.containsValue(configuration)) {
+      // return FormValidation.error("TPT File with such Configuration is already set, d.");
+      // }
+      // nameAndConfig.put(cfg.getTptFile(), cfg.getConfiguration());
+      // }
+      // }
+      // }
+      if ((configuration == null) || (configuration.trim().length() == 0)) {
+        return FormValidation.error("Enter a configuration name.");
+      } else {
+        return FormValidation.ok();
+      }
+
     }
 
     public static boolean getDefaultEnableTest() {
@@ -206,4 +214,5 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
       return "";
     }
   }
+
 }

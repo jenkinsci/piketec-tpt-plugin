@@ -100,16 +100,18 @@ class TptPluginSingleJobExecutor {
     // execute the sub-configuration
     for (JenkinsConfiguration ec : executionConfigs) {
       if (ec.isEnableTest()) {
-        File dataDir = Utils.getAbsolutePath(workspaceDir, ec.getTestdataDir());
-        File reportDir = Utils.getAbsolutePath(workspaceDir, ec.getReportDir());
-        File tptFile = Utils.getAbsolutePath(workspaceDir, ec.getTptFile());
+        String testdataDir = Utils.getGeneratedTestDataDir(ec);
+        FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
+        String reportDir = Utils.getGeneratedReportDir(ec);
+        FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
+        File tptFile = Utils.getAbsolutePath(workspaceDir, new File(ec.getTptFile()));
         String configurationName = ec.getConfiguration();
         logger.info("*** Running TPT-File \"" + tptFile + //
             "\" with configuration \"" + configurationName + "\" now. ***");
-        if (Utils.createParentDir(dataDir, workspace)
-            && Utils.createParentDir(reportDir, workspace)) {
-          String cmd =
-              buildCommand(exeFile, arguments, tptFile, dataDir, reportDir, configurationName);
+        if (Utils.createParentDir(new File(testdataDir), workspace)
+            && Utils.createParentDir(new File(reportDir), workspace)) {
+          String cmd = buildCommand(exeFile, arguments, tptFile, testDataPath.getRemote(),
+              reportPath.getRemote(), configurationName);
           try {
             // run the test...
             launchTPT(launcher, listener, cmd, ec.getTimeout());
@@ -125,8 +127,8 @@ class TptPluginSingleJobExecutor {
             return false;
           }
         } else {
-          logger
-              .error("Failed to create parent directories for " + dataDir + " and/or " + reportDir);
+          logger.error(
+              "Failed to create parent directories for " + testdataDir + " and/or " + reportDir);
           success = false;
         }
       }
@@ -151,8 +153,8 @@ class TptPluginSingleJobExecutor {
    *          the name of the execution configuration to execute
    * @return The concatenated string to start the test execution via command line.
    */
-  private String buildCommand(FilePath exeFile, String arguments, File tptFile, File dataDir,
-                              File reportDir, String configurationName) {
+  private String buildCommand(FilePath exeFile, String arguments, File tptFile, String dataDir,
+                              String reportDir, String configurationName) {
     StringBuilder cmd = new StringBuilder();
     String exeString = exeFile.getRemote();
     // surround path with ""
@@ -189,23 +191,21 @@ class TptPluginSingleJobExecutor {
 
     cmd.append(" --dataDir ");
     // surround path with ""
-    String dataDirString = dataDir.toString();
-    if (!dataDirString.startsWith("\"")) {
+    if (!dataDir.startsWith("\"")) {
       cmd.append('"');
     }
-    cmd.append(dataDirString);
-    if (!dataDirString.endsWith("\"")) {
+    cmd.append(dataDir);
+    if (!dataDir.endsWith("\"")) {
       cmd.append('"');
     }
 
     cmd.append(" --reportDir ");
     // surround path with ""
-    String reportDirString = reportDir.toString();
-    if (!reportDirString.startsWith("\"")) {
+    if (!reportDir.startsWith("\"")) {
       cmd.append('"');
     }
-    cmd.append(reportDirString);
-    if (!reportDirString.endsWith("\"")) {
+    cmd.append(reportDir);
+    if (!reportDir.endsWith("\"")) {
       cmd.append('"');
     }
 

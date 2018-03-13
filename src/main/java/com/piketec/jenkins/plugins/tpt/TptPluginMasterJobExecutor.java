@@ -123,6 +123,7 @@ class TptPluginMasterJobExecutor {
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.slaveJobCount = slaveJobCount;
     this.slaveJobTries = slaveJobTries;
+
   }
 
   boolean execute() {
@@ -148,8 +149,10 @@ class TptPluginMasterJobExecutor {
       }
       Collection<String> testCases = null;
       ExecutionConfiguration executionConfig;
-      FilePath testDataPath = new FilePath(build.getWorkspace(), ec.getTestdataDir().getPath());
-      FilePath reportPath = new FilePath(build.getWorkspace(), ec.getReportDir().getPath());
+      String testdataDir = Utils.getGeneratedTestDataDir(ec);
+      FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
+      String reportDir = Utils.getGeneratedReportDir(ec);
+      FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
       try {
         logger.info("Create and/or clear test data directory " + testDataPath.getRemote());
         Utils.deleteFiles(testDataPath);
@@ -171,7 +174,7 @@ class TptPluginMasterJobExecutor {
       }
 
       try {
-        OpenResult openProject = api.openProject(ec.getTptFile());
+        OpenResult openProject = api.openProject(new File(ec.getTptFile()));
         if (openProject.getProject() == null) {
           logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
           return false;
@@ -225,14 +228,13 @@ class TptPluginMasterJobExecutor {
         testSets.add(Utils.escapeTestCaseNames(currentTestSet));
       }
       // start one job for every test set
-      String predefinedBuildParametersString = this.execCfgVarName + "=" + ec.getConfiguration()
-          + "\n" //
-          + this.tptFileVarName + "=" + ec.getTptFile().getPath().replace("\\", "\\\\") + "\n" //
-          + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
-          + this.testDataDirVarName + "=" + ec.getTestdataDir().getPath().replace("\\", "\\\\")
-          + "\n" //
-          + this.reportDirVarName + "=" + ec.getReportDir().getPath().replace("\\", "\\\\") + "\n"//
-          + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId;//
+      String predefinedBuildParametersString =
+          this.execCfgVarName + "=" + ec.getConfiguration() + "\n" //
+              + this.tptFileVarName + "=" + ec.getTptFile().replace("\\", "\\\\") + "\n" //
+              + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
+              + this.testDataDirVarName + "=" + testdataDir.replace("\\", "\\\\") + "\n" //
+              + this.reportDirVarName + "=" + reportDir.replace("\\", "\\\\") + "\n"//
+              + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId;//
       for (String testCase : testSets) {
         logger.info("Create job for \"" + testCase + "\"");
         PredefinedBuildParameters predefinedBuildParameters = new PredefinedBuildParameters(
@@ -268,12 +270,8 @@ class TptPluginMasterJobExecutor {
         File oldTestDataFile = executionConfig.getDataDir();
         File oldReportDir = executionConfig.getReportDir();
 
-        if (ec.getTestdataDir() != null && !ec.getTestdataDir().getPath().isEmpty()) {
-          executionConfig.setDataDir(new File(testDataPath.getRemote()));
-        }
-        if (ec.getReportDir() != null && !ec.getReportDir().getPath().isEmpty()) {
-          executionConfig.setReportDir(new File(reportPath.getRemote()));
-        }
+        executionConfig.setDataDir(new File(testDataPath.getRemote()));
+        executionConfig.setReportDir(new File(reportPath.getRemote()));
         ExecutionStatus execStatus = api.reGenerateOverviewReport(executionConfig);
 
         while (execStatus.isRunning() || execStatus.isPending()) {
