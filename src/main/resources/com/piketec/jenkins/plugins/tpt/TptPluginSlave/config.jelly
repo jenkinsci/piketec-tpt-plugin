@@ -47,6 +47,10 @@
     <f:textbox value="${instance.reportDir}" default="${descriptor.defaultReportDir}"/>
   </f:entry>
   
+  <f:entry field="testSet" title="Test Set" help="/plugin/piketec-tpt/testSet.html">
+    <f:textbox value="${instance.testSet}" default="${descriptor.defaultTestSet}"/>
+  </f:entry>
+  
   <f:entry field="tptStartUpWaitTime" title="Wait for TPT start [s]" help="/plugin/piketec-tpt/tptStartUpWaitTime.html">
     <f:textbox value="${instance.tptStartUpWaitTime}" default="${descriptor.defaultTptStartUpWaitTime}"/>
   </f:entry>

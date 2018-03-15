@@ -39,6 +39,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   private final boolean enableTest;
 
+  private final String testSet;
+
   private long timeout;
 
   private final String tptFile;
@@ -66,13 +68,14 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   @DataBoundConstructor
   public JenkinsConfiguration(String tptFile, String configuration, String testdataDir,
-                              String reportDir, boolean enableTest, long timeout) {
+                              String reportDir, boolean enableTest, long timeout, String testSet) {
     this.tptFile = tptFile;
     this.configuration = configuration;
     this.testdataDir = testdataDir;
     this.reportDir = reportDir;
     this.enableTest = enableTest;
     this.timeout = timeout;
+    this.testSet = testSet;
 
   }
 
@@ -93,6 +96,10 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   public String getTptFile() {
     return tptFile;
+  }
+
+  public String getTestSet() {
+    return testSet;
   }
 
   // /**
@@ -156,7 +163,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
     return new JenkinsConfiguration(Util.replaceMacro(tptFile, environment),
         Util.replaceMacro(configuration, environment), Util.replaceMacro(testdataDir, environment),
-        Util.replaceMacro(reportDir, environment), enableTest, timeout);
+        Util.replaceMacro(reportDir, environment), enableTest, timeout,
+        Util.replaceMacro(testSet, environment));
   }
 
   /**
@@ -207,6 +215,10 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
     public static int getDefaultSlaveJobCount() {
       return 0;
+    }
+
+    public static String getDefaultTestSet() {
+      return "";
     }
 
     @Override

@@ -63,6 +63,8 @@ public class Utils {
 
   static final String TPT_EXECUTION_ID_VAR_NAME = "PIKETEC_TPT_EXECUTION_ID";
 
+  static final String TPT_TEST_SET_NAME_VAR = "PIKETEC-TPT_TEST_SET_NAME";
+
   static final int DEFAULT_TPT_PORT = 1099;
 
   static final String DEFAULT_TPT_BINDING_NAME = "TptApi";

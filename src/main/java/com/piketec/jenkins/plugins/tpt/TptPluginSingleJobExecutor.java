@@ -106,12 +106,13 @@ class TptPluginSingleJobExecutor {
         FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
         File tptFile = Utils.getAbsolutePath(workspaceDir, new File(ec.getTptFile()));
         String configurationName = ec.getConfiguration();
+        String tesSet = ec.getTestSet();
         logger.info("*** Running TPT-File \"" + tptFile + //
             "\" with configuration \"" + configurationName + "\" now. ***");
         if (Utils.createParentDir(new File(testdataDir), workspace)
             && Utils.createParentDir(new File(reportDir), workspace)) {
           String cmd = buildCommand(exeFile, arguments, tptFile, testDataPath.getRemote(),
-              reportPath.getRemote(), configurationName);
+              reportPath.getRemote(), configurationName, tesSet);
           try {
             // run the test...
             launchTPT(launcher, listener, cmd, ec.getTimeout());
@@ -154,7 +155,7 @@ class TptPluginSingleJobExecutor {
    * @return The concatenated string to start the test execution via command line.
    */
   private String buildCommand(FilePath exeFile, String arguments, File tptFile, String dataDir,
-                              String reportDir, String configurationName) {
+                              String reportDir, String configurationName, String testSet) {
     StringBuilder cmd = new StringBuilder();
     String exeString = exeFile.getRemote();
     // surround path with ""
@@ -187,6 +188,19 @@ class TptPluginSingleJobExecutor {
     cmd.append(configurationName);
     if (!configurationName.endsWith("\"")) {
       cmd.append('"');
+    }
+
+    if (!testSet.equals("")) {
+      cmd.append(" --testSet ");
+      // surround path with ""
+      if (!testSet.startsWith("\"")) {
+        cmd.append('"');
+      }
+      cmd.append(testSet);
+      if (!testSet.endsWith("\"")) {
+        cmd.append('"');
+      }
+      logger.info("Running " + testSet);
     }
 
     cmd.append(" --dataDir ");

@@ -55,11 +55,14 @@ public class TptPluginSlave extends Builder {
 
   private String tptStartUpWaitTime;
 
+  private String testSet;
+
   // ----------- Data Binding --------------
 
   @DataBoundConstructor
   public TptPluginSlave(String exePaths, String tptBindingName, String tptPort, String tptFile,
-                        String testDataDir, String reportDir, String tptStartUpWaitTime) {
+                        String testDataDir, String reportDir, String testSet,
+                        String tptStartUpWaitTime) {
     this.exePaths = exePaths;
     this.tptFile = tptFile;
     this.tptBindingName = tptBindingName;
@@ -67,6 +70,7 @@ public class TptPluginSlave extends Builder {
     this.testDataDir = testDataDir;
     this.reportDir = reportDir;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
+    this.testSet = testSet;
 
   }
 
@@ -92,6 +96,10 @@ public class TptPluginSlave extends Builder {
 
   public String getReportDir() {
     return reportDir;
+  }
+
+  public String getTestSet() {
+    return testSet;
   }
 
   /**
@@ -163,10 +171,11 @@ public class TptPluginSlave extends Builder {
     String expandedReportDir = environment.expand(reportDir);
     String expandedTestcaseName = environment.expand("${" + Utils.TPT_TEST_CASE_NAME_VAR + "}");
     String expandedExecutionId = environment.expand("${" + Utils.TPT_EXECUTION_ID_VAR_NAME + "}");
+    String expandedTestSetName = environment.expand("${" + Utils.TPT_TEST_SET_NAME_VAR + "}");
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
         expandedExePaths, expandedTptPort, expandedTptBindingName, new File(expandedTptFile),
         expandedExecConfig, expandedTestDataDir, expandedReportDir, expandedTestcaseName,
-        expandedTptStartupWaitTime, expandedExecutionId);
+        expandedTptStartupWaitTime, expandedExecutionId, expandedTestSetName);
     return executor.execute();
   }
 
@@ -213,6 +222,10 @@ public class TptPluginSlave extends Builder {
 
     public static String getDefaultReportDir() {
       return "${" + Utils.TPT_REPORT_DIR_VAR_NAME + "}";
+    }
+
+    public static String getDefaultTestSet() {
+      return "${" + Utils.TPT_TEST_SET_NAME_VAR + "}";
     }
 
     public static int getDefaultTptStartUpWaitTime() {

@@ -66,6 +66,12 @@
 		>
 			<f:textbox value="${instance.reportDir}" />
 		</f:entry>
+		
+		<f:entry field="testSet" title="Test Set"
+      help="/plugin/piketec-tpt/testSet.html"
+    >
+      <f:textbox value="${instance.testSet}" default="${descriptor.defaultTestSet}" />
+    </f:entry>
 
 		<f:entry field="timeout" title="Timeout [h]"
 			help="/plugin/piketec-tpt/timeout.html"

@@ -62,9 +62,9 @@ public class TPTReportPublisher extends Notifier {
       throws IOException, InterruptedException {
 
     listener.getLogger().println("Starting Post Build Action \"TPT Report\"");
-    // Key TestData Dir, Value Report Ord
-    ArrayList<String> uniqueTestDataDir = new ArrayList<>();
-    ArrayList<String> uniqueReportDataDir = new ArrayList<>();
+
+    ArrayList<FilePath> uniqueTestDataDir = new ArrayList<>();
+    ArrayList<FilePath> uniqueReportDataDir = new ArrayList<>();
 
     ArrayList<TPTFile> tptFiles = new ArrayList<>();
     ArrayList<TPTTestCase> failedTests = new ArrayList<>();
@@ -118,13 +118,12 @@ public class TPTReportPublisher extends Notifier {
           }
 
           // Check if the Testdata dir and the Report are unique, otherwise throw an exception
-          if (uniqueReportDataDir.contains(cfg.getReportDir())
-              || uniqueTestDataDir.contains(cfg.getTestdataDir())) {
+          if (uniqueReportDataDir.contains(reportDir) || uniqueTestDataDir.contains(testDataDir)) {
             throw new IOException("The directory \"" + cfg.getReportDir() + "\" or the directoy \""
                 + cfg.getTestdataDir() + " is already used, please choose another one");
           }
-          uniqueReportDataDir.add(cfg.getReportDir());
-          uniqueTestDataDir.add(cfg.getTestdataDir());
+          uniqueReportDataDir.add(reportDir);
+          uniqueTestDataDir.add(testDataDir);
 
         }
       }

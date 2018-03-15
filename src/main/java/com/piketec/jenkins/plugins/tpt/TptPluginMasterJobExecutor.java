@@ -40,6 +40,7 @@ import com.piketec.tpt.api.ExecutionStatus;
 import com.piketec.tpt.api.OpenResult;
 import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.Scenario;
+import com.piketec.tpt.api.TestSet;
 import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
@@ -186,7 +187,19 @@ class TptPluginMasterJobExecutor {
           logger.error("Could not find config");
           return false;
         }
-        testCases = getTestCaseNames(executionConfig, build, ec);
+        if (!ec.getTestSet().equals("")) {
+          for (TestSet definedTestset : openProject.getProject().getTestSets().getItems()) {
+            if (definedTestset.getName().equals(ec.getTestSet())) {
+              testCases = new ArrayList<>();
+              for (Scenario testcase : definedTestset.getTestCases().getItems()) {
+                testCases.add(testcase.getName());
+              }
+              break;
+            }
+          }
+        } else {
+          testCases = getTestCaseNames(executionConfig, build, ec);
+        }
       } catch (RemoteException e) {
         logger.error(e.getMessage());
         return false;
@@ -234,6 +247,7 @@ class TptPluginMasterJobExecutor {
               + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
               + this.testDataDirVarName + "=" + testdataDir.replace("\\", "\\\\") + "\n" //
               + this.reportDirVarName + "=" + reportDir.replace("\\", "\\\\") + "\n"//
+              + Utils.TPT_TEST_SET_NAME_VAR + "=" + ec.getTestSet() + "\n" //
               + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId;//
       for (String testCase : testSets) {
         logger.info("Create job for \"" + testCase + "\"");

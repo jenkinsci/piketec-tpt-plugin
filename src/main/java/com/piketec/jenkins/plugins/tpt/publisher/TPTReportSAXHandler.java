@@ -52,7 +52,7 @@ public class TPTReportSAXHandler extends DefaultHandler {
     // setFailedTests
     if (TESTCASEINFORMATION.equalsIgnoreCase(qName)) {
 
-      String result = attributes.getValue("Result");
+      String result = attributes.getValue("Result").toUpperCase();
       String id = attributes.getValue("Testcase");
       String executionDate = attributes.getValue("ExecutionDate");
       String reportFile = attributes.getValue("ReportFile");

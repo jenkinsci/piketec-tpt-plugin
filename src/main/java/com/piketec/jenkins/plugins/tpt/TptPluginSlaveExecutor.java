@@ -86,10 +86,12 @@ class TptPluginSlaveExecutor {
 
   private String executionId;
 
+  private String testSetName;
+
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
                          String execCfg, String testDataDir, String reportDir, String testSet,
-                         long tptStartupWaitTime, String executionId) {
+                         long tptStartupWaitTime, String executionId, String testSetName) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -104,6 +106,7 @@ class TptPluginSlaveExecutor {
     this.testSetString = Utils.unescapeTestcaseNames(testSet);
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.executionId = executionId;
+    this.testSetName = testSetName;
   }
 
   public boolean execute() {
@@ -197,30 +200,45 @@ class TptPluginSlaveExecutor {
       List<TestSet> newTestSets = new ArrayList<>();
       List<ExecutionConfigurationItem> deactivated = new ArrayList<>();
       int i = 0;
-      for (ExecutionConfigurationItem item : config.getItems()) {
-        oldTestSets.add(item.getTestSet());
-        if (item.isActive()) {
-          Collection<Scenario> intersectionSet =
-              intersectByHash(item.getTestSet().getTestCases().getItems(), foundScenearios);
-          if (intersectionSet.isEmpty()) {
-            item.setActive(false);
-            deactivated.add(item);
-          } else {
-            String tmpTestSetName = "JENKINS Exec " + i;
-            i++;
-            logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
-                + remoteScenarioSetToString(intersectionSet) + "\"");
-            TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
-            newTestSets.add(testSet);
-            for (Scenario scen : intersectionSet) {
-              testSet.addTestCase(scen);
+      if (testSetName.equals("")) {
+        for (ExecutionConfigurationItem item : config.getItems()) {
+          oldTestSets.add(item.getTestSet());
+          if (item.isActive()) {
+            Collection<Scenario> intersectionSet =
+                intersectByHash(item.getTestSet().getTestCases().getItems(), foundScenearios);
+            if (intersectionSet.isEmpty()) {
+              item.setActive(false);
+              deactivated.add(item);
+            } else {
+              String tmpTestSetName = "JENKINS Exec " + i;
+              i++;
+              logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
+                  + remoteScenarioSetToString(intersectionSet) + "\"");
+              TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+              newTestSets.add(testSet);
+              for (Scenario scen : intersectionSet) {
+                testSet.addTestCase(scen);
+              }
+              item.setTestSet(testSet);
             }
+          }
+        }
+      } else {
+        String tmpTestSetName = "JENKINS Exec" + testSetName;
+        logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
+            + remoteScenarioSetToString(foundScenearios) + "\"");
+
+        TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+        for (Scenario scen : foundScenearios) {
+          testSet.addTestCase(scen);
+        }
+        for (ExecutionConfigurationItem item : config.getItems()) {
+          oldTestSets.add(item.getTestSet());
+          if (item.isActive()) {
             item.setTestSet(testSet);
           }
         }
-
       }
-
       // execute test
       ExecutionStatus execStatus = api.run(config);
       while (execStatus.isRunning() || execStatus.isPending()) {
