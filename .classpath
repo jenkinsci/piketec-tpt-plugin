@@ -179,7 +179,7 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/org/jenkins-ci/constant-pool-scanner/1.2/constant-pool-scanner-1.2-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/plugins/copy-to-slave/1.4.4/copy-to-slave-1.4.4.jar" sourcepath="M2_REPO/org/jenkins-ci/plugins/copy-to-slave/1.4.4/copy-to-slave-1.4.4-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/plugins/copy-to-slave/1.4.4/copy-to-slave-1.4.4.jar" sourcepath="SOURCE_ATTACHER/copy-to-slave-1.4.4-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/org/jenkins-ci/plugins/copy-to-slave/1.4.4/copy-to-slave-1.4.4-javadoc.jar!/"/>
 		</attributes>
@@ -220,7 +220,7 @@
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/org/codehaus/groovy/groovy-all/1.8.9/groovy-all-1.8.9-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="M2_REPO/com/google/guava/guava/11.0.1/guava-11.0.1.jar" sourcepath="M2_REPO/com/google/guava/guava/11.0.1/guava-11.0.1-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/com/google/guava/guava/11.0.1/guava-11.0.1.jar" sourcepath="SOURCE_ATTACHER/guava-11.0.1-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/com/google/guava/guava/11.0.1/guava-11.0.1-javadoc.jar!/"/>
 		</attributes>

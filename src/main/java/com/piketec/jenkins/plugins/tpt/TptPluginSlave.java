@@ -43,19 +43,11 @@ public class TptPluginSlave extends Builder {
 
   private String exePaths;
 
-  private String tptFile;
-
   private String tptBindingName;
 
   private String tptPort;
 
-  private String testDataDir;
-
-  private String reportDir;
-
   private String tptStartUpWaitTime;
-
-  private String testSet;
 
   // ----------- Data Binding --------------
 
@@ -64,22 +56,14 @@ public class TptPluginSlave extends Builder {
                         String testDataDir, String reportDir, String testSet,
                         String tptStartUpWaitTime) {
     this.exePaths = exePaths;
-    this.tptFile = tptFile;
     this.tptBindingName = tptBindingName;
     this.tptPort = tptPort;
-    this.testDataDir = testDataDir;
-    this.reportDir = reportDir;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
-    this.testSet = testSet;
 
   }
 
   public String getExePaths() {
     return exePaths;
-  }
-
-  public String getTptFile() {
-    return tptFile;
   }
 
   public String getTptBindingName() {
@@ -88,18 +72,6 @@ public class TptPluginSlave extends Builder {
 
   public String getTptPort() {
     return tptPort;
-  }
-
-  public String getTestDataDir() {
-    return testDataDir;
-  }
-
-  public String getReportDir() {
-    return reportDir;
-  }
-
-  public String getTestSet() {
-    return testSet;
   }
 
   /**
@@ -114,6 +86,7 @@ public class TptPluginSlave extends Builder {
   @Override
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
+
     TptLogger logger = new TptLogger(listener.getLogger());
     EnvVars environment;
     try {
@@ -162,20 +135,33 @@ public class TptPluginSlave extends Builder {
     } else {
       expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
     }
-    String expandedTptFile = environment.expand(tptFile);
-    if (expandedTptFile == null) {
-      expandedTptFile = "";
-    }
-    String expandedExecConfig = environment.expand("${" + Utils.TPT_EXECUTION_CONFIG_VAR + "}");
-    String expandedTestDataDir = environment.expand(testDataDir);
-    String expandedReportDir = environment.expand(reportDir);
-    String expandedTestcaseName = environment.expand("${" + Utils.TPT_TEST_CASE_NAME_VAR + "}");
+
     String expandedExecutionId = environment.expand("${" + Utils.TPT_EXECUTION_ID_VAR_NAME + "}");
-    String expandedTestSetName = environment.expand("${" + Utils.TPT_TEST_SET_NAME_VAR + "}");
+
+    WorkLoad workloadToDo =
+        TptPluginMasterJobExecutor.getAndRemoveWorkload(build.getProject().getName());
+
+    String fileNameFromWorkload = workloadToDo.getFileName();
+    String exeConfigFromWorkload = workloadToDo.getExeConfig();
+    String testDataDirFromWorload = workloadToDo.getDataDir();
+    String reportDirFromWorkload = workloadToDo.getReportDir();
+    String testCasesFromWorkload = workloadToDo.getTestCases();
+    String testSetFromWorkload = workloadToDo.getTestSetName();
+    FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
+
+    listener.getLogger().println("File Name : " + fileNameFromWorkload);
+    listener.getLogger().println("Execution Configuration : " + exeConfigFromWorkload);
+    listener.getLogger().println("Test Data directory : " + testDataDirFromWorload);
+    listener.getLogger().println("Report directory : " + reportDirFromWorkload);
+    listener.getLogger().println("Test Cases : " + testCasesFromWorkload);
+    listener.getLogger().println("Test Set : " + testSetFromWorkload);
+    listener.getLogger().println("Execution ID : " + expandedExecutionId);
+
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
-        expandedExePaths, expandedTptPort, expandedTptBindingName, new File(expandedTptFile),
-        expandedExecConfig, expandedTestDataDir, expandedReportDir, expandedTestcaseName,
-        expandedTptStartupWaitTime, expandedExecutionId, expandedTestSetName);
+        expandedExePaths, expandedTptPort, expandedTptBindingName, new File(fileNameFromWorkload),
+        exeConfigFromWorkload, testDataDirFromWorload, reportDirFromWorkload, testCasesFromWorkload,
+        expandedTptStartupWaitTime, expandedExecutionId, testSetFromWorkload, masterWorkspace);
+
     return executor.execute();
   }
 
@@ -204,28 +190,12 @@ public class TptPluginSlave extends Builder {
       return "${" + Utils.TPT_EXE_VAR + "}";
     }
 
-    public static String getDefaultTptFile() {
-      return "${" + Utils.TPT_FILE_VAR + "}";
-    }
-
     public static String getDefaultTptBindingName() {
       return Utils.DEFAULT_TPT_BINDING_NAME;
     }
 
     public static int getDefaultTptPort() {
       return Utils.DEFAULT_TPT_PORT;
-    }
-
-    public static String getDefaultTestDataDir() {
-      return "${" + Utils.TPT_TEST_DATA_DIR_VAR_NAME + "}";
-    }
-
-    public static String getDefaultReportDir() {
-      return "${" + Utils.TPT_REPORT_DIR_VAR_NAME + "}";
-    }
-
-    public static String getDefaultTestSet() {
-      return "${" + Utils.TPT_TEST_SET_NAME_VAR + "}";
     }
 
     public static int getDefaultTptStartUpWaitTime() {

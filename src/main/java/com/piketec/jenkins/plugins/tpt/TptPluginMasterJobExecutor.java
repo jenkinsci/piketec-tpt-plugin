@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -48,10 +49,8 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
-import hudson.plugins.parameterizedtrigger.AbstractBuildParameters;
-import hudson.plugins.parameterizedtrigger.CurrentBuildParameters;
-import hudson.plugins.parameterizedtrigger.PredefinedBuildParameters;
-import hudson.plugins.parameterizedtrigger.ResultCondition;
+import hudson.model.Job;
+import jenkins.model.Jenkins;
 import jenkins.model.Jenkins.MasterComputer;
 
 class TptPluginMasterJobExecutor {
@@ -78,32 +77,42 @@ class TptPluginMasterJobExecutor {
 
   private String slaveJobName;
 
-  private String testcaseVarName;
-
-  private String execCfgVarName;
-
-  private String tptFileVarName;
-
-  private String exePathsVarName;
-
-  private String testDataDirVarName;
-
-  private String reportDirVarName;
-
   private long tptStartupWaitTime;
 
   private int slaveJobCount;
 
   private int slaveJobTries;
 
+  private static HashMap<String, List<WorkLoad>> workload = new HashMap<>();
+
+  public static void putWorkLoad(String jobName, WorkLoad workloadToAdd) {
+    synchronized (workload) {
+      List<WorkLoad> set = workload.get(jobName);
+      if (set == null) {
+        set = new ArrayList<>();
+        if (!set.contains(workloadToAdd)) {
+          workload.put(jobName, set);
+        }
+      }
+      set.add(workloadToAdd);
+    }
+  }
+
+  public static WorkLoad getAndRemoveWorkload(String jobName) {
+    synchronized (workload) {
+      List<WorkLoad> set = workload.get(jobName);
+      if (set == null || set.isEmpty()) {
+        return null;
+      }
+      return set.remove(0);
+    }
+  }
+
   TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
                              BuildListener listener, FilePath[] exePaths, String jUnitXmlPath,
                              LogLevel jUnitLogLevel, List<JenkinsConfiguration> executionConfigs,
                              int tptPort, String tptBindingName, String slaveJobName,
-                             String testcaseVarName, String execCfgVarName, String tptFileVarName,
-                             String exePathsVarName, String testDataDirVarName,
-                             String reportDirVarName, long tptStartupWaitTime, int slaveJobCount,
-                             int slaveJobTries) {
+                             long tptStartupWaitTime, int slaveJobCount, int slaveJobTries) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -115,12 +124,6 @@ class TptPluginMasterJobExecutor {
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
     this.slaveJobName = slaveJobName;
-    this.testcaseVarName = testcaseVarName;
-    this.execCfgVarName = execCfgVarName;
-    this.tptFileVarName = tptFileVarName;
-    this.exePathsVarName = exePathsVarName;
-    this.testDataDirVarName = testDataDirVarName;
-    this.reportDirVarName = reportDirVarName;
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.slaveJobCount = slaveJobCount;
     this.slaveJobTries = slaveJobTries;
@@ -207,7 +210,6 @@ class TptPluginMasterJobExecutor {
         logger.error(e.getMessage());
         return false;
       }
-      CurrentBuildParameters currentBuildParameters = new CurrentBuildParameters();
       ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
       // create test sets for slave jobs
       int slaveJobSize;
@@ -241,30 +243,30 @@ class TptPluginMasterJobExecutor {
         testSets.add(Utils.escapeTestCaseNames(currentTestSet));
       }
       // start one job for every test set
-      String predefinedBuildParametersString =
-          this.execCfgVarName + "=" + ec.getConfiguration() + "\n" //
-              + this.tptFileVarName + "=" + ec.getTptFile().replace("\\", "\\\\") + "\n" //
-              + this.exePathsVarName + "=" + exePathsAsSingleString().replace("\\", "\\\\") + "\n" //
-              + this.testDataDirVarName + "=" + testdataDir.replace("\\", "\\\\") + "\n" //
-              + this.reportDirVarName + "=" + reportDir.replace("\\", "\\\\") + "\n"//
-              + Utils.TPT_TEST_SET_NAME_VAR + "=" + ec.getTestSet() + "\n" //
-              + Utils.TPT_EXECUTION_ID_VAR_NAME + "=" + executionId;//
+
+      Job slaveJob = null;
+
+      for (Job j : Jenkins.getInstance().getAllItems(Job.class)) {
+        if (j.getName().equals(slaveJobName)) {
+          slaveJob = j;
+        }
+      }
+      if (slaveJob == null) {
+        logger.error("Slave Job not found");
+        return false;
+      }
+
       for (String testCase : testSets) {
         logger.info("Create job for \"" + testCase + "\"");
-        PredefinedBuildParameters predefinedBuildParameters = new PredefinedBuildParameters(
-            this.testcaseVarName + "=" + testCase.replace("\\", "\\\\") + "\n" //
-                + predefinedBuildParametersString);
 
-        ArrayList<AbstractBuildParameters> configs = new ArrayList<AbstractBuildParameters>();
-        configs.add(currentBuildParameters);
-        configs.add(predefinedBuildParameters);
+        WorkLoad workloadToAdd = new WorkLoad(ec.getTptFile(), ec.getConfiguration(), testdataDir,
+            reportDir, ec.getTestSet(), testCase, build.getWorkspace());
+        putWorkLoad(slaveJobName, workloadToAdd);
 
-        hudson.plugins.parameterizedtrigger.BuildTriggerConfig cfg =
-            new hudson.plugins.parameterizedtrigger.BuildTriggerConfig(slaveJobName,
-                ResultCondition.ALWAYS, false, null, configs);
-        RetryableJob retryableJob = new RetryableJob(slaveJobTries, logger, cfg);
+        RetryableJob retryableJob = new RetryableJob(slaveJobTries, logger, slaveJob);
         retryableJob.perform(build, launcher, listener);
         retryableJobs.add(retryableJob);
+
       }
       logger.info("Waiting for completion of child jobs.");
       for (RetryableJob retryableJob : retryableJobs) {
@@ -360,4 +362,5 @@ class TptPluginMasterJobExecutor {
     }
     return sb.toString();
   }
+
 }

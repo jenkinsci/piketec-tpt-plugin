@@ -64,6 +64,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   public boolean getStaticValue() {
     return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
+
   }
 
   private void initBuildAndTestCaseResultCounts() {

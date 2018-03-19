@@ -27,10 +27,6 @@
     <f:textbox value="${instance.exePaths}" />
   </f:entry>
 
-  <f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
-    <f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
-  </f:entry>
-
   <f:entry field="report" title="JUnit XML directory" help="/plugin/piketec-tpt/report.html">
     <f:textbox value="${instance.report}" default="${descriptor.defaultReport}" />
   </f:entry>
@@ -40,6 +36,9 @@
   </f:entry>
   
   <f:advanced>
+  <f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
+    <f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
+  </f:entry>
     <f:entry  help="/plugin/piketec-tpt/masterMode.html">
       <f:checkbox title="Distribute work to TPT slave jobs" checked="${instance.isTptMaster}" field="isTptMaster"/>
     </f:entry>

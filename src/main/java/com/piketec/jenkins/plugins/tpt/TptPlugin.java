@@ -355,9 +355,7 @@ public class TptPlugin extends Builder {
     // start execution
     TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
         expandedExePaths, jUnitXmlPath, jUnitLogLevel, normalizedConfigs, expandedTptPort,
-        expandedTptBindingName, expandedSlaveJobName, Utils.TPT_TEST_CASE_NAME_VAR,
-        Utils.TPT_EXECUTION_CONFIG_VAR, Utils.TPT_FILE_VAR, Utils.TPT_EXE_VAR,
-        Utils.TPT_TEST_DATA_DIR_VAR_NAME, Utils.TPT_REPORT_DIR_VAR_NAME, expandedTptStartupWaitTime,
+        expandedTptBindingName, expandedSlaveJobName, expandedTptStartupWaitTime,
         parsedSlaveJobCount, parsedSlaveJobTries);
     return executor.execute();
   }

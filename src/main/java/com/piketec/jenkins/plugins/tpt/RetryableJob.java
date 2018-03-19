@@ -6,16 +6,30 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.annotation.Nonnull;
+
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.Cause;
+import hudson.model.CauseAction;
+import hudson.model.Item;
+import hudson.model.Job;
+import hudson.model.ParameterValue;
+import hudson.model.ParametersAction;
 import hudson.model.Result;
 import hudson.model.Run;
-import hudson.plugins.parameterizedtrigger.BuildTriggerConfig;
+import hudson.model.StringParameterValue;
+import hudson.model.TaskListener;
+import hudson.model.Cause.UpstreamCause;
+import jenkins.model.Jenkins;
+import jenkins.model.ParameterizedJobMixIn;
 
 class RetryableJob {
 
-  private BuildTriggerConfig config;
+  private Job slaveJob;
 
   private int tries;
 
@@ -25,13 +39,14 @@ class RetryableJob {
 
   private InterruptedException interruptedException = null;
 
-  RetryableJob(int tries, TptLogger logger, BuildTriggerConfig config) {
+  RetryableJob(int tries, TptLogger logger, Job slaveJob) {
     if (tries < 1) {
       tries = 1;
     }
     this.tries = tries;
     this.logger = logger;
-    this.config = config;
+    this.slaveJob = slaveJob;
+
   }
 
   void perform(final AbstractBuild< ? , ? > build, final Launcher launcher,
@@ -44,7 +59,27 @@ class RetryableJob {
         while (tries > 0 && !success) {
           List<Future<Run>> futures = new ArrayList<>();
           try {
-            futures.addAll(config.perform3(build, launcher, listener).values());
+            EnvVars env = build.getEnvironment(listener);
+            env.overrideAll(build.getBuildVariables());
+
+            ArrayList<Action> test = new ArrayList<>();
+            // here for "started duch anonyme benutzer" in the status page from build
+            // test.add(new CauseAction(new Cause.UserIdCause()));
+
+            ArrayList<ParameterValue> parameterValues = new ArrayList<>();
+            parameterValues.add(new StringParameterValue(String.valueOf(Math.random()),
+                String.valueOf(Math.random())));
+            test.add(new ParametersAction(parameterValues));
+
+            // test.add(new UniqueAction());
+
+            final Future scheduled = schedule(build, slaveJob,
+                ((ParameterizedJobMixIn.ParameterizedJob)slaveJob).getQuietPeriod(), test,
+                listener);
+            if (scheduled != null) {
+              futures.add(scheduled);
+            }
+
             for (Future<Run> future : futures) {
               Run run = future.get();
               // retry if cancled or failed
@@ -91,6 +126,80 @@ class RetryableJob {
 
   void cancel() {
     runner.interrupt();
+  }
+
+  // from BuildTriggerConfig
+  protected Future schedule(@Nonnull AbstractBuild< ? , ? > build, @Nonnull final Job project,
+                            int quietPeriod, @Nonnull List<Action> list,
+                            @Nonnull TaskListener listener)
+      throws InterruptedException, IOException {
+    Cause cause = new UpstreamCause(build);
+    List<Action> queueActions = new ArrayList<Action>(list);
+    if (cause != null) {
+      queueActions.add(new CauseAction(cause));
+    }
+
+    // Includes both traditional projects via AbstractProject and Workflow Job
+    if (project instanceof ParameterizedJobMixIn.ParameterizedJob) {
+      final ParameterizedJobMixIn< ? , ? > parameterizedJobMixIn = new ParameterizedJobMixIn() {
+
+        @Override
+        protected Job< ? , ? > asJob() {
+          return project;
+        }
+      };
+
+      // permision ???
+      // if (!canTriggerProject(build, project, listener)) {
+      // return null;
+      // }
+
+      return parameterizedJobMixIn.scheduleBuild2(quietPeriod,
+          queueActions.toArray(new Action[queueActions.size()]));
+    }
+    return null;
+  }
+
+  static boolean canTriggerProject(@Nonnull AbstractBuild< ? , ? > build, @Nonnull final Job job,
+                                   @Nonnull TaskListener taskListener) {
+    if (!job.hasPermission(Item.BUILD)) {
+      String message = String.format(
+          "Cannot schedule the build of %s from %s. "
+              + "The authenticated build user %s has no Job.BUILD permission",
+          job.getFullDisplayName(), build.getFullDisplayName(),
+          Jenkins.getAuthentication().getName());
+      taskListener.error(message);
+      return false;
+    }
+    return true;
+  }
+
+  private static class UniqueAction implements Action {
+
+    @Override
+    public String getIconFileName() {
+      return null;
+    }
+
+    @Override
+    public String getDisplayName() {
+      return null;
+    }
+
+    @Override
+    public String getUrlName() {
+      return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return super.hashCode();
+    }
   }
 
 }

@@ -75,16 +75,6 @@
             </exclusion>
         </exclusions>
     </dependency>
-    <dependency>
-    	<groupId>org.jenkins-ci.plugins</groupId>
-    	<artifactId>parameterized-trigger</artifactId>
-    	<version>[2.29,)</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.jenkins-ci.plugins</groupId>
-    	<artifactId>copy-to-slave</artifactId>
-    	<version>[1.4.4,)</version>
-    </dependency>
   </dependencies>
   <properties>
   	<maven-hpi-plugin>3.0.2</maven-hpi-plugin>

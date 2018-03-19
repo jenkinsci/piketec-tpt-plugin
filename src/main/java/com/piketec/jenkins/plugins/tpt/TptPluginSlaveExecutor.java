@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.michelin.cio.hudson.plugins.copytoslave.CopyToMasterNotifier;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
@@ -88,10 +87,13 @@ class TptPluginSlaveExecutor {
 
   private String testSetName;
 
+  private FilePath masterWorkspace;
+
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
                          String execCfg, String testDataDir, String reportDir, String testSet,
-                         long tptStartupWaitTime, String executionId, String testSetName) {
+                         long tptStartupWaitTime, String executionId, String testSetName,
+                         FilePath masterWorkspace) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -107,6 +109,7 @@ class TptPluginSlaveExecutor {
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.executionId = executionId;
     this.testSetName = testSetName;
+    this.masterWorkspace = masterWorkspace;
   }
 
   public boolean execute() {
@@ -148,6 +151,10 @@ class TptPluginSlaveExecutor {
       // adjust config to execute only the given one test case
       File oldReportDir = config.getReportDir();
       File oldTestDataDir = config.getDataDir();
+
+      logger.info(oldReportDir.getPath());
+
+      logger.info(oldTestDataDir.getPath());
 
       Collection<Scenario> foundScenearios = new HashSet<>();
       find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
@@ -264,9 +271,14 @@ class TptPluginSlaveExecutor {
               : new File(tptFile.getParent(), oldReportDir.getPath()).getAbsolutePath());
           includes += "\\**\\*.*";
         }
-        CopyToMasterNotifier copyToMaster =
-            new CopyToMasterNotifier(includes, "", false, "", false);
-        copyToMaster.perform(build, launcher, listener);
+
+        FilePath slaveDataDir = build.getWorkspace();
+        slaveDataDir.copyRecursiveTo(masterWorkspace);
+
+        // CopyToMasterNotifier copyToMaster =
+        // new CopyToMasterNotifier(includes, "", false, "", false);
+        // copyToMaster.perform(build, launcher, listener);
+
       } catch (InterruptedException e) {
         logger.interrupt(e.getMessage());
         return false;

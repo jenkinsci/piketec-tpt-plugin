@@ -1,5 +1,7 @@
 package com.piketec.jenkins.plugins.tpt;
 
+import hudson.FilePath;
+
 public class WorkLoad {
 
   private String fileName;
@@ -16,8 +18,10 @@ public class WorkLoad {
 
   private String exeId;
 
+  private FilePath masterWorkspace;
+
   public WorkLoad(String fileName, String exeConfig, String dataDir, String reportDir,
-                  String testSetName, String testCases) {
+                  String testSetName, String testCases, FilePath masterWorkspace) {
 
     this.fileName = fileName;
     this.exeConfig = exeConfig;
@@ -26,6 +30,7 @@ public class WorkLoad {
     this.testSetName = testSetName;
     this.testCases = testCases;
     this.exeId = Double.toString(Math.random());
+    this.setMasterWorkspace(masterWorkspace);
   }
 
   public String getFileName() {
@@ -74,6 +79,14 @@ public class WorkLoad {
 
   public void setTestCases(String testCases) {
     this.testCases = testCases;
+  }
+
+  public FilePath getMasterWorkspace() {
+    return masterWorkspace;
+  }
+
+  public void setMasterWorkspace(FilePath masterWorkspace) {
+    this.masterWorkspace = masterWorkspace;
   }
 
 }
