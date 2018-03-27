@@ -65,13 +65,10 @@ class RetryableJob {
             ArrayList<Action> test = new ArrayList<>();
             // here for "started duch anonyme benutzer" in the status page from build
             // test.add(new CauseAction(new Cause.UserIdCause()));
-
             ArrayList<ParameterValue> parameterValues = new ArrayList<>();
             parameterValues.add(new StringParameterValue(String.valueOf(Math.random()),
                 String.valueOf(Math.random())));
             test.add(new ParametersAction(parameterValues));
-
-            // test.add(new UniqueAction());
 
             final Future scheduled = schedule(build, slaveJob,
                 ((ParameterizedJobMixIn.ParameterizedJob)slaveJob).getQuietPeriod(), test,
@@ -172,34 +169,6 @@ class RetryableJob {
       return false;
     }
     return true;
-  }
-
-  private static class UniqueAction implements Action {
-
-    @Override
-    public String getIconFileName() {
-      return null;
-    }
-
-    @Override
-    public String getDisplayName() {
-      return null;
-    }
-
-    @Override
-    public String getUrlName() {
-      return null;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return super.hashCode();
-    }
   }
 
 }

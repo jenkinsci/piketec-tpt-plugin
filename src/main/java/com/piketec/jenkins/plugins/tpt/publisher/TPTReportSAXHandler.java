@@ -29,6 +29,9 @@ public class TPTReportSAXHandler extends DefaultHandler {
 
   private String executionConfiguration;
 
+  // Key Result , Value how many of these
+  private Map<String, Integer> resultCount;
+
   public TPTReportSAXHandler(TPTFile tptFile, ArrayList<TPTTestCase> failedTests, String reportDir,
                              String executionConfiguration) {
     this.reportDir = reportDir;
@@ -36,6 +39,12 @@ public class TPTReportSAXHandler extends DefaultHandler {
     this.failedTests = failedTests;
     this.executionConfiguration = executionConfiguration;
     nameAndId = new HashMap<>();
+    resultCount = new HashMap<>();
+    // Adding the start values
+    resultCount.put("PASSED", 0);
+    resultCount.put("INCONCLUSIVE", 0);
+    resultCount.put("FAILED", 0);
+    resultCount.put("ERROR", 0);
 
   }
 
@@ -53,6 +62,9 @@ public class TPTReportSAXHandler extends DefaultHandler {
     if (TESTCASEINFORMATION.equalsIgnoreCase(qName)) {
 
       String result = attributes.getValue("Result").toUpperCase();
+      int currentResultValue = resultCount.get(result) + 1;
+
+      resultCount.put(result, currentResultValue);
       String id = attributes.getValue("Testcase");
       String executionDate = attributes.getValue("ExecutionDate");
       String reportFile = attributes.getValue("ReportFile");
@@ -71,21 +83,35 @@ public class TPTReportSAXHandler extends DefaultHandler {
         failedTests.add(t);
       }
 
+      // set the result
+      int error = resultCount.get("ERROR");
+      int failed = resultCount.get("FAILED");
+      int inconclusive = resultCount.get("INCONCLUSIVE");
+      int passed = resultCount.get("PASSED");
+      int total = error + failed + inconclusive + passed;
+
+      tptFile.setExecutionError(error);
+      tptFile.setFailed(failed);
+      tptFile.setInconclusive(inconclusive);
+      tptFile.setPassed(passed);
+      tptFile.setTotal(total);
+
     }
 
-    if (EXECUTIONSUMMARY.equalsIgnoreCase(qName)) {
-      String error = attributes.getValue("Errors");
-      String failed = attributes.getValue("Failed");
-      String inconclusive = attributes.getValue("Inconclusive");
-      String passed = attributes.getValue("Succeeded");
-      String total = attributes.getValue("Tests");
+    // if (EXECUTIONSUMMARY.equalsIgnoreCase(qName)) {
+    // int error = resultCount.get("ERROR");
+    // int failed = resultCount.get("FAILED");
+    // int inconclusive = resultCount.get("INCONCLUSIVE");
+    // int passed = resultCount.get("PASSED");
+    // int total = error + failed + inconclusive + passed;
+    //
+    // tptFile.setExecutionError(error);
+    // tptFile.setFailed(failed);
+    // tptFile.setInconclusive(inconclusive);
+    // tptFile.setPassed(passed);
 
-      tptFile.setExecutionError(Integer.parseInt(error));
-      tptFile.setFailed(Integer.parseInt(failed));
-      tptFile.setInconclusive(Integer.parseInt(inconclusive));
-      tptFile.setPassed(Integer.parseInt(passed));
-      tptFile.setTotal(Integer.parseInt(total));
-    }
+    // tptFile.setTotal(total);
+    // }
 
   }
 
@@ -101,8 +127,12 @@ public class TPTReportSAXHandler extends DefaultHandler {
   }
 
   public String getLinkToFailedReport2(String reportFile, String reportDir) {
+    if (reportFile.equals("")) {
+      return "";
+    }
     Path path = Paths.get(reportDir);
     return path.relativize(Paths.get(reportFile)).toFile().getPath();
+
   }
 
 }

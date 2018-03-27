@@ -3,7 +3,6 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -221,11 +220,10 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
     generateJson();
 
-    FilePath workspace = actualBuild.getWorkspace();
-    File workspaceDir = new File(URLDecoder.decode(workspace.toURI().getPath(), "UTF-8"));
+    File buildDir = actualBuild.getRootDir();
 
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
-        new FilePath(new File(workspaceDir.getAbsolutePath() + "\\TrendGraph")), "TPT Report",
+        new FilePath(new File(buildDir.getAbsolutePath() + "\\TrendGraph")), "TPT Report",
         "/plugin/piketec-tpt/tpt.ico", false);
 
     if (req.getRestOfPath().equals("")) {
@@ -246,9 +244,10 @@ public class TrendGraph implements RunAction2, StaplerProxy {
   private void generateJson() throws IOException, InterruptedException {
     File oldIndexHTML = new File(Utils.getTptPluginRootDir(), "TrendGraph/index.html");
     File utilsJs = new File(Utils.getTptPluginRootDir(), "TrendGraph/utils.js");
-    FilePath workspace = actualBuild.getWorkspace();
-    File workspaceDir = new File(URLDecoder.decode(workspace.toURI().getPath(), "UTF-8"));
-    File trendGraph = new File(workspaceDir.getAbsolutePath() + "\\TrendGraph");
+
+    File buildDir = actualBuild.getRootDir();
+
+    File trendGraph = new File(buildDir.getAbsolutePath() + "\\TrendGraph");
 
     if (!trendGraph.isDirectory() && !trendGraph.mkdirs()) {
       throw new IOException("Could not create directory \"" + trendGraph.getAbsolutePath() + "\"");
@@ -261,9 +260,9 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     String jsonScript = getResultArray(historyData);
     String newIndexHTMLWithJson = FileUtils.readFileToString(oldIndexHTML);
     newIndexHTMLWithJson = newIndexHTMLWithJson.replace("toReplace", jsonScript);
-    PrintWriter pw = new PrintWriter(workspaceDir.getAbsolutePath() + "\\TrendGraph\\index.html");
+    PrintWriter pw = new PrintWriter(buildDir.getAbsolutePath() + "\\TrendGraph\\index.html");
     pw.close();
-    File newIndexHTML = new File(workspaceDir.getAbsolutePath() + "\\TrendGraph\\index.html");
+    File newIndexHTML = new File(buildDir.getAbsolutePath() + "\\TrendGraph\\index.html");
     FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson);
 
   }

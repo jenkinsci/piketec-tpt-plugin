@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.FilePath;
@@ -53,15 +52,10 @@ class TptPluginSingleJobExecutor {
 
   private String arguments;
 
-  private String jUnitXmlPath;
-
-  private LogLevel jUnitLogLevel;
-
   private List<JenkinsConfiguration> executionConfigs;
 
   TptPluginSingleJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
                              BuildListener listener, FilePath[] exePaths, String arguments,
-                             String jUnitXmlPath, LogLevel jUnitLogLevel,
                              List<JenkinsConfiguration> executionConfigs) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
@@ -69,8 +63,6 @@ class TptPluginSingleJobExecutor {
     this.listener = listener;
     this.exePaths = exePaths;
     this.arguments = arguments;
-    this.jUnitXmlPath = jUnitXmlPath;
-    this.jUnitLogLevel = jUnitLogLevel;
     this.executionConfigs = executionConfigs;
   }
 
@@ -116,9 +108,6 @@ class TptPluginSingleJobExecutor {
           try {
             // run the test...
             launchTPT(launcher, listener, cmd, ec.getTimeout());
-            // transform TPT results into JUnit results
-            logger.info("*** Publishing results now ***");
-            Utils.publishResults(workspace, ec, jUnitXmlPath, jUnitLogLevel, logger);
           } catch (IOException e) {
             logger.error(e.getMessage());
             success = false;

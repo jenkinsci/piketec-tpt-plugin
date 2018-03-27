@@ -30,9 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
@@ -48,10 +45,8 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import hudson.model.Computer;
 import hudson.model.Job;
 import jenkins.model.Jenkins;
-import jenkins.model.Jenkins.MasterComputer;
 
 class TptPluginMasterJobExecutor {
 
@@ -64,10 +59,6 @@ class TptPluginMasterJobExecutor {
   private BuildListener listener;
 
   private FilePath[] exePaths;
-
-  private String jUnitXmlPath;
-
-  private LogLevel jUnitLogLevel;
 
   private List<JenkinsConfiguration> executionConfigs;
 
@@ -109,17 +100,15 @@ class TptPluginMasterJobExecutor {
   }
 
   TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
-                             BuildListener listener, FilePath[] exePaths, String jUnitXmlPath,
-                             LogLevel jUnitLogLevel, List<JenkinsConfiguration> executionConfigs,
-                             int tptPort, String tptBindingName, String slaveJobName,
-                             long tptStartupWaitTime, int slaveJobCount, int slaveJobTries) {
+                             BuildListener listener, FilePath[] exePaths,
+                             List<JenkinsConfiguration> executionConfigs, int tptPort,
+                             String tptBindingName, String slaveJobName, long tptStartupWaitTime,
+                             int slaveJobCount, int slaveJobTries) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
     this.listener = listener;
     this.exePaths = exePaths;
-    this.jUnitXmlPath = jUnitXmlPath;
-    this.jUnitLogLevel = jUnitLogLevel;
     this.executionConfigs = executionConfigs;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
@@ -131,10 +120,6 @@ class TptPluginMasterJobExecutor {
   }
 
   boolean execute() {
-    if (!(Computer.currentComputer() instanceof MasterComputer)) {
-      logger.error("TPT master has to run on master node");
-      return false;
-    }
     TptApi api = null;
     String executionId = Double.toString(Math.random());
     try {
@@ -163,12 +148,6 @@ class TptPluginMasterJobExecutor {
         logger.info("Create and/or clear report directory " + reportPath.getRemote());
         reportPath.mkdirs();
         reportPath.deleteContents();
-        if (!StringUtils.isBlank(jUnitXmlPath)) {
-          FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
-          logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
-          path.mkdirs();
-          path.deleteContents();
-        }
       } catch (InterruptedException e) {
         logger.interrupt(e.getMessage());
         return false;
@@ -210,6 +189,14 @@ class TptPluginMasterJobExecutor {
         logger.error(e.getMessage());
         return false;
       }
+
+      // check if test Cases arent null, if so return false -> not TestSet with such name found
+      if (testCases == null) {
+        logger.error("No \"" + ec.getTestSet()
+            + " \"  test set found, please create such testset on the TPT File on where the Master Job is running");
+        return false;
+      }
+
       ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
       // create test sets for slave jobs
       int slaveJobSize;
@@ -300,8 +287,16 @@ class TptPluginMasterJobExecutor {
         }
         executionConfig.setDataDir(oldTestDataFile);
         executionConfig.setReportDir(oldReportDir);
-        int foundTestData =
-            Utils.publishResults(build.getWorkspace(), ec, jUnitXmlPath, jUnitLogLevel, logger);
+
+        int foundTestData = 0;
+        try {
+          foundTestData = Publish.getTestcases(testDataPath, logger).size();
+        } catch (InterruptedException e) {
+          logger.error(
+              "Error while parsing the \"test_summary.xml\" or the xml report from the testcases.");
+          return false;
+        }
+
         if (foundTestData != testCases.size()) {
           logger
               .error("Found only " + foundTestData + " of " + testCases.size() + " test results.");

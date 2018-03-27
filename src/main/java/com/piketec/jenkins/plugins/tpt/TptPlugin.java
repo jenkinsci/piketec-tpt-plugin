@@ -28,7 +28,6 @@ import java.util.List;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.EnvVars;
@@ -41,7 +40,6 @@ import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
 
 /**
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
@@ -71,10 +69,6 @@ public class TptPlugin extends Builder {
 
   private String tptPort;
 
-  private String report; // JUnit Report!
-
-  private LogLevel jUnitLogLevel;
-
   private String tptStartUpWaitTime;
 
   private final ArrayList<JenkinsConfiguration> executionConfiguration;
@@ -87,15 +81,13 @@ public class TptPlugin extends Builder {
   public TptPlugin(String exe, String exePaths, String arguments, boolean isTptMaster,
                    String slaveJob, String slaveJobCount, String slaveJobTries,
                    String tptBindingName, String tptPort,
-                   ArrayList<JenkinsConfiguration> executionConfiguration, String report,
-                   LogLevel jUnitLogLevel, String tptStartUpWaitTime) {
+                   ArrayList<JenkinsConfiguration> executionConfiguration,
+                   String tptStartUpWaitTime) {
     this.exePaths = exe;
     if (exePaths != null) {
       this.exePaths = exePaths;
     }
     this.arguments = arguments;
-    this.report = report;
-    this.jUnitLogLevel = jUnitLogLevel;
     this.isTptMaster = isTptMaster;
     this.slaveJob = slaveJob;
     this.slaveJobCount = slaveJobCount;
@@ -201,24 +193,6 @@ public class TptPlugin extends Builder {
   }
 
   /**
-   * Report dir (optional).
-   * 
-   * @return The directory, where to store the results, can be <code>null</code>.
-   */
-  public String getReport() {
-    return report;
-  }
-
-  /**
-   * The severity level of TPT log messages that will be written to failed JUnit tests.
-   * 
-   * @return The severity level of TPT log messages that will be written to failed JUnit tests.
-   */
-  public LogLevel getJUnitLogLevel() {
-    return jUnitLogLevel;
-  }
-
-  /**
    * @return The time waited before trying to get the API handle after starting TPT
    */
   public String getTptStartUpWaitTime() {
@@ -278,10 +252,9 @@ public class TptPlugin extends Builder {
     }
     // expand arguments and report
     String expandedArguments = environment.expand(this.arguments);
-    String jUnitXmlPath = environment.expand(report);
     // start execution
     TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launch, listener,
-        expandedExePaths, expandedArguments, jUnitXmlPath, jUnitLogLevel, normalizedConfigs);
+        expandedExePaths, expandedArguments, normalizedConfigs);
     return executor.execute();
   }
 
@@ -295,7 +268,6 @@ public class TptPlugin extends Builder {
       expandedExePaths[i] =
           new FilePath(launcher.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
     }
-    String jUnitXmlPath = environment.expand(report);
     // expand and parse TPT RMI port
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {
@@ -354,9 +326,8 @@ public class TptPlugin extends Builder {
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
     TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
-        expandedExePaths, jUnitXmlPath, jUnitLogLevel, normalizedConfigs, expandedTptPort,
-        expandedTptBindingName, expandedSlaveJobName, expandedTptStartupWaitTime,
-        parsedSlaveJobCount, parsedSlaveJobTries);
+        expandedExePaths, normalizedConfigs, expandedTptPort, expandedTptBindingName,
+        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries);
     return executor.execute();
   }
 
@@ -382,28 +353,12 @@ public class TptPlugin extends Builder {
       return false;
     }
 
-    public static LogLevel getDefaultJUnitLogLevel() {
-      return LogLevel.INFO;
-    }
-
     public static int getDefaultTptPort() {
       return Utils.DEFAULT_TPT_PORT;
     }
 
-    public static String getDefaultReport() {
-      return "";
-    }
-
     public static int getDefaultTptStartUpWaitTime() {
       return Utils.DEFAULT_STARTUP_WAIT_TIME;
-    }
-
-    public ListBoxModel doFillJUnitLogLevelItems() {
-      ListBoxModel items = new ListBoxModel();
-      for (LogLevel goal : LogLevel.values()) {
-        items.add(goal.name());
-      }
-      return items;
     }
 
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {

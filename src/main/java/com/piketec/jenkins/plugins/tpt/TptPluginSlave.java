@@ -154,8 +154,9 @@ public class TptPluginSlave extends Builder {
     listener.getLogger().println("Test Data directory : " + testDataDirFromWorload);
     listener.getLogger().println("Report directory : " + reportDirFromWorkload);
     listener.getLogger().println("Test Cases : " + testCasesFromWorkload);
-    listener.getLogger().println("Test Set : " + testSetFromWorkload);
-    listener.getLogger().println("Execution ID : " + expandedExecutionId);
+    if (!testSetFromWorkload.equals("")) {
+      listener.getLogger().println("Test Set : " + testSetFromWorkload);
+    }
 
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
         expandedExePaths, expandedTptPort, expandedTptBindingName, new File(fileNameFromWorkload),

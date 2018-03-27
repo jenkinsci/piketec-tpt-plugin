@@ -26,6 +26,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.Computer;
 import hudson.model.Project;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
@@ -115,6 +116,9 @@ public class TPTReportPublisher extends Notifier {
             parse(reportXML, newTPTFile, failedTests, reportDir.getRemote(),
                 cfg.getConfiguration());
             tptFiles.add(newTPTFile);
+          } else {
+            throw new IOException("There is no test_summary.xml in Computer "
+                + Computer.currentComputer().getName() + " in " + reportXML.getRemote());
           }
 
           // Check if the Testdata dir and the Report are unique, otherwise throw an exception

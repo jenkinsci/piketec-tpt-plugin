@@ -101,7 +101,7 @@ public final class Publish {
    * @throws InterruptedException
    * @throws IOException
    */
-  private static List<Testcase> getTestcases(FilePath rootdir, TptLogger logger)
+  public static List<Testcase> getTestcases(FilePath rootdir, TptLogger logger)
       throws IOException, InterruptedException {
     Collection<FilePath> files = new HashSet<FilePath>();
     List<Testcase> testcases;

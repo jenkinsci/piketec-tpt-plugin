@@ -26,14 +26,6 @@
   <f:entry field="exePaths" title="Path to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
     <f:textbox value="${instance.exePaths}" />
   </f:entry>
-
-  <f:entry field="report" title="JUnit XML directory" help="/plugin/piketec-tpt/report.html">
-    <f:textbox value="${instance.report}" default="${descriptor.defaultReport}" />
-  </f:entry>
-  
-  <f:entry field="jUnitLogLevel" title="JUnit Log Level" help="/plugin/piketec-tpt/loglevel.html">
-    <f:select default="${descriptor.defaultJUnitLogLevel}"/>
-  </f:entry>
   
   <f:advanced>
   <f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">

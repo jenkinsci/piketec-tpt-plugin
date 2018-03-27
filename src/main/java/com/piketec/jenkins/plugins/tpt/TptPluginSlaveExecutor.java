@@ -29,8 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
@@ -46,8 +44,6 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import hudson.model.Computer;
-import hudson.slaves.SlaveComputer;
 
 /**
  * Executes one test case via TPT API.
@@ -152,10 +148,6 @@ class TptPluginSlaveExecutor {
       File oldReportDir = config.getReportDir();
       File oldTestDataDir = config.getDataDir();
 
-      logger.info(oldReportDir.getPath());
-
-      logger.info(oldTestDataDir.getPath());
-
       Collection<Scenario> foundScenearios = new HashSet<>();
       find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
           testSetString, foundScenearios);
@@ -165,12 +157,13 @@ class TptPluginSlaveExecutor {
         return false;
       }
 
-      FilePath path = null;
+      FilePath slaveDataDir = null;
+      FilePath slaveReportDir = null;
       try {
-        path = new FilePath(build.getWorkspace(), testDataDir).absolutize();
-        if (Computer.currentComputer() instanceof SlaveComputer) {
+        slaveDataDir = new FilePath(build.getWorkspace(), testDataDir).absolutize();
+        if (!masterWorkspace.equals(build.getWorkspace())) {
           logger.info("Creating and/or cleaning test data directory");
-          Utils.deleteFiles(path);
+          Utils.deleteFiles(slaveDataDir);
         }
       } catch (IOException e) {
         logger.error("Could not create or clear test data dir");
@@ -179,16 +172,15 @@ class TptPluginSlaveExecutor {
         logger.interrupt(e.getMessage());
         return false;
       }
-      logger.info("Setting test data directory to " + path.getRemote());
-      config.setDataDir(new File(path.getRemote()));
+      logger.info("Setting test data directory to " + slaveDataDir.getRemote());
+      config.setDataDir(new File(slaveDataDir.getRemote()));
 
-      path = null;
       try {
-        path = new FilePath(build.getWorkspace(), reportDir).absolutize();
-        if (Computer.currentComputer() instanceof SlaveComputer) {
+        slaveReportDir = new FilePath(build.getWorkspace(), reportDir).absolutize();
+        if (!masterWorkspace.equals(build.getWorkspace())) {
           logger.info("Creating and/or cleaning report directory");
-          path.mkdirs();
-          path.deleteContents();
+          slaveReportDir.mkdirs();
+          slaveReportDir.deleteContents();
         }
       } catch (IOException e) {
         logger.error(e.getMessage());
@@ -199,8 +191,8 @@ class TptPluginSlaveExecutor {
         config.setDataDir(oldTestDataDir);
         return false;
       }
-      logger.info("Setting report directory to " + path.getRemote());
-      config.setReportDir(new File(path.getRemote()));
+      logger.info("Setting report directory to " + slaveReportDir.getRemote());
+      config.setReportDir(new File(slaveReportDir.getRemote()));
 
       // store information to undo changes
       List<TestSet> oldTestSets = new ArrayList<>();
@@ -231,11 +223,12 @@ class TptPluginSlaveExecutor {
           }
         }
       } else {
-        String tmpTestSetName = "JENKINS Exec" + testSetName;
+        String tmpTestSetName = "JENKINS Exec " + testSetName;
         logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
-            + remoteScenarioSetToString(foundScenearios) + "\"");
+            + remoteScenarioSetToString(foundScenearios) + "\" from File " + tptFile.getName());
 
         TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+        newTestSets.add(testSet);
         for (Scenario scen : foundScenearios) {
           testSet.addTestCase(scen);
         }
@@ -263,21 +256,11 @@ class TptPluginSlaveExecutor {
         item.setTestSet(oldTestSets.remove(0));
       }
       try {
-        String includes = !StringUtils.isBlank(testDataDir) ? testDataDir
-            : new File(tptFile.getParent(), oldTestDataDir.getPath()).getAbsolutePath();
-        includes += "\\**\\*.*";
-        if (!StringUtils.isBlank(reportDir) || StringUtils.isBlank(oldReportDir.getPath())) {
-          includes += "," + (!StringUtils.isBlank(reportDir) ? reportDir
-              : new File(tptFile.getParent(), oldReportDir.getPath()).getAbsolutePath());
-          includes += "\\**\\*.*";
-        }
+        slaveDataDir.copyRecursiveTo(new FilePath(masterWorkspace, testDataDir));
+        slaveReportDir.copyRecursiveTo(new FilePath(masterWorkspace, reportDir));
 
-        FilePath slaveDataDir = build.getWorkspace();
-        slaveDataDir.copyRecursiveTo(masterWorkspace);
-
-        // CopyToMasterNotifier copyToMaster =
-        // new CopyToMasterNotifier(includes, "", false, "", false);
-        // copyToMaster.perform(build, launcher, listener);
+        logger.info("Copied all data to master from File " + tptFile.getName() + " to "
+            + masterWorkspace.getRemote());
 
       } catch (InterruptedException e) {
         logger.interrupt(e.getMessage());
