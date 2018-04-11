@@ -11,11 +11,11 @@ import com.piketec.tpt.api.Project;
 
 public class CleanUpTask {
 
-  private static Map<String, List<CleanUpTask>> registry = new HashMap<String, List<CleanUpTask>>();
+  private static Map<Object, List<CleanUpTask>> registry = new HashMap<Object, List<CleanUpTask>>();
 
   private Project prj;
 
-  public CleanUpTask(Project prokject, String masterId) {
+  public CleanUpTask(Project prokject, Object masterId) {
     prj = prokject;
     if (prj != null) {
       register(this, masterId);
@@ -31,7 +31,7 @@ public class CleanUpTask {
     }
   }
 
-  private static synchronized void register(CleanUpTask task, String masterId) {
+  private static synchronized void register(CleanUpTask task, Object masterId) {
     List<CleanUpTask> list = registry.get(masterId);
     if (list == null) {
       list = new ArrayList<CleanUpTask>();
@@ -40,8 +40,8 @@ public class CleanUpTask {
     list.add(task);
   }
 
-  public static synchronized boolean cleanUp(String executionId) {
-    List<CleanUpTask> tasks = registry.remove(executionId);
+  public static synchronized boolean cleanUp(Object masterId) {
+    List<CleanUpTask> tasks = registry.remove(masterId);
     if (tasks == null) {
       // nothing to clean up
       return true;

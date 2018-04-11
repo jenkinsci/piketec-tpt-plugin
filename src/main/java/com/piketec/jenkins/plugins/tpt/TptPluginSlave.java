@@ -136,8 +136,6 @@ public class TptPluginSlave extends Builder {
       expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
     }
 
-    String expandedExecutionId = environment.expand("${" + Utils.TPT_EXECUTION_ID_VAR_NAME + "}");
-
     WorkLoad workloadToDo =
         TptPluginMasterJobExecutor.getAndRemoveWorkload(build.getProject().getName());
 
@@ -147,6 +145,7 @@ public class TptPluginSlave extends Builder {
     String reportDirFromWorkload = workloadToDo.getReportDir();
     String testCasesFromWorkload = workloadToDo.getTestCases();
     String testSetFromWorkload = workloadToDo.getTestSetName();
+    Object masterId = workloadToDo.getMasterId();
     FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
 
     listener.getLogger().println("File Name : " + fileNameFromWorkload);
@@ -161,7 +160,7 @@ public class TptPluginSlave extends Builder {
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
         expandedExePaths, expandedTptPort, expandedTptBindingName, new File(fileNameFromWorkload),
         exeConfigFromWorkload, testDataDirFromWorload, reportDirFromWorkload, testCasesFromWorkload,
-        expandedTptStartupWaitTime, expandedExecutionId, testSetFromWorkload, masterWorkspace);
+        expandedTptStartupWaitTime, masterId, testSetFromWorkload, masterWorkspace);
 
     return executor.execute();
   }

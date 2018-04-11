@@ -37,6 +37,7 @@ import com.piketec.tpt.api.ExecutionConfigurationItem;
 import com.piketec.tpt.api.ExecutionStatus;
 import com.piketec.tpt.api.OpenResult;
 import com.piketec.tpt.api.Project;
+import com.piketec.tpt.api.RemoteCollection;
 import com.piketec.tpt.api.Scenario;
 import com.piketec.tpt.api.TestSet;
 import com.piketec.tpt.api.TptApi;
@@ -76,6 +77,26 @@ class TptPluginMasterJobExecutor {
 
   private static HashMap<String, List<WorkLoad>> workload = new HashMap<>();
 
+  TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
+                             BuildListener listener, FilePath[] exePaths,
+                             List<JenkinsConfiguration> executionConfigs, int tptPort,
+                             String tptBindingName, String slaveJobName, long tptStartupWaitTime,
+                             int slaveJobCount, int slaveJobTries) {
+    logger = new TptLogger(listener.getLogger());
+    this.launcher = launcher;
+    this.build = build;
+    this.listener = listener;
+    this.exePaths = exePaths;
+    this.executionConfigs = executionConfigs;
+    this.tptPort = tptPort;
+    this.tptBindingName = tptBindingName;
+    this.slaveJobName = slaveJobName;
+    this.tptStartupWaitTime = tptStartupWaitTime;
+    this.slaveJobCount = slaveJobCount;
+    this.slaveJobTries = slaveJobTries;
+
+  }
+
   public static void putWorkLoad(String jobName, WorkLoad workloadToAdd) {
     synchronized (workload) {
       List<WorkLoad> set = workload.get(jobName);
@@ -99,29 +120,8 @@ class TptPluginMasterJobExecutor {
     }
   }
 
-  TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
-                             BuildListener listener, FilePath[] exePaths,
-                             List<JenkinsConfiguration> executionConfigs, int tptPort,
-                             String tptBindingName, String slaveJobName, long tptStartupWaitTime,
-                             int slaveJobCount, int slaveJobTries) {
-    logger = new TptLogger(listener.getLogger());
-    this.launcher = launcher;
-    this.build = build;
-    this.listener = listener;
-    this.exePaths = exePaths;
-    this.executionConfigs = executionConfigs;
-    this.tptPort = tptPort;
-    this.tptBindingName = tptBindingName;
-    this.slaveJobName = slaveJobName;
-    this.tptStartupWaitTime = tptStartupWaitTime;
-    this.slaveJobCount = slaveJobCount;
-    this.slaveJobTries = slaveJobTries;
-
-  }
-
   boolean execute() {
     TptApi api = null;
-    String executionId = Double.toString(Math.random());
     try {
       api = Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
           tptStartupWaitTime);
@@ -162,7 +162,7 @@ class TptPluginMasterJobExecutor {
           logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
           return false;
         }
-        new CleanUpTask(openProject.getProject(), executionId);
+        new CleanUpTask(openProject.getProject(), build);
 
         executionConfig = getExecutionConfigByName(openProject.getProject(), ec.getConfiguration());
         if (executionConfig == null) {
@@ -190,7 +190,7 @@ class TptPluginMasterJobExecutor {
         return false;
       }
 
-      // check if test Cases arent null, if so return false -> not TestSet with such name found
+      // check if test Cases arent null, if so return false -> no TestSet with such name found
       if (testCases == null) {
         logger.error("No \"" + ec.getTestSet()
             + " \"  test set found, please create such testset on the TPT File on where the Master Job is running");
@@ -247,7 +247,7 @@ class TptPluginMasterJobExecutor {
         logger.info("Create job for \"" + testCase + "\"");
 
         WorkLoad workloadToAdd = new WorkLoad(ec.getTptFile(), ec.getConfiguration(), testdataDir,
-            reportDir, ec.getTestSet(), testCase, build.getWorkspace());
+            reportDir, ec.getTestSet(), testCase, build.getWorkspace(), build);
         putWorkLoad(slaveJobName, workloadToAdd);
 
         RetryableJob retryableJob = new RetryableJob(slaveJobTries, logger, slaveJob);
@@ -275,6 +275,31 @@ class TptPluginMasterJobExecutor {
 
         executionConfig.setDataDir(new File(testDataPath.getRemote()));
         executionConfig.setReportDir(new File(reportPath.getRemote()));
+
+        // set explicit defined test set for all items
+        TestSet oldTestSet = null;
+        if (!ec.getTestSet().equals("")) {
+          OpenResult openProject = api.openProject(new File(ec.getTptFile()));
+          RemoteCollection<TestSet> allTestSets = openProject.getProject().getTestSets();
+
+          TestSet newTestSet = null;
+
+          for (TestSet t : allTestSets.getItems()) {
+            if (t.getName().equals(ec.getTestSet())) {
+              newTestSet = t;
+            }
+          }
+
+          if (newTestSet == null) {
+            throw new RuntimeException("No new Test Set found");
+          }
+
+          for (ExecutionConfigurationItem item : executionConfig.getItems()) {
+            oldTestSet = (item.getTestSet());
+            item.setTestSet(newTestSet);
+          }
+        }
+
         ExecutionStatus execStatus = api.reGenerateOverviewReport(executionConfig);
 
         while (execStatus.isRunning() || execStatus.isPending()) {
@@ -287,6 +312,17 @@ class TptPluginMasterJobExecutor {
         }
         executionConfig.setDataDir(oldTestDataFile);
         executionConfig.setReportDir(oldReportDir);
+
+        // reset test sets to old values
+        if (!ec.getTestSet().equals("")) {
+          if (oldTestSet == null) {
+            throw new RuntimeException("No old Test Set found");
+          }
+
+          for (ExecutionConfigurationItem item : executionConfig.getItems()) {
+            item.setTestSet(oldTestSet);
+          }
+        }
 
         int foundTestData = 0;
         try {
@@ -313,7 +349,7 @@ class TptPluginMasterJobExecutor {
         return false;
       } finally {
         logger.info("Close open TPT project on master and slaves.");
-        if (!CleanUpTask.cleanUp(executionId)) {
+        if (!CleanUpTask.cleanUp(build)) {
           logger.error("Could not close all open TPT files. "
               + "There is no guarantee next run will be be done with correct file version.");
           return false;
@@ -345,17 +381,6 @@ class TptPluginMasterJobExecutor {
       }
     }
     return result;
-  }
-
-  private String exePathsAsSingleString() {
-    StringBuilder sb = new StringBuilder();
-    for (FilePath path : exePaths) {
-      if (sb.length() > 0) {
-        sb.append(',');
-      }
-      sb.append(path.getRemote());
-    }
-    return sb.toString();
   }
 
 }

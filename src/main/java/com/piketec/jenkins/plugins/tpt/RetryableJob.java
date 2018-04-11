@@ -15,7 +15,6 @@ import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
-import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.ParameterValue;
 import hudson.model.ParametersAction;
@@ -24,7 +23,6 @@ import hudson.model.Run;
 import hudson.model.StringParameterValue;
 import hudson.model.TaskListener;
 import hudson.model.Cause.UpstreamCause;
-import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 
 class RetryableJob {
@@ -146,29 +144,10 @@ class RetryableJob {
         }
       };
 
-      // permision ???
-      // if (!canTriggerProject(build, project, listener)) {
-      // return null;
-      // }
-
       return parameterizedJobMixIn.scheduleBuild2(quietPeriod,
           queueActions.toArray(new Action[queueActions.size()]));
     }
     return null;
-  }
-
-  static boolean canTriggerProject(@Nonnull AbstractBuild< ? , ? > build, @Nonnull final Job job,
-                                   @Nonnull TaskListener taskListener) {
-    if (!job.hasPermission(Item.BUILD)) {
-      String message = String.format(
-          "Cannot schedule the build of %s from %s. "
-              + "The authenticated build user %s has no Job.BUILD permission",
-          job.getFullDisplayName(), build.getFullDisplayName(),
-          Jenkins.getAuthentication().getName());
-      taskListener.error(message);
-      return false;
-    }
-    return true;
   }
 
 }

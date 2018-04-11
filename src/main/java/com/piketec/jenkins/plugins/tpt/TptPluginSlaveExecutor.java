@@ -79,7 +79,7 @@ class TptPluginSlaveExecutor {
 
   private long tptStartupWaitTime;
 
-  private String executionId;
+  private Object masterId;
 
   private String testSetName;
 
@@ -88,7 +88,7 @@ class TptPluginSlaveExecutor {
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
                          String execCfg, String testDataDir, String reportDir, String testSet,
-                         long tptStartupWaitTime, String executionId, String testSetName,
+                         long tptStartupWaitTime, Object masterId, String testSetName,
                          FilePath masterWorkspace) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
@@ -103,7 +103,7 @@ class TptPluginSlaveExecutor {
     this.reportDir = reportDir;
     this.testSetString = Utils.unescapeTestcaseNames(testSet);
     this.tptStartupWaitTime = tptStartupWaitTime;
-    this.executionId = executionId;
+    this.masterId = masterId;
     this.testSetName = testSetName;
     this.masterWorkspace = masterWorkspace;
   }
@@ -129,7 +129,7 @@ class TptPluginSlaveExecutor {
         logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
         return false;
       }
-      new CleanUpTask(openProject.getProject(), executionId);
+      new CleanUpTask(openProject.getProject(), masterId);
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
           openProject.getProject().getExecutionConfigurations().getItems();
