@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
@@ -15,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.xml.sax.SAXException;
 
+import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.TptPlugin;
 import com.piketec.jenkins.plugins.tpt.Utils;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
@@ -42,36 +63,32 @@ public class TPTReportPublisher extends Notifier {
   @DataBoundConstructor
   public TPTReportPublisher() {
     // allow to display HTML files
-    setSecurity();
+    TPTGlobalConfiguration.setSecurity();
   }
 
-  private void setSecurity() {
-    if (TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers) {
-      System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "");
-    } else {
-      if (TPTGlobalConfiguration.DescriptorImpl.staticOldSettings != null) {
-        System.setProperty("hudson.model.DirectoryBrowserSupport.CSP",
-            TPTGlobalConfiguration.DescriptorImpl.staticOldSettings);
-      }
-    }
-
-  }
-
+  /**
+   * Creates the directories on the build directory, loops over all JenkinsConfigurations and
+   * extract from each one the data from the "test_summary.xml". Then it sets the failed tests and
+   * finally it creates the TPTReportPage action . (Thats the one who is displaying the files,
+   * piechart and failed tests)
+   */
   @Override
   public boolean perform(@SuppressWarnings("rawtypes") final AbstractBuild build,
                          final Launcher launcher, final BuildListener listener)
       throws IOException, InterruptedException {
 
-    listener.getLogger().println("Starting Post Build Action \"TPT Report\"");
-
+    Result result = build.getResult();
+    if (result == null || result.isWorseThan(Result.UNSTABLE)) {
+      return false;
+    }
+    TptLogger logger = new TptLogger(listener.getLogger());
+    logger.info("Starting Post Build Action \"TPT Report\"");
     ArrayList<FilePath> uniqueTestDataDir = new ArrayList<>();
     ArrayList<FilePath> uniqueReportDataDir = new ArrayList<>();
-
     ArrayList<TPTFile> tptFiles = new ArrayList<>();
     ArrayList<TPTTestCase> failedTests = new ArrayList<>();
     FilePath workspace = build.getWorkspace();
     Project< ? , ? > proj = (Project< ? , ? >)build.getProject();
-
     // global file in Build
     File piketectptDir = new File(build.getRootDir().getAbsolutePath() + "/Piketec-TPT");
     if (!piketectptDir.exists()) {
@@ -85,7 +102,6 @@ public class TPTReportPublisher extends Notifier {
       if (builder instanceof TptPlugin) {
         TptPlugin tptPlugin = (TptPlugin)builder;
         for (JenkinsConfiguration cfg : tptPlugin.getExecutionConfiguration()) {
-
           // make file in build und copy report dir
           String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
           File dir = new File(piketectptDir.getAbsolutePath() + "/" + tptFileName);
@@ -94,41 +110,36 @@ public class TPTReportPublisher extends Notifier {
               throw new IOException("Could not create directory \"" + dir.getAbsolutePath() + "\"");
             }
           }
-
           File dirExConfig = new File(
               piketectptDir.getAbsolutePath() + "/" + tptFileName + "/" + cfg.getConfiguration());
           if (!dirExConfig.mkdirs()) {
             throw new IOException(
                 "Could not create directory \"" + dirExConfig.getAbsolutePath() + "\"");
           }
-
           FilePath reportDir = new FilePath(workspace, Utils.getGeneratedReportDir(cfg));
           FilePath testDataDir = new FilePath(workspace, Utils.getGeneratedTestDataDir(cfg));
-
           if (reportDir.exists()) {
             reportDir.copyRecursiveTo(new FilePath(dirExConfig));
           }
-
           FilePath reportXML = new FilePath(testDataDir, "test_summary.xml");
-
           if (reportXML.exists()) {
             TPTFile newTPTFile = new TPTFile(tptFileName, cfg.getConfiguration());
-            parse(reportXML, newTPTFile, failedTests, reportDir.getRemote(),
-                cfg.getConfiguration());
+            // get the remote path, then cut the path and get just what is needed (the last part),
+            // see getLinkToFailedReport() in TPTReportSAXHandler.
+            parse(reportXML, newTPTFile, failedTests, reportDir.getRemote(), cfg.getConfiguration(),
+                logger);
             tptFiles.add(newTPTFile);
           } else {
-            throw new IOException("There is no test_summary.xml in Computer "
-                + Computer.currentComputer().getName() + " in " + reportXML.getRemote());
+            throw new IOException("There is no test_summary.xml in Computer \""
+                + Computer.currentComputer().getName() + "\" in \"" + reportXML.getRemote() + "\"");
           }
-
           // Check if the Testdata dir and the Report are unique, otherwise throw an exception
           if (uniqueReportDataDir.contains(reportDir) || uniqueTestDataDir.contains(testDataDir)) {
             throw new IOException("The directory \"" + cfg.getReportDir() + "\" or the directoy \""
-                + cfg.getTestdataDir() + " is already used, please choose another one");
+                + cfg.getTestdataDir() + "\" is already used, please choose another one");
           }
           uniqueReportDataDir.add(reportDir);
           uniqueTestDataDir.add(testDataDir);
-
         }
       }
     }
@@ -136,11 +147,9 @@ public class TPTReportPublisher extends Notifier {
     // Failed Since. Look up test in previous build. If failed there. extract failed since
     // information and add 1
     AbstractBuild lastSuccBuild = (AbstractBuild)build.getPreviousNotFailedBuild();
-
     // the tpt report of last successful build
     TPTReportPage lastTptFilesAction =
         (lastSuccBuild == null) ? null : lastSuccBuild.getAction(TPTReportPage.class);
-
     if (lastTptFilesAction != null) {
       HashMap<FailedTestKey, TPTTestCase> prevFailed = new HashMap<FailedTestKey, TPTTestCase>();
       for (TPTTestCase tptTestCase : lastTptFilesAction.getFailedTests()) {
@@ -152,18 +161,15 @@ public class TPTReportPublisher extends Notifier {
         String fileName = t.getFileName();
         String exeConfig = t.getExecutionConfiguration();
         String platform = t.getPlatform();
-
         FailedTestKey ftk = new FailedTestKey(id, fileName, exeConfig, platform);
         if (prevFailed.containsKey(ftk)) {
           t.setBuildHistoy(prevFailed.get(ftk).getBuildHistoy() + 1);
         }
       }
     }
-
     filesAction = new TPTReportPage(build, failedTests, tptFiles);
     filesAction.createGraph();
     build.addAction(filesAction);
-
     listener.getLogger().println("Finished Post Build Action");
     if (!failedTests.isEmpty()) {
       build.setResult(Result.UNSTABLE);
@@ -171,15 +177,25 @@ public class TPTReportPublisher extends Notifier {
     return true;
   }
 
+  /**
+   * Xml SAXparser
+   * 
+   * @param xmlFile
+   * @param tptFile
+   * @param failedTests
+   * @param reportDirOnRemote
+   * @param executionConfiguration
+   * @throws InterruptedException
+   */
   public void parse(FilePath xmlFile, TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
-                    String reportDir, String executionConfiguration)
+                    String reportDirOnRemote, String executionConfiguration, TptLogger logger)
       throws InterruptedException {
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
     try {
       SAXParser saxParser = saxParserFactory.newSAXParser();
       TPTReportSAXHandler handler =
-          new TPTReportSAXHandler(tptFile, failedTests, reportDir, executionConfiguration);
+          new TPTReportSAXHandler(tptFile, failedTests, reportDirOnRemote, executionConfiguration);
       InputStream inputStream = xmlFile.read();
       try {
         saxParser.parse(inputStream, handler);
@@ -187,7 +203,7 @@ public class TPTReportPublisher extends Notifier {
         IOUtils.closeQuietly(inputStream);
       }
     } catch (ParserConfigurationException | SAXException | IOException e) {
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
 
   }
@@ -231,6 +247,13 @@ public class TPTReportPublisher extends Notifier {
     return BuildStepMonitor.NONE;
   }
 
+  /**
+   * In order to increase the performance and make a HashMap with a "FailedTestKey" instead of
+   * looping throug a list.
+   * 
+   * @author FInfantino, PikeTec GmbH
+   *
+   */
   private static class FailedTestKey {
 
     private final String id;

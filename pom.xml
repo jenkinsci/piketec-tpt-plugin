@@ -46,6 +46,11 @@
       <name>Joachim Kuhnert</name>
       <email>joachim.kuhnert@piketec.com</email>
     </developer>
+    <developer>
+      <id>felipeinfantino</id>
+      <name>Felipe Infantino Moreno</name>
+      <email>felipe.infantino@piketec.com</email>
+    </developer>
   </developers>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
@@ -63,7 +68,7 @@
       <url>http://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
-  <dependencies>
+    <dependencies>
     <dependency>
         <groupId>net.java.dev.stax-utils</groupId>  
         <artifactId>stax-utils</artifactId>

@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
@@ -24,9 +44,21 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
 
   private String exeConfig;
 
+  /**
+   * This class is for hosting the HTML Report in an action. After requesting the url in the
+   * TPTReportPage it redirects to this class and here will be the HTML displayed through the
+   * doDynamic method.(It uses the DirectoryBrowserSupport)
+   * 
+   * @param build
+   *          , to locate where the file is
+   * @param urlFileName
+   *          , to know which file it is
+   * @param exeConfig
+   *          , to know which file it is , the path is made by a filename and a execution config
+   */
   public InvisibleActionHostingHtml(AbstractBuild< ? , ? > build, String urlFileName,
                                     String exeConfig) {
-    name = urlFileName;
+    this.name = urlFileName;
     this.build = build;
     this.exeConfig = exeConfig;
 
@@ -60,18 +92,23 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
     return build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name + "\\" + exeConfig;
   }
 
+  /**
+   * This method is called when an InvisibleActionHostingHtml object is created. It displays the
+   * "index.html"
+   * 
+   * @param req
+   * @param rsp
+   * @throws IOException
+   * @throws ServletException
+   */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
 
-    File f = new File(build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name + "\\"
-        + exeConfig + "\\index.html");
-    FileUtils.touch(f);
-
-    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
-        new FilePath(new File(
-            build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name + "\\" + exeConfig)),
+    File f = new File(path() + "\\index.html");
+    FileUtils.touch(f); // refresh the index if security changed
+    // this displays the "index.html" in the given path
+    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(new File(path())),
         "TPT Report", "clipboard.png", false);
-
     if (req.getRestOfPath().equals("")) {
       throw HttpResponses.forwardToView(this, "index.jelly");
     }

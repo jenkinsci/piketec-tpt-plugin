@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.awt.Color;
@@ -54,7 +74,6 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
       failedCount += f.getFailed();
     }
     this.build = build;
-
     this.setFailedTests(failedTests);
     this.setTptFiles(tptFiles);
 
@@ -151,11 +170,16 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     this.failedCount = failedCount;
   }
 
-  public boolean getStaticValue() {
+  public boolean isTrustSlavesAndUsers() {
     return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
   }
 
-  // used to calculate the actual number from the 'failed since' build, failed Since is always >=1
+  /**
+   * Used to calculate the actual number from the 'failed since' build, failed Since is always >=1
+   * 
+   * @param failedSince
+   * @return the actual number from the 'failed since' build
+   */
   public int getNumberFromHistory(int failedSince) {
     List< ? > previousBuilds =
         this.build.getPreviousBuildsOverThreshold(failedSince - 1, Result.UNSTABLE);
@@ -165,14 +189,20 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     return ((Run< ? , ? >)previousBuilds.get(previousBuilds.size() - 1)).getNumber();
   }
 
-  // Host images, HTML report and failed report
-  // see http://stapler.kohsuke.org/reference.html
+  /**
+   * Host images, HTML report and failed report
+   * 
+   * @see http://stapler.kohsuke.org/reference.html
+   * @param name
+   *          string on the requested url
+   * @param req
+   * @param rsp
+   * @return an new Action that is going to be host
+   */
   public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
-
     if (name.equals("SecurityError")) {
       return new SecurityErrorAction();
     }
-
     if (name.equals("Images")) {
       return new InvisibleActionHostingImages(build);
     }
@@ -187,15 +217,17 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
       if (name.equals(t.getFileName() + t.getConfiguration())) {
         return new InvisibleActionHostingHtml(build, t.getFileName(), t.getConfiguration());
       }
-
     }
-
     return null;
   }
 
+  /**
+   * Creates the pie chart from the TPT Report
+   * 
+   * @throws IOException
+   */
   public void createGraph() throws IOException {
     List<com.piketec.jenkins.plugins.tpt.publisher.PieChart.Segment> list = new ArrayList<>();
-
     com.piketec.jenkins.plugins.tpt.publisher.PieChart.Segment passed =
         new PieChart.Segment("Passed", passedCount, COLOR_GREEN);
     com.piketec.jenkins.plugins.tpt.publisher.PieChart.Segment inconlusive =
@@ -204,19 +236,14 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
         new PieChart.Segment("Error", errorCount, COLOR_BROWN);
     com.piketec.jenkins.plugins.tpt.publisher.PieChart.Segment failed =
         new PieChart.Segment("Failed", failedCount, COLOR_RED);
-
     list.add(passed);
     list.add(inconlusive);
     list.add(error);
     list.add(failed);
-
     PieChart pieChart = new PieChart(list, 0, true);
-
     File output =
         new File(build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\Images\\pieChart.png");
-
     BufferedImage image = pieChart.render(150);
-
     if (!output.exists() && !output.mkdirs()) {
       throw new IOException("Could not create directory " + output.getAbsolutePath());
     }

@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
@@ -32,6 +52,20 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
 
   private String platform;
 
+  /**
+   * This class is made for generating the failed html on the TPTReportPage. We open the index.html
+   * and we replace the string "overview.html" with the name of the failed test. We store that in a
+   * new html file called "failedTest.html". This will be done when it is requested by the user.
+   * This class is also similar to InvisibleActionHostingHtml.
+   * 
+   * @param build
+   * @param fileName
+   * @param reportFile
+   * @param id
+   * @param exConfig
+   * @param platform
+   * @param date
+   */
   public OpenReportForFailedTestAction(AbstractBuild< ? , ? > build, String fileName,
                                        String reportFile, String id, String exConfig,
                                        String platform, String date) {
@@ -69,6 +103,14 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
     return name;
   }
 
+  /**
+   * This method is called when an object from this class is created.
+   * 
+   * @param req
+   * @param rsp
+   * @throws IOException
+   * @throws ServletException
+   */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
 

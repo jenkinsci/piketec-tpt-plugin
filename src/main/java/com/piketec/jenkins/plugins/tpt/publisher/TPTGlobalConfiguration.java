@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -9,19 +29,56 @@ import hudson.model.Descriptor;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+/**
+ * Allows the user to set the security in order to allow javascript on Jenkins. The jelly from this
+ * class will apear on the Jenkins Global Configuration. This class is the responsable for the
+ * "trust slaves and users to modify the Jenkins workspace option".
+ * 
+ * @author FInfantino, PikeTec GmbH
+ *
+ */
 public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguration> {
+
+  /**
+   * Checks if the security has been set. If it has been set more than once, it sets the security
+   * back to its old settings.
+   */
+  public static void setSecurity() {
+    if (TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers) {
+      System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "");
+    } else {
+      if (TPTGlobalConfiguration.DescriptorImpl.staticOldSettings != null) {
+        System.setProperty("hudson.model.DirectoryBrowserSupport.CSP",
+            TPTGlobalConfiguration.DescriptorImpl.staticOldSettings);
+      }
+    }
+  }
+
+  public static boolean isTrustSlavesAndUsers() {
+    return DescriptorImpl.trustSlavesAndUsers;
+  }
+
+  @Override
+  public Descriptor<TPTGlobalConfiguration> getDescriptor() {
+    Jenkins instance = Jenkins.getInstance();
+    if (instance == null) {
+      return null;
+    }
+    @SuppressWarnings("unchecked")
+    Descriptor<TPTGlobalConfiguration> descriptor = instance.getDescriptor(getClass());
+    return descriptor;
+  }
 
   @DataBoundConstructor
   public TPTGlobalConfiguration() {
-
   }
 
   @Extension
   public static class DescriptorImpl extends Descriptor<TPTGlobalConfiguration> {
 
-    public static boolean trustSlavesAndUsers;
+    static boolean trustSlavesAndUsers;
 
-    public static String staticOldSettings;
+    static String staticOldSettings;
 
     public String oldSettings;
 
@@ -29,8 +86,8 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
 
     public DescriptorImpl() {
       load();
-      trustSlavesAndUsers = toSave;
-      staticOldSettings = oldSettings;
+      setTrustSlavesAndUsers(toSave);
+      setStaticOldSettings(oldSettings);
     }
 
     @Override
@@ -51,8 +108,20 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
       return "";
     }
 
-    public void setTrustSlavesAndUsers(boolean enableClou) {
+    public static void setTrustSlavesAndUsers(boolean enableClou) {
       trustSlavesAndUsers = enableClou;
+    }
+
+    public static boolean isTrustSlavesAndUsers() {
+      return trustSlavesAndUsers;
+    }
+
+    public static boolean getTrustSlavesAndUsers() {
+      return trustSlavesAndUsers;
+    }
+
+    static void setStaticOldSettings(String oldSettings) {
+      staticOldSettings = oldSettings;
     }
 
     public void setStaticOldSettings() {
@@ -64,28 +133,8 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
         staticOldSettings = settings;
       }
       System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", staticOldSettings);
-
     }
 
-  }
-
-  @Override
-  public Descriptor<TPTGlobalConfiguration> getDescriptor() {
-    Jenkins instance = Jenkins.getInstance();
-    if (instance == null) {
-      return null;
-    }
-    @SuppressWarnings("unchecked")
-    Descriptor<TPTGlobalConfiguration> descriptor = instance.getDescriptor(getClass());
-    return descriptor;
-  }
-
-  public boolean isTrustSlavesAndUsers() {
-    return DescriptorImpl.trustSlavesAndUsers;
-  }
-
-  public static boolean getA() {
-    return DescriptorImpl.trustSlavesAndUsers;
   }
 
 }

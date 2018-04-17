@@ -1,8 +1,27 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +45,12 @@ import hudson.model.Run;
 import hudson.util.HttpResponses;
 import jenkins.model.RunAction2;
 
+/**
+ * Generates the trend graph on the main page.
+ * 
+ * @author FInfantino, PikeTec GmbH
+ *
+ */
 public class TrendGraph implements RunAction2, StaplerProxy {
 
   private static final String INDENT = "\t";
@@ -50,28 +75,33 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   private ArrayList<ResultData> historyData;
 
-  boolean isFirstBuild;
-
   public TrendGraph(final AbstractProject< ? , ? > project) {
-
-    historyData = new ArrayList<>();
+    this.historyData = new ArrayList<>();
     this.project = project;
     initBuildAndTestCaseResultCounts();
     setHistoryIterativ();
-
   }
 
-  public boolean getStaticValue() {
+  /**
+   * @return true if the security has been set. (By security is meant the "trust slaves and user to
+   *         modify the jenkins workspace option).
+   */
+  public boolean isTrustSlavesAndUsers() {
     return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
-
   }
 
+  /**
+   * Gets the last successful build and gets the data (passed, inconclusive, error and failed tests)
+   * from there. We need this method although we have the setHistoryIterativ method because in the
+   * setHistoryIterativ method the call actualBuild.getPreviousBuildsOverThreshold doesnt get the
+   * data from actual build, thats why we have a method for the history and this one for the actual
+   * build.
+   */
   private void initBuildAndTestCaseResultCounts() {
     actualBuild = this.project.getLastSuccessfulBuild();
     if (actualBuild == null) {
       return;
     }
-
     Action tptAction = actualBuild.getAction(TPTReportPage.class);
     if (tptAction == null) {
       return;
@@ -82,23 +112,32 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     this.failed = ((TPTReportPage)tptAction).getFailedCount();
   }
 
+  /**
+   * Regenerates the trend graph. It is called everytime the page is refreshed, this is useful
+   * because when a new build is created we want the graph to update on runtime.
+   */
   private void refreshTrendGraph() {
-
     historyData.clear();
     setHistoryIterativ();
     initBuildAndTestCaseResultCounts();
   }
 
+  /**
+   * Fills the history Data with the data from the last 20 builds.
+   */
   private void setHistoryIterativ() {
     if (actualBuild == null) {
       return;
     }
+    Result result = actualBuild.getResult();
+    if (result == null) {
+      return;
+    }
     @SuppressWarnings("unchecked")
     List<Run> builds = (List<Run>)actualBuild.getPreviousBuildsOverThreshold(20, Result.UNSTABLE);
-    if (actualBuild.getResult().isBetterOrEqualTo(Result.UNSTABLE)) {
+    if (result.isBetterOrEqualTo(Result.UNSTABLE)) {
       builds.add(0, actualBuild);
     }
-
     for (Run run : builds) {
       ResultData toAdd = new ResultData();
       TPTReportPage tptAction = run.getAction(TPTReportPage.class); // is always unique
@@ -117,7 +156,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   @Override
   public String getIconFileName() {
-
     return "/plugin/piketec-tpt/tpt.ico";
   }
 
@@ -147,7 +185,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
   @Override
   public void onLoad(Run< ? , ? > run) {
     this.run = run;
-
   }
 
   public Run< ? , ? > getRun() {
@@ -207,6 +244,16 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     return this;
   }
 
+  /**
+   * This method is called everytime the page is refreshed. It regenerates the json file and
+   * refreshes the graph.
+   * 
+   * @param req
+   * @param rsp
+   * @throws IOException
+   * @throws ServletException
+   * @throws InterruptedException
+   */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException, InterruptedException {
     // For every refresh the actual build will be updated. If actual build equals null, nothing to
@@ -216,12 +263,9 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     if (actualBuild == null) {
       return;
     }
-    setSecurity();
-
+    TPTGlobalConfiguration.setSecurity();
     generateJson();
-
     File buildDir = actualBuild.getRootDir();
-
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
         new FilePath(new File(buildDir.getAbsolutePath() + "\\TrendGraph")), "TPT Report",
         "/plugin/piketec-tpt/tpt.ico", false);
@@ -232,15 +276,12 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     dbs.generateResponse(req, rsp, this);
   }
 
-  private void setSecurity() {
-    if (TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers) {
-      System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "");
-    } else {
-      System.setProperty("hudson.model.DirectoryBrowserSupport.CSP",
-          TPTGlobalConfiguration.DescriptorImpl.staticOldSettings);
-    }
-  }
-
+  /**
+   * Generates the json file with the historyData.
+   * 
+   * @throws IOException
+   * @throws InterruptedException
+   */
   private void generateJson() throws IOException, InterruptedException {
     File oldIndexHTML = new File(Utils.getTptPluginRootDir(), "TrendGraph/index.html");
     File utilsJs = new File(Utils.getTptPluginRootDir(), "TrendGraph/utils.js");
@@ -260,17 +301,20 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     String jsonScript = getResultArray(historyData);
     String newIndexHTMLWithJson = FileUtils.readFileToString(oldIndexHTML);
     newIndexHTMLWithJson = newIndexHTMLWithJson.replace("toReplace", jsonScript);
-    PrintWriter pw = new PrintWriter(buildDir.getAbsolutePath() + "\\TrendGraph\\index.html");
-    pw.close();
     File newIndexHTML = new File(buildDir.getAbsolutePath() + "\\TrendGraph\\index.html");
     FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson);
 
   }
 
+  /**
+   * Minor function from generateJson()
+   * 
+   * @param data
+   * @return
+   */
   private static String getResultArray(ArrayList<ResultData> data) {
     StringBuffer buf = new StringBuffer();
     int indent = 1;
-
     buf.append(StringUtils.repeat(INDENT, indent + 1) + " { \"data\" : [" + LF);
     for (int i = 0; i < data.size(); i++) {
       ResultData currentData = data.get(i);
@@ -287,6 +331,19 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     return buf.toString();
   }
 
+  /**
+   * Minor function from generateJson().
+   * 
+   * @param total
+   * @param failed
+   * @param inconclusive
+   * @param error
+   * @param passed
+   * @param buildNummer
+   * @param indent
+   * @param withComma
+   * @return
+   */
   private static String getResultStruct(int total, int failed, int inconclusive, int error,
                                         int passed, int buildNummer, int indent,
                                         boolean withComma) {
@@ -317,6 +374,21 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   private static String getJSONIntEntry(String name, int value, int indent) {
     return getJSONIntEntry(name, value, indent, false);
+  }
+
+  private static class ResultData {
+
+    public int total;
+
+    public int error;
+
+    public int failed;
+
+    public int passed;
+
+    public int inconclusive;
+
+    public int buildNummer;
   }
 
 }

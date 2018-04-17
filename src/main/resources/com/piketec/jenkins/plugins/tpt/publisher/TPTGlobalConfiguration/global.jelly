@@ -1,72 +1,31 @@
-<!-- ~ The MIT License (MIT) ~ ~ Copyright (c) 2015 PikeTec GmbH ~ ~ Permission 
-  is hereby granted, free of charge, to any person obtaining a copy of this 
-  software and ~ associated documentation files (the "Software"), to deal in 
-  the Software without restriction, ~ including without limitation the rights 
-  to use, copy, modify, merge, publish, distribute, ~ sublicense, and/or sell 
-  copies of the Software, and to permit persons to whom the Software is ~ furnished 
-  to do so, subject to the following conditions: ~ ~ The above copyright notice 
-  and this permission notice shall be included in all copies or ~ substantial 
-  portions of the Software. ~ ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
-  OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT ~ NOT LIMITED TO THE WARRANTIES 
-  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND ~ NONINFRINGEMENT. 
-  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
-  ~ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
-  ARISING FROM, ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-  DEALINGS IN THE SOFTWARE.
-  
-  
-  <f:section title="TPT-Plugin Configuration">
-  
- <f:entry field="trustSlavesAndUsers" help="/plugin/piketec-tpt/tptFile.html" >
-        <f:checkbox title="${%Trust Slaves and Users to modify Jenkins workspace}" value="${instance.trustSlavesAndUsers}"   />
-      aa${it.trustSlavesAndUsers} bb ${it}
-  </f:entry>
- 
-  </f:section>
-  
-  
-  
-   -->
-  
-  
-  <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-         xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-         
-        <f:section  name="securityPermission" >
-     <f:optionalBlock title="${%Trust Slaves and Users to modify Jenkins workspace}"
-                         name="trustSlavesAndUsers"
-                         field="trustSlavesAndUsers"
-                          inline="true"
-                           help="/plugin/piketec-tpt/security.html"/> 
-  </f:section>   
-  
- 
-  
-
-  
-   
-   <!--   <f:entry  name="securityPermission" field="trustSlavesAndUsers" help="/plugin/piketec-tpt/security.html" inline="true">
-        <f:checkbox title="${%Trust Slaves and Users to modify Jenkins workspace}" />
-      </f:entry>  
-      
-      <f:checkbox name="securityPermission" help="/plugin/piketec-tpt/security.html" inline="true" title="${%Trust Slaves and Users to modify Jenkins workspace}" 
-  field="trustSlavesAndUsers"/>
-  
-  
-   <f:entry  name="securityPermission" help="/plugin/piketec-tpt/security.html" inline="true">
-   <f:optionalBlock title="${%Trust Slaves and Users to modify Jenkins workspace}"
-                         name="trustSlavesAndUsers"
-                         field="trustSlavesAndUsers"
-                          inline="true"
-                          help="/plugin/piketec-tpt/security.html"/> 
-   </f:entry>
-      
-      --> 
-  
-
-
-  
-  
+<!--
+ ~ The MIT License (MIT)
+ ~ 
+ ~ Copyright (c) 2018 PikeTec GmbH
+ ~ 
+ ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ ~ associated documentation files (the "Software"), to deal in the Software without restriction,
+ ~ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ ~ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ ~ furnished to do so, subject to the following conditions:
+ ~ 
+ ~ The above copyright notice and this permission notice shall be included in all copies or
+ ~ substantial portions of the Software.
+ ~ 
+ ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ ~ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ ~ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ ~ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ -->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<f:section name="securityPermission">
+		<f:optionalBlock
+			title="${%Trust Slaves and Users to modify Jenkins workspace}" name="trustSlavesAndUsers"
+			field="trustSlavesAndUsers" inline="true"
+			help="/plugin/piketec-tpt/security.html" />
+	</f:section>
 </j:jelly>
   
   

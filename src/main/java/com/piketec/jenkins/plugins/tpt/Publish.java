@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -39,42 +39,49 @@ import hudson.FilePath;
 
 public final class Publish {
 
-  public static int publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
-                                        JenkinsConfiguration ex, TptLogger logger,
+  /**
+   * Publish the Junits results, it creates an XML file and write the results on it.
+   * 
+   * @param jenkinsconfiguration,
+   *          to get the tpt file name
+   * @param testdatadir
+   *          , get the data to write on the xml
+   * @param jUnitOutput
+   *          dir, to know where to publish the results
+   * @param logger,
+   *          to display the information
+   * @param loglevel,
+   *          to check if there where any logs
+   * @return the number of testcases .
+   */
+  public static int publishJUnitResults(JenkinsConfiguration ec, FilePath testDataDir,
+                                        FilePath jUnitOutputDir, TptLogger logger,
                                         LogLevel logLevel)
       throws IOException {
     XmlStreamWriter xmlPub = null;
 
     try {
-      String classname = FilenameUtils.getBaseName(ex.getTptFile());
-      FilePath reportFile = new FilePath(reportFolder,
-          classname + "." + ex.getConfigurationWithUnderscore() + ".xml");
-      String testDataText = Utils.getGeneratedTestDataDir(ex);
-      FilePath testDataDir = ((testDataText == null) || testDataText.trim().isEmpty())
-          ? workspaceDir : new FilePath(workspaceDir, testDataText);
-      List<Testcase> testdata;
+      String classname = FilenameUtils.getBaseName(ec.getTptFile());
+      FilePath jUnitXMLFile = new FilePath(jUnitOutputDir,
+          classname + "." + ec.getConfigurationWithUnderscore() + ".xml");
       xmlPub = new XmlStreamWriter();
-      xmlPub.initalize(reportFile);
+      xmlPub.initalize(jUnitXMLFile);
       xmlPub.writeTestsuite(classname);
-      testdata = getTestcases(testDataDir, logger);
+      List<Testcase> testdata = getTestcases(testDataDir, logger);
       logger.info("Found " + testdata.size() + " test results.");
-
-      if (!testdata.isEmpty()) {
-        for (Testcase tc : testdata) {
-
-          if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
-            xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
-          } else {
-            StringBuilder log = new StringBuilder();
-            for (LogEntry entry : tc.getLogEntries(logLevel)) {
-              if (log.length() > 0) {
-                log.append('\n');
-              }
-              log.append('[').append(entry.level.name()).append("] ").append(entry.message);
+      for (Testcase tc : testdata) {
+        if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
+          xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
+        } else {
+          StringBuilder log = new StringBuilder();
+          for (LogEntry entry : tc.getLogEntries(logLevel)) {
+            if (log.length() > 0) {
+              log.append('\n');
             }
-            xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
-                log.toString());
+            log.append('[').append(entry.level.name()).append("] ").append(entry.message);
           }
+          xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
+              log.toString());
         }
       }
       return testdata.size();
@@ -85,7 +92,6 @@ public final class Publish {
     } catch (InterruptedException ie) {
       throw new IOException("traverse test data directory failed: " + ie.getMessage());
     } finally {
-
       if (xmlPub != null) {
         xmlPub.close();
       }
@@ -104,9 +110,8 @@ public final class Publish {
   public static List<Testcase> getTestcases(FilePath rootdir, TptLogger logger)
       throws IOException, InterruptedException {
     Collection<FilePath> files = new HashSet<FilePath>();
-    List<Testcase> testcases;
     find(rootdir, "testcase_information.xml", files);
-    testcases = new ArrayList<Testcase>(files.size());
+    List<Testcase> testcases = new ArrayList<Testcase>(files.size());
 
     for (FilePath f : files) {
 

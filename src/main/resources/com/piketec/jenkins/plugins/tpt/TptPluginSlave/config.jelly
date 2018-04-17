@@ -1,7 +1,7 @@
 <!--
  ~ The MIT License (MIT)
  ~ 
- ~ Copyright (c) 2015 PikeTec GmbH
+ ~ Copyright (c) 2018 PikeTec GmbH
  ~ 
  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  ~ associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,40 +21,17 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
 	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-
 	<!-- TPT Configuration -->
 	<f:entry field="exePaths" title="Paths to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
 		<f:textbox value="${instance.exePaths}" />
 	</f:entry>
-	
   <f:entry field="tptPort" title="TPT Port" help="/plugin/piketec-tpt/tptPort.html">
     <f:textbox value="${instance.tptPort}" default="${descriptor.defaultTptPort}"/>
   </f:entry>
-  
   <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
     <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>
   </f:entry>
-  
   <f:entry field="tptStartUpWaitTime" title="Wait for TPT start [s]" help="/plugin/piketec-tpt/tptStartUpWaitTime.html">
     <f:textbox value="${instance.tptStartUpWaitTime}" default="${descriptor.defaultTptStartUpWaitTime}"/>
   </f:entry>
-
-	<!--  <f:entry field="tptFile" title="TPT File name" help="/plugin/piketec-tpt/tptFile.html">
-		<f:textbox value="${instance.tptFile}" default="${descriptor.defaultTptFile}"/>
-	</f:entry>
-  
-  <f:entry field="testDataDir" title="Test data directory" help="/plugin/piketec-tpt/testdataDir.html">
-    <f:textbox value="${instance.testDataDir}" default="${descriptor.defaultTestDataDir}"/>
-  </f:entry>
-  
-  <f:entry field="reportDir" title="Report directory" help="/plugin/piketec-tpt/reportDir.html">
-    <f:textbox value="${instance.reportDir}" default="${descriptor.defaultReportDir}"/>
-  </f:entry>
-  
-  <f:entry field="testSet" title="Test Set" help="/plugin/piketec-tpt/testSet.html">
-    <f:textbox value="${instance.testSet}" default="${descriptor.defaultTestSet}"/>
-  </f:entry>
-  -->
-  
-
 </j:jelly>

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,6 +28,7 @@ import java.util.List;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.EnvVars;
@@ -40,6 +41,7 @@ import hudson.model.BuildListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 
 /**
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
@@ -71,18 +73,58 @@ public class TptPlugin extends Builder {
 
   private String tptStartUpWaitTime;
 
+  private Boolean enableJunit;
+
+  private String jUnitreport; // JUnit Report!
+
+  private LogLevel jUnitLogLevel;
+
   private final ArrayList<JenkinsConfiguration> executionConfiguration;
 
   private transient TptLogger logger;
 
   // --------------------- DATA BINDING -----------------------------------------
 
+  /**
+   * All the parameter are processed and then they are passed to TptPluginSingleJobExecutor or to
+   * TptPluginMasterJobExecutor
+   * 
+   * @param exe
+   *          deprecated
+   * @param exePaths
+   *          paths to tpt executables separated by a comma or a semicolon
+   * @param arguments
+   *          the commandline arguments given in the descriptor
+   * @param isTptMaster
+   *          to know if there will be distributed builds or a singleJob
+   * @param slaveJob
+   *          the name of the slave job, used for putting the workload to the right slave
+   * @param slaveJobCount
+   *          the number of slaveJobs that will be executed
+   * @param slaveJobTries
+   *          used for the retryablejob
+   * @param tptBindingName
+   *          the binding name used to connect to the TptApi (for the registry)
+   * @param tptPort
+   *          the port for binding to the TptApi
+   * @param executionConfiguration
+   *          all the jenkins configurations given in the descriptor, used to get the
+   *          Files,Execution Configuration, test Set, testDataDir, reportDir,etc
+   * @param tptStartUpWaitTime
+   *          the time it should wait before start tpt
+   * @param enableJunit
+   *          to know if is necessary to generate the jUnit report
+   * @param jUnitreport
+   *          path to where the jUnit report will generated
+   * @param jUnitLogLevel
+   */
   @DataBoundConstructor
   public TptPlugin(String exe, String exePaths, String arguments, boolean isTptMaster,
                    String slaveJob, String slaveJobCount, String slaveJobTries,
                    String tptBindingName, String tptPort,
                    ArrayList<JenkinsConfiguration> executionConfiguration,
-                   String tptStartUpWaitTime) {
+                   String tptStartUpWaitTime, Boolean enableJunit, String jUnitreport,
+                   LogLevel jUnitLogLevel) {
     this.exePaths = exe;
     if (exePaths != null) {
       this.exePaths = exePaths;
@@ -95,16 +137,21 @@ public class TptPlugin extends Builder {
     this.tptBindingName = tptBindingName;
     this.tptPort = tptPort;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
-
     this.executionConfiguration = new ArrayList<JenkinsConfiguration>();
-
     if (executionConfiguration != null) {
       this.executionConfiguration.addAll(executionConfiguration);
-
     }
-
+    this.jUnitreport = jUnitreport;
+    this.jUnitLogLevel = jUnitLogLevel;
+    this.enableJunit = enableJunit;
   }
 
+  /**
+   * This method is used to persist the data format when upgrading the plugin.
+   * 
+   * @return this
+   * 
+   */
   protected Object readResolve() {
     if (tptBindingName == null) {
       tptBindingName = DescriptorImpl.getDefaultTptBindingName();
@@ -120,6 +167,9 @@ public class TptPlugin extends Builder {
     }
     if (slaveJobTries == null) {
       slaveJobTries = "1";
+    }
+    if (enableJunit == null) {
+      enableJunit = Boolean.TRUE;
     }
     return this;
   }
@@ -206,6 +256,31 @@ public class TptPlugin extends Builder {
     return Collections.unmodifiableList(this.executionConfiguration);
   }
 
+  /**
+   * @return if the TPT test result should be transformed into a JUnit XML (legacy behaviour)
+   */
+  public boolean isEnableJunit() {
+    return Boolean.TRUE.equals(enableJunit);
+  }
+
+  /**
+   * Report dir (optional).
+   * 
+   * @return The directory, where to store the results, can be <code>null</code>.
+   */
+  public String getJUnitreport() {
+    return jUnitreport;
+  }
+
+  /**
+   * The severity level of TPT log messages that will be written to failed JUnit tests.
+   * 
+   * @return The severity level of TPT log messages that will be written to failed JUnit tests.
+   */
+  public LogLevel getJUnitLogLevel() {
+    return jUnitLogLevel;
+  }
+
   // --------------------------------------------------------------
 
   /**
@@ -240,6 +315,19 @@ public class TptPlugin extends Builder {
 
   }
 
+  /**
+   * Get the required data to create a TptPluginSingleJobExecutor and excecutes it. It is called
+   * when there are no distributed builds.
+   * 
+   * All the parameters are used to get the data for creating a new TptPluginSingleJobExecutor
+   * 
+   * @param build
+   * @param launcher
+   * @param listener
+   * @param environment
+   * @param normalizedConfig
+   * @return true if it was possible to execute the TptPluginSingleJobExecutor.
+   */
   public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launch,
                                       BuildListener listener, EnvVars environment,
                                       ArrayList<JenkinsConfiguration> normalizedConfigs) {
@@ -252,22 +340,39 @@ public class TptPlugin extends Builder {
     }
     // expand arguments and report
     String expandedArguments = environment.expand(this.arguments);
+    String jUnitXmlPath = environment.expand(jUnitreport);
     // start execution
-    TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launch, listener,
-        expandedExePaths, expandedArguments, normalizedConfigs);
+    TptPluginSingleJobExecutor executor =
+        new TptPluginSingleJobExecutor(build, launch, listener, expandedExePaths, expandedArguments,
+            normalizedConfigs, jUnitXmlPath, jUnitLogLevel, enableJunit);
     return executor.execute();
+
   }
 
+  /**
+   * Get the required data to create a TptPluginMasterJobExecutor and excecutes it. It is called
+   * when there are distributed builds. @see the execute() method from TptPluginMasterJobExecutor.
+   * 
+   * All the parameters are used to get the data for creating a new TptPluginMasterJobExecutor
+   * 
+   * @param build
+   * @param launcher
+   * @param listener
+   * @param environment
+   * @param normalizedConfig
+   * @return true if the execution from slaves and master were successful.
+   */
   public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
                                  BuildListener listener, EnvVars environment,
                                  ArrayList<JenkinsConfiguration> normalizedConfigs) {
-    // split and expand list of ptahs to TPT installations
+    // split and expand list of paths to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
     for (int i = 0; i < expandedStringExePaths.length; i++) {
       expandedExePaths[i] =
           new FilePath(launcher.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
     }
+    String jUnitXmlPath = environment.expand(jUnitreport);
     // expand and parse TPT RMI port
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {
@@ -327,8 +432,15 @@ public class TptPlugin extends Builder {
     // start execution
     TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
         expandedExePaths, normalizedConfigs, expandedTptPort, expandedTptBindingName,
-        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries);
-    return executor.execute();
+        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries,
+        jUnitXmlPath, jUnitLogLevel, enableJunit);
+    try {
+      return executor.execute();
+    } finally {
+      // clean the workload, if the process is interrupted it removes the workload that did not
+      // execute.
+      WorkLoad.clean(expandedSlaveJobName, build);
+    }
   }
 
   @Override
@@ -361,6 +473,20 @@ public class TptPlugin extends Builder {
       return Utils.DEFAULT_STARTUP_WAIT_TIME;
     }
 
+    public static boolean getDefaultEnableJunit() {
+      return false;
+    }
+
+    public static LogLevel getDefaultJUnitLogLevel() {
+      return LogLevel.INFO;
+    }
+
+    /**
+     * Formvalidation for the Arguments field in the descriptor.
+     * 
+     * @param arguments
+     * @return
+     */
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {
       FormValidation formValidator = null;
 
@@ -369,11 +495,9 @@ public class TptPlugin extends Builder {
       } else {
         formValidator = FormValidation.ok();
       }
-
       return formValidator;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public boolean isApplicable(Class< ? extends AbstractProject> jobType) {
       // all project types allowed
@@ -383,6 +507,19 @@ public class TptPlugin extends Builder {
     @Override
     public String getDisplayName() {
       return "Execute TPT test cases";
+    }
+
+    /**
+     * Makes the combobox list on the descriptor with all the possible options for the JunitLogLevel
+     * 
+     * @return items from the combobox list
+     */
+    public ListBoxModel doFillJUnitLogLevelItems() {
+      ListBoxModel items = new ListBoxModel();
+      for (LogLevel goal : LogLevel.values()) {
+        items.add(goal.name());
+      }
+      return items;
     }
   }
 }

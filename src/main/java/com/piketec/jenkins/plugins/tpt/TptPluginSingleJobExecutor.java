@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.FilePath;
@@ -37,8 +38,6 @@ import hudson.model.BuildListener;
  * Executes the TPT test cases via command line on a single node.
  */
 class TptPluginSingleJobExecutor {
-
-  private boolean onlyNullExitCode = true; // have all TPT processes terminated with exit code == 0?
 
   private TptLogger logger;
 
@@ -54,9 +53,36 @@ class TptPluginSingleJobExecutor {
 
   private List<JenkinsConfiguration> executionConfigs;
 
+  private String jUnitXmlPath;
+
+  private LogLevel jUnitLogLevel;
+
+  private boolean enableJunit;
+
+  /**
+   * @param build
+   *          used to get the workspace
+   * @param launcher
+   *          used to execute a process
+   * @param listener
+   *          to join TPT with a given timeout
+   * @param exePaths
+   *          the paths to the Tpt Executables
+   * @param arguments
+   *          commandline arguments for running tpt from the commandline
+   * @param executionConfigs
+   *          all the jenkins configurations given in the descriptor, used to get the
+   *          Files,Execution Configuration, test Set, testDataDir, reportDir,etc
+   * @param jUnitXmlPath
+   *          the path where the jUnit XML is going to be created
+   * @param jUnitLogLevel
+   * @param enableJunit
+   *          to know if is necessary to generate the jUnit XML
+   */
   TptPluginSingleJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
                              BuildListener listener, FilePath[] exePaths, String arguments,
-                             List<JenkinsConfiguration> executionConfigs) {
+                             List<JenkinsConfiguration> executionConfigs, String jUnitXmlPath,
+                             LogLevel jUnitLogLevel, boolean enableJunit) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -64,12 +90,28 @@ class TptPluginSingleJobExecutor {
     this.exePaths = exePaths;
     this.arguments = arguments;
     this.executionConfigs = executionConfigs;
+    this.jUnitXmlPath = jUnitXmlPath;
+    this.jUnitLogLevel = jUnitLogLevel;
+    this.enableJunit = enableJunit;
   }
 
+  /**
+   * It looks for the tpt installation . Then prepares the test- and data directories. After that it
+   * creates a command ( @see buildCommand ) in order to execute Tpt from the commandline. Then it
+   * runs that command through the launcher and publish the Junit XML if necessary.
+   * 
+   * @return true if the execution from the tpt file was successful.
+   */
   boolean execute() {
     boolean success = true;
     FilePath workspace = build.getWorkspace();
-    File workspaceDir = Utils.getWorkspaceDir(workspace, logger);
+    File workspaceDir;
+    try {
+      workspaceDir = Utils.getWorkspaceDir(workspace, logger);
+    } catch (InterruptedException e) {
+      logger.interrupt(e.getMessage());
+      return false;
+    }
     // use first found (existing) TPT installation
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
@@ -81,7 +123,7 @@ class TptPluginSingleJobExecutor {
       } catch (IOException e) {
         // NOP, just try next file
       } catch (InterruptedException e) {
-        logger.error("Interrupted");
+        logger.interrupt(e.getMessage());
         return false;
       }
     }
@@ -107,7 +149,13 @@ class TptPluginSingleJobExecutor {
               reportPath.getRemote(), configurationName, tesSet);
           try {
             // run the test...
-            launchTPT(launcher, listener, cmd, ec.getTimeout());
+            success &= launchTPT(launcher, listener, cmd, ec.getTimeout());
+            if (enableJunit) {
+              // transform TPT results into JUnit results
+              logger.info("*** Publishing results now ***");
+              Utils.publishResults(workspace, ec, testDataPath, jUnitXmlPath, jUnitLogLevel,
+                  logger);
+            }
           } catch (IOException e) {
             logger.error(e.getMessage());
             success = false;
@@ -123,7 +171,7 @@ class TptPluginSingleJobExecutor {
         }
       }
     }
-    return success && onlyNullExitCode;
+    return success;
   }
 
   /**
@@ -158,7 +206,6 @@ class TptPluginSingleJobExecutor {
     cmd.append(' ');
     cmd.append(arguments);
     cmd.append(' ');
-
     String tptFileString = tptFile.toString();
     // surround path with ""
     if (!tptFileString.startsWith("\"")) {
@@ -169,7 +216,6 @@ class TptPluginSingleJobExecutor {
       cmd.append('"');
     }
     cmd.append(' ');
-
     // surround name with ""
     if (!configurationName.startsWith("\"")) {
       cmd.append('"');
@@ -178,7 +224,6 @@ class TptPluginSingleJobExecutor {
     if (!configurationName.endsWith("\"")) {
       cmd.append('"');
     }
-
     if (!testSet.equals("")) {
       cmd.append(" --testSet ");
       // surround path with ""
@@ -191,7 +236,6 @@ class TptPluginSingleJobExecutor {
       }
       logger.info("Running " + testSet);
     }
-
     cmd.append(" --dataDir ");
     // surround path with ""
     if (!dataDir.startsWith("\"")) {
@@ -201,7 +245,6 @@ class TptPluginSingleJobExecutor {
     if (!dataDir.endsWith("\"")) {
       cmd.append('"');
     }
-
     cmd.append(" --reportDir ");
     // surround path with ""
     if (!reportDir.startsWith("\"")) {
@@ -211,7 +254,6 @@ class TptPluginSingleJobExecutor {
     if (!reportDir.endsWith("\"")) {
       cmd.append('"');
     }
-
     return cmd.toString();
   }
 
@@ -229,8 +271,9 @@ class TptPluginSingleJobExecutor {
    * @throws InterruptedException
    * @throws IOException
    */
-  private void launchTPT(Launcher launcher, BuildListener listener, String cmd, long timeout)
+  private boolean launchTPT(Launcher launcher, BuildListener listener, String cmd, long timeout)
       throws InterruptedException, IOException {
+    boolean exitCodeWasNull = true;
     logger.info("Launching \"" + cmd + "\"");
     Launcher.ProcStarter starter = launcher.new ProcStarter();
     starter.cmdAsSingleString(cmd);
@@ -246,19 +289,20 @@ class TptPluginSingleJobExecutor {
       int exitcode = tpt.joinWithTimeout(timeout, TimeUnit.HOURS, listener);
       if (exitcode != 0) {
         logger.error("TPT process stops with exit code " + exitcode);
-        onlyNullExitCode = false;
+        exitCodeWasNull = false;
       }
     } catch (IOException e) {
       throw new IOException("TPT launch error: " + e.getMessage());
     } catch (InterruptedException e) {
       try {
         tpt.kill();
-      } catch (Exception e1) {
+      } catch (IOException | InterruptedException e1) {
         throw new IOException(
             "TPT launch error: Interrupt requested, but cannot kill the TPT process. Please kill it manually.");
       }
       throw e;
     }
+    return exitCodeWasNull;
   }
 
 }

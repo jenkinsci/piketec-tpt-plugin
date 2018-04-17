@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -40,6 +40,15 @@ public class XmlStreamWriter {
 
   private BufferedOutputStream bos;
 
+  /**
+   * Used by Publish.publishJUnitResults, write the XML file.
+   * 
+   * @param file
+   * @throws XMLStreamException
+   * @throws FactoryConfigurationError
+   * @throws IOException
+   * @throws InterruptedException
+   */
   public void initalize(FilePath file)
       throws XMLStreamException, FactoryConfigurationError, IOException, InterruptedException {
     os = file.write();
@@ -49,12 +58,26 @@ public class XmlStreamWriter {
     writer.writeStartDocument("UTF-8", "1.0");
   }
 
+  /**
+   * Used by Publish.publishJUnitResults , it writes a test case in the XML
+   * 
+   * @param name
+   * @throws XMLStreamException
+   */
   public void writeTestsuite(String name) throws XMLStreamException {
     writer.writeStartElement("testsuite");
     writer.writeAttribute("name", name);
     writer.flush();
   }
 
+  /**
+   * Used by Publish.publishJUnitResults , it writes a test case in the XML
+   * 
+   * @param classname
+   * @param testname
+   * @param timeMillis
+   * @throws XMLStreamException
+   */
   public void writeTestcase(String classname, String testname, String timeMillis)
       throws XMLStreamException {
     writer.writeStartElement("testcase");
@@ -65,6 +88,15 @@ public class XmlStreamWriter {
     writer.flush();
   }
 
+  /**
+   * Used by Publish.publishJUnitResults , it writes an error in the XML
+   * 
+   * @param classname
+   * @param testname
+   * @param timeMillis
+   * @param error
+   * @throws XMLStreamException
+   */
   public void writeTestcaseError(String classname, String testname, String timeMillis, String error)
       throws XMLStreamException {
     writer.writeStartElement("testcase");
@@ -79,6 +111,12 @@ public class XmlStreamWriter {
     writer.flush();
   }
 
+  /**
+   * Convert milliseconds to seconds
+   * 
+   * @param t
+   * @return a String with the converted seconds
+   */
   private String millis2secs(String t) {
     try {
       return Double.toString(Long.parseLong(t) / 1000.0);
@@ -87,10 +125,11 @@ public class XmlStreamWriter {
     }
   }
 
+  /**
+   * Writes the end element and closes the file.
+   */
   public void close() {
-
     if (writer != null) {
-
       try {
         writer.writeEndElement();
         writer.flush();

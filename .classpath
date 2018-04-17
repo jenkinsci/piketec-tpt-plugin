@@ -23,7 +23,7 @@
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/jstl/1.1.0/jstl-1.1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4.4/mail-1.4.4.jar" sourcepath="M2_REPO/javax/mail/mail/1.4.4/mail-1.4.4-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.4/servlet-api-2.4-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar" sourcepath="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar" sourcepath="SOURCE_ATTACHER/stax-api-1.0-2-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/kohsuke/access-modifier-annotation/1.4/access-modifier-annotation-1.4.jar" sourcepath="M2_REPO/org/kohsuke/access-modifier-annotation/1.4/access-modifier-annotation-1.4-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/org/kohsuke/access-modifier-annotation/1.4/access-modifier-annotation-1.4-javadoc.jar!/"/>
@@ -150,7 +150,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar" sourcepath="M2_REPO/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar" sourcepath="SOURCE_ATTACHER/commons-io-2.4-sources-1520836913058.jar">
+	<classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar" sourcepath="SOURCE_ATTACHER/commons-io-2.4-sources-1523856057722.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/commons-io/commons-io/2.4/commons-io-2.4-javadoc.jar!/"/>
 		</attributes>
@@ -457,7 +457,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="var" path="M2_REPO/relaxngDatatype/relaxngDatatype/20020414/relaxngDatatype-20020414.jar" sourcepath="M2_REPO/relaxngDatatype/relaxngDatatype/20020414/relaxngDatatype-20020414-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/remoting/2.52/remoting-2.52.jar" sourcepath="M2_REPO/org/jenkins-ci/main/remoting/2.52/remoting-2.52-sources.jar">
+	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/main/remoting/2.52/remoting-2.52.jar" sourcepath="SOURCE_ATTACHER/remoting-2.52-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/C:/Users/JKuhnert/.m2/repository/org/jenkins-ci/main/remoting/2.52/remoting-2.52-javadoc.jar!/"/>
 		</attributes>
@@ -614,6 +614,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="var" path="M2_REPO/org/jenkins-ci/plugins/parameterized-trigger/2.35.2/parameterized-trigger-2.35.2.jar" sourcepath="SOURCE_ATTACHER/parameterized-trigger-2.35.2-sources-1513775722914.jar"/>
 	<classpathentry kind="output" path="target/eclipse-classes"/>
 </classpath>

@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2018 PikeTec GmbH
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.awt.BasicStroke;
@@ -14,6 +34,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -29,6 +50,12 @@ import org.apache.commons.lang.ArrayUtils;
 
 import jenkins.model.Jenkins;
 
+/**
+ * TPT pie chart.
+ * 
+ * @author FInfantino, PikeTec GmbH
+ *
+ */
 public class PieChart {
 
   public static final Color BRIGHT_GRAY = new Color(240, 242, 240);
@@ -80,12 +107,18 @@ public class PieChart {
   private ImageIcon keyShadow;
 
   public PieChart(List<Segment> segments, int fractionalDigits, boolean showTotalInLegend)
-      throws MalformedURLException {
+      throws MalformedURLException, IOException {
     this(segments, null, fractionalDigits, showTotalInLegend, false, null);
-    pieShadow = new ImageIcon(new File(Jenkins.getInstance().getRootDir(),
-        "\\plugins\\piketec-tpt\\TorteImag\\Shadow.png").toURI().toURL());
-    keyShadow = new ImageIcon(new File(Jenkins.getInstance().getRootDir(),
-        "\\plugins\\piketec-tpt\\TorteImag\\Shadow2.png").toURI().toURL());
+    Jenkins jenkinsInstance = Jenkins.getInstance();
+    if (jenkinsInstance == null) {
+      throw new IOException("No Jenkins instance found.");
+    }
+    pieShadow = new ImageIcon(
+        new File(jenkinsInstance.getRootDir(), "\\plugins\\piketec-tpt\\PieChart\\Shadow.png")
+            .toURI().toURL());
+    keyShadow = new ImageIcon(
+        new File(jenkinsInstance.getRootDir(), "\\plugins\\piketec-tpt\\PieChart\\Shadow2.png")
+            .toURI().toURL());
   }
 
   public PieChart(List<Segment> segments, @Nullable int[] legendSegmentOrder, int fractionalDigits,
@@ -94,7 +127,7 @@ public class PieChart {
     // segments and legendSegmentOrder
     this.segments = segments;
     this.showTotalInLegend = showTotalInLegend;
-    this.legendSegmentOrder = legendSegmentOrder;
+    this.legendSegmentOrder = legendSegmentOrder != null ? legendSegmentOrder.clone() : null;
     this.withSubSegments = withSubSegments;
     this.subTotalTextOrNull = subTotalTextOrNull;
 
@@ -188,8 +221,7 @@ public class PieChart {
       g2.drawString(s.getPercent(), x, y);
       start += portionDegrees;
     }
-    int width = (int)((double)totalWidth / totalHeight * height); // compute width to preserve ratio
-    return image;// resize(image, width, height);
+    return image;
   }
 
   private void renderLegend(Graphics2D g2) {

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -76,7 +76,6 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     this.enableTest = enableTest;
     this.timeout = timeout;
     this.testSet = testSet;
-
   }
 
   protected Object readResolve() {
@@ -102,32 +101,12 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return testSet;
   }
 
-  // /**
-  // * @return the tpt filename without ".tpt"
-  // */
-  // public String getTptFileName() {
-  // int end = tptFile.getName().lastIndexOf(".");
-  // return tptFile.getName().substring(0, end);
-  // }
-  //
-  // public String getReportName() {
-  // return getTptFileName() + "." + getConfigurationWithUnderscore() + ".xml";
-  // }
-
   /**
    * @return the configuration with replaced whitespace. <code> " " -&gt; "_"</code>
    */
   public String getConfigurationWithUnderscore() {
     return configuration.replace(" ", "_");
   }
-
-  // /**
-  // *
-  // * @return the tpt filename with a dot and the configuration with underscores as spaces
-  // */
-  // public String getClassname() {
-  // return getTptFileName() + "." + getConfigurationWithUnderscore();
-  // }
 
   /**
    * @return the whole configuration string defined in the jenkins conf
@@ -184,19 +163,6 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
     public static FormValidation doCheckConfiguration(@QueryParameter String configuration,
                                                       @AncestorInPath AbstractProject project) {
-      // Project< ? , ? > proj = (Project< ? , ? >)project;
-      // HashMap<String, String> nameAndConfig = new HashMap<>();
-      // for (Builder builder : proj.getBuilders()) {
-      // if (builder instanceof TptPlugin) {
-      // TptPlugin tptPlugin = (TptPlugin)builder;
-      // for (JenkinsConfiguration cfg : tptPlugin.getExecutionConfiguration()) {
-      // if (nameAndConfig.containsValue(configuration)) {
-      // return FormValidation.error("TPT File with such Configuration is already set, d.");
-      // }
-      // nameAndConfig.put(cfg.getTptFile(), cfg.getConfiguration());
-      // }
-      // }
-      // }
       if ((configuration == null) || (configuration.trim().length() == 0)) {
         return FormValidation.error("Enter a configuration name.");
       } else {

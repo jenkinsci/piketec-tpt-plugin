@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -49,7 +49,6 @@ import hudson.model.BuildListener;
  * Executes one test case via TPT API.
  * 
  * @author jkuhnert, PikeTec GmbH
- *
  */
 class TptPluginSlaveExecutor {
 
@@ -75,20 +74,50 @@ class TptPluginSlaveExecutor {
 
   private String reportDir;
 
-  private Set<String> testSetString;
+  private List<String> testSetString;
 
   private long tptStartupWaitTime;
 
-  private Object masterId;
+  private AbstractBuild masterId;
 
   private String testSetName;
 
   private FilePath masterWorkspace;
 
+  /**
+   * @param launcher
+   *          passed for executing a process
+   * @param build
+   *          current build, used to get the workspace and for binding to the TptApi
+   * @param listener
+   *          for the logs
+   * @param exePaths
+   *          the paths to the Tpt Executables
+   * @param tptPort
+   *          the port for binding to the TptApi
+   * @param tptBindingName
+   *          the binding name used to connect to the TptApi (for the registry)
+   * @param tptFile
+   *          the tpt file that will be executed
+   * @param execCfg
+   *          the tpt execution configuration as String
+   * @param testDataDir
+   *          the path to the test data dir
+   * @param testSet
+   *          a chunk of test
+   * @param tptStartupWaitTime
+   *          the time it should wait before start tpt
+   * @param masterId
+   *          actual build, used for getting an unique id
+   * @param testSetName
+   *          the name of the test set if given
+   * @param masterWorkspace
+   *          the workspace from the master, to know where to copy the results
+   */
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
-                         String execCfg, String testDataDir, String reportDir, String testSet,
-                         long tptStartupWaitTime, Object masterId, String testSetName,
+                         String execCfg, String testDataDir, String reportDir, List<String> testSet,
+                         long tptStartupWaitTime, AbstractBuild masterId, String testSetName,
                          FilePath masterWorkspace) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
@@ -101,13 +130,21 @@ class TptPluginSlaveExecutor {
     this.execCfg = execCfg;
     this.testDataDir = testDataDir;
     this.reportDir = reportDir;
-    this.testSetString = Utils.unescapeTestcaseNames(testSet);
+    this.testSetString = testSet;
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.masterId = masterId;
     this.testSetName = testSetName;
     this.masterWorkspace = masterWorkspace;
   }
 
+  /**
+   * Executes a small chunks of tests. It binds to the Tpt Api , check if the given Execution
+   * Configuration exists. Prepares the test- and data-directories. Creates a temporary testSet from
+   * the chunk of test (if no testSet is given). Then through the tpt api executes the testCases and
+   * then it copies the results to the master workspace.
+   * 
+   * @return true if the tpt execution has been successfully.
+   */
   public boolean execute() {
     logger = new TptLogger(listener.getLogger());
     try {
@@ -292,6 +329,16 @@ class TptPluginSlaveExecutor {
     return true;
   }
 
+  /**
+   * Finds all the test cases of a given test set
+   * 
+   * @param sogs
+   * @param names
+   * @param result
+   * @throws RemoteException
+   * @throws ApiException
+   */
+
   private void find(Collection<ScenarioOrGroup> sogs, Collection<String> names,
                     Collection<Scenario> result)
       throws RemoteException, ApiException {
@@ -306,6 +353,15 @@ class TptPluginSlaveExecutor {
     }
   }
 
+  /**
+   * Matches the tests cases from a test set with all the test cases found.
+   * 
+   * @param scenColl1
+   * @param scenCol2
+   * @return the intersected test cases
+   * @throws RemoteException
+   * @throws ApiException
+   */
   static Collection<Scenario> intersectByHash(Collection<Scenario> scenColl1,
                                               Collection<Scenario> scenCol2)
       throws RemoteException, ApiException {
@@ -322,6 +378,15 @@ class TptPluginSlaveExecutor {
     return result;
   }
 
+  /**
+   * Convert the given test cases to a String
+   * 
+   * @param intersectionSet
+   *          to be converted
+   * @return the given test cases as a String , separated with a comma
+   * @throws RemoteException
+   * @throws ApiException
+   */
   private String remoteScenarioSetToString(Collection<Scenario> intersectionSet)
       throws RemoteException, ApiException {
     StringBuilder sb = new StringBuilder();
