@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,10 +22,22 @@ package com.piketec.jenkins.plugins.tpt;
 
 import java.io.PrintStream;
 
+/**
+ * Just a wrapper to add prefixes like "[ERROR" + " date" + "] " to the messages.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ *
+ */
 public class TptLogger {
 
   PrintStream logger;
 
+  /**
+   * Wraps the given <code>PrintStream</code> into the TptLogger.
+   * 
+   * @param logger
+   *          The stream to print messages to
+   */
   public TptLogger(PrintStream logger) {
     this.logger = logger;
   }

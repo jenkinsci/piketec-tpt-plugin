@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,15 +20,17 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogEntry;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 
+/**
+ * The result of a parsed TPT test case execution result
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ */
 public class Testcase {
 
   private String name;
@@ -43,71 +45,95 @@ public class Testcase {
 
   private TptLog log;
 
-  /** ordered set of variables (ordered by name) */
-  private final Set<AssessmentVariable> variables;
-
   Testcase() {
     log = new TptLog();
-    variables = new HashSet<AssessmentVariable>();
     execDuration = "0";
     result = "";
     name = "";
     id = 0;
   }
 
+  /**
+   * @return name ,get the name of the testcase
+   * 
+   */
   String getName() {
     return name;
   }
 
+  /**
+   * @param name
+   *          ,set the name of the testcase while parsing
+   * 
+   */
   void setName(String name) {
     this.name = name;
   }
 
-  Set<AssessmentVariable> getVariables() {
-    return Collections.unmodifiableSet(variables);
-  }
-
-  void addAssessmentVariable(AssessmentVariable assessmentVar) {
-    variables.add(assessmentVar);
-  }
-
+  /**
+   * @return id ,get the id of the testcase
+   * 
+   */
   int getID() {
     return id;
   }
 
+  /**
+   * @param id
+   *          ,set the id of the testcase while parsing
+   * 
+   */
   void setID(int id) {
     this.id = id;
   }
 
+  /**
+   * @param date
+   *          ,set the date of the testcase while parsing
+   * 
+   */
   void setExecDate(Date execDate) {
     this.execDate = execDate;
   }
 
+  /**
+   * @return date ,get the date of execution from the testcase
+   */
   Date getExecDate() {
     return execDate;
   }
 
+  /**
+   * @param time
+   *          set the execution duration from a test case
+   */
   void setExecDuration(String time) {
     this.execDuration = time;
   }
 
+  /**
+   * @return get the execution duration from a test case
+   */
   String getExecDuration() {
     return execDuration;
   }
 
+  /**
+   * @param result
+   *          , set the result from a test case
+   */
   void setResult(String result) {
     this.result = result;
   }
 
+  /**
+   * @return get the result from a test case
+   */
   String getResult() {
     return result;
   }
 
   void addLogEntry(String entry, LogLevel level) {
-    if (level == LogLevel.ERROR) {
-      entry = entry.replaceAll("address=0x[0-9a-fA-F]{4}", "address=0x%%%%");
-      entry = entry.replaceAll("(heap size: \\d+, required heap size: \\d+)", "");
-    }
     log.log(level, entry);
   }
 

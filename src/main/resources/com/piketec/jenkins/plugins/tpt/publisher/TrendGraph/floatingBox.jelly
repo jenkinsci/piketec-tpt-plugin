@@ -19,19 +19,29 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<!-- TPT Configuration -->
-	<f:entry field="exePaths" title="Paths to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
-		<f:textbox value="${instance.exePaths}" />
-	</f:entry>
-  <f:entry field="tptPort" title="TPT Port" help="/plugin/piketec-tpt/tptPort.html">
-    <f:textbox value="${instance.tptPort}" default="${descriptor.defaultTptPort}"/>
-  </f:entry>
-  <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
-    <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>
-  </f:entry>
-  <f:entry field="tptStartUpWaitTime" title="Wait for TPT start [s]" help="/plugin/piketec-tpt/tptStartUpWaitTime.html">
-    <f:textbox value="${instance.tptStartUpWaitTime}" default="${descriptor.defaultTptStartUpWaitTime}"/>
-  </f:entry>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:t="/lib/hudson" xmlns:test="/lib/hudson/test" >
+   <style>
+   iframe{
+   align: right !important;
+   text-align: right !important;
+   }
+   #error {
+    width: 50%;
+    align : left !important;
+   }
+   </style>
+
+<!-- Override Parent Div the floating by error display -->
+
+<j:if test="${it.getLastSuccessfulBuild() != null}">
+  <j:invokeStatic className="com.piketec.jenkins.plugins.tpt.publisher.TPTGlobalConfiguration" method="isTrustSlavesAndUsers" var="trustSlaves"/>
+  <j:if test="${!trustSlaves}">
+  <div id="error" >
+   <h2 style="color:#CCCC00 ">Cannot display the TPT trend graph. Please "Trust Slaves and User to modify Jenkins workspace" under <a href="${it.rootUrl}/configure">Jenkins Configuration</a></h2>
+  </div>
+  </j:if>
+  <j:if test="${trustSlaves}">
+  <iframe  id="knowledgeFrame" width="1650" height="410" frameborder="0" src="${it.rootUrl}/job/${it.name}/TPTtrendResults/index.html" ></iframe>
+  </j:if>
+ </j:if>
 </j:jelly>

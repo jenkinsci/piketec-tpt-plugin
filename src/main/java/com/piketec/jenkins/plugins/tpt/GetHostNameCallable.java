@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,6 +29,8 @@ import hudson.remoting.Callable;
 
 /**
  * A callable to get the host name of a jenkins node.
+ * 
+ * @author jkuhnert, PikeTec GmbH
  *
  */
 public class GetHostNameCallable implements Callable<String, UnknownHostException> {

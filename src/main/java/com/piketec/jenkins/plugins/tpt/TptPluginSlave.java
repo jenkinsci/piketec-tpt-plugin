@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,7 @@ package com.piketec.jenkins.plugins.tpt;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -43,54 +44,56 @@ public class TptPluginSlave extends Builder {
 
   private String exePaths;
 
-  private String tptFile;
-
   private String tptBindingName;
 
   private String tptPort;
-
-  private String testDataDir;
-
-  private String reportDir;
 
   private String tptStartUpWaitTime;
 
   // ----------- Data Binding --------------
 
+  /**
+   * 
+   * Those arguments are processed and then passed to the TptPluginSlaveExecutor. This class is used
+   * as a wrapper
+   * 
+   * @param exePaths
+   *          the paths to the Tpt Executables
+   * @param tptBindingName
+   *          the binding name used to connect to the TptApi (for the registry)
+   * @param tptPort
+   *          the port for binding to the TptApi
+   * @param tptStartUpWaitTime
+   *          the time it should wait before start tpt
+   */
   @DataBoundConstructor
-  public TptPluginSlave(String exePaths, String tptBindingName, String tptPort, String tptFile,
-                        String testDataDir, String reportDir, String tptStartUpWaitTime) {
+  public TptPluginSlave(String exePaths, String tptBindingName, String tptPort,
+                        String tptStartUpWaitTime) {
     this.exePaths = exePaths;
-    this.tptFile = tptFile;
     this.tptBindingName = tptBindingName;
     this.tptPort = tptPort;
-    this.testDataDir = testDataDir;
-    this.reportDir = reportDir;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
   }
 
+  /**
+   * @return the given paths to the tpt executable (tpt.exe)
+   */
   public String getExePaths() {
     return exePaths;
   }
 
-  public String getTptFile() {
-    return tptFile;
-  }
-
+  /**
+   * @return the given bindingname, used to connect to the api.
+   */
   public String getTptBindingName() {
     return tptBindingName;
   }
 
+  /**
+   * @return the tpt port , used to make the connection to the TptApi
+   */
   public String getTptPort() {
     return tptPort;
-  }
-
-  public String getTestDataDir() {
-    return testDataDir;
-  }
-
-  public String getReportDir() {
-    return reportDir;
   }
 
   /**
@@ -102,9 +105,20 @@ public class TptPluginSlave extends Builder {
 
   // --------------------------------------------------------------
 
+  /**
+   * It collects the necesary data (tpt exe path, tpt Port, tpt bindingname and tpt
+   * expandedTptStartupWaitTime) from the environment. Then collects the necesary data from the
+   * workload (put by the TptPluginMasterJobExecutor). After collecting all the necesary data it
+   * creates a new TptPluginSlaveExecutor and execute it . This method will be called from Jenkins
+   * when a build for a slave is scheduled. @see retryableJob. The logic is that the retryableJob
+   * schedules builds for the slaves and those builds will be executed here.
+   * 
+   * @return true if the slave executed successfully its workload.
+   */
   @Override
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
+
     TptLogger logger = new TptLogger(listener.getLogger());
     EnvVars environment;
     try {
@@ -153,19 +167,32 @@ public class TptPluginSlave extends Builder {
     } else {
       expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
     }
-    String expandedTptFile = environment.expand(tptFile);
-    if (expandedTptFile == null) {
-      expandedTptFile = "";
+
+    WorkLoad workloadToDo = WorkLoad.pollWorkload(build.getProject().getName());
+
+    String fileNameFromWorkload = workloadToDo.getFileName();
+    String exeConfigFromWorkload = workloadToDo.getExeConfig();
+    String testDataDirFromWorload = workloadToDo.getDataDir();
+    String reportDirFromWorkload = workloadToDo.getReportDir();
+    List<String> testCasesFromWorkload = workloadToDo.getTestCases();
+    String testSetFromWorkload = workloadToDo.getTestSetName();
+    AbstractBuild masterId = workloadToDo.getMasterId();
+    FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
+
+    logger.info("File Name :               " + fileNameFromWorkload);
+    logger.info("Execution Configuration : " + exeConfigFromWorkload);
+    logger.info("Test Data directory :     " + testDataDirFromWorload);
+    logger.info("Report directory :        " + reportDirFromWorkload);
+    logger.info("Test Cases :              " + testCasesFromWorkload);
+    if (!testSetFromWorkload.equals("")) {
+      logger.info("Test Set :                " + testSetFromWorkload);
     }
-    String expandedExecConfig = environment.expand("${" + Utils.TPT_EXECUTION_CONFIG_VAR + "}");
-    String expandedTestDataDir = environment.expand(testDataDir);
-    String expandedReportDir = environment.expand(reportDir);
-    String expandedTestcaseName = environment.expand("${" + Utils.TPT_TEST_CASE_NAME_VAR + "}");
-    String expandedExecutionId = environment.expand("${" + Utils.TPT_EXECUTION_ID_VAR_NAME + "}");
+
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
-        expandedExePaths, expandedTptPort, expandedTptBindingName, new File(expandedTptFile),
-        expandedExecConfig, expandedTestDataDir, expandedReportDir, expandedTestcaseName,
-        expandedTptStartupWaitTime, expandedExecutionId);
+        expandedExePaths, expandedTptPort, expandedTptBindingName, new File(fileNameFromWorkload),
+        exeConfigFromWorkload, testDataDirFromWorload, reportDirFromWorkload, testCasesFromWorkload,
+        expandedTptStartupWaitTime, masterId, testSetFromWorkload, masterWorkspace);
+
     return executor.execute();
   }
 
@@ -176,6 +203,11 @@ public class TptPluginSlave extends Builder {
 
   // --------------------------- Descriptor Class -----------------------------------
 
+  /**
+   * The Descriptor of TptPluginSlave
+   * 
+   * @author jkuhnert, PikeTec GmbH
+   */
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
@@ -190,30 +222,30 @@ public class TptPluginSlave extends Builder {
       return "Execute TPT tests slave";
     }
 
+    /**
+     * @return "${PIKECTEC_TPT_EXE}"
+     */
     public static String getDefaultExePaths() {
       return "${" + Utils.TPT_EXE_VAR + "}";
     }
 
-    public static String getDefaultTptFile() {
-      return "${" + Utils.TPT_FILE_VAR + "}";
-    }
-
+    /**
+     * @return "TptApi"
+     */
     public static String getDefaultTptBindingName() {
       return Utils.DEFAULT_TPT_BINDING_NAME;
     }
 
+    /**
+     * @return "1099"
+     */
     public static int getDefaultTptPort() {
       return Utils.DEFAULT_TPT_PORT;
     }
 
-    public static String getDefaultTestDataDir() {
-      return "${" + Utils.TPT_TEST_DATA_DIR_VAR_NAME + "}";
-    }
-
-    public static String getDefaultReportDir() {
-      return "${" + Utils.TPT_REPORT_DIR_VAR_NAME + "}";
-    }
-
+    /**
+     * @return "60" (1 min)
+     */
     public static int getDefaultTptStartUpWaitTime() {
       return Utils.DEFAULT_STARTUP_WAIT_TIME;
     }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,7 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,49 +29,68 @@ import java.util.List;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.commons.io.FilenameUtils;
+
 import com.piketec.jenkins.plugins.tpt.TptLog.LogEntry;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.FilePath;
 
+/**
+ * Class for helper methods to collect and tranform TPT test result.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ */
 public final class Publish {
 
-  public static int publishJUnitResults(FilePath workspaceDir, FilePath reportFolder,
-                                        JenkinsConfiguration ex, TptLogger logger,
+  /**
+   * Publish the Junits results, it creates an XML file and write the results on it.
+   * 
+   * @param jenkinsConfig
+   *          The configuration to which the TPT test resuklt should be tranformed to JUnit
+   * @param testDataDir
+   *          The directory where TPT test data should be searched
+   * @param jUnitOutputDir
+   *          The directory where the transformed results should be written to.
+   * @param logger
+   *          to display the information
+   * @param logLevel
+   *          the threshold for the severity of the log messages
+   * @return the number of testcases .
+   * @throws IOException
+   *           if an error occured while parsing TPT test data or writing the JUnit xml files
+   * @throws InterruptedException
+   *           If the job was interrupted
+   */
+  public static int publishJUnitResults(JenkinsConfiguration jenkinsConfig, FilePath testDataDir,
+                                        FilePath jUnitOutputDir, TptLogger logger,
                                         LogLevel logLevel)
-      throws IOException {
+      throws IOException, InterruptedException {
     XmlStreamWriter xmlPub = null;
 
     try {
-      String classname = ex.getClassname();
-      FilePath reportFile = new FilePath(reportFolder, ex.getReportName());
-      File testDataText = ex.getTestdataDir();
-      FilePath testDataDir = ((testDataText == null) || testDataText.toString().trim().isEmpty())
-          ? workspaceDir : new FilePath(workspaceDir, testDataText.toString());
-      List<Testcase> testdata;
+      String classname = FilenameUtils.getBaseName(jenkinsConfig.getTptFile());
+      FilePath jUnitXMLFile = new FilePath(jUnitOutputDir,
+          classname + "." + jenkinsConfig.getConfigurationWithUnderscore() + ".xml");
       xmlPub = new XmlStreamWriter();
-      xmlPub.initalize(reportFile);
+      xmlPub.initalize(jUnitXMLFile);
       xmlPub.writeTestsuite(classname);
-      testdata = getTestcases(testDataDir, logger);
+      List<Testcase> testdata = getTestcases(testDataDir, logger);
       logger.info("Found " + testdata.size() + " test results.");
-
-      if (!testdata.isEmpty()) {
-        for (Testcase tc : testdata) {
-
-          if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
-            xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
-          } else {
-            StringBuilder log = new StringBuilder();
-            for (LogEntry entry : tc.getLogEntries(logLevel)) {
-              if (log.length() > 0) {
-                log.append('\n');
-              }
-              log.append('[').append(entry.level.name()).append("] ").append(entry.message);
+      for (Testcase tc : testdata) {
+        if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
+          xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
+        } else {
+          StringBuilder log = new StringBuilder();
+          for (LogEntry entry : tc.getLogEntries(logLevel)) {
+            if (log.length() > 0) {
+              log.append('\n');
             }
-            xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
-                log.toString());
+            log.append('[').append(entry.level.name()).append("] ").append(entry.message);
           }
+          xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
+              log.toString());
         }
       }
       return testdata.size();
@@ -80,10 +98,7 @@ public final class Publish {
       throw new IOException("XML stream error: " + e.getMessage());
     } catch (FactoryConfigurationError e) {
       throw new IOException("XML configuration error: " + e.getMessage());
-    } catch (InterruptedException ie) {
-      throw new IOException("traverse test data directory failed: " + ie.getMessage());
     } finally {
-
       if (xmlPub != null) {
         xmlPub.close();
       }
@@ -96,15 +111,22 @@ public final class Publish {
    * Collects recursively all test cases by searching for "testcase_information.xml" files in
    * "rootdir". If a file could not be loaded, an error message will be printed.
    * 
-   * @throws InterruptedException
+   * @param testDataDir
+   *          The directory where TPT test data should be searched
+   * @param logger
+   *          to display the information
+   * @return The list of parsed TPT test cases
+   * 
    * @throws IOException
+   *           If an error occured while parsing TPT test data
+   * @throws InterruptedException
+   *           If the job was interrupted
    */
-  private static List<Testcase> getTestcases(FilePath rootdir, TptLogger logger)
+  public static List<Testcase> getTestcases(FilePath testDataDir, TptLogger logger)
       throws IOException, InterruptedException {
     Collection<FilePath> files = new HashSet<FilePath>();
-    List<Testcase> testcases;
-    find(rootdir, "testcase_information.xml", files);
-    testcases = new ArrayList<Testcase>(files.size());
+    find(testDataDir, "testcase_information.xml", files);
+    List<Testcase> testcases = new ArrayList<Testcase>(files.size());
 
     for (FilePath f : files) {
 

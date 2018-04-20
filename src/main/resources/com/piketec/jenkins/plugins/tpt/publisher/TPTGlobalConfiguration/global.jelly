@@ -21,17 +21,16 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
 	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<!-- TPT Configuration -->
-	<f:entry field="exePaths" title="Paths to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
-		<f:textbox value="${instance.exePaths}" />
-	</f:entry>
-  <f:entry field="tptPort" title="TPT Port" help="/plugin/piketec-tpt/tptPort.html">
-    <f:textbox value="${instance.tptPort}" default="${descriptor.defaultTptPort}"/>
-  </f:entry>
-  <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
-    <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>
-  </f:entry>
-  <f:entry field="tptStartUpWaitTime" title="Wait for TPT start [s]" help="/plugin/piketec-tpt/tptStartUpWaitTime.html">
-    <f:textbox value="${instance.tptStartUpWaitTime}" default="${descriptor.defaultTptStartUpWaitTime}"/>
-  </f:entry>
+	<f:section name="securityPermission">
+		<f:optionalBlock
+			title="${%Trust Slaves and Users to modify Jenkins workspace}" name="trustSlavesAndUsers"
+			field="trustSlavesAndUsers" inline="true"
+			help="/plugin/piketec-tpt/security.html" />
+	</f:section>
 </j:jelly>
+  
+  
+
+
+
+

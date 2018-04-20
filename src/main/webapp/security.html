@@ -1,7 +1,7 @@
 <!--
  ~ The MIT License (MIT)
  ~ 
- ~ Copyright (c) 2018 PikeTec GmbH
+ ~ Copyright (c) 2016 PikeTec GmbH
  ~ 
  ~ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  ~ associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,20 +18,6 @@
  ~ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<!-- TPT Configuration -->
-	<f:entry field="exePaths" title="Paths to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
-		<f:textbox value="${instance.exePaths}" />
-	</f:entry>
-  <f:entry field="tptPort" title="TPT Port" help="/plugin/piketec-tpt/tptPort.html">
-    <f:textbox value="${instance.tptPort}" default="${descriptor.defaultTptPort}"/>
-  </f:entry>
-  <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
-    <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>
-  </f:entry>
-  <f:entry field="tptStartUpWaitTime" title="Wait for TPT start [s]" help="/plugin/piketec-tpt/tptStartUpWaitTime.html">
-    <f:textbox value="${instance.tptStartUpWaitTime}" default="${descriptor.defaultTptStartUpWaitTime}"/>
-  </f:entry>
-</j:jelly>
+<div>
+Allow Users and Slaves to modify the Jenkins workspace. This checkbox is relaxing the CSP from the Browser, in order to allow Javascript Code and Iframes, used by some Plugins (e.g. TPT-Plugin , HTML-Publisher , etc). More information under :  https://wiki.jenkins.io/display/JENKINS/Configuring+Content+Security+Policy
+</div>

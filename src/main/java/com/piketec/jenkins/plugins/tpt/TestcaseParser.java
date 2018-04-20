@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -36,6 +36,12 @@ import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 
 import hudson.FilePath;
 
+/**
+ * Parser for TPT test case execution result (testcase_information.xml) files.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ *
+ */
 public class TestcaseParser extends DefaultHandler {
 
   private static final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
@@ -46,8 +52,6 @@ public class TestcaseParser extends DefaultHandler {
 
   private StringBuffer logString = null;
 
-  private AssessmentVariable assessmentVariable = null;
-
   /**
    * Parse an XML file to retrieve a testcase info instance (non null)
    * 
@@ -57,8 +61,10 @@ public class TestcaseParser extends DefaultHandler {
    * 
    * @throws IOException
    *           if the xml file cannot be read or has a wrong format
+   * @throws InterruptedException
+   *           If the Job is cancelled
    */
-  public static Testcase parseXml(FilePath xmlFile) throws IOException {
+  public static Testcase parseXml(FilePath xmlFile) throws IOException, InterruptedException {
     try {
       TestcaseParser parser = new TestcaseParser();
       SAXParserFactory.newInstance().newSAXParser().parse(xmlFile.read(), parser);
@@ -73,8 +79,6 @@ public class TestcaseParser extends DefaultHandler {
       throw new IOException("SAX error: " + e.getMessage());
     } catch (IOException e) {
       throw new IOException("I/O error: " + e.getMessage());
-    } catch (InterruptedException e) {
-      throw new IOException("Interrupted reading XML File: " + e.getMessage(), e);
     }
   }
 
@@ -90,7 +94,11 @@ public class TestcaseParser extends DefaultHandler {
     if (elementName.equalsIgnoreCase("TestcaseInformation")) {
       ti = new Testcase();
       ti.setName(attributes.getValue("ScenarioName"));
-      ti.setID(Integer.parseInt(attributes.getValue("ScenarioId")));
+      try {
+        ti.setID(Integer.parseInt(attributes.getValue("ScenarioId")));
+      } catch (NumberFormatException e) {
+        throw new SAXException("Could not parse ScenarioId", e);
+      }
       ti.setExecDuration(attributes.getValue("ExecutionDuration"));
       ti.setResult(attributes.getValue("Result"));
       ti.setExecDate(parseDate(attributes.getValue("ExecDate")));
@@ -110,12 +118,6 @@ public class TestcaseParser extends DefaultHandler {
       } else if (!type.equalsIgnoreCase("invisible")) {
         this.type = LogLevel.ALL;
       }
-    } else if (elementName.equalsIgnoreCase("AssessmentVariable")) {
-      String name = attributes.getValue("Name");
-      String result = attributes.getValue("Result");
-      String type = attributes.getValue("Type");
-      String value = attributes.getValue("Value");
-      assessmentVariable = new AssessmentVariable(name, result, type, value);
     }
   }
 
@@ -124,9 +126,6 @@ public class TestcaseParser extends DefaultHandler {
     if (qName.equalsIgnoreCase("log")) {
       ti.addLogEntry(logString.toString(), type);
       logString = null;
-    } else if (qName.equalsIgnoreCase("AssessmentVariable")) {
-      ti.addAssessmentVariable(assessmentVariable);
-      assessmentVariable = null;
     }
   }
 
@@ -135,11 +134,15 @@ public class TestcaseParser extends DefaultHandler {
     if (logString != null) {
       logString.append(ac, i, j);
     }
-    if (assessmentVariable != null) {
-      assessmentVariable.appendMessage(new String(ac, i, j));
-    }
   }
 
+  /**
+   * Parses the date on which the testcase has been executed.
+   * 
+   * @param value
+   * @return
+   * @throws SAXException
+   */
   private Date parseDate(String value) throws SAXException {
     if (value != null) {
       synchronized (sdf) {

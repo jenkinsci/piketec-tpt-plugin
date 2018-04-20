@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,9 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.michelin.cio.hudson.plugins.copytoslave.CopyToMasterNotifier;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
@@ -47,14 +44,11 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
-import hudson.model.Computer;
-import hudson.slaves.SlaveComputer;
 
 /**
  * Executes one test case via TPT API.
  * 
  * @author jkuhnert, PikeTec GmbH
- *
  */
 class TptPluginSlaveExecutor {
 
@@ -80,16 +74,51 @@ class TptPluginSlaveExecutor {
 
   private String reportDir;
 
-  private Set<String> testSetString;
+  private List<String> testSetString;
 
   private long tptStartupWaitTime;
 
-  private String executionId;
+  private AbstractBuild masterId;
 
+  private String testSetName;
+
+  private FilePath masterWorkspace;
+
+  /**
+   * @param launcher
+   *          passed for executing a process
+   * @param build
+   *          current build, used to get the workspace and for binding to the TptApi
+   * @param listener
+   *          for the logs
+   * @param exePaths
+   *          the paths to the Tpt Executables
+   * @param tptPort
+   *          the port for binding to the TptApi
+   * @param tptBindingName
+   *          the binding name used to connect to the TptApi (for the registry)
+   * @param tptFile
+   *          the tpt file that will be executed
+   * @param execCfg
+   *          the tpt execution configuration as String
+   * @param testDataDir
+   *          the path to the test data dir
+   * @param testSet
+   *          a chunk of test
+   * @param tptStartupWaitTime
+   *          the time it should wait before start tpt
+   * @param masterId
+   *          actual build, used for getting an unique id
+   * @param testSetName
+   *          the name of the test set if given
+   * @param masterWorkspace
+   *          the workspace from the master, to know where to copy the results
+   */
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName, File tptFile,
-                         String execCfg, String testDataDir, String reportDir, String testSet,
-                         long tptStartupWaitTime, String executionId) {
+                         String execCfg, String testDataDir, String reportDir, List<String> testSet,
+                         long tptStartupWaitTime, AbstractBuild masterId, String testSetName,
+                         FilePath masterWorkspace) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -101,11 +130,21 @@ class TptPluginSlaveExecutor {
     this.execCfg = execCfg;
     this.testDataDir = testDataDir;
     this.reportDir = reportDir;
-    this.testSetString = Utils.unescapeTestcaseNames(testSet);
+    this.testSetString = testSet;
     this.tptStartupWaitTime = tptStartupWaitTime;
-    this.executionId = executionId;
+    this.masterId = masterId;
+    this.testSetName = testSetName;
+    this.masterWorkspace = masterWorkspace;
   }
 
+  /**
+   * Executes a small chunks of tests. It binds to the Tpt Api , check if the given Execution
+   * Configuration exists. Prepares the test- and data-directories. Creates a temporary testSet from
+   * the chunk of test (if no testSet is given). Then through the tpt api executes the testCases and
+   * then it copies the results to the master workspace.
+   * 
+   * @return true if the tpt execution has been successfully.
+   */
   public boolean execute() {
     logger = new TptLogger(listener.getLogger());
     try {
@@ -127,7 +166,7 @@ class TptPluginSlaveExecutor {
         logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
         return false;
       }
-      new CleanUpTask(openProject.getProject(), executionId);
+      new CleanUpTask(openProject.getProject(), masterId);
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
           openProject.getProject().getExecutionConfigurations().getItems();
@@ -155,12 +194,13 @@ class TptPluginSlaveExecutor {
         return false;
       }
 
-      FilePath path = null;
+      FilePath slaveDataDir = null;
+      FilePath slaveReportDir = null;
       try {
-        path = new FilePath(build.getWorkspace(), testDataDir).absolutize();
-        if (Computer.currentComputer() instanceof SlaveComputer) {
+        slaveDataDir = new FilePath(build.getWorkspace(), testDataDir).absolutize();
+        if (!masterWorkspace.equals(build.getWorkspace())) {
           logger.info("Creating and/or cleaning test data directory");
-          Utils.deleteFiles(path);
+          Utils.deleteFiles(slaveDataDir);
         }
       } catch (IOException e) {
         logger.error("Could not create or clear test data dir");
@@ -169,16 +209,15 @@ class TptPluginSlaveExecutor {
         logger.interrupt(e.getMessage());
         return false;
       }
-      logger.info("Setting test data directory to " + path.getRemote());
-      config.setDataDir(new File(path.getRemote()));
+      logger.info("Setting test data directory to " + slaveDataDir.getRemote());
+      config.setDataDir(new File(slaveDataDir.getRemote()));
 
-      path = null;
       try {
-        path = new FilePath(build.getWorkspace(), reportDir).absolutize();
-        if (Computer.currentComputer() instanceof SlaveComputer) {
+        slaveReportDir = new FilePath(build.getWorkspace(), reportDir).absolutize();
+        if (!masterWorkspace.equals(build.getWorkspace())) {
           logger.info("Creating and/or cleaning report directory");
-          path.mkdirs();
-          path.deleteContents();
+          slaveReportDir.mkdirs();
+          slaveReportDir.deleteContents();
         }
       } catch (IOException e) {
         logger.error(e.getMessage());
@@ -189,38 +228,54 @@ class TptPluginSlaveExecutor {
         config.setDataDir(oldTestDataDir);
         return false;
       }
-      logger.info("Setting report directory to " + path.getRemote());
-      config.setReportDir(new File(path.getRemote()));
+      logger.info("Setting report directory to " + slaveReportDir.getRemote());
+      config.setReportDir(new File(slaveReportDir.getRemote()));
 
       // store information to undo changes
       List<TestSet> oldTestSets = new ArrayList<>();
       List<TestSet> newTestSets = new ArrayList<>();
       List<ExecutionConfigurationItem> deactivated = new ArrayList<>();
       int i = 0;
-      for (ExecutionConfigurationItem item : config.getItems()) {
-        oldTestSets.add(item.getTestSet());
-        if (item.isActive()) {
-          Collection<Scenario> intersectionSet =
-              intersectByHash(item.getTestSet().getTestCases().getItems(), foundScenearios);
-          if (intersectionSet.isEmpty()) {
-            item.setActive(false);
-            deactivated.add(item);
-          } else {
-            String tmpTestSetName = "JENKINS Exec " + i;
-            i++;
-            logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
-                + remoteScenarioSetToString(intersectionSet) + "\"");
-            TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
-            newTestSets.add(testSet);
-            for (Scenario scen : intersectionSet) {
-              testSet.addTestCase(scen);
+      if (testSetName.equals("")) {
+        for (ExecutionConfigurationItem item : config.getItems()) {
+          oldTestSets.add(item.getTestSet());
+          if (item.isActive()) {
+            Collection<Scenario> intersectionSet =
+                intersectByHash(item.getTestSet().getTestCases().getItems(), foundScenearios);
+            if (intersectionSet.isEmpty()) {
+              item.setActive(false);
+              deactivated.add(item);
+            } else {
+              String tmpTestSetName = "JENKINS Exec " + i;
+              i++;
+              logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
+                  + remoteScenarioSetToString(intersectionSet) + "\"");
+              TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+              newTestSets.add(testSet);
+              for (Scenario scen : intersectionSet) {
+                testSet.addTestCase(scen);
+              }
+              item.setTestSet(testSet);
             }
+          }
+        }
+      } else {
+        String tmpTestSetName = "JENKINS Exec " + testSetName;
+        logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
+            + remoteScenarioSetToString(foundScenearios) + "\" from File " + tptFile.getName());
+
+        TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+        newTestSets.add(testSet);
+        for (Scenario scen : foundScenearios) {
+          testSet.addTestCase(scen);
+        }
+        for (ExecutionConfigurationItem item : config.getItems()) {
+          oldTestSets.add(item.getTestSet());
+          if (item.isActive()) {
             item.setTestSet(testSet);
           }
         }
-
       }
-
       // execute test
       ExecutionStatus execStatus = api.run(config);
       while (execStatus.isRunning() || execStatus.isPending()) {
@@ -238,17 +293,12 @@ class TptPluginSlaveExecutor {
         item.setTestSet(oldTestSets.remove(0));
       }
       try {
-        String includes = !StringUtils.isBlank(testDataDir) ? testDataDir
-            : new File(tptFile.getParent(), oldTestDataDir.getPath()).getAbsolutePath();
-        includes += "\\**\\*.*";
-        if (!StringUtils.isBlank(reportDir) || StringUtils.isBlank(oldReportDir.getPath())) {
-          includes += "," + (!StringUtils.isBlank(reportDir) ? reportDir
-              : new File(tptFile.getParent(), oldReportDir.getPath()).getAbsolutePath());
-          includes += "\\**\\*.*";
-        }
-        CopyToMasterNotifier copyToMaster =
-            new CopyToMasterNotifier(includes, "", false, "", false);
-        copyToMaster.perform(build, launcher, listener);
+        slaveDataDir.copyRecursiveTo(new FilePath(masterWorkspace, testDataDir));
+        slaveReportDir.copyRecursiveTo(new FilePath(masterWorkspace, reportDir));
+
+        logger.info("Copied all data to master from File " + tptFile.getName() + " to "
+            + masterWorkspace.getRemote());
+
       } catch (InterruptedException e) {
         logger.interrupt(e.getMessage());
         return false;
@@ -279,6 +329,16 @@ class TptPluginSlaveExecutor {
     return true;
   }
 
+  /**
+   * Finds all the test cases of a given test set
+   * 
+   * @param sogs
+   * @param names
+   * @param result
+   * @throws RemoteException
+   * @throws ApiException
+   */
+
   private void find(Collection<ScenarioOrGroup> sogs, Collection<String> names,
                     Collection<Scenario> result)
       throws RemoteException, ApiException {
@@ -293,6 +353,15 @@ class TptPluginSlaveExecutor {
     }
   }
 
+  /**
+   * Matches the tests cases from a test set with all the test cases found.
+   * 
+   * @param scenColl1
+   * @param scenCol2
+   * @return the intersected test cases
+   * @throws RemoteException
+   * @throws ApiException
+   */
   static Collection<Scenario> intersectByHash(Collection<Scenario> scenColl1,
                                               Collection<Scenario> scenCol2)
       throws RemoteException, ApiException {
@@ -309,6 +378,15 @@ class TptPluginSlaveExecutor {
     return result;
   }
 
+  /**
+   * Convert the given test cases to a String
+   * 
+   * @param intersectionSet
+   *          to be converted
+   * @return the given test cases as a String , separated with a comma
+   * @throws RemoteException
+   * @throws ApiException
+   */
   private String remoteScenarioSetToString(Collection<Scenario> intersectionSet)
       throws RemoteException, ApiException {
     StringBuilder sb = new StringBuilder();
