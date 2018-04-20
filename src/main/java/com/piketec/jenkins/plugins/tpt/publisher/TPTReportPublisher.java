@@ -56,10 +56,16 @@ import hudson.tasks.Builder;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
+/**
+ * The post build action to publish the TPT test results in Jenkins
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
 public class TPTReportPublisher extends Notifier {
 
-  public TPTReportPage filesAction = null;
-
+  /**
+   * Creates a TPTReportPublisher
+   */
   @DataBoundConstructor
   public TPTReportPublisher() {
     // allow to display HTML files
@@ -163,11 +169,11 @@ public class TPTReportPublisher extends Notifier {
         String platform = t.getPlatform();
         FailedTestKey ftk = new FailedTestKey(id, fileName, exeConfig, platform);
         if (prevFailed.containsKey(ftk)) {
-          t.setBuildHistoy(prevFailed.get(ftk).getBuildHistoy() + 1);
+          t.setFailedSince(prevFailed.get(ftk).getFailedSince() + 1);
         }
       }
     }
-    filesAction = new TPTReportPage(build, failedTests, tptFiles);
+    TPTReportPage filesAction = new TPTReportPage(build, failedTests, tptFiles);
     filesAction.createGraph();
     build.addAction(filesAction);
     listener.getLogger().println("Finished Post Build Action");
@@ -187,8 +193,8 @@ public class TPTReportPublisher extends Notifier {
    * @param executionConfiguration
    * @throws InterruptedException
    */
-  public void parse(FilePath xmlFile, TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
-                    String reportDirOnRemote, String executionConfiguration, TptLogger logger)
+  private void parse(FilePath xmlFile, TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
+                     String reportDirOnRemote, String executionConfiguration, TptLogger logger)
       throws InterruptedException {
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
@@ -218,6 +224,12 @@ public class TPTReportPublisher extends Notifier {
     return (DescriptorImpl)super.getDescriptor();
   }
 
+  /**
+   * The descriptor for the publisher
+   * 
+   * @author FInfantino, PikeTec GmbH
+   *
+   */
   @Extension
   public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 

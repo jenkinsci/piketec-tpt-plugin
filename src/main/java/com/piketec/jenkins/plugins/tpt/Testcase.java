@@ -26,6 +26,11 @@ import java.util.List;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogEntry;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 
+/**
+ * The result of a parsed TPT test case execution result
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ */
 public class Testcase {
 
   private String name;
@@ -93,14 +98,13 @@ public class Testcase {
 
   /**
    * @return date ,get the date of execution from the testcase
-   * 
    */
   Date getExecDate() {
     return execDate;
   }
 
   /**
-   * @param time,
+   * @param time
    *          set the execution duration from a test case
    */
   void setExecDuration(String time) {

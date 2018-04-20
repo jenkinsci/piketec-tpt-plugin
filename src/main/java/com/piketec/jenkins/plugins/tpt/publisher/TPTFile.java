@@ -20,7 +20,7 @@
  */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
-public class TPTFile {
+class TPTFile {
 
   private String fileName;
 
@@ -42,7 +42,9 @@ public class TPTFile {
    * Data container for each TPT File in order to organize all the TPT Files.
    * 
    * @param fileName
+   *          The name of the TPT file
    * @param configuration
+   *          the name of the execution configuration
    */
   public TPTFile(String fileName, String configuration) {
     this.fileName = fileName;

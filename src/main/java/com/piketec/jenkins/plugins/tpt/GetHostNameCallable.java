@@ -29,12 +29,12 @@ import hudson.remoting.Callable;
 
 /**
  * A callable to get the host name of a jenkins node.
+ * 
+ * @author jkuhnert, PikeTec GmbH
  *
  */
 public class GetHostNameCallable implements Callable<String, UnknownHostException> {
 
-  // TODO_FInfantino (until_12.04.2018): besser alle RMI calls in einem callable direkt auf dem
-  // slave ausfuehren?
   @Override
   public void checkRoles(RoleChecker checker) throws SecurityException {
   }

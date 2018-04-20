@@ -44,6 +44,11 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import jenkins.model.Jenkins;
 
+/**
+ * Collection of some utility methods and constants
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ */
 public class Utils {
 
   static final String TPT_EXE_VAR = "PIKETEC_TPT_EXE";
@@ -106,11 +111,15 @@ public class Utils {
   }
 
   /**
-   * Creates a File (workspace) with a FilePath .
+   * Creates a File (workspace) with a FilePath.
    * 
    * @param workspace
+   *          The workspace of the jenkisn job
    * @param logger
-   * @return
+   *          To print some messages
+   * @return The worksapce as a native Java file.
+   * @throws InterruptedException
+   *           If the current Job is cancelled
    */
   public static File getWorkspaceDir(FilePath workspace, TptLogger logger)
       throws InterruptedException {
@@ -166,6 +175,8 @@ public class Utils {
   /**
    * @return the rootdir from the "piketec-tpt" plugin, used for knowing where to get html files,
    *         json or some data stored there.
+   * @throws IOException
+   *           If no Jenkins isntance could be found
    */
   public static File getTptPluginRootDir() throws IOException {
     Jenkins jenkinsInstance = Jenkins.getInstance();
@@ -233,14 +244,22 @@ public class Utils {
    * registry with the TptApi through the tpt binding name.
    * 
    * @param build
+   *          The current Jenkins build
    * @param launcher
+   *          The launcher
    * @param logger
+   *          The logger to displax messages
    * @param exePaths
+   *          The paths to TPT executables
    * @param tptPort
+   *          the TPTRMI port
    * @param tptBindingName
+   *          the TPT RMI binding name
    * @param startupWaitTime
+   *          The wait time to start up TPT
    * @return Tpt Api that allows accessing tpt through the api.
    * @throws InterruptedException
+   *           If the Job is cancelled
    */
   public static TptApi getTptApi(AbstractBuild< ? , ? > build, Launcher launcher, TptLogger logger,
                                  FilePath[] exePaths, int tptPort, String tptBindingName,
@@ -290,21 +309,33 @@ public class Utils {
 
   /**
    * Publishes the Junit XML , it creates the folder for the XML and then it publishes the XML by
-   * calling Publish.publishJUnitResults, @see publishJUnitResults . This method is used as a
-   * wrapper.
+   * calling Publish.publishJUnitResults,
+   * {@link Publish#publishJUnitResults(JenkinsConfiguration, FilePath, FilePath, TptLogger, LogLevel)
+   * Publish.publishJUnitResults}. This method is used as a wrapper.
    * 
    * @param workspace
-   * @param ec
+   *          The Jenkins workspace
+   * @param jenkinsConfiguration
+   *          The configuration to which the TPT test resuklt should be tranformed to JUnit
    * @param testDataDir
+   *          The directory where TPT test data should be searched
    * @param jUnitXml
+   *          The directory where the transformed results should be written to.
    * @param jUnitLogLevel
+   *          the threshold for the severity of the log messages
    * @param logger
+   *          To display messages
    * @return the number of test cases in the Junit XML
    * @throws IOException
+   *           If an IO exception occured while parsing the TPT test results or while writing the
+   *           JUnit xml files
+   * @throws InterruptedException
+   *           If the job is cancelled
    */
-  static int publishResults(FilePath workspace, JenkinsConfiguration ec, FilePath testDataDir,
-                            String jUnitXml, LogLevel jUnitLogLevel, TptLogger logger)
-      throws IOException {
+  static int publishAsJUnitResults(FilePath workspace, JenkinsConfiguration jenkinsConfiguration,
+                                   FilePath testDataDir, String jUnitXml, LogLevel jUnitLogLevel,
+                                   TptLogger logger)
+      throws IOException, InterruptedException {
     FilePath reportPath = ((jUnitXml == null) || jUnitXml.trim().isEmpty()) ? workspace
         : new FilePath(workspace, jUnitXml);
     try {
@@ -317,7 +348,8 @@ public class Utils {
     } catch (InterruptedException ie) {
       throw new IOException("Failed to get the directory: " + reportPath, ie);
     }
-    return Publish.publishJUnitResults(ec, testDataDir, reportPath, logger, jUnitLogLevel);
+    return Publish.publishJUnitResults(jenkinsConfiguration, testDataDir, reportPath, logger,
+        jUnitLogLevel);
   }
 
   /**

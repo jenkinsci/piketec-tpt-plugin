@@ -37,33 +37,42 @@ import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.FilePath;
 
+/**
+ * Class for helper methods to collect and tranform TPT test result.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ */
 public final class Publish {
 
   /**
    * Publish the Junits results, it creates an XML file and write the results on it.
    * 
-   * @param jenkinsconfiguration,
-   *          to get the tpt file name
-   * @param testdatadir
-   *          , get the data to write on the xml
-   * @param jUnitOutput
-   *          dir, to know where to publish the results
-   * @param logger,
+   * @param jenkinsConfig
+   *          The configuration to which the TPT test resuklt should be tranformed to JUnit
+   * @param testDataDir
+   *          The directory where TPT test data should be searched
+   * @param jUnitOutputDir
+   *          The directory where the transformed results should be written to.
+   * @param logger
    *          to display the information
-   * @param loglevel,
-   *          to check if there where any logs
+   * @param logLevel
+   *          the threshold for the severity of the log messages
    * @return the number of testcases .
+   * @throws IOException
+   *           if an error occured while parsing TPT test data or writing the JUnit xml files
+   * @throws InterruptedException
+   *           If the job was interrupted
    */
-  public static int publishJUnitResults(JenkinsConfiguration ec, FilePath testDataDir,
+  public static int publishJUnitResults(JenkinsConfiguration jenkinsConfig, FilePath testDataDir,
                                         FilePath jUnitOutputDir, TptLogger logger,
                                         LogLevel logLevel)
-      throws IOException {
+      throws IOException, InterruptedException {
     XmlStreamWriter xmlPub = null;
 
     try {
-      String classname = FilenameUtils.getBaseName(ec.getTptFile());
+      String classname = FilenameUtils.getBaseName(jenkinsConfig.getTptFile());
       FilePath jUnitXMLFile = new FilePath(jUnitOutputDir,
-          classname + "." + ec.getConfigurationWithUnderscore() + ".xml");
+          classname + "." + jenkinsConfig.getConfigurationWithUnderscore() + ".xml");
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(jUnitXMLFile);
       xmlPub.writeTestsuite(classname);
@@ -89,8 +98,6 @@ public final class Publish {
       throw new IOException("XML stream error: " + e.getMessage());
     } catch (FactoryConfigurationError e) {
       throw new IOException("XML configuration error: " + e.getMessage());
-    } catch (InterruptedException ie) {
-      throw new IOException("traverse test data directory failed: " + ie.getMessage());
     } finally {
       if (xmlPub != null) {
         xmlPub.close();
@@ -104,13 +111,21 @@ public final class Publish {
    * Collects recursively all test cases by searching for "testcase_information.xml" files in
    * "rootdir". If a file could not be loaded, an error message will be printed.
    * 
-   * @throws InterruptedException
+   * @param testDataDir
+   *          The directory where TPT test data should be searched
+   * @param logger
+   *          to display the information
+   * @return The list of parsed TPT test cases
+   * 
    * @throws IOException
+   *           If an error occured while parsing TPT test data
+   * @throws InterruptedException
+   *           If the job was interrupted
    */
-  public static List<Testcase> getTestcases(FilePath rootdir, TptLogger logger)
+  public static List<Testcase> getTestcases(FilePath testDataDir, TptLogger logger)
       throws IOException, InterruptedException {
     Collection<FilePath> files = new HashSet<FilePath>();
-    find(rootdir, "testcase_information.xml", files);
+    find(testDataDir, "testcase_information.xml", files);
     List<Testcase> testcases = new ArrayList<Testcase>(files.size());
 
     for (FilePath f : files) {

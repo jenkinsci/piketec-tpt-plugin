@@ -36,6 +36,12 @@ import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 
 import hudson.FilePath;
 
+/**
+ * Parser for TPT test case execution result (testcase_information.xml) files.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ *
+ */
 public class TestcaseParser extends DefaultHandler {
 
   private static final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd.MM.yyyy");
@@ -56,6 +62,7 @@ public class TestcaseParser extends DefaultHandler {
    * @throws IOException
    *           if the xml file cannot be read or has a wrong format
    * @throws InterruptedException
+   *           If the Job is cancelled
    */
   public static Testcase parseXml(FilePath xmlFile) throws IOException, InterruptedException {
     try {

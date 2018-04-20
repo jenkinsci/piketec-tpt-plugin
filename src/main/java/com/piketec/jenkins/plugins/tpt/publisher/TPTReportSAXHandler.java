@@ -30,7 +30,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class TPTReportSAXHandler extends DefaultHandler {
+/**
+ * Parser for paring the TPT test_summary.xml file.
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
+class TPTReportSAXHandler extends DefaultHandler {
 
   private static final String TESTCASEINFORMATION = "TestcaseInformation";
 
@@ -55,9 +60,13 @@ public class TPTReportSAXHandler extends DefaultHandler {
    * data from it.
    * 
    * @param tptFile
+   *          The data container that will be enriched with the parsing results
    * @param failedTests
+   *          The list that will be filled with all test cases that are not passed
    * @param reportDirOnRemote
+   *          The report directory. Needed to resolve paths to report files
    * @param executionConfiguration
+   *          The name of the execution configuration
    */
   public TPTReportSAXHandler(TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
                              String reportDirOnRemote, String executionConfiguration) {
@@ -127,7 +136,7 @@ public class TPTReportSAXHandler extends DefaultHandler {
     return reportFile.substring(0, index);
   }
 
-  public String getLinkToFailedReport(String reportFile, String reportDir) {
+  private String getLinkToFailedReport(String reportFile, String reportDir) {
     if (reportFile.equals("")) {
       return "";
     }

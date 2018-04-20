@@ -153,7 +153,7 @@ class TptPluginSingleJobExecutor {
             if (enableJunit) {
               // transform TPT results into JUnit results
               logger.info("*** Publishing results now ***");
-              Utils.publishResults(workspace, ec, testDataPath, jUnitXmlPath, jUnitLogLevel,
+              Utils.publishAsJUnitResults(workspace, ec, testDataPath, jUnitXmlPath, jUnitLogLevel,
                   logger);
             }
           } catch (IOException e) {

@@ -117,6 +117,7 @@ public class TptPlugin extends Builder {
    * @param jUnitreport
    *          path to where the jUnit report will generated
    * @param jUnitLogLevel
+   *          The sverity of log messages that will be written ti the JUnit xml file
    */
   @DataBoundConstructor
   public TptPlugin(String exe, String exePaths, String arguments, boolean isTptMaster,
@@ -157,7 +158,7 @@ public class TptPlugin extends Builder {
       tptBindingName = DescriptorImpl.getDefaultTptBindingName();
     }
     if (tptPort == null || tptPort.trim().isEmpty()) {
-      tptPort = Integer.toString(DescriptorImpl.getDefaultTptPort());
+      tptPort = DescriptorImpl.getDefaultTptPort();
     }
     if (exe != null) {
       this.exePaths = exe;
@@ -283,12 +284,6 @@ public class TptPlugin extends Builder {
 
   // --------------------------------------------------------------
 
-  /**
-   * Executes this Build-Step. Expands variables and starts the standalone or master executor.
-   * 
-   * @throws IOException
-   * @throws InterruptedException
-   */
   @Override
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
@@ -322,13 +317,18 @@ public class TptPlugin extends Builder {
    * All the parameters are used to get the data for creating a new TptPluginSingleJobExecutor
    * 
    * @param build
+   *          The current Jenkins build
    * @param launcher
+   *          The launcher
    * @param listener
+   *          The listener
    * @param environment
-   * @param normalizedConfig
+   *          The map of envrionment varibales and their value
+   * @param normalizedConfigs
+   *          The configs with already replaced $-variables
    * @return true if it was possible to execute the TptPluginSingleJobExecutor.
    */
-  public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launch,
+  public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launcher,
                                       BuildListener listener, EnvVars environment,
                                       ArrayList<JenkinsConfiguration> normalizedConfigs) {
     // split and expand list of ptahs to TPT installations
@@ -336,15 +336,15 @@ public class TptPlugin extends Builder {
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
     for (int i = 0; i < expandedStringExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(launch.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(launcher.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
     }
     // expand arguments and report
     String expandedArguments = environment.expand(this.arguments);
     String jUnitXmlPath = environment.expand(jUnitreport);
     // start execution
     TptPluginSingleJobExecutor executor =
-        new TptPluginSingleJobExecutor(build, launch, listener, expandedExePaths, expandedArguments,
-            normalizedConfigs, jUnitXmlPath, jUnitLogLevel, enableJunit);
+        new TptPluginSingleJobExecutor(build, launcher, listener, expandedExePaths,
+            expandedArguments, normalizedConfigs, jUnitXmlPath, jUnitLogLevel, enableJunit);
     return executor.execute();
 
   }
@@ -356,10 +356,15 @@ public class TptPlugin extends Builder {
    * All the parameters are used to get the data for creating a new TptPluginMasterJobExecutor
    * 
    * @param build
+   *          The current Jenkins build
    * @param launcher
+   *          The launcher
    * @param listener
+   *          The listener
    * @param environment
-   * @param normalizedConfig
+   *          The map of envrionment varibales and their value
+   * @param normalizedConfigs
+   *          The configs with already replaced $-variables
    * @return true if the execution from slaves and master were successful.
    */
   public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
@@ -381,10 +386,10 @@ public class TptPlugin extends Builder {
       } catch (NumberFormatException e) {
         logger.error("The given port " + environment.expand(tptPort) + " is not an integer."
             + " Using default value.");
-        expandedTptPort = DescriptorImpl.getDefaultTptPort();
+        expandedTptPort = Utils.DEFAULT_TPT_PORT;
       }
     } else {
-      expandedTptPort = DescriptorImpl.getDefaultTptPort();
+      expandedTptPort = Utils.DEFAULT_TPT_PORT;
     }
     // expand TPT RMI binding name
     String expandedTptBindingName;
@@ -402,10 +407,10 @@ public class TptPlugin extends Builder {
         logger
             .error("The given TPT startup waiting time \"" + environment.expand(tptStartUpWaitTime)
                 + "\" is not an integer. Using default value.");
-        expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
+        expandedTptStartupWaitTime = Utils.DEFAULT_STARTUP_WAIT_TIME * 1000;
       }
     } else {
-      expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
+      expandedTptStartupWaitTime = Utils.DEFAULT_STARTUP_WAIT_TIME * 1000;
     }
     // expand slaveJobCount
     int parsedSlaveJobCount = 0;
@@ -450,33 +455,59 @@ public class TptPlugin extends Builder {
 
   // --------------------------- Descriptor Class -----------------------------------
 
+  /**
+   * The descriptor of TptPlugin
+   * 
+   * @author jkuhnert, PikeTec GmbH
+   */
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+    /**
+     * @return "--run build"
+     */
     public static String getDefaultArguments() {
       return "--run build";
     }
 
+    /**
+     * @return "TptApi"
+     */
     public static String getDefaultTptBindingName() {
       return "TptApi";
     }
 
+    /**
+     * @return <code>false</code>
+     */
     public static boolean getDefaultIsTptMaster() {
       return false;
     }
 
-    public static int getDefaultTptPort() {
-      return Utils.DEFAULT_TPT_PORT;
+    /**
+     * @return "1099"
+     */
+    public static String getDefaultTptPort() {
+      return Integer.toString(Utils.DEFAULT_TPT_PORT);
     }
 
-    public static int getDefaultTptStartUpWaitTime() {
-      return Utils.DEFAULT_STARTUP_WAIT_TIME;
+    /**
+     * @return "60" (1 min)
+     */
+    public static String getDefaultTptStartUpWaitTime() {
+      return Integer.toString(Utils.DEFAULT_STARTUP_WAIT_TIME);
     }
 
+    /**
+     * @return <code>false</code>
+     */
     public static boolean getDefaultEnableJunit() {
       return false;
     }
 
+    /**
+     * @return <code>INFO</code>
+     */
     public static LogLevel getDefaultJUnitLogLevel() {
       return LogLevel.INFO;
     }
@@ -485,7 +516,8 @@ public class TptPlugin extends Builder {
      * Formvalidation for the Arguments field in the descriptor.
      * 
      * @param arguments
-     * @return
+     *          The TPT run arguments
+     * @return The validation of the form
      */
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {
       FormValidation formValidator = null;

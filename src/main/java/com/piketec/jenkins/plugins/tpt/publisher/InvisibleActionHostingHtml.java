@@ -36,6 +36,11 @@ import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
 import hudson.util.HttpResponses;
 
+/**
+ * An invisibale action to show HTML reports
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
 public class InvisibleActionHostingHtml implements Action, StaplerProxy {
 
   private String name;
@@ -50,11 +55,11 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    * doDynamic method.(It uses the DirectoryBrowserSupport)
    * 
    * @param build
-   *          , to locate where the file is
+   *          to locate where the file is
    * @param urlFileName
-   *          , to know which file it is
+   *          to know which file it is
    * @param exeConfig
-   *          , to know which file it is , the path is made by a filename and a execution config
+   *          to know which file it is , the path is made by a filename and a execution config
    */
   public InvisibleActionHostingHtml(AbstractBuild< ? , ? > build, String urlFileName,
                                     String exeConfig) {
@@ -84,10 +89,16 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
     return this;
   }
 
+  /**
+   * @return The name of the TPT file
+   */
   public String getName() {
     return name;
   }
 
+  /**
+   * @return The path to the html file
+   */
   public String path() {
     return build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name + "\\" + exeConfig;
   }
@@ -97,9 +108,13 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    * "index.html"
    * 
    * @param req
+   *          The request
    * @param rsp
+   *          The response
    * @throws IOException
+   *           If an IO error occures
    * @throws ServletException
+   *           If the response could not be generated
    */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {

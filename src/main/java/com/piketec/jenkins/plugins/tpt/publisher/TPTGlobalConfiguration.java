@@ -54,6 +54,10 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
     }
   }
 
+  /**
+   * @return Has the user activated the "trust slaves and users" check box in the global Jenkins
+   *         configurations
+   */
   public static boolean isTrustSlavesAndUsers() {
     return DescriptorImpl.trustSlavesAndUsers;
   }
@@ -69,10 +73,18 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
     return descriptor;
   }
 
+  /**
+   * Creates a new TPTGlobalConfiguration
+   */
   @DataBoundConstructor
   public TPTGlobalConfiguration() {
   }
 
+  /**
+   * The descriptor for TPTGlobalConfiguration
+   * 
+   * @author FInfantino, PikeTec GmbH
+   */
   @Extension
   public static class DescriptorImpl extends Descriptor<TPTGlobalConfiguration> {
 
@@ -80,10 +92,13 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
 
     static String staticOldSettings;
 
-    public String oldSettings;
+    private String oldSettings;
 
-    public boolean toSave;
+    private boolean toSave;
 
+    /**
+     * Creates a new Descriptor
+     */
     public DescriptorImpl() {
       load();
       setTrustSlavesAndUsers(toSave);
@@ -108,14 +123,29 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
       return "";
     }
 
-    public static void setTrustSlavesAndUsers(boolean enableClou) {
-      trustSlavesAndUsers = enableClou;
+    /**
+     * Set if the user hase activated the "trust slaves and users" check box in the global Jenkins
+     * configurations
+     * 
+     * @param enableTrustSlavesAndUsers
+     *          Should the option be enabled
+     */
+    public static void setTrustSlavesAndUsers(boolean enableTrustSlavesAndUsers) {
+      trustSlavesAndUsers = enableTrustSlavesAndUsers;
     }
 
+    /**
+     * @return Has the user activated the "trust slaves and users" check box in the global Jenkins
+     *         configurations
+     */
     public static boolean isTrustSlavesAndUsers() {
       return trustSlavesAndUsers;
     }
 
+    /**
+     * @return Has the user activated the "trust slaves and users" check box in the global Jenkins
+     *         configurations
+     */
     public static boolean getTrustSlavesAndUsers() {
       return trustSlavesAndUsers;
     }
@@ -124,7 +154,7 @@ public class TPTGlobalConfiguration implements Describable<TPTGlobalConfiguratio
       staticOldSettings = oldSettings;
     }
 
-    public void setStaticOldSettings() {
+    private void setStaticOldSettings() {
       String settings = System.getProperty("hudson.model.DirectoryBrowserSupport.CSP");
       // set the setting for the first time
       settings = (settings == null)

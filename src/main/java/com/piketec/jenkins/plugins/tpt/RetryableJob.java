@@ -169,8 +169,8 @@ class RetryableJob {
    * Schedules a build throgh ParameterizedJobMixIn.ParameterizedJob
    * 
    * @param build
-   *          , to get the cause from the build
-   * @param project,
+   *          to get the cause from the build
+   * @param project
    *          check if the job is triggable
    * @param quietPeriod
    *          for the method scheduleBuild2

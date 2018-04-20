@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 import hudson.FilePath;
 import javanet.staxutils.IndentingXMLStreamWriter;
 
-public class XmlStreamWriter {
+class XmlStreamWriter {
 
   private XMLStreamWriter writer;
 
@@ -44,10 +44,15 @@ public class XmlStreamWriter {
    * Used by Publish.publishJUnitResults, write the XML file.
    * 
    * @param file
+   *          The file write to
    * @throws XMLStreamException
+   *           If the XML cannot be created
    * @throws FactoryConfigurationError
+   *           if the XML write coudl not be created
    * @throws IOException
+   *           if the file cannot be written
    * @throws InterruptedException
+   *           if the job is cancelled
    */
   public void initalize(FilePath file)
       throws XMLStreamException, FactoryConfigurationError, IOException, InterruptedException {
@@ -62,7 +67,9 @@ public class XmlStreamWriter {
    * Used by Publish.publishJUnitResults , it writes a test case in the XML
    * 
    * @param name
+   *          The name of the JUnit test suite
    * @throws XMLStreamException
+   *           If the XML cannot be created
    */
   public void writeTestsuite(String name) throws XMLStreamException {
     writer.writeStartElement("testsuite");
@@ -74,9 +81,13 @@ public class XmlStreamWriter {
    * Used by Publish.publishJUnitResults , it writes a test case in the XML
    * 
    * @param classname
+   *          the JUnit class name
    * @param testname
+   *          the name of the test
    * @param timeMillis
+   *          The duration of the test
    * @throws XMLStreamException
+   *           If the XML cannot be created
    */
   public void writeTestcase(String classname, String testname, String timeMillis)
       throws XMLStreamException {
@@ -92,10 +103,15 @@ public class XmlStreamWriter {
    * Used by Publish.publishJUnitResults , it writes an error in the XML
    * 
    * @param classname
+   *          the JUnit class name
    * @param testname
+   *          the name of the test
    * @param timeMillis
+   *          The duration of the test
    * @param error
+   *          the error message
    * @throws XMLStreamException
+   *           If the XML cannot be created
    */
   public void writeTestcaseError(String classname, String testname, String timeMillis, String error)
       throws XMLStreamException {

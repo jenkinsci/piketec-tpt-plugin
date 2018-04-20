@@ -35,6 +35,12 @@ import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jenkins.model.Jenkins;
 
+/**
+ * Repeatable subelement for the TPT configuration. Mainly a pair of TPT file and execution
+ * configuration enriched with some additional information.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ */
 public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   private final boolean enableTest;
@@ -65,6 +71,11 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    *          Report directory, if empty, path from the configuration will used.
    * @param enableTest
    *          - true if you want to skip this configuration
+   * @param timeout
+   *          how long the execution of this test run is allwoed to take at max
+   * @param testSet
+   *          the name of test set that should be used, <code>null</code> or empty if the test set
+   *          defined in the file should be used.
    */
   @DataBoundConstructor
   public JenkinsConfiguration(String tptFile, String configuration, String testdataDir,
@@ -85,18 +96,31 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return this;
   }
 
+  /**
+   * @return if this {@link JenkinsConfiguration} should run at all
+   */
   public boolean isEnableTest() {
     return enableTest;
   }
 
+  /**
+   * @return how long the execution of this test run is allwoed to take at max
+   */
   public long getTimeout() {
     return timeout;
   }
 
+  /**
+   * @return The TPT file
+   */
   public String getTptFile() {
     return tptFile;
   }
 
+  /**
+   * @return the name of test set that should be used, <code>null</code> or empty if the test set
+   *         defined in the file should be used.
+   */
   public String getTestSet() {
     return testSet;
   }
@@ -131,14 +155,26 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return descriptor;
   }
 
+  /**
+   * @return the directory where the TPT report shall be written to.
+   */
   public String getReportDir() {
     return reportDir;
   }
 
+  /**
+   * @return The directory where the execution result data shall be written to
+   */
   public String getTestdataDir() {
     return testdataDir;
   }
 
+  /**
+   * @param environment
+   *          The map of environment variables and their values
+   * @return A {@link JenkinsConfiguration} where all "${}"-Variables are replaced by their value if
+   *         available in <code>environment</code>.
+   */
   public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
     return new JenkinsConfiguration(Util.replaceMacro(tptFile, environment),
         Util.replaceMacro(configuration, environment), Util.replaceMacro(testdataDir, environment),
@@ -152,6 +188,11 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   @Extension
   public static final class DescriptorImpl extends Descriptor<JenkinsConfiguration> {
 
+    /**
+     * @param tptFile
+     *          the TPT file
+     * @return An error if the TPT file field is empty
+     */
     public static FormValidation doCheckTptFile(@QueryParameter File tptFile) {
 
       if ((tptFile != null) && (tptFile.getName().trim().length() > 0)) {
@@ -161,6 +202,13 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
       }
     }
 
+    /**
+     * @param configuration
+     *          The name of the execution configuration
+     * @param project
+     *          The jenkins project
+     * @return An error
+     */
     public static FormValidation doCheckConfiguration(@QueryParameter String configuration,
                                                       @AncestorInPath AbstractProject project) {
       if ((configuration == null) || (configuration.trim().length() == 0)) {
@@ -168,21 +216,32 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
       } else {
         return FormValidation.ok();
       }
-
     }
 
+    /**
+     * @return <code>true</code>
+     */
     public static boolean getDefaultEnableTest() {
       return true;
     }
 
+    /**
+     * @return 6
+     */
     public static long getDefaultTimeout() {
       return 6;
     }
 
+    /**
+     * @return 0
+     */
     public static int getDefaultSlaveJobCount() {
       return 0;
     }
 
+    /**
+     * @return an empty String
+     */
     public static String getDefaultTestSet() {
       return "";
     }

@@ -149,7 +149,9 @@ public class WorkLoad {
    * here and then triggers the slave job.
    * 
    * @param jobName
+   *          The name of the jenkins job serving as a slave.
    * @param workloadToAdd
+   *          The work package to be executed by the slave job
    */
   public static synchronized void putWorkLoad(String jobName, WorkLoad workloadToAdd) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
@@ -167,6 +169,7 @@ public class WorkLoad {
    * been triggered and it needs to do some workload.
    * 
    * @param jobName
+   *          The name of the jenkins job serving as a slave.
    * @return the workload that has been removed , null if there is nothing to remove.
    */
   public static synchronized WorkLoad pollWorkload(String jobName) {
@@ -182,9 +185,11 @@ public class WorkLoad {
    * something goes wrong.
    * 
    * @param jobName
-   * @param masterId
+   *          The name of the jenkins job serving as a slave.
+   * @param masterBuild
+   *          the build of the master job
    */
-  public static synchronized void clean(String jobName, AbstractBuild masterId) {
+  public static synchronized void clean(String jobName, AbstractBuild masterBuild) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
     if (queue == null) {
       return;
@@ -192,7 +197,7 @@ public class WorkLoad {
     Iterator<WorkLoad> iterator = queue.iterator();
     while (iterator.hasNext()) {
       WorkLoad next = iterator.next();
-      if (Objects.equals(next.masterId, masterId)) {
+      if (Objects.equals(next.masterId, masterBuild)) {
         iterator.remove();
       }
     }

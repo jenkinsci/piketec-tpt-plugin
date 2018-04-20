@@ -203,6 +203,11 @@ public class TptPluginSlave extends Builder {
 
   // --------------------------- Descriptor Class -----------------------------------
 
+  /**
+   * The Descriptor of TptPluginSlave
+   * 
+   * @author jkuhnert, PikeTec GmbH
+   */
   @Extension
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
@@ -217,18 +222,30 @@ public class TptPluginSlave extends Builder {
       return "Execute TPT tests slave";
     }
 
+    /**
+     * @return "${PIKECTEC_TPT_EXE}"
+     */
     public static String getDefaultExePaths() {
       return "${" + Utils.TPT_EXE_VAR + "}";
     }
 
+    /**
+     * @return "TptApi"
+     */
     public static String getDefaultTptBindingName() {
       return Utils.DEFAULT_TPT_BINDING_NAME;
     }
 
+    /**
+     * @return "1099"
+     */
     public static int getDefaultTptPort() {
       return Utils.DEFAULT_TPT_PORT;
     }
 
+    /**
+     * @return "60" (1 min)
+     */
     public static int getDefaultTptStartUpWaitTime() {
       return Utils.DEFAULT_STARTUP_WAIT_TIME;
     }

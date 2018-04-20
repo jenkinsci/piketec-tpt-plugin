@@ -35,6 +35,11 @@ import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
 import hudson.util.HttpResponses;
 
+/**
+ * An invisible action to display images
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
 public class InvisibleActionHostingImages implements Action, StaplerProxy {
 
   private AbstractBuild< ? , ? > build;
@@ -44,6 +49,7 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
    * InvisibleActionHostingHtml.
    * 
    * @param build
+   *          The current jenkins build
    */
   public InvisibleActionHostingImages(AbstractBuild< ? , ? > build) {
     this.build = build;
@@ -69,14 +75,35 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
     return this;
   }
 
+  /**
+   * @return The jenkins build this action belongs to
+   */
   public AbstractBuild< ? , ? > getBuild() {
     return build;
   }
 
+  /**
+   * Set the Jenkins build for this action
+   * 
+   * @param build
+   *          The current jenkins build
+   */
   public void setBuild(AbstractBuild< ? , ? > build) {
     this.build = build;
   }
 
+  /**
+   * Implicitly called jelly to create a html response
+   * 
+   * @param req
+   *          The request
+   * @param rsp
+   *          The response
+   * @throws IOException
+   *           if the response could not be generated
+   * @throws ServletException
+   *           if the response could not be generated
+   */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,

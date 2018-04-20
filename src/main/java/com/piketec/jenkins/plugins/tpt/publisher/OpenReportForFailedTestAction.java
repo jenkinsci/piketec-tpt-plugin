@@ -36,6 +36,11 @@ import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
 import hudson.util.HttpResponses;
 
+/**
+ * Avtion to open a TPT report of a failed test case
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
 public class OpenReportForFailedTestAction implements Action, StaplerProxy {
 
   private String name;
@@ -59,12 +64,19 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
    * This class is also similar to InvisibleActionHostingHtml.
    * 
    * @param build
+   *          The current jenkins build
    * @param fileName
+   *          The name of the tpt file
    * @param reportFile
+   *          the path to the report file
    * @param id
+   *          the test case id
    * @param exConfig
+   *          the name of the execution configuration
    * @param platform
+   *          the name of the platform
    * @param date
+   *          the execution date
    */
   public OpenReportForFailedTestAction(AbstractBuild< ? , ? > build, String fileName,
                                        String reportFile, String id, String exConfig,
@@ -99,6 +111,9 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
     return this;
   }
 
+  /**
+   * @return The name of the TPT file
+   */
   public String getName() {
     return name;
   }
@@ -106,10 +121,15 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   /**
    * This method is called when an object from this class is created.
    * 
+   * 
    * @param req
+   *          The request
    * @param rsp
+   *          The response
    * @throws IOException
+   *           if the response could not be generated
    * @throws ServletException
+   *           if the response could not be generated
    */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
@@ -133,18 +153,37 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
     dbs.generateResponse(req, rsp, this);
   }
 
+  /**
+   * @return the name of the TPT execution configuration
+   */
   public String getExecutionConfiguration() {
     return executionConfiguration;
   }
 
+  /**
+   * set the name of the TPT execution configuration
+   * 
+   * @param executionConfiguration
+   *          the name of the TPT execution configuration
+   * 
+   */
   public void setExecutionConfiguration(String executionConfiguration) {
     this.executionConfiguration = executionConfiguration;
   }
 
+  /**
+   * @return The name of the TPT platform configuration
+   */
   public String getPlatform() {
     return platform;
   }
 
+  /**
+   * Set the name of the TPT platform configuration
+   * 
+   * @param platform
+   *          The name of the TPT platform configuration
+   */
   public void setPlatform(String platform) {
     this.platform = platform;
   }

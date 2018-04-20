@@ -21,13 +21,13 @@
 package com.piketec.jenkins.plugins.tpt.publisher;
 
 /**
- * This class is for the failed test. Objects from this class will be created , when by parsing the
- * "test_summary.xml" we get a failed test (inconclusive, error or failed).
+ * This class is for the failed test. Objects from this class will be created when parsing the
+ * "test_summary.xml". We get a list of failed tests (inconclusive, error or failed).
  * 
  * @author FInfantino, PikeTec GmbH
  *
  */
-public class TPTTestCase {
+class TPTTestCase {
 
   private String result;
 
@@ -39,7 +39,7 @@ public class TPTTestCase {
 
   private String fileName;
 
-  private int buildHistoy;
+  private int failedSince;
 
   private String executionConfiguration;
 
@@ -47,79 +47,166 @@ public class TPTTestCase {
 
   private String platform;
 
+  /**
+   * Creates a new TPTTestCase data container
+   */
   public TPTTestCase() {
-    setBuildHistoy(1);
+    setFailedSince(1);
 
   }
 
+  /**
+   * @return The result represented by as a String
+   */
   public String getResult() {
     return result;
   }
 
+  /**
+   * Set the result represented as a String
+   * 
+   * @param result
+   *          the result represented as a String
+   */
   public void setResult(String result) {
     this.result = result;
   }
 
+  /**
+   * @return The test case id
+   */
   public String getId() {
     return id;
   }
 
+  /**
+   * Set the test case id
+   * 
+   * @param id
+   *          The test case id
+   */
   public void setId(String id) {
     this.id = id;
   }
 
+  /**
+   * In the test_summary.xml file are the relative paths to the report listed for each test case.
+   * 
+   * @return The path to the report file
+   */
   public String getReportFile() {
     return reportFile;
   }
 
+  /**
+   * Set the path to the report file In the test_summary.xml file are the relative paths to the
+   * report listed for each test case.
+   * 
+   * @param reportFile
+   *          The path to the report file
+   */
   public void setReportFile(String reportFile) {
     this.reportFile = reportFile;
   }
 
+  /**
+   * @return The date of the TPT test execution
+   */
   public String getExecutionDate() {
     return executionDate;
   }
 
+  /**
+   * Set the date of the TPT test execution
+   * 
+   * @param executionDate
+   *          The date of the TPT test execution
+   */
   public void setExecutionDate(String executionDate) {
     this.executionDate = executionDate;
   }
 
+  /**
+   * @return The name of the TPT file
+   */
   public String getFileName() {
     return fileName;
   }
 
+  /**
+   * Set the name of the TPT file
+   * 
+   * @param fileName
+   *          The name of the TPT file
+   */
   public void setFileName(String fileName) {
     this.fileName = fileName;
   }
 
-  public int getBuildHistoy() {
-    return buildHistoy;
+  /**
+   * @return The number of builds this test failed
+   */
+  public int getFailedSince() {
+    return failedSince;
   }
 
-  public void setBuildHistoy(int buildHistoy) {
-    this.buildHistoy = buildHistoy;
+  /**
+   * Set the number of builds this test failed
+   * 
+   * @param failedSince
+   *          The number of builds this test failed
+   */
+  public void setFailedSince(int failedSince) {
+    this.failedSince = failedSince;
   }
 
+  /**
+   * @return The name of the executed execution configuration
+   */
   public String getExecutionConfiguration() {
     return executionConfiguration;
   }
 
+  /**
+   * Set the name of the executed execution configuration
+   * 
+   * @param executionConfiguration
+   *          The name of the executed execution configuration
+   */
   public void setExecutionConfiguration(String executionConfiguration) {
     this.executionConfiguration = executionConfiguration;
   }
 
+  /**
+   * @return The name of the test case
+   */
   public String getTestCaseName() {
     return testCaseName;
   }
 
+  /**
+   * Set the name of the test case
+   * 
+   * @param testCaseName
+   *          The name of the test case
+   */
   public void setTestCaseName(String testCaseName) {
     this.testCaseName = testCaseName;
   }
 
+  /**
+   * @return The name of the executed platform
+   */
   public String getPlatform() {
     return platform;
   }
 
+  /**
+   * Set the name of the executed platform
+   * 
+   * @param platform
+   *          The name of the executed platform
+   */
   public void setPlatform(String platform) {
     this.platform = platform;
   }

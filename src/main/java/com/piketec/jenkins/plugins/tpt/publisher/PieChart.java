@@ -24,13 +24,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -56,11 +53,11 @@ import jenkins.model.Jenkins;
  * @author FInfantino, PikeTec GmbH
  *
  */
-public class PieChart {
+class PieChart {
 
-  public static final Color BRIGHT_GRAY = new Color(240, 242, 240);
+  private static final Color BRIGHT_GRAY = new Color(240, 242, 240);
 
-  public static final Font NORMALFONT = new Font("Dialog", Font.PLAIN, 12);
+  private static final Font NORMALFONT = new Font("Dialog", Font.PLAIN, 12);
 
   private static void checkLegendSegmentOrder(List<Segment> segments, int[] legendSegmentOrder) {
     if (legendSegmentOrder == null) {
@@ -152,6 +149,13 @@ public class PieChart {
     legendPortionFormat = new DecimalFormat(pattern.toString());
   }
 
+  /**
+   * Render the pie chart with the given height
+   * 
+   * @param height
+   *          The height of the resulting image
+   * @return The pie chart rendered as an image
+   */
   public BufferedImage render(int height) {
     BufferedImage image = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = image.createGraphics();
@@ -271,43 +275,6 @@ public class PieChart {
     }
   }
 
-  public static BufferedImage resize(BufferedImage source, int width, int height) {
-    assert source != null;
-    assert width >= 0 : "width < 0";
-    assert height >= 0 : "height < 0";
-    int swidth = source.getWidth();
-    int sheight = source.getHeight();
-    double xScale = ((double)width) / (double)swidth;
-    double yScale = ((double)height) / (double)sheight;
-    if (width <= 0) {
-      xScale = yScale;
-      width = (int)Math.rint(xScale * swidth);
-    }
-    if (height <= 0) {
-      yScale = xScale;
-      height = (int)Math.rint(yScale * sheight);
-    }
-    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-
-    BufferedImage result = gd.getDefaultConfiguration().createCompatibleImage(width, height,
-        source.getColorModel().getTransparency());
-    Graphics2D g2d = null;
-    try {
-      g2d = result.createGraphics();
-      g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-          RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-      g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-      AffineTransform at = AffineTransform.getScaleInstance(xScale, yScale);
-      g2d.drawRenderedImage(source, at);
-    } finally {
-      if (g2d != null) {
-        g2d.dispose();
-      }
-    }
-    return result;
-  }
-
   private Segment getLegendSegment(int row) {
     if (legendSegmentOrder == null) {
       return segments.get(row);
@@ -364,14 +331,14 @@ public class PieChart {
     return pie;
   }
 
-  public static final String removeSuffix(String text, String suffix) {
+  private static final String removeSuffix(String text, String suffix) {
     if (text.endsWith(suffix)) {
       return text.substring(0, text.length() - suffix.length());
     }
     return text;
   }
 
-  public static final String plural(boolean plural, CharSequence text) {
+  private static final String plural(boolean plural, CharSequence text) {
     StringBuilder b = new StringBuilder();
     int mode = 0;
     for (int i = 0; i < text.length(); i++) {

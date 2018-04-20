@@ -22,10 +22,22 @@ package com.piketec.jenkins.plugins.tpt;
 
 import java.io.PrintStream;
 
+/**
+ * Just a wrapper to add prefixes like "[ERROR" + " date" + "] " to the messages.
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ *
+ */
 public class TptLogger {
 
   PrintStream logger;
 
+  /**
+   * Wraps the given <code>PrintStream</code> into the TptLogger.
+   * 
+   * @param logger
+   *          The stream to print messages to
+   */
   public TptLogger(PrintStream logger) {
     this.logger = logger;
   }

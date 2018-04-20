@@ -31,6 +31,12 @@ import com.piketec.tpt.api.Project;
 
 import hudson.model.AbstractBuild;
 
+/**
+ * Task to execute after executing a builder. Usually done in a finally block
+ * 
+ * @author jkuhnert, PikeTec GmbH
+ *
+ */
 public class CleanUpTask {
 
   private static Map<Object, List<CleanUpTask>> registry = new HashMap<Object, List<CleanUpTask>>();
@@ -39,9 +45,9 @@ public class CleanUpTask {
 
   /**
    * @param project
-   *          , Tpt Project
+   *          Tpt Project
    * @param masterId
-   *          , Abstractbuild as unique Id
+   *          Abstractbuild as unique Id
    */
   public CleanUpTask(Project project, AbstractBuild masterId) {
     prj = project;
@@ -72,7 +78,7 @@ public class CleanUpTask {
    * 
    * @param task
    *          which is going to be added
-   * @param masterId,
+   * @param masterId
    *          to identify to which registry the task is going to be added
    */
   private static synchronized void register(CleanUpTask task, AbstractBuild masterId) {
@@ -87,7 +93,7 @@ public class CleanUpTask {
   /**
    * removes a list of CleanUpTask from the registry
    * 
-   * @param masterId,
+   * @param masterId
    *          to identify to which registry the task is going to be removed
    * @return true if it was possible to erase the tasks.
    */

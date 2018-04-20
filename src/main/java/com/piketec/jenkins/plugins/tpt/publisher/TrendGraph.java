@@ -75,6 +75,12 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   private ArrayList<ResultData> historyData;
 
+  /**
+   * Creates a new TrendGraph
+   * 
+   * @param project
+   *          The Jenkins project this Trendgraph belongs to.
+   */
   public TrendGraph(final AbstractProject< ? , ? > project) {
     this.historyData = new ArrayList<>();
     this.project = project;
@@ -169,10 +175,19 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     return "TPTtrendResults";
   }
 
+  /**
+   * @return The Jenkins project this Trendgraph belongs to
+   */
   public AbstractProject< ? , ? > getProject() {
     return project;
   }
 
+  /**
+   * Set the Jenkins project this Trendgraph belongs to
+   * 
+   * @param project
+   *          The Jenkins project this Trendgraph belongs to
+   */
   public void setProject(AbstractProject< ? , ? > project) {
     this.project = project;
   }
@@ -187,54 +202,124 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     this.run = run;
   }
 
+  /**
+   * @return The concrete run this trend graph belongs to
+   */
   public Run< ? , ? > getRun() {
     return run;
   }
 
+  /**
+   * Set the concrete run this trend graph belongs to
+   * 
+   * @param run
+   *          The concrete run this trend graph belongs to
+   */
   public void setRun(Run< ? , ? > run) {
     this.run = run;
   }
 
+  /**
+   * @return The number of failed builds of the jenkins project this trend graph belongs to
+   */
   public ArrayList<Integer> getFailedBuilds() {
     return failedBuilds;
   }
 
+  /**
+   * Set the number of failed builds of the jenkins project this trend graph belongs to
+   * 
+   * @param failedBuilds
+   *          The number of failed builds of the jenkins project this trend graph belongs to
+   */
   public void setFailedBuilds(ArrayList<Integer> failedBuilds) {
     this.failedBuilds = failedBuilds;
   }
 
+  /**
+   * @return The number of passed tests of the last build of the jenkins project this trend graph
+   *         belongs to.
+   */
   public int getPassed() {
     return passed;
   }
 
+  /**
+   * Set the number of passed tests of the last build of the jenkins project this trend graph
+   * belongs to.
+   * 
+   * @param passed
+   *          TThe number of passed tests of the last build of the jenkins project this trend graph
+   *          belongs to.
+   */
   public void setPassed(int passed) {
     this.passed = passed;
   }
 
+  /**
+   * @return The number of failed tests of the last build of the jenkins project this trend graph
+   *         belongs to.
+   */
   public int getFailed() {
     return failed;
   }
 
+  /**
+   * Set the number of failed tests of the last build of the jenkins project this trend graph
+   * belongs to.
+   * 
+   * @param failed
+   *          The number of failed tests of the last build of the jenkins project this trend graph
+   *          belongs to.
+   */
   public void setFailed(int failed) {
     this.failed = failed;
   }
 
+  /**
+   * @return The number of tests with execution error of the last build of the jenkins project this
+   *         trend graph belongs to.
+   */
   public int getError() {
     return error;
   }
 
+  /**
+   * Set the number of tests with execution error of the last build of the jenkins project this
+   * trend graph belongs to.
+   * 
+   * @param error
+   *          The number of tests with execution error of the last build of the jenkins project this
+   *          trend graph belongs to.
+   */
   public void setError(int error) {
     this.error = error;
   }
 
+  /**
+   * @return The number of inconclusive tests of the last build of the jenkins project this trend
+   *         graph belongs to.
+   */
   public int getInconclusive() {
     return inconclusive;
   }
 
+  /**
+   * Set the number of inconclusive tests of the last build of the jenkins project this trend graph
+   * belongs to.
+   * 
+   * @param inconclusive
+   *          Set the number of inconclusive tests of the last build of the jenkins project this
+   *          trend graph belongs to.
+   */
   public void setInconclusive(int inconclusive) {
     this.inconclusive = inconclusive;
   }
 
+  /**
+   * @return A List of Data containing the numer off passed, failed, inconcluive etc. TPT tests of
+   *         previous builds.
+   */
   public ArrayList<ResultData> getHistoryData() {
     return this.historyData;
   }
@@ -248,11 +333,17 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * This method is called everytime the page is refreshed. It regenerates the json file and
    * refreshes the graph.
    * 
+   * 
    * @param req
+   *          The request
    * @param rsp
+   *          The response
    * @throws IOException
+   *           if the response could not be generated
    * @throws ServletException
+   *           if the response could not be generated
    * @throws InterruptedException
+   *           if the job is cancelled
    */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException, InterruptedException {
@@ -280,7 +371,9 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * Generates the json file with the historyData.
    * 
    * @throws IOException
+   *           if files could not be created
    * @throws InterruptedException
+   *           if the job is cancelled
    */
   private void generateJson() throws IOException, InterruptedException {
     File oldIndexHTML = new File(Utils.getTptPluginRootDir(), "TrendGraph/index.html");
@@ -310,6 +403,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * Minor function from generateJson()
    * 
    * @param data
+   *          The data to create the graph from
    * @return
    */
   private static String getResultArray(ArrayList<ResultData> data) {
@@ -335,14 +429,23 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * Minor function from generateJson().
    * 
    * @param total
+   *          The total number of test cases
    * @param failed
+   *          The number of failed test cases
    * @param inconclusive
+   *          The number of inconclusive test cases
    * @param error
+   *          The number of test cases with execution errors
    * @param passed
+   *          the number of passed test cases
    * @param buildNummer
+   *          the build number of the Jenkins build
    * @param indent
+   *          indentation. Just for formating the json output
    * @param withComma
-   * @return
+   *          should the last line end with a comma
+   * @return The part of the json output containing the numbers of test cases foreach result and teh
+   *         build number
    */
   private static String getResultStruct(int total, int failed, int inconclusive, int error,
                                         int passed, int buildNummer, int indent,
@@ -376,18 +479,44 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     return getJSONIntEntry(name, value, indent, false);
   }
 
-  private static class ResultData {
+  /**
+   * Data container to collect numbers of test results of TPT test execuiton for build previous
+   * builds.
+   * 
+   * @author FInfantino, PikeTec GmbH
+   *
+   */
+  public static class ResultData {
 
+    /**
+     * The total number of TPT test cases
+     */
     public int total;
 
+    /**
+     * The number of TPT test cases with execution error
+     */
     public int error;
 
+    /**
+     * The number of failed TPT test cases
+     */
     public int failed;
 
+    /**
+     * The number of passed TPT test cases
+     * 
+     */
     public int passed;
 
+    /**
+     * The number of inconclusive TPT test cases
+     */
     public int inconclusive;
 
+    /**
+     * The number of the Jenkins build
+     */
     public int buildNummer;
   }
 

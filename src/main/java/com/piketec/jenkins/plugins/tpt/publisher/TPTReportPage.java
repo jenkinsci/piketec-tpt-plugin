@@ -38,15 +38,21 @@ import hudson.model.Result;
 import hudson.model.Run;
 import jenkins.model.RunAction2;
 
+/**
+ * A Page with a table of all executed TPT files and their configuration on top and a table with all
+ * failed test cases.
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
 public class TPTReportPage implements RunAction2, StaplerProxy {
 
   private AbstractBuild< ? , ? > build;
 
   private transient Run run;
 
-  private ArrayList<TPTTestCase> failedTests;
+  private List<TPTTestCase> failedTests;
 
-  private ArrayList<TPTFile> tptFiles;
+  private List<TPTFile> tptFiles;
 
   private int passedCount = 0;
 
@@ -64,6 +70,16 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
 
   private static final Color COLOR_BROWN = new Color(177, 7, 7);
 
+  /**
+   * Creates a new TPTRportPage
+   * 
+   * @param build
+   *          The Jnekins build
+   * @param failedTests
+   *          The list of failed test cases
+   * @param tptFiles
+   *          The List of TPT files
+   */
   public TPTReportPage(AbstractBuild< ? , ? > build, ArrayList<TPTTestCase> failedTests,
                        ArrayList<TPTFile> tptFiles) {
 
@@ -94,10 +110,19 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     return "TPT_Report";
   }
 
+  /**
+   * @return The Jenkins build
+   */
   public AbstractBuild< ? , ? > getBuild() {
     return build;
   }
 
+  /**
+   * Set the Jenkins build
+   * 
+   * @param build
+   *          The Jenkins build
+   */
   public void setBuild(AbstractBuild< ? , ? > build) {
     this.build = build;
   }
@@ -113,6 +138,9 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     this.run = run;
   }
 
+  /**
+   * @return The Jenkins run
+   */
   public Run getRun() {
     return run;
   }
@@ -122,62 +150,122 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     return this;
   }
 
-  public ArrayList<TPTFile> getTptFiles() {
+  /**
+   * @return The list of executed TPT files
+   */
+  public List<TPTFile> getTptFiles() {
     return tptFiles;
   }
 
-  public void setTptFiles(ArrayList<TPTFile> tptFiles) {
+  /**
+   * Set the list of executed TPT files
+   * 
+   * @param tptFiles
+   *          The list of executed TPT files
+   */
+  public void setTptFiles(List<TPTFile> tptFiles) {
     this.tptFiles = tptFiles;
   }
 
-  public ArrayList<TPTTestCase> getFailedTests() {
+  /**
+   * @return The list of failed test cases
+   */
+  public List<TPTTestCase> getFailedTests() {
     return failedTests;
   }
 
+  /**
+   * Set the list of failed test cases
+   * 
+   * @param failedTests
+   *          The list of failed test cases
+   */
   public void setFailedTests(ArrayList<TPTTestCase> failedTests) {
     this.failedTests = failedTests;
   }
 
+  /**
+   * @return The number of passed test cases
+   */
   public int getPassedCount() {
     return passedCount;
   }
 
+  /**
+   * Set the number of passed test cases
+   * 
+   * @param passedCount
+   *          The number of passed test cases
+   */
   public void setPassedCount(int passedCount) {
     this.passedCount = passedCount;
   }
 
+  /**
+   * @return The number of inconclusive test cases
+   */
   public int getInconclusiveCount() {
     return inconclusiveCount;
   }
 
+  /**
+   * Set the number of inconclusive test cases
+   * 
+   * @param inconclusiveCount
+   *          The number of inconclusive test cases
+   */
   public void setInconclusiveCount(int inconclusiveCount) {
     this.inconclusiveCount = inconclusiveCount;
   }
 
+  /**
+   * @return The number of test cases with execution error
+   */
   public int getErrorCount() {
     return errorCount;
   }
 
+  /**
+   * Set the number of test cases with execution error
+   * 
+   * @param errorCount
+   *          The number of test cases with execution error
+   */
   public void setErrorCount(int errorCount) {
     this.errorCount = errorCount;
   }
 
+  /**
+   * @return he number of failed test cases
+   */
   public int getFailedCount() {
     return failedCount;
   }
 
+  /**
+   * Set the number of failed test cases
+   * 
+   * @param failedCount
+   *          The number of failed test cases
+   */
   public void setFailedCount(int failedCount) {
     this.failedCount = failedCount;
   }
 
+  /**
+   * @return Has the user activated the "trust slaves and users" check box in the global Jenkins
+   *         configurations
+   */
   public boolean isTrustSlavesAndUsers() {
     return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
   }
 
   /**
-   * Used to calculate the actual number from the 'failed since' build, failed Since is always >=1
+   * Used to calculate the actual build number of the 'failed since' build, failed since is always
+   * &gt;=1
    * 
    * @param failedSince
+   *          The count of builds in the past that should have been unstable.
    * @return the actual number from the 'failed since' build
    */
   public int getNumberFromHistory(int failedSince) {
@@ -192,11 +280,13 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
   /**
    * Host images, HTML report and failed report
    * 
-   * @see http://stapler.kohsuke.org/reference.html
+   * @see "http://stapler.kohsuke.org/reference.html"
    * @param name
    *          string on the requested url
    * @param req
+   *          The request
    * @param rsp
+   *          The response
    * @return an new Action that is going to be host
    */
   public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
@@ -226,7 +316,7 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
    * 
    * @throws IOException
    */
-  public void createGraph() throws IOException {
+  void createGraph() throws IOException {
     List<com.piketec.jenkins.plugins.tpt.publisher.PieChart.Segment> list = new ArrayList<>();
     com.piketec.jenkins.plugins.tpt.publisher.PieChart.Segment passed =
         new PieChart.Segment("Passed", passedCount, COLOR_GREEN);

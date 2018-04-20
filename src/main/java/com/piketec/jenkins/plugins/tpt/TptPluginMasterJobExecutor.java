@@ -351,7 +351,7 @@ class TptPluginMasterJobExecutor {
       }
       int foundTestData = 0;
       if (enableJunit) {
-        foundTestData = Utils.publishResults(build.getWorkspace(), ec, testDataPath, jUnitXmlPath,
+        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), ec, testDataPath, jUnitXmlPath,
             jUnitLogLevel, logger);
       } else {
         try {
