@@ -27,7 +27,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
  * @author FInfantino, PikeTec GmbH
  *
  */
-class TPTTestCase {
+public class TPTTestCase {
 
   private String result;
 

@@ -20,7 +20,12 @@
  */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
-class TPTFile {
+/**
+ * Metainformation of a executed TPT file.
+ * 
+ * @author FInfantino, PikeTec GmbH
+ */
+public class TPTFile {
 
   private String fileName;
 
@@ -36,8 +41,6 @@ class TPTFile {
 
   private int total;
 
-  private String htmlPath;
-
   /**
    * Data container for each TPT File in order to organize all the TPT Files.
    * 
@@ -52,68 +55,81 @@ class TPTFile {
 
   }
 
+  /**
+   * @return The name of the TPT file
+   */
   public String getFileName() {
     return fileName;
   }
 
-  public void setFileName(String fileName) {
+  void setFileName(String fileName) {
     this.fileName = fileName;
   }
 
-  public int getPassed() {
-    return passed;
-  }
-
-  public void setPassed(int passed) {
-    this.passed = passed;
-  }
-
-  public int getInconclusive() {
-    return inconclusive;
-  }
-
-  public void setInconclusive(int inconclusive) {
-    this.inconclusive = inconclusive;
-  }
-
+  /**
+   * @return The name of the execution configuration
+   */
   public String getConfiguration() {
     return configuration;
   }
 
-  public void setConfiguration(String configuration) {
+  void setConfiguration(String configuration) {
     this.configuration = configuration;
   }
 
+  /**
+   * @return the number of passed tests
+   */
+  public int getPassed() {
+    return passed;
+  }
+
+  void setPassed(int passed) {
+    this.passed = passed;
+  }
+
+  /**
+   * @return @return the number of inconclusive tests
+   */
+  public int getInconclusive() {
+    return inconclusive;
+  }
+
+  void setInconclusive(int inconclusive) {
+    this.inconclusive = inconclusive;
+  }
+
+  /**
+   * @return the number of tests with execution errors
+   */
   public int getExecutionError() {
     return executionError;
   }
 
-  public void setExecutionError(int executionError) {
+  void setExecutionError(int executionError) {
     this.executionError = executionError;
   }
 
+  /**
+   * @return the number of failed tests
+   */
   public int getFailed() {
     return failed;
   }
 
-  public void setFailed(int failed) {
+  void setFailed(int failed) {
     this.failed = failed;
   }
 
+  /**
+   * @return the total number of tests
+   */
   public int getTotal() {
     return total;
   }
 
-  public void setTotal(int total) {
+  void setTotal(int total) {
     this.total = total;
-  }
-
-  public String getHtmlPath() {
-    return htmlPath;
-  }
-
-  public void setHtmlPath(String htmlPath) {
-    this.htmlPath = htmlPath;
   }
 
 }
