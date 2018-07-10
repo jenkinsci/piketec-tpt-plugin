@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -35,8 +36,8 @@ import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.xml.sax.SAXException;
 
+import com.piketec.jenkins.plugins.tpt.TPTBuildStepEntries;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
-import com.piketec.jenkins.plugins.tpt.TptPlugin;
 import com.piketec.jenkins.plugins.tpt.Utils;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
@@ -48,11 +49,9 @@ import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
-import hudson.model.Project;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Builder;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 
@@ -62,6 +61,8 @@ import hudson.tasks.Publisher;
  * @author FInfantino, PikeTec GmbH
  */
 public class TPTReportPublisher extends Notifier {
+
+  private static final String FILESEPARATOR = File.separator;
 
   /**
    * Creates a TPTReportPublisher
@@ -89,13 +90,23 @@ public class TPTReportPublisher extends Notifier {
     }
     TptLogger logger = new TptLogger(listener.getLogger());
     logger.info("Starting Post Build Action \"TPT Report\"");
+
+    TPTBuildStepEntries.cleanInvalidEntries();
+    List<JenkinsConfiguration> jenkinsConfigurationsToPublishForThisWorkspace =
+        TPTBuildStepEntries.getEntries(build);
+
+    if (jenkinsConfigurationsToPublishForThisWorkspace == null) {
+      logger.info("Nothing to publish");
+      // Vermute das ist nicht notwendif, da wir fragen oben, ob der result unstable oder besser ist
+      return false;
+    }
+
     ArrayList<FilePath> uniqueTestDataDir = new ArrayList<>();
     ArrayList<FilePath> uniqueReportDataDir = new ArrayList<>();
     ArrayList<TPTFile> tptFiles = new ArrayList<>();
     ArrayList<TPTTestCase> failedTests = new ArrayList<>();
-    FilePath workspace = build.getWorkspace();
-    Project< ? , ? > proj = (Project< ? , ? >)build.getProject();
     // global file in Build
+    FilePath workspace = build.getWorkspace();
     File piketectptDir = new File(build.getRootDir().getAbsolutePath() + "/Piketec-TPT");
     if (!piketectptDir.exists()) {
       if (!piketectptDir.mkdirs()) {
@@ -104,51 +115,48 @@ public class TPTReportPublisher extends Notifier {
       }
     }
 
-    for (Builder builder : proj.getBuilders()) {
-      if (builder instanceof TptPlugin) {
-        TptPlugin tptPlugin = (TptPlugin)builder;
-        for (JenkinsConfiguration cfg : tptPlugin.getExecutionConfiguration()) {
-          // make file in build und copy report dir
-          String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
-          File dir = new File(piketectptDir.getAbsolutePath() + "/" + tptFileName);
-          if (!dir.isDirectory()) {
-            if (!dir.mkdirs()) {
-              throw new IOException("Could not create directory \"" + dir.getAbsolutePath() + "\"");
-            }
-          }
-          File dirExConfig = new File(
-              piketectptDir.getAbsolutePath() + "/" + tptFileName + "/" + cfg.getConfiguration());
-          if (!dirExConfig.mkdirs()) {
-            throw new IOException(
-                "Could not create directory \"" + dirExConfig.getAbsolutePath() + "\"");
-          }
-          FilePath reportDir = new FilePath(workspace, Utils.getGeneratedReportDir(cfg));
-          FilePath testDataDir = new FilePath(workspace, Utils.getGeneratedTestDataDir(cfg));
-          if (reportDir.exists()) {
-            reportDir.copyRecursiveTo(new FilePath(dirExConfig));
-          }
-          FilePath reportXML = new FilePath(testDataDir, "test_summary.xml");
-          if (reportXML.exists()) {
-            TPTFile newTPTFile = new TPTFile(tptFileName, cfg.getConfiguration());
-            // get the remote path, then cut the path and get just what is needed (the last part),
-            // see getLinkToFailedReport() in TPTReportSAXHandler.
-            parse(reportXML, newTPTFile, failedTests, reportDir.getRemote(), cfg.getConfiguration(),
-                logger);
-            tptFiles.add(newTPTFile);
-          } else {
-            throw new IOException("There is no test_summary.xml in Computer \""
-                + Computer.currentComputer().getName() + "\" in \"" + reportXML.getRemote() + "\"");
-          }
-          // Check if the Testdata dir and the Report are unique, otherwise throw an exception
-          if (uniqueReportDataDir.contains(reportDir) || uniqueTestDataDir.contains(testDataDir)) {
-            throw new IOException("The directory \"" + cfg.getReportDir() + "\" or the directoy \""
-                + cfg.getTestdataDir() + "\" is already used, please choose another one");
-          }
-          uniqueReportDataDir.add(reportDir);
-          uniqueTestDataDir.add(testDataDir);
+    for (JenkinsConfiguration cfg : jenkinsConfigurationsToPublishForThisWorkspace) {
+      // make file in build und copy report dir
+      String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
+      File dir = new File(piketectptDir.getAbsolutePath() + "/" + tptFileName);
+      if (!dir.isDirectory()) {
+        if (!dir.mkdirs()) {
+          throw new IOException("Could not create directory \"" + dir.getAbsolutePath() + "\"");
         }
       }
+      File dirExConfig = new File(piketectptDir.getAbsolutePath() + FILESEPARATOR + tptFileName
+          + FILESEPARATOR + cfg.getConfiguration());
+      if (!dirExConfig.mkdirs()) {
+        throw new IOException(
+            "Could not create directory \"" + dirExConfig.getAbsolutePath() + "\"");
+      }
+      FilePath reportDir = new FilePath(workspace, Utils.getGeneratedReportDir(cfg));
+      FilePath testDataDir = new FilePath(workspace, Utils.getGeneratedTestDataDir(cfg));
+      if (reportDir.exists()) {
+        reportDir.copyRecursiveTo(new FilePath(dirExConfig));
+      }
+      FilePath reportXML = new FilePath(testDataDir, "test_summary.xml");
+      if (reportXML.exists()) {
+        TPTFile newTPTFile = new TPTFile(tptFileName, cfg.getConfiguration());
+        // get the remote path, then cut the path and get just what is needed (the last part),
+        // see getLinkToFailedReport() in TPTReportSAXHandler.
+        parse(reportXML, newTPTFile, failedTests, reportDir.getRemote(), cfg.getConfiguration(),
+            logger);
+        tptFiles.add(newTPTFile);
+      } else {
+        throw new IOException("There is no test_summary.xml in Computer \""
+            + Computer.currentComputer().getName() + "\" in \"" + reportXML.getRemote() + "\"");
+      }
+      // Check if the Testdata dir and the Report are unique, otherwise throw an exception
+      if (uniqueReportDataDir.contains(reportDir) || uniqueTestDataDir.contains(testDataDir)) {
+        throw new IOException("The directory \"" + cfg.getReportDir() + "\" or the directoy \""
+            + cfg.getTestdataDir() + "\" is already used, please choose another one");
+      }
+      uniqueReportDataDir.add(reportDir);
+      uniqueTestDataDir.add(testDataDir);
     }
+
+    TPTBuildStepEntries.clearEntries(build);
 
     // Failed Since. Look up test in previous build. If failed there. extract failed since
     // information and add 1

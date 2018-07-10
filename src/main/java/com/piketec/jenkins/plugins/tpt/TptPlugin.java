@@ -302,12 +302,18 @@ public class TptPlugin extends Builder {
     for (JenkinsConfiguration ec : executionConfiguration) {
       normalizedConfigs.add(ec.replaceAndNormalize(environment));
     }
+    boolean succesfullyBuild;
     if (isTptMaster) {
-      return performAsMaster(build, launcher, listener, environment, normalizedConfigs);
+      succesfullyBuild = performAsMaster(build, launcher, listener, environment, normalizedConfigs);
     } else {
-      return performWithoutSlaves(build, launcher, listener, environment, normalizedConfigs);
+      succesfullyBuild =
+          performWithoutSlaves(build, launcher, listener, environment, normalizedConfigs);
     }
-
+    if (succesfullyBuild) {
+      TPTBuildStepEntries.addEntry(normalizedConfigs, build);
+      return true;
+    }
+    return false;
   }
 
   /**
