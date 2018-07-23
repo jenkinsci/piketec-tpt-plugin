@@ -100,7 +100,8 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    * @return The path to the html file
    */
   public String path() {
-    return build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name + "\\" + exeConfig;
+    return build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator
+        + name + File.separator + exeConfig;
   }
 
   /**
@@ -119,7 +120,7 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
 
-    File f = new File(path() + "\\index.html");
+    File f = new File(path() + File.separator + "index.html");
     FileUtils.touch(f); // refresh the index if security changed
     // this displays the "index.html" in the given path
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(new File(path())),

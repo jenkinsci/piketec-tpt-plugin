@@ -110,12 +110,13 @@ class PieChart {
     if (jenkinsInstance == null) {
       throw new IOException("No Jenkins instance found.");
     }
-    pieShadow = new ImageIcon(
-        new File(jenkinsInstance.getRootDir(), "\\plugins\\piketec-tpt\\PieChart\\Shadow.png")
+    pieShadow = new ImageIcon(new File(jenkinsInstance.getRootDir(), File.separator + "plugins"
+        + File.separator + "piketec-tpt" + File.separator + "PieChart" + File.separator + "Shadow.png")
             .toURI().toURL());
     keyShadow = new ImageIcon(
-        new File(jenkinsInstance.getRootDir(), "\\plugins\\piketec-tpt\\PieChart\\Shadow2.png")
-            .toURI().toURL());
+        new File(jenkinsInstance.getRootDir(), File.separator + "plugins" + File.separator
+            + "piketec-tpt" + File.separator + "PieChart" + File.separator + "Shadow2.png").toURI()
+                .toURL());
   }
 
   public PieChart(List<Segment> segments, @Nullable int[] legendSegmentOrder, int fractionalDigits,
