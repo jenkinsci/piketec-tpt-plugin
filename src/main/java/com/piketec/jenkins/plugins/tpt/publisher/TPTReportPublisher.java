@@ -62,8 +62,6 @@ import hudson.tasks.Publisher;
  */
 public class TPTReportPublisher extends Notifier {
 
-  private static final String FILESEPARATOR = File.separator;
-
   /**
    * Creates a TPTReportPublisher
    */
@@ -107,7 +105,8 @@ public class TPTReportPublisher extends Notifier {
     ArrayList<TPTTestCase> failedTests = new ArrayList<>();
     // global file in Build
     FilePath workspace = build.getWorkspace();
-    File piketectptDir = new File(build.getRootDir().getAbsolutePath() + "/Piketec-TPT");
+    File piketectptDir =
+        new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT");
     if (!piketectptDir.exists()) {
       if (!piketectptDir.mkdirs()) {
         throw new IOException(
@@ -118,14 +117,14 @@ public class TPTReportPublisher extends Notifier {
     for (JenkinsConfiguration cfg : jenkinsConfigurationsToPublishForThisWorkspace) {
       // make file in build und copy report dir
       String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
-      File dir = new File(piketectptDir.getAbsolutePath() + "/" + tptFileName);
+      File dir = new File(piketectptDir.getAbsolutePath() + File.separator + tptFileName);
       if (!dir.isDirectory()) {
         if (!dir.mkdirs()) {
           throw new IOException("Could not create directory \"" + dir.getAbsolutePath() + "\"");
         }
       }
-      File dirExConfig = new File(piketectptDir.getAbsolutePath() + FILESEPARATOR + tptFileName
-          + FILESEPARATOR + cfg.getConfiguration());
+      File dirExConfig = new File(piketectptDir.getAbsolutePath() + File.separator + tptFileName
+          + File.separator + cfg.getConfiguration());
       if (!dirExConfig.mkdirs()) {
         throw new IOException(
             "Could not create directory \"" + dirExConfig.getAbsolutePath() + "\"");

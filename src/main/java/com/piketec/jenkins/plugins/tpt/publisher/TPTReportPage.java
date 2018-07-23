@@ -331,8 +331,8 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     list.add(error);
     list.add(failed);
     PieChart pieChart = new PieChart(list, 0, true);
-    File output =
-        new File(build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\Images\\pieChart.png");
+    File output = new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT"
+        + File.separator + "Images" + File.separator + "pieChart.png");
     BufferedImage image = pieChart.render(150);
     if (!output.exists() && !output.mkdirs()) {
       throw new IOException("Could not create directory " + output.getAbsolutePath());

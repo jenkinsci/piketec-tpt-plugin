@@ -134,17 +134,19 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
 
-    File indexFromFile = new File(build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name
-        + "\\" + executionConfiguration + "\\index.html");
+    File indexFromFile = new File(
+        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator + name
+            + File.separator + executionConfiguration + File.separator + "index.html");
     String indexFromFileAsString = FileUtils.readFileToString(indexFromFile);
     String failedHtmlAsString = indexFromFileAsString.replace("overview.html", reportFile);
-    File failedHTML = new File(build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name
-        + "\\" + executionConfiguration + "\\failedTest.html");
+    File failedHTML = new File(
+        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator + name
+            + File.separator + executionConfiguration + File.separator + "failedTest.html");
 
     FileUtils.writeStringToFile(failedHTML, failedHtmlAsString);
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
-        new FilePath(new File(build.getRootDir().getAbsolutePath() + "\\Piketec-TPT\\" + name + "\\"
-            + executionConfiguration)),
+        new FilePath(new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT"
+            + File.separator + name + File.separator + executionConfiguration)),
         "TPT Report", "clipboard.png", false);
 
     if (req.getRestOfPath().equals("")) {

@@ -358,8 +358,8 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     generateJson();
     File buildDir = actualBuild.getRootDir();
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
-        new FilePath(new File(buildDir.getAbsolutePath() + "\\TrendGraph")), "TPT Report",
-        "/plugin/piketec-tpt/tpt.ico", false);
+        new FilePath(new File(buildDir.getAbsolutePath() + File.separator + "TrendGraph")),
+        "TPT Report", "/plugin/piketec-tpt/tpt.ico", false);
 
     if (req.getRestOfPath().equals("")) {
       throw HttpResponses.forwardToView(this, "index.jelly");
@@ -376,12 +376,13 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    *           if the job is cancelled
    */
   private void generateJson() throws IOException, InterruptedException {
-    File oldIndexHTML = new File(Utils.getTptPluginRootDir(), "TrendGraph/index.html");
-    File utilsJs = new File(Utils.getTptPluginRootDir(), "TrendGraph/utils.js");
+    File oldIndexHTML =
+        new File(Utils.getTptPluginRootDir(), "TrendGraph" + File.separator + "index.html");
+    File utilsJs = new File(Utils.getTptPluginRootDir(), "TrendGraph" + File.separator + "utils.js");
 
     File buildDir = actualBuild.getRootDir();
 
-    File trendGraph = new File(buildDir.getAbsolutePath() + "\\TrendGraph");
+    File trendGraph = new File(buildDir.getAbsolutePath() + File.separator + "TrendGraph");
 
     if (!trendGraph.isDirectory() && !trendGraph.mkdirs()) {
       throw new IOException("Could not create directory \"" + trendGraph.getAbsolutePath() + "\"");
@@ -394,7 +395,8 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     String jsonScript = getResultArray(historyData);
     String newIndexHTMLWithJson = FileUtils.readFileToString(oldIndexHTML);
     newIndexHTMLWithJson = newIndexHTMLWithJson.replace("toReplace", jsonScript);
-    File newIndexHTML = new File(buildDir.getAbsolutePath() + "\\TrendGraph\\index.html");
+    File newIndexHTML = new File(
+        buildDir.getAbsolutePath() + File.separator + "TrendGraph" + File.separator + "index.html");
     FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson);
 
   }

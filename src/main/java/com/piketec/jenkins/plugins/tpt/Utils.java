@@ -147,8 +147,8 @@ public class Utils {
    */
   public static String getGeneratedTestDataDir(JenkinsConfiguration ec) {
     if (ec.getTestdataDir() == null || ec.getTestdataDir().trim().isEmpty()) {
-      return "Piketec/" + FilenameUtils.getBaseName(ec.getTptFile()) + "/" + ec.getConfiguration()
-          + "/testdata";
+      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile()) + File.separator
+          + ec.getConfiguration() + File.separator + "testdata";
     } else {
       return ec.getTestdataDir();
     }
@@ -165,8 +165,8 @@ public class Utils {
    */
   public static String getGeneratedReportDir(JenkinsConfiguration ec) {
     if (ec.getReportDir() == null || ec.getReportDir().trim().isEmpty()) {
-      return "Piketec/" + FilenameUtils.getBaseName(ec.getTptFile()) + "/" + ec.getConfiguration()
-          + "/report";
+      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile()) + File.separator
+          + ec.getConfiguration() + File.separator + "report";
     } else {
       return ec.getReportDir();
     }
@@ -183,7 +183,7 @@ public class Utils {
     if (jenkinsInstance == null) {
       throw new IOException("No Jenkins instance found.");
     }
-    return new File(jenkinsInstance.getRootDir(), "plugins\\piketec-tpt");
+    return new File(jenkinsInstance.getRootDir(), "plugins" + File.separator + "piketec-tpt");
   }
 
   /**
