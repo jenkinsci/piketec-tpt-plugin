@@ -155,8 +155,6 @@ public class TPTReportPublisher extends Notifier {
       uniqueTestDataDir.add(testDataDir);
     }
 
-    TPTBuildStepEntries.clearEntries(build);
-
     // Failed Since. Look up test in previous build. If failed there. extract failed since
     // information and add 1
     AbstractBuild lastSuccBuild = (AbstractBuild)build.getPreviousNotFailedBuild();

@@ -7,8 +7,12 @@ import java.util.Map;
 
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.Extension;
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.model.listeners.RunListener;
 
 public class TPTBuildStepEntries {
 
@@ -23,12 +27,6 @@ public class TPTBuildStepEntries {
     }
     currentEntriesForWorkspace.addAll(configs);
     entries.put(build, currentEntriesForWorkspace);
-  }
-
-  public static void clearEntries(AbstractBuild< ? , ? > build) {
-    if (entries.get(build) != null) {
-      entries.remove(build);
-    }
   }
 
   public static void cleanInvalidEntries() {
@@ -46,6 +44,17 @@ public class TPTBuildStepEntries {
 
   public static List<JenkinsConfiguration> getEntries(AbstractBuild< ? , ? > build) {
     return entries.get(build);
+  }
+
+  @Extension
+  public static class RunListenerImpl extends RunListener<Run> {
+
+    @Override
+    public void onCompleted(Run r, TaskListener listener) {
+      if (r instanceof AbstractBuild< ? , ? > && entries.containsKey(r)) {
+        entries.remove(r);
+      }
+    }
   }
 
 }
