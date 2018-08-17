@@ -307,7 +307,6 @@ public class TptPlugin extends Builder {
     } else {
       return performWithoutSlaves(build, launcher, listener, environment, normalizedConfigs);
     }
-
   }
 
   /**

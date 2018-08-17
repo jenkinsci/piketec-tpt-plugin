@@ -147,8 +147,8 @@ public class Utils {
    */
   public static String getGeneratedTestDataDir(JenkinsConfiguration ec) {
     if (ec.getTestdataDir() == null || ec.getTestdataDir().trim().isEmpty()) {
-      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile()) + File.separator
-          + ec.getConfiguration() + File.separator + "testdata";
+      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile())
+          + File.separator + ec.getConfiguration() + File.separator + "testdata";
     } else {
       return ec.getTestdataDir();
     }
@@ -165,8 +165,8 @@ public class Utils {
    */
   public static String getGeneratedReportDir(JenkinsConfiguration ec) {
     if (ec.getReportDir() == null || ec.getReportDir().trim().isEmpty()) {
-      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile()) + File.separator
-          + ec.getConfiguration() + File.separator + "report";
+      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile())
+          + File.separator + ec.getConfiguration() + File.separator + "report";
     } else {
       return ec.getReportDir();
     }
@@ -338,15 +338,11 @@ public class Utils {
       throws IOException, InterruptedException {
     FilePath reportPath = ((jUnitXml == null) || jUnitXml.trim().isEmpty()) ? workspace
         : new FilePath(workspace, jUnitXml);
-    try {
+    if (!reportPath.isDirectory()) {
+      reportPath.mkdirs();
       if (!reportPath.isDirectory()) {
-        reportPath.mkdirs();
-        if (!reportPath.isDirectory()) {
-          throw new IOException("Could not create report directory \"" + reportPath + "\"");
-        }
+        throw new IOException("Could not create report directory \"" + reportPath + "\"");
       }
-    } catch (InterruptedException ie) {
-      throw new IOException("Failed to get the directory: " + reportPath, ie);
     }
     return Publish.publishJUnitResults(jenkinsConfiguration, testDataDir, reportPath, logger,
         jUnitLogLevel);
