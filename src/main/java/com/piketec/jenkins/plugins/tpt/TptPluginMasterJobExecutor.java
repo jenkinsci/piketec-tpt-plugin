@@ -246,7 +246,8 @@ class TptPluginMasterJobExecutor {
     }
     // check if found test cases to execute
     if (testCases == null || testCases.isEmpty()) {
-      logger.error("No test cases are found to execute.");
+      logger.error(
+          "No test cases are found to execute. It is possible that \"selected Test Cases \" is configured as test set. If so please change it to another existing test set");
       return false;
     }
     ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
@@ -351,8 +352,8 @@ class TptPluginMasterJobExecutor {
       }
       int foundTestData = 0;
       if (enableJunit) {
-        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), ec, testDataPath, jUnitXmlPath,
-            jUnitLogLevel, logger);
+        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), ec, testDataPath,
+            jUnitXmlPath, jUnitLogLevel, logger);
       } else {
         try {
           foundTestData = Publish.getTestcases(testDataPath, logger).size();
@@ -375,6 +376,7 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not publish result: " + e.getMessage());
       return false;
     }
+    TPTBuildStepEntries.addEntry(ec, build);
     return true;
   }
 
@@ -438,6 +440,10 @@ class TptPluginMasterJobExecutor {
       throws RemoteException, ApiException {
     HashSet<String> result = new HashSet<String>();
     for (ExecutionConfigurationItem item : config.getItems()) {
+      if (item.getTestSet() == null || item.getTestSet().getTestCases() == null
+          || item.getTestSet().getTestCases().getItems() == null) {
+        return null;
+      }
       for (Scenario testcase : item.getTestSet().getTestCases().getItems()) {
         result.add(testcase.getName());
       }

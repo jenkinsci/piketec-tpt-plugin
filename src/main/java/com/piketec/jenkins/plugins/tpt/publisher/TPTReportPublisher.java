@@ -48,7 +48,6 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
-import hudson.model.Computer;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -82,20 +81,14 @@ public class TPTReportPublisher extends Notifier {
                          final Launcher launcher, final BuildListener listener)
       throws IOException, InterruptedException {
 
-    Result result = build.getResult();
-    if (result == null || result.isWorseThan(Result.UNSTABLE)) {
-      return false;
-    }
     TptLogger logger = new TptLogger(listener.getLogger());
     logger.info("Starting Post Build Action \"TPT Report\"");
 
-    TPTBuildStepEntries.cleanInvalidEntries();
     List<JenkinsConfiguration> jenkinsConfigurationsToPublishForThisWorkspace =
         TPTBuildStepEntries.getEntries(build);
 
     if (jenkinsConfigurationsToPublishForThisWorkspace == null) {
       logger.info("Nothing to publish");
-      // Vermute das ist nicht notwendif, da wir fragen oben, ob der result unstable oder besser ist
       return false;
     }
 
@@ -143,8 +136,9 @@ public class TPTReportPublisher extends Notifier {
             logger);
         tptFiles.add(newTPTFile);
       } else {
-        throw new IOException("There is no test_summary.xml in Computer \""
-            + Computer.currentComputer().getName() + "\" in \"" + reportXML.getRemote() + "\"");
+        logger.error("There is no test_summary.xml for the file \"" + tptFileName
+            + "\".It won't be published ");
+        continue;
       }
       // Check if the Testdata dir and the Report are unique, otherwise throw an exception
       if (uniqueReportDataDir.contains(reportDir) || uniqueTestDataDir.contains(testDataDir)) {

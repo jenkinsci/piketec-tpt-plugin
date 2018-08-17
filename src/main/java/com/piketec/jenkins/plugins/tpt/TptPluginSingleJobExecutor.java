@@ -149,7 +149,12 @@ class TptPluginSingleJobExecutor {
               reportPath.getRemote(), configurationName, tesSet);
           try {
             // run the test...
-            success &= launchTPT(launcher, listener, cmd, ec.getTimeout());
+            boolean successOnlyForOneConfig;
+            successOnlyForOneConfig = launchTPT(launcher, listener, cmd, ec.getTimeout());
+            success &= successOnlyForOneConfig;
+            if (successOnlyForOneConfig) {
+              TPTBuildStepEntries.addEntry(ec, build);
+            }
             if (enableJunit) {
               // transform TPT results into JUnit results
               logger.info("*** Publishing results now ***");
