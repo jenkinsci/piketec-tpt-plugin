@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
@@ -236,7 +238,7 @@ class TptPluginSlaveExecutor {
       List<TestSet> newTestSets = new ArrayList<>();
       List<ExecutionConfigurationItem> deactivated = new ArrayList<>();
       int i = 0;
-      if (testSetName.equals("")) {
+      if (StringUtils.isEmpty(testSetName)) {
         for (ExecutionConfigurationItem item : config.getItems()) {
           oldTestSets.add(item.getTestSet());
           if (item.isActive()) {

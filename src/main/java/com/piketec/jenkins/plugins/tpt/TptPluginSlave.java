@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import hudson.EnvVars;
@@ -168,7 +169,12 @@ public class TptPluginSlave extends Builder {
       expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
     }
 
-    WorkLoad workloadToDo = WorkLoad.pollWorkload(build.getProject().getName());
+    String jobName = build.getProject().getName();
+    WorkLoad workloadToDo = WorkLoad.pollWorkload(jobName);
+    if (workloadToDo == null) {
+      logger.error("Nothing todo. No work package for \"" + jobName + "\" enqueued.");
+      return false;
+    }
 
     String fileNameFromWorkload = workloadToDo.getFileName();
     String exeConfigFromWorkload = workloadToDo.getExeConfig();
@@ -184,7 +190,7 @@ public class TptPluginSlave extends Builder {
     logger.info("Test Data directory :     " + testDataDirFromWorload);
     logger.info("Report directory :        " + reportDirFromWorkload);
     logger.info("Test Cases :              " + testCasesFromWorkload);
-    if (!testSetFromWorkload.equals("")) {
+    if (StringUtils.isNotEmpty(testSetFromWorkload)) {
       logger.info("Test Set :                " + testSetFromWorkload);
     }
 
@@ -193,7 +199,12 @@ public class TptPluginSlave extends Builder {
         exeConfigFromWorkload, testDataDirFromWorload, reportDirFromWorkload, testCasesFromWorkload,
         expandedTptStartupWaitTime, masterId, testSetFromWorkload, masterWorkspace);
 
-    return executor.execute();
+    boolean result = executor.execute();
+    if (!result) {
+      // reenqueue for new try if job is configured to try multiple times
+      WorkLoad.putWorkLoad(jobName, workloadToDo);
+    }
+    return result;
   }
 
   @Override

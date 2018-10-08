@@ -157,11 +157,11 @@ public class WorkLoad {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
     if (queue == null) {
       queue = new LinkedList<>();
-      if (!queue.contains(workloadToAdd)) {
-        workloads.put(jobName, queue);
-      }
+      workloads.put(jobName, queue);
     }
-    queue.offer(workloadToAdd);
+    if (!queue.contains(workloadToAdd)) {
+      queue.offer(workloadToAdd);
+    }
   }
 
   /**

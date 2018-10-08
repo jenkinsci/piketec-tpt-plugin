@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
@@ -228,7 +230,7 @@ class TptPluginSingleJobExecutor {
     if (!configurationName.endsWith("\"")) {
       cmd.append('"');
     }
-    if (!testSet.equals("")) {
+    if (StringUtils.isNotEmpty(testSet)) {
       cmd.append(" --testSet ");
       // surround path with ""
       if (!testSet.startsWith("\"")) {

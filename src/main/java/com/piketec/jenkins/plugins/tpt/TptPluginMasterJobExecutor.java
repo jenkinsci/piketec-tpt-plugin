@@ -201,8 +201,9 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not create or clear directories on master: " + e.getMessage());
       return false;
     }
+    OpenResult openProject;
     try {
-      OpenResult openProject = api.openProject(new File(ec.getTptFile()));
+      openProject = api.openProject(new File(ec.getTptFile()));
       if (openProject.getProject() == null) {
         logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
         return false;
@@ -214,7 +215,7 @@ class TptPluginMasterJobExecutor {
         logger.error("Could not find config");
         return false;
       }
-      if (!ec.getTestSet().equals("")) {
+      if (StringUtils.isNotEmpty(ec.getTestSet())) {
         boolean testSetFound = false;
         for (TestSet definedTestset : openProject.getProject().getTestSets().getItems()) {
           if (definedTestset.getName().equals(ec.getTestSet())) {
@@ -312,8 +313,7 @@ class TptPluginMasterJobExecutor {
       executionConfig.setReportDir(new File(reportPath.getRemote()));
       // set explicit defined test set for all items
       ArrayList<TestSet> oldTestSets = new ArrayList<>();
-      if (!ec.getTestSet().equals("")) {
-        OpenResult openProject = api.openProject(new File(ec.getTptFile()));
+      if (StringUtils.isNotEmpty(ec.getTestSet())) {
         RemoteCollection<TestSet> allTestSets = openProject.getProject().getTestSets();
         TestSet newTestSet = null;
         for (TestSet t : allTestSets.getItems()) {
@@ -343,7 +343,7 @@ class TptPluginMasterJobExecutor {
       executionConfig.setDataDir(oldTestDataFile);
       executionConfig.setReportDir(oldReportDir);
       // reset test sets to old values
-      if (!ec.getTestSet().equals("")) {
+      if (StringUtils.isNotEmpty(ec.getTestSet())) {
         for (ExecutionConfigurationItem item : executionConfig.getItems()) {
           item.setTestSet(oldTestSets.remove(0));
         }
