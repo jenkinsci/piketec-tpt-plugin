@@ -23,6 +23,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,6 +56,8 @@ class TPTReportSAXHandler extends DefaultHandler {
   // Key Result , Value how many of these
   private Map<String, Integer> resultCount;
 
+  private boolean isFileCorrupt;
+
   /**
    * This class is an XML Parser for parsing the "test_summary.xml" and extract all the relevant
    * data from it.
@@ -67,13 +70,16 @@ class TPTReportSAXHandler extends DefaultHandler {
    *          The report directory. Needed to resolve paths to report files
    * @param executionConfiguration
    *          The name of the execution configuration
+   * @param isFileCorrupt
    */
   public TPTReportSAXHandler(TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
-                             String reportDirOnRemote, String executionConfiguration) {
+                             String reportDirOnRemote, String executionConfiguration,
+                             boolean isFileCorrupt) {
     this.reportDir = reportDirOnRemote;
     this.tptFile = tptFile;
     this.failedTests = failedTests;
     this.executionConfiguration = executionConfiguration;
+    this.isFileCorrupt = isFileCorrupt;
     nameAndId = new HashMap<>();
     resultCount = new HashMap<>();
     // Adding the start values
@@ -90,6 +96,25 @@ class TPTReportSAXHandler extends DefaultHandler {
       String id = attributes.getValue("Id");
       String name = attributes.getValue("Name");
       nameAndId.put(id, name);
+      // If the file is corrupt, then we are goint to set the test case to Error and add it to the
+      // failed tests and fill the other parameters with default values. This is for the publisher.
+      // If the file is corrupt, than we do not have a testsummary tag, so we are filling the things
+      // here.
+      if (isFileCorrupt) {
+        int currentResultValue = resultCount.get("ERROR") + 1;
+        resultCount.put("ERROR", currentResultValue);
+        TPTTestCase t = new TPTTestCase();
+        t.setId(id);
+        t.setExecutionDate(new Date().toString());
+        t.setResult("ERROR");
+        t.setFileName(tptFile.getFileName());
+        t.setPlatform("Corrupted Platform");
+        t.setReportFile("Corrupted File");
+        t.setExecutionConfiguration(this.executionConfiguration);
+        t.setTestCaseName(name);
+        failedTests.add(t);
+        setResultsToTPTFile();
+      }
     }
     // setFailedTests
     if (TESTCASEINFORMATION.equalsIgnoreCase(qName)) {
@@ -113,19 +138,22 @@ class TPTReportSAXHandler extends DefaultHandler {
         t.setTestCaseName(nameAndId.get(id));
         failedTests.add(t);
       }
-
       // set the result
-      int error = resultCount.get("ERROR");
-      int failed = resultCount.get("FAILED");
-      int inconclusive = resultCount.get("INCONCLUSIVE");
-      int passed = resultCount.get("PASSED");
-      int total = error + failed + inconclusive + passed;
-      tptFile.setExecutionError(error);
-      tptFile.setFailed(failed);
-      tptFile.setInconclusive(inconclusive);
-      tptFile.setPassed(passed);
-      tptFile.setTotal(total);
+      setResultsToTPTFile();
     }
+  }
+
+  private void setResultsToTPTFile() {
+    int error = resultCount.get("ERROR");
+    int failed = resultCount.get("FAILED");
+    int inconclusive = resultCount.get("INCONCLUSIVE");
+    int passed = resultCount.get("PASSED");
+    int total = error + failed + inconclusive + passed;
+    tptFile.setExecutionError(error);
+    tptFile.setFailed(failed);
+    tptFile.setInconclusive(inconclusive);
+    tptFile.setPassed(passed);
+    tptFile.setTotal(total);
   }
 
   private String getPlatformName(String reportFile) {

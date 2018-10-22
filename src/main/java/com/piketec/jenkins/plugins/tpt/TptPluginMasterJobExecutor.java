@@ -160,6 +160,17 @@ class TptPluginMasterJobExecutor {
       if (api == null) {
         return false;
       }
+      // Wir loeschen die JUnit Daten bevor die iteration ueber die jenkinsConfigs
+      if (!StringUtils.isBlank(jUnitXmlPath)) {
+        FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
+        logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
+        try {
+          path.mkdirs();
+          path.deleteContents();
+        } catch (IOException e) {
+          logger.error("Could not create and/or clear JUnit XML directory " + path.getRemote());
+        }
+      }
       for (JenkinsConfiguration ec : executionConfigs) {
         success &= executeOneConfig(ec, api);
       }
@@ -195,12 +206,6 @@ class TptPluginMasterJobExecutor {
       logger.info("Create and/or clean report directory \"" + reportPath.getRemote() + "\"");
       reportPath.mkdirs();
       reportPath.deleteContents();
-      if (!StringUtils.isBlank(jUnitXmlPath)) {
-        FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
-        logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
-        path.mkdirs();
-        path.deleteContents();
-      }
     } catch (IOException e) {
       logger.error("Could not create or clear directories on master: " + e.getMessage());
       return false;
