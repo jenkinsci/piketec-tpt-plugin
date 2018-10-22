@@ -23,8 +23,11 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +39,7 @@ import org.apache.commons.io.IOUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.xml.sax.SAXException;
 
+import com.piketec.jenkins.plugins.tpt.Publish;
 import com.piketec.jenkins.plugins.tpt.TPTBuildStepEntries;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
@@ -132,8 +136,11 @@ public class TPTReportPublisher extends Notifier {
         TPTFile newTPTFile = new TPTFile(tptFileName, cfg.getConfiguration());
         // get the remote path, then cut the path and get just what is needed (the last part),
         // see getLinkToFailedReport() in TPTReportSAXHandler.
+        // Because of the GenerateOverviewReport bug, we should check if there are
+        // testcase_information.xml, if there are not any of them, pass a flag to the parser.
+        boolean isFileCorrupt = checkForTestCaseInformation(testDataDir);
         parse(reportXML, newTPTFile, failedTests, reportDir.getRemote(), cfg.getConfiguration(),
-            logger);
+            logger, isFileCorrupt);
         tptFiles.add(newTPTFile);
       } else {
         logger.error("There is no test_summary.xml for the file \"" + tptFileName
@@ -182,6 +189,22 @@ public class TPTReportPublisher extends Notifier {
     return true;
   }
 
+  private boolean checkForTestCaseInformation(FilePath testDataDir)
+      throws IOException, InterruptedException {
+    Collection<FilePath> files = new HashSet<FilePath>();
+    Publish.find(testDataDir, "testcase_information.xml", files);
+    boolean containsTestcaseInformation = false;
+    FilePath summaryXMl = new FilePath(testDataDir, "test_summary.xml");
+    if (summaryXMl.exists()) {
+      InputStream inputStream = summaryXMl.read();
+      String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+      containsTestcaseInformation = result.contains("TestcaseInformation");
+    }
+    // File is only corrupt, when there arent any testcase_information and it does not contain any
+    // testcaseinformation tag.
+    return files.size() == 0 && !containsTestcaseInformation;
+  }
+
   /**
    * Xml SAXparser
    * 
@@ -190,17 +213,19 @@ public class TPTReportPublisher extends Notifier {
    * @param failedTests
    * @param reportDirOnRemote
    * @param executionConfiguration
+   * @param isFileCorrupt
    * @throws InterruptedException
    */
   private void parse(FilePath xmlFile, TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
-                     String reportDirOnRemote, String executionConfiguration, TptLogger logger)
+                     String reportDirOnRemote, String executionConfiguration, TptLogger logger,
+                     boolean isFileCorrupt)
       throws InterruptedException {
     SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
     try {
       SAXParser saxParser = saxParserFactory.newSAXParser();
-      TPTReportSAXHandler handler =
-          new TPTReportSAXHandler(tptFile, failedTests, reportDirOnRemote, executionConfiguration);
+      TPTReportSAXHandler handler = new TPTReportSAXHandler(tptFile, failedTests, reportDirOnRemote,
+          executionConfiguration, isFileCorrupt);
       InputStream inputStream = xmlFile.read();
       try {
         saxParser.parse(inputStream, handler);

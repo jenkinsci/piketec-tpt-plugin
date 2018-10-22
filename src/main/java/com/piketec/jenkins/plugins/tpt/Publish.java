@@ -127,17 +127,25 @@ public final class Publish {
     Collection<FilePath> files = new HashSet<FilePath>();
     find(testDataDir, "testcase_information.xml", files);
     List<Testcase> testcases = new ArrayList<Testcase>(files.size());
-
-    for (FilePath f : files) {
-
-      try {
-        Testcase tc = TestcaseParser.parseXml(f);
-        testcases.add(tc);
-      } catch (IOException e) {
-        logger.error("File \"" + f + "\": " + e.getMessage() + "\n\r");
+    // Wenn es kein testcase_information.xml gibt bedeutet nicht, dass es keine Tests gibt. (Es ist
+    // wegen den GenerateOverviewReport bug)
+    if (files.size() == 0) {
+      // Es muss dann trotzdem eine test_summary.xml geben bei der testDataDir
+      FilePath xmlFile = new FilePath(testDataDir, "test_summary.xml");
+      if (!xmlFile.exists()) {
+        logger.error("No \"test_summary.xml\" found.");
+      }
+      testcases = TestcaseSummaryParser.parseXml(xmlFile);
+    } else {
+      for (FilePath f : files) {
+        try {
+          Testcase tc = TestcaseParser.parseXml(f);
+          testcases.add(tc);
+        } catch (IOException e) {
+          logger.error("File \"" + f + "\": " + e.getMessage() + "\n\r");
+        }
       }
     }
-
     return testcases;
   }
 
@@ -145,10 +153,19 @@ public final class Publish {
    * find all files in directory "root" with file name "pattern" and stores them in collection
    * "files"
    * 
-   * @throws InterruptedException
+   * @param rootdir
+   *          The directory that should be searched
+   * @param pattern
+   *          The file name that has to be found.
+   * @param files
+   *          The collection to pupulate
+   * 
    * @throws IOException
+   *           If an error occured while parsing TPT test data
+   * @throws InterruptedException
+   *           If the job was interrupted
    */
-  private static void find(FilePath rootdir, String pattern, Collection<FilePath> files)
+  public static void find(FilePath rootdir, String pattern, Collection<FilePath> files)
       throws IOException, InterruptedException {
 
     if (rootdir.isDirectory()) {
