@@ -27,22 +27,24 @@ import java.rmi.RemoteException;
 import com.piketec.tpt.api.ApiException;
 
 /**
- * Ein Objekt mit x- und y-Koordinate.
+ * The class represents an object with a position (x- and y- coordinate) in the diagram like a state
+ * or a junction.
  */
 public interface Positioned extends Remote {
 
   /**
-   * Liefert die Koordinate zurueck.
+   * Return the current position of the object as a two-dimensional {@link Point}.
    * 
-   * @return Die x- und y-Koordinate als Punkt.
+   * @return A poin representing x-and y- coordinate of this object.
    */
   public Point getPosition() throws ApiException, RemoteException;
 
   /**
-   * Setzt die x- und y-Koordninate
+   * Set the position of a object.
    * 
    * @param p
-   *          Der Punkt, der die Positions-Koordnianten enthaelt.
+   *          A {@link Point} represting the desired position of the object in the two-dimensional
+   *          drawing area.
    */
   public void setPosition(Point p) throws ApiException, RemoteException;
 

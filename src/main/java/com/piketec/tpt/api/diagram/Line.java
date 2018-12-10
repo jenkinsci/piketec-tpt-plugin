@@ -26,22 +26,23 @@ import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 
 /**
- * Eine horizontale Linie, die ein Diagramm in zwei Bereiche fuer prallele Automaten unterteilt.
+ * A horizontal line that divides a Diagram into two paralell regions. Each region needs to contain
+ * a seperate, parallel automaton.
  */
 public interface Line extends IdentifiableRemote {
 
   /**
-   * Fragt die Hoehenposition der Linie im Diagramm ab
+   * Get vertical position (y-position) of the line in the drawing area.
    * 
-   * @return Die y-Position
+   * @return The y-Position
    */
   public int getPosition() throws ApiException, RemoteException;
 
   /**
-   * Setzt die vertikale Position der Linie im Diagramm.
+   * Set the vertical postion of a line in the drawing area.
    * 
    * @param y
-   *          Die Hoehenposition
+   *          The vertical (y-)position for the line.
    */
   public void setPosition(int y) throws ApiException, RemoteException;
 

@@ -23,44 +23,44 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * Eine geordnete Sammlung von Items. aenderungen an der Liste finden direkt in TPT statt.
+ * A sorted set of (Remote) elements. Changes to this list will be done directly in TPT.
  */
 public interface RemoteList<E> extends RemoteCollection<E> {
 
   /**
-   * Liefert das Element an der Stelle <code>index</code> zurueck.
+   * Returns the element at position <code>index</code>.
    * 
    * @param index
-   *          Die Stelle in der Liste.
-   * @return Das das Element an der gegebenen Stelle.
+   *          The position of the element in the list.
+   * @return The element that is at this position.
    * @throws IndexOutOfBoundsException
-   *           Wenn der <code>index &lt; 0</code> oder <code>index &gt;= getItems().size()</code>
+   *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
    */
   public E get(int index) throws ApiException, IndexOutOfBoundsException, RemoteException;
 
   /**
-   * Entfernt das Element an der Stelle <code>index</code> aus der Liste.
+   * Removes the element at position <code>index</code> from the list.
    * 
    * @param index
-   *          Die Stelle des zu loeschenen Items.
+   *          The position of the item that should be deleted.
    * @throws IndexOutOfBoundsException
-   *           Wenn der <code>index &lt; 0</code> oder <code>index &gt;= getItems().size()</code>
+   *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
    */
   public void delete(int index) throws ApiException, IndexOutOfBoundsException, RemoteException;
 
   /**
-   * Verschiebt ein Item von der Stelle <code>form</code> nach <code>to</code>. Items in diesem
-   * Intervall ruecken entsprechend auf, so dass keine Luecken entstehen und kein Item
-   * ueberschrieben wird.
+   * Moves an element from the position <code>from</code> to <code>to</code>. All elements in this
+   * interval will be shifted accordingly such that no gaps exist afterwards and no items will be
+   * overwritten.
    * 
    * @param from
-   *          Die alte Position des zu verschiebenden Items.
+   *          The old position of the element.
    * @param to
-   *          Die neue Position des zu verschiebenden items.
-   * @return Das verschoben Item.
+   *          The new position for the element given by <code>from</code>
+   * @return Returns a referens to the moved item.
    * @throws IndexOutOfBoundsException
-   *           Wenn <code>to</code> oder <code>from</code> <code>&lt; 0</code> oder
-   *           <code>&gt;= getItems().size()</code>
+   *           If <code>to &lt; 0 </code> or <code>from &lt; 0</code> or
+   *           <code>to &gt;= getItems().size()</code> or <code>from &gt;= getItems().size()</code>
    */
   public E move(int from, int to) throws ApiException, IndexOutOfBoundsException, RemoteException;
 

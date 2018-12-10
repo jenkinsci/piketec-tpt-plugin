@@ -27,23 +27,24 @@ import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.NamedObject;
 
 /**
- * <code>TransitionSpecOrGroup</code> sind in einer Baumstruktur angeordnet. Knoten sind
- * {@link TransitionSpecGroup}, Blaetter {@link TransitionSpec}.
+ * <code>TransitionSpecOrGroup</code> represents a tree structure. Nodes are
+ * {@link TransitionSpecGroup}, leaves are {@link TransitionSpec}.
  */
 public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject {
 
   /**
-   * Die Gruppe unter der diese TransitionSpecOrGroup haengt oder NULL wenn dieses Objekt direkt
-   * unter der {@link Transition} haengt.
+   * Returns a {@link TransitionSpecGroup} if the object is a child object or <code>null</code> if
+   * the object is dircrectly contained by the {@link Transition}.
    *
-   * @return Den Parent oder <code>null</code>.
+   * @return The parent group or <code>null</code>.
    */
   public TransitionSpecGroup getGroup() throws ApiException, RemoteException;
 
   /**
-   * Die Transition, zu der diese <code>TransitionSpecOrGroup</code> gehoert.
+   * Returns the {@link Transition} object which directly or indirectly contains this
+   * <code>TransitionSpecOrGroup</code>.
    * 
-   * @return Die zugehoerige Transition
+   * @return The parent <code>Transition</code>
    */
   public Transition getTransition() throws ApiException, RemoteException;
 }

@@ -21,23 +21,26 @@
 package com.piketec.tpt.api;
 
 import java.io.File;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
 
 /**
- * Alle Einstellungen fuer ein Ausfuehrungskonfuguration. Eine ExecutionConfiguration kann ueber
- * {@link Project#createExecutionConfiguration(String)} angelegt werden. Die Konfiguration besteht
- * aus mehreren Attributen sowie einer Liste der {@link ExecutionConfigurationItem} Die zur
- * Verfuegung stehenden Attribute entsprechen den Attributen, die ueber die GUI verstellt werden
- * koennen. Die Beschreibung kann aus dem allgemeinen Users Guide entnommen werden.
+ * This object represents all settings for a particular execution configuration.
+ * <p>
+ * An <code>ExecutionConfiguration</code> can be only created via
+ * {@link Project#createExecutionConfiguration(String)}. The configuration consists of a number of
+ * attributes as well as a list of {@link ExecutionConfigurationItem}. The attributes represent the
+ * controls from the executution configuration GUI.
+ * <p>
+ * For a detailed description of the attributes please refer to the User Guide.
+ *
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
-@SuppressWarnings("unused")
 public interface ExecutionConfiguration
-    extends Remote, IdentifiableRemote, NamedObject, RemoteList<ExecutionConfigurationItem> {
+    extends IdentifiableRemote, NamedObject, RemoteList<ExecutionConfigurationItem> {
 
   /**
-   * Das Ausgabeformat des Reports.
+   * Enumeration representing the possible output formats of the report.
    * 
    * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
    */
@@ -46,7 +49,7 @@ public interface ExecutionConfiguration
   }
 
   /**
-   * Die Struktur des Datenverzeichnisses
+   * Enumeration representing the different directory structure configurations.
    * 
    * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
    */
@@ -55,179 +58,264 @@ public interface ExecutionConfiguration
   }
 
   /**
-   * Erzeugt eine neue {@link ExecutionConfigurationItem} und fuegt diese an das Ende der Liste der
-   * Items an.
+   * Creates a new {@link ExecutionConfigurationItem} and adds it to the tail of the
+   * ExecutionConfiguration list. This list is represented by the table in the GUI.
    * 
-   * @return Das neuerzeugte ExecutionConfigurationItem
+   * 
+   * @return A fresh ExecutionConfigurationItem
    * 
    */
   public ExecutionConfigurationItem createExecutionConfigurationItem()
       throws ApiException, RemoteException;
 
   /**
-   * @return Das Datenverzeichnis
+   * @return The data directory.
+   * @deprecated No support for $-variables and relative paths - use {@link #getDataDirPath()}
+   *             instead.
    */
+  @Deprecated
   public File getDataDir() throws ApiException, RemoteException;
 
   /**
-   * @return Das Verzeichnis fuer den Report
+   * @return Returns the test data direcory as {@link String}
    */
+  public String getDataDirPath() throws ApiException, RemoteException;
+
+  /**
+   * @return The report directory.
+   * @deprecated No support for $-variables and relative paths - use {@link #getReportDirPath()}
+   *             instead.
+   */
+  @Deprecated
   public File getReportDir() throws ApiException, RemoteException;
 
   /**
-   * Setzt das Arbeitsverzeichnis.
+   * @return Returns the report directory.
+   */
+  public String getReportDirPath() throws ApiException, RemoteException;
+
+  /**
+   * Set the data directory.
    * 
    * @param f
-   *          Das Datenverzecihnis
+   *          The Data directory as File.
+   * @deprecated No support for $-variables and relative paths - use {@link #setDataDirPath(String)}
+   *             instead.
    */
+  @Deprecated
   public void setDataDir(File f) throws ApiException, RemoteException;
 
   /**
-   * Kann wie in der GUI leer <code>null</code> gesetzt werden. In diesem Fall wird das DataDir
-   * verwendet.
+   * Set the data directory.
+   * 
+   * @param path
+   *          A directory as String.
+   */
+  public void setDataDirPath(String path) throws ApiException, RemoteException;
+
+  /**
+   * Set the report directory.
+   * <p>
+   * Optionally, specify the report direcory as {@link File}. Use <code>null</code> to set the data
+   * direcory.
+   * 
    * 
    * @param f
-   *          Das Datenverzeichnis oder <code>null</code>
+   *          The report directory as <code>File</code> or <code>null</code>
+   * @deprecated No support for $-variables and relative paths - use
+   *             {@link #setReportDirPath(String)} instead.
    */
+  @Deprecated
   public void setReportDir(File f) throws ApiException, RemoteException;
 
   /**
-   * @return ob die Tests ausgefuehrt werden sollen
+   * Set the report directory.
+   * <p>
+   * Optionally, specify the report direcory as {@link String}. Use <code>null</code> to set the
+   * data direcory.
+   * 
+   * @param path
+   *          The report directory as <code>String</code> or <code>null</code>
+   * 
+   */
+  public void setReportDirPath(String path) throws ApiException, RemoteException;
+
+  /**
+   * @return Returns <code>true</code> if test should be executed. Represents the "Execute" check
+   *         box.
    */
   public boolean isRunExec() throws ApiException, RemoteException;
 
   /**
-   * @return ob die Assessments ausgefuehrt werden sollen.
+   * @return Returns <code>true</code> if the assessments should be executed. Represents the
+   *         "Assess" check box.
    */
   public boolean isRunAssess() throws ApiException, RemoteException;
 
   /**
-   * @return ob ein Report generiert werden soll
+   * 
+   * @return Returns <code>true</code> if a report should be generated. Represents the "Report"
+   *         check box.
+   * 
    */
   public boolean isRunReport() throws ApiException, RemoteException;
 
   /**
-   * @return ob die Ausfuehrung im Debug-Modus stattfinden soll
+   * @return Returns <code>true</code> if the execution should be done in debug mode. Represents the
+   *         "Debug" check box.
    */
   public boolean isRunDebug() throws ApiException, RemoteException;
 
   /**
-   * @return ob das Dashboard benutz werden soll
+   * @return Returns <code>true</code> if the dashboard should be enabled during test execution.
+   *         Represent the "Dashboard" check box.
    */
   public boolean isRunDashboard() throws ApiException, RemoteException;
 
   /**
    * @param enabled
-   *          ob die Testst ausgefuehrt werden soll
+   *          Set whether tests should be executed.
    */
   public void setRunExec(boolean enabled) throws ApiException, RemoteException;
 
   /**
    * @param enabled
-   *          ob die Assessments ausgefuehrt werden sollen.
+   *          Set whether assessments should be executed.
    */
   public void setRunAssess(boolean enabled) throws ApiException, RemoteException;
 
   /**
+   * 
    * @param enabled
-   *          ob ein Report generiert werden soll
+   *          Set whether a report should be generated.
+   *          <p>
+   *          Note that a report can be only generated if assessments have been executed.
    */
   public void setRunReport(boolean enabled) throws ApiException, RemoteException;
 
   /**
    * @param enabled
-   *          ob die Ausfuehrung im Debug-Modus stattfinden soll
+   *          Enable the debug mode for the execution.
    */
   public void setRunDebug(boolean enabled) throws ApiException, RemoteException;
 
   /**
    * @param enabled
-   *          ob das Dashboard benutz werden soll
+   *          Enable the Dashboard during execution.
    */
   public void setRunDashboard(boolean enabled) throws ApiException, RemoteException;
 
   /**
-   * Die zusaetzlichen Userattribute einer ExecutionConfiguration.
+   * Returns the addtional attributes for a Execution Configuration as specified by the user. This
+   * map corresponds to the "Attributes" tab of the Execution Configuration GUI.
    * 
-   * @return Die Zurodnung von Attributen und ihrem Wert
+   * @return User attributes as map
    *
    */
   public Map<String, String> getAttributes() throws ApiException, RemoteException;
 
   /**
-   * Setzt das entsprechende Userattribut oder loescht das Attribut (wenn value==null)
+   * Set a user-defined attribute given by <code>key</code> to the value given by the
+   * <code>value</code> parameter. <br>
+   * If <code>value==null</code>, the attribute <code>key</code> will be deleted.
    * 
    * @param key
-   *          Der Name des Attributs
+   *          The name of the attribute to be set.
    * @param value
-   *          Der neue Wert, <code>null</code> zum loeschen.
+   *          The new value or <code>null</code> to delete the attribute.
    * 
    * @throws ApiException
-   *           wenn <code>name==null</code>
+   *           if <code>name==null</code>
    *
    */
   public void setAttributes(String key, String value) throws ApiException, RemoteException;
 
   /**
-   * @return das aktuell eingestellte Reportformat
+   * 
+   * @return The currently selected report format
    * 
    * @throws ApiException
-   *           wenn das eingestellte Reportformat der API nicht bekannt ist.
+   *           If the currently selected report format is unknown.
    */
   public ReportFormat getReportFormat() throws ApiException, RemoteException;
 
   /**
-   * Setzt das ReportFormat
+   * Set the report format.
    * 
    * @param rf
-   *          Das neue Reportformat
+   *          the new report format.
    * @throws ApiException
-   *           Wenn die API das angebene Format keinem Format in TPT zuordnen kann.
+   *           If the given report format is not known to the API.
    */
   public void setReportFormat(ReportFormat rf) throws ApiException, RemoteException;
 
   /**
-   * @return die aktuell eingestellte Datenverzeichnis-Struktur
+   * @return the currently selected directory structure for saving the test data.
    * @throws ApiException
-   *           wenn die eingestellte Datenverzeichnis-Struktur der API nicht bekannt ist.
+   *           if the directory structure is unknown
    */
   public DataDirStructure getDataDirStructure() throws ApiException, RemoteException;
 
   /**
-   * Setzt die Struktur des Datenverzeichnisses.
+   * Set the directory structure for the data directory.
    * 
    * @param dds
-   *          Die neue Datenverzeichnis-Struktur.
+   *          The new directory structure.
    * @throws ApiException
-   *           Wenn die API die angebene Struktur keiner Struktur in TPT zuordnen kann.
+   *           if the given directory structure is unkown to the API.
    */
   public void setDataDirStructure(DataDirStructure dds) throws ApiException, RemoteException;
 
   /**
-   * @return <code>null</code> wenn kein Pack-Report eingestellt ist, die Zieldatei sonst.
-   *
+   * @return Returns <code>null</code> if "Pack report" is not enabled. Otherwise, the target file
+   *         for the ZIP is returned.
+   * @deprecated No support for $-variables and relative paths - use {@link #getReportPackPath()}
+   *             instead.
    */
 
+  @Deprecated
   public File getReportPackFile() throws ApiException, RemoteException;
 
   /**
-   * Setzt das ZIP-File in das der Report gepackt werden soll oder stellt das packen aus, wenn
-   * <code>zipFile==null</code>.
+   * Set the ZIP file where the packed report should be stored. Using <code>zipFile==null</code>
+   * will disable the "Pack report" option.
    *
    * @param zipFile
-   *          die Zieldatei fuer den gepackten Report oder <code>null</code>.
-   *
+   *          target file or <code>null</code>.
+   * @deprecated No support for $-variables and relative paths - use
+   *             {@link #setReportPackPath(String)} instead.
    */
+  @Deprecated
   public void setReportPackFile(File zipFile) throws ApiException, RemoteException;
 
   /**
-   * @return ob der ungepackte Report nach dem packen geloescht werden soll.
+   * @return Returns <code>null</code> if "Pack report" is not enabled. Otherwise, the target file
+   *         for the ZIP is returned.
+   * 
+   */
+
+  public String getReportPackPath() throws ApiException, RemoteException;
+
+  /**
+   * Set the ZIP file where the packed report should be stored. Using <code>zipFile==null</code>
+   * will disable the "Pack report" option.
+   *
+   * @param zipFile
+   *          target file or <code>null</code>.
+   * 
+   */
+  public void setReportPackPath(String zipFile) throws ApiException, RemoteException;
+
+  /**
+   * @return Returns <code>true</code> if the riport directory should be deleted after it has been
+   *         zipped by "Pack report".
    */
   public boolean isDeleteReportDirAfterPack() throws ApiException, RemoteException;
 
   /**
    * @param enable
-   *          ob der ungepackte Report nach dem packen geloescht werden soll
+   *          Enable or disable the automatic removal of the report directory if "Pack report" is
+   *          enabled and after the report has been zipped.
    */
   public void setDeleteReportDirAfterPack(boolean enable) throws ApiException, RemoteException;
 

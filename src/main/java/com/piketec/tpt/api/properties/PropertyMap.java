@@ -26,50 +26,51 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
- * Eine Proeprty, die jedem Schluessel eine Property zuordnet.
+ * A property consisting of multiple key-value-pairs.
  */
 public class PropertyMap implements Property, Serializable {
 
   static final long serialVersionUID = 1L;
 
-  HashMap<String, Property> map = new HashMap<String, Property>();
+  HashMap<String, Property> map = new HashMap<>();
 
   /**
-   * @return Die Menger der Schluessel
+   * @return Returns a set of all keys
    */
   public Collection<String> getKeys() {
     return map.keySet();
   }
 
   /**
+   * Get the Values defined for a given key.
+   * 
    * @param key
-   *          Der Schluessel
-   * @return Die dem Schluessel zugeordnete Property
+   *          The key
+   * @return The value that is stored in the map for this key.
    */
   public Property getValue(String key) {
     return map.get(key);
   }
 
   /**
-   * Ordnet einem Schluessel eine Property zu. Ist dem Schluessel bereits eine Property zugeordnet,
-   * wird diese ueberschrieben.
+   * Assign a property value to a given key.Already existing properties will be overwritten.
    * 
    * @param key
-   *          Der Schluessel
+   *          The property key
    * @param value
-   *          Die Property, die diesem Schluessel zugeordnet werden soll.
+   *          The property value that shall be assigned to this key.
    */
   public void setValue(String key, Property value) {
     map.put(key, value);
   }
 
   /**
-   * Abkuerzung fuer <code>setValue(key, new PropertyString(value))</code>
+   * Shorthand for <code>setValue(key, new PropertyString(value))</code>
    * 
    * @param key
-   *          Der Schluessel
+   *          The property key
    * @param value
-   *          Der Wert der StringProperty
+   *          The {@link String} property value that shall be assigned to this key.
    */
   public void setValue(String key, String value) {
     map.put(key, new PropertyString(value));
@@ -86,7 +87,7 @@ public class PropertyMap implements Property, Serializable {
   public void toString(StringBuffer buffer, String indentation) {
     String indent1 = indentation + "  ";
     String indent2 = indentation + "    ";
-    buffer.append('\n');
+    buffer.append(indentation);
     buffer.append("PropertyMap {\n");
     for (Entry<String, Property> entry : map.entrySet()) {
       if (entry.getKey() == null) {

@@ -25,26 +25,32 @@ import java.rmi.RemoteException;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.RemoteList;
 import com.piketec.tpt.api.Scenario;
+import com.piketec.tpt.api.Testlet;
 
 /**
- * Ein <code>StepListScenario</code> enthaelt eine Liste von {@link Step} und ist der Inhalt eines
- * {@link StepListTestlet}.
+ * A <code>StepListScenario</code> contains a list of {@link Step steps} and can be a variant of a
+ * {@link Testlet}.
+ * 
+ * @see Testlet#createSLVariant(String, com.piketec.tpt.api.ScenarioGroup)
  */
 public interface StepListScenario extends Scenario {
 
   /**
-   * @return Die Liste der Steps in ihrer Reihenfolge.
+   * @return The list of {@link Step Steps} in thier given order.
    */
   public RemoteList<Step> getSteps() throws ApiException, RemoteException;
 
   /**
+   * Create a step of a given type at the given position.
+   * 
    * @param index
-   *          An welche Stelle in der Liste de Steps soll der Step eingefuehgt werden.
+   *          Indicates the position where the new step shall be insertet in the Steplist
+   *          represented by this object.
    * @param type
-   *          Die Art des Steps, der erzeugt werden soll.
-   * @return Den neuerstellten Step.
+   *          The type of the newly created Step as String
+   * @return The newly created Step.
    * @throws ApiException
-   *           Wennd er angebene Typ <code>type</code> nicht gefunden wurde.
+   *           If the given <code>type</code> does not exist.
    */
   public Step createStep(int index, String type) throws ApiException, RemoteException;
 

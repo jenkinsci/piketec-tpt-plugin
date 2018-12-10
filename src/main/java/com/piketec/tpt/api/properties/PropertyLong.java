@@ -18,36 +18,42 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.piketec.tpt.api;
+package com.piketec.tpt.api.properties;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-import java.util.Collection;
+import java.io.Serializable;
 
 /**
- * A collection of items where changes to the items are directly performed in TPT
- *
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * A long property value.
  */
-public interface RemoteCollection<E> extends Remote {
+public class PropertyLong implements Property, Serializable {
+
+  static final long serialVersionUID = 1L;
+
+  private final long value;
 
   /**
-   * @return Returns all items from this <code>RemoteCollection</code>. Any change to the returned
-   *         <code>Collection</code> are local and will not be sent to TPT.
+   * @param value
+   *          the actual integer value represented by this property
    */
-  public Collection<E> getItems() throws ApiException, RemoteException;
+  public PropertyLong(long value) {
+    this.value = value;
+  }
 
   /**
-   * Delete an element from the list. This function directly deletes the corresponding
-   * <code>element</code> in TPT.
-   * <p>
-   * 
-   * If multiple {@link NamedObject NamedObjects} refer to the same TPT object, the TPT object will
-   * be deleted from the collection as soon as this method is called with any of those.
-   * 
-   * @param element
-   *          The element to remove.
+   * @return the integer value represented by this property
    */
-  public void delete(E element) throws ApiException, RemoteException;
+  public long getValue() {
+    return value;
+  }
 
+  @Override
+  public String toString() {
+    return Long.toString(value);
+  }
+
+  @Override
+  public void toString(StringBuffer buffer, String indentation) {
+    buffer.append(indentation);
+    buffer.append(toString());
+  }
 }

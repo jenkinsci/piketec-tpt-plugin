@@ -23,7 +23,7 @@ package com.piketec.tpt.api.properties;
 import java.io.Serializable;
 
 /**
- * Eine ganze Zahl.
+ * A integer property value.
  */
 public class PropertyInt implements Property, Serializable {
 
@@ -33,14 +33,14 @@ public class PropertyInt implements Property, Serializable {
 
   /**
    * @param value
-   *          Der von dieser Proeprty repraesentierte Wert
+   *          the actual integer value represented by this property.
    */
   public PropertyInt(int value) {
     this.value = value;
   }
 
   /**
-   * @return Den von dieser Proeprty repraesentierte Wert
+   * @return the integer value represented by this property.
    */
   public int getValue() {
     return value;

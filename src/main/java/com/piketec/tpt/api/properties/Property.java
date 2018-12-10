@@ -21,19 +21,21 @@
 package com.piketec.tpt.api.properties;
 
 /**
- * Stellt einen beliebigen Wert dar. Der Wert kann dabei eine beliebige Struktur sein.
+ * Represents an arbitrary property value. The structure of the value can be arbitrary, too.
  */
 public interface Property {
 
   /**
-   * Fuellt den uebergebenen <code>StringBuffer</code> mit einem moeglichst uebersichtlichen
-   * String-Repraesenatation aller dieser Property und aller Unterelemente, wobei mit der
-   * uebergebenen Einrueckung <code>indentation</code> begonnen wird und jedes weitere Element um
-   * weitere Leerzeichen eingerueckt wird.
+   * Fills the given <code>StringBuffer</code> with a clear String-representation of all (possibly
+   * nested) property values of this <code>Property</code> object.
+   * 
+   * <p>
+   * For that, the given String <code>indentation</code> is used initally and each additional
+   * element is shifted by additional whitespaces.
    * 
    * @param buffer
    * @param indentation
-   *          Der aktuelle String zum einruecken.
+   *          String representing the current intendation.
    */
   void toString(StringBuffer buffer, String indentation);
 

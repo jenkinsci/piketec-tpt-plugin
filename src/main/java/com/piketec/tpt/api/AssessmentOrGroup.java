@@ -23,21 +23,24 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * Die gemeinsame Oberklasse von Assessment und AssessmentOrGroup. Gemeinsam bilden diese eine
- * Baumstruktur.
+ * An object representing either an {@link Assessment} or a group of assessments
+ * ({@link AssessmentGroup}). These objects can build up a tree where both, assessments and
+ * assessment groups, could be leaf nodes.
+ *
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
 
   /**
-   * Die AssessmentGroup in der dieses Objekt haengt oder <code>null</code> wenn dieses Objekt ein
-   * Toplevel Objekt ist also direkt unter dem {@link Project} haengt.
+   * Returns the parent group ({@link AssessmentGroup}) of this assessment or <code>null</code> if
+   * this is the top level object (i.e. it resides directly below the {@link Project}).
    *
-   * @return Die Parent-Gruppe oder <code>null</code>.
+   * @return The parent {@link AssessmentGroup} or <code>null</code>.
    */
   public AssessmentGroup getGroup() throws ApiException, RemoteException;
 
   /**
-   * @return Das Projekt, zu dem diese <code>AssessmentOrGroup</code> gehoert.
+   * @return The parent TPT {@link Project} for this <code>AssessmentOrGroup</code>.
    */
   public Project getProject() throws ApiException, RemoteException;
 

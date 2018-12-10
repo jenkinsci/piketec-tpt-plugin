@@ -21,8 +21,9 @@
 package com.piketec.tpt.api;
 
 /**
- * Ein Objekt unter dem mehrer {@link Scenario} und weitere <code>ScneraioGroup</code>-Instanzen
- * liegen koennen. Dadurch entsteht eine Baumstruktur.
+ * The object represents a group of {@link Scenario} and <code>ScenrioGroup</code> objects stored
+ * {@link AssessmentGroup} {@link ScenarioOrGroup}. Together with the sub-groups it represents a
+ * tree.
  */
 public interface ScenarioGroup extends ScenarioOrGroup, RemoteList<ScenarioOrGroup> {
 

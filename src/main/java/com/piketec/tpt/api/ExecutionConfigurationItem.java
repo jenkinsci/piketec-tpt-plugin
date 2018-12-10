@@ -25,95 +25,151 @@ import java.rmi.RemoteException;
 import java.util.Map;
 
 /**
- * Die Konfiguration einer Testausfuehrung fuer eine Platform. Bestandteil einer
- * {@link ExecutionConfiguration}
+ * Configuration of the test execution for a particular platform, test set and parameter set. Part
+ * of a {@link ExecutionConfiguration}
+ *
+ * @author Copyright (c) 2017 Piketec GmbH - All rights reserved.
  */
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 
   /**
-   * Setzt, ob fuer dieses <code>ExecutionConfigItem</code> ausgefuehrt werden soll.
+   * @return The {@link ExecutionConfiguration} this instance belongs to.
+   * 
+   * @throws ApiException
+   *           If the instance does not belong to an <code>ExecutionConfiguration</code> and
+   *           therefore is not part of a TPT model.
+   */
+  public ExecutionConfiguration getExecutionConfiguration() throws ApiException, RemoteException;
+
+  /**
+   * @return The index of this instance in its {@link ExecutionConfiguration}.
+   * 
+   * @throws ApiException
+   *           If the instance does not belong to a <code>ExecutionConfiguration</code> and
+   *           therefore is not part of a TPT model.
+   */
+  public int getIndex() throws ApiException, RemoteException;
+
+  /**
+   * Enable or disable the execution of this <code>ExecutionConfigItem</code> in the parent
+   * {@link ExecutionConfiguration}.
    * 
    * @param active
-   *          Der neue Wert
+   *          <code>true</code> to enable, <code>false</code> otherwise
    */
   public void setActive(boolean active) throws ApiException, RemoteException;
 
   /**
-   * @return ob fuer dieses <code>ExecutionConfigItem</code> ausgefuehrt werden soll.
+   * @return Returns whether this <code>ExecutionConfigItem</code> is enabled for execution or not.
    */
   public boolean isActive() throws ApiException, RemoteException;
 
   /**
-   * @return Das ausgewaehlte TestSet oder <code>null</code> wenn noch keiner ausgewaehlt wurde.
+   * @return Returns the selected test set or <code>null</code> if it set to "Selected test cases".
    */
   public TestSet getTestSet() throws ApiException, RemoteException;
 
   /**
-   * @return Die ausgewaehlte Platformkonfiguration oder <code>null</code> wenn noch keine
-   *         ausgewaehlt wurde.
+   * @return Returns the currently selected {@link PlatformConfiguration} or <code>null</code> if
+   *         none has been selected so far.
    */
   public PlatformConfiguration getPlatformConfiguration() throws ApiException, RemoteException;
 
   /**
-   * @return Das Parameter-File oder <code>null</code> wenn noch keins ausgewaehlt wurde.
+   * @return Returns the parameter file or <code>null</code> if none has been selected so far.
+   * @deprecated No support for $-variables and relative paths - use {@link #getParameterFilePath()}
+   *             instead.
+   * 
    */
+  @Deprecated
   public File getParameterFile() throws ApiException, RemoteException;
 
   /**
-   * Liefert die definierten Variablen.
+   * @return The parameter file as <code>String</code> or <code>null</code> if none has yet been
+   *         selected.
+   */
+  public String getParameterFilePath() throws ApiException, RemoteException;
+
+  /**
+   * Returns the variables defined for <b>this</b> <code>ExecutionConfigurationItem</code>.
+   * <p>
+   * These variable could potentially overwrite variables defined in a parent scope. However, other
+   * variables defined in a parent scope are not returned by this function.
    * 
-   * @return Die Namen der Variablennamen mit den ihnen zugeordneten Werten
+   * 
+   * @return A map containing the names of the "locally" defined variables and there "local" values.
    */
   public Map<String, String> getVariables() throws ApiException, RemoteException;
 
   /**
-   * Setzt den Testset dieses ExecutionConfigurationItems.
+   * Set a {@link TestSet} for this <code>ExecutionConfigurationItem</code>.
    * 
    * @param ts
-   *          Das TestSet
+   *          the test set to be set.
    */
   public void setTestSet(TestSet ts) throws ApiException, RemoteException;
 
   /**
-   * Setz die Platformkonfiguration dieses ExecutionConfigurationItems.
+   * Set a particular {@link PlatformConfiguration} for this ExecutionConfigurationItem.
    * 
    * @param pc
-   *          Die Platformkonfiguration
+   *          The Platform Configuration
    */
   public void setPlatformConfiguration(PlatformConfiguration pc)
       throws ApiException, RemoteException;
 
   /**
-   * Setzt das Parameter-File oder loescht den Eintrag, wenn <code>f==null</code>
+   * Set the parameter file as <code>File</code> or deletes the entry if <code>f==null</code>
    * 
    * @param f
-   *          Das Paramersterset-File
+   *          The file containing the parameter set.
+   * 
+   * @deprecated No support for $-variables and relative paths - use
+   *             {@link #setParameterFilePath(String)} instead.
    */
+  @Deprecated
   public void setParameterFile(File f) throws ApiException, RemoteException;
 
   /**
-   * Setzt, ob fuer dieses <code>ExecutionConfigItem</code> Assessments ausgefuehrt werden sollen.
+   * Set the parameter file as <code>String</code> or delete the entry if <code>path==null</code>
+   * 
+   * @param path
+   *          A string containing the path to the parameter file.
+   */
+  public void setParameterFilePath(String path) throws ApiException, RemoteException;
+
+  /**
+   * Enable or disable whether assessments sould be executed for this
+   * <code>ExecutionConfigItem</code>.
+   * <p>
+   * This option enables the user to omit the assessments for a particular Platform Configuration
+   * although the execution of assessments is enabled for the Execution Configuration.<br>
+   * However, in the opposite case, disabling the assessment in the Execution Configuration and
+   * enabling it for the Platform will have no effect.
    * 
    * @param run
-   *          der neue Wert
+   *          A Boolean indicating whether the assessments shall be run or not.
    */
   public void setRunAssessments(boolean run) throws ApiException, RemoteException;
 
   /**
-   * @return Ob fuer dieses <code>ExecutionConfigItem</code> Assessments ausgefuehrt werden sollen.
+   * @return Returns <code>true</code> if assessments should be executed for this
+   *         <code>ExecutionConfigItem</code>.
    */
   public boolean isRunAssessments() throws ApiException, RemoteException;
 
   /**
-   * Setzt die entsprechende Variable oder loescht diese (wenn value==<code>null</code>)
+   * Set the variables <code>name</code> to the given <code>value</code> or delete it, if
+   * value==<code>null</code>
    * 
    * @param name
-   *          Der Name der Variable
+   *          The name of the variable
    * @param value
-   *          Der neue Wert, <code>null</code> zum loeschen.
+   *          Either the value for <code>name</code> or <code>null</code> to delete
+   *          <code>name</code>
    * 
    * @throws ApiException
-   *           wenn <code>name==null</code>
+   *           if <code>name==null</code>
    *
    */
   public void setVariable(String name, String value) throws ApiException, RemoteException;

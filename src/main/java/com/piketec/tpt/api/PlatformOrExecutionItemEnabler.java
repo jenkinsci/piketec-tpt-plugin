@@ -21,9 +21,12 @@
 package com.piketec.tpt.api;
 
 /**
- * Manche Assesslets sollen zusammen mit bestimmten {@link PlatformConfiguration Platforms} oder
- * {@link ExecutionConfigurationItem ExecutionConfigurationItems} ausgefuehrt werden. Dazu dient
- * dieses gemeinsame Interface.
+ * This interface either represents a general platform adapter {@link PlatformConfiguration} or a
+ * platform within a particular execution configuration {@link ExecutionConfigurationItem} and is
+ * used to enable and disable the execution of assessments for the platform.
+ * 
+ *
+ * @author Copyright (c) 2015 Piketec GmbH - All rights reserved.
  */
 public interface PlatformOrExecutionItemEnabler extends IdentifiableRemote {
 

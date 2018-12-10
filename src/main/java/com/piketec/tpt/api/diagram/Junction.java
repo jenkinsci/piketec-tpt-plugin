@@ -20,9 +20,12 @@
  */
 package com.piketec.tpt.api.diagram;
 
+import com.piketec.tpt.api.Testlet;
+
 /**
- * Ein Knotenpunkt, an dem mehrere Transitionen enden und starten koennen, der aber kein
- * {@link State} ist.
+ * A {@link Junction} where multiple transions could start or end. This node is not a
+ * {@link Testlet} and, hence, does not cosume time during executions.
+ * 
  */
 public interface Junction extends DiagramNode, Positioned {
 

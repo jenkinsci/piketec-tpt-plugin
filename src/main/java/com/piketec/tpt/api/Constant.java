@@ -20,34 +20,33 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Collection;
 
 /**
- * A collection of items where changes to the items are directly performed in TPT
- *
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * A Constant is a value that stays the same during execution time.
+ * 
+ * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
  */
-public interface RemoteCollection<E> extends Remote {
+public interface Constant extends Declaration {
 
   /**
-   * @return Returns all items from this <code>RemoteCollection</code>. Any change to the returned
-   *         <code>Collection</code> are local and will not be sent to TPT.
+   * Get if the constant is a system constant.
+   * 
+   * @return <code>true</code> if the constant is a system constant, <code>false</code> otherwise.
+   * @throws ApiException
+   * @throws RemoteException
    */
-  public Collection<E> getItems() throws ApiException, RemoteException;
+  boolean isSystemConstant() throws ApiException, RemoteException;
 
   /**
-   * Delete an element from the list. This function directly deletes the corresponding
-   * <code>element</code> in TPT.
-   * <p>
+   * Set if the constant is a system constant.
    * 
-   * If multiple {@link NamedObject NamedObjects} refer to the same TPT object, the TPT object will
-   * be deleted from the collection as soon as this method is called with any of those.
-   * 
-   * @param element
-   *          The element to remove.
+   * @param on
+   *          <code>true</code> if the constant should be system constant, <code>false</code>
+   *          otherwise.
+   * @throws ApiException
+   * @throws RemoteException
    */
-  public void delete(E element) throws ApiException, RemoteException;
+  void setSystemConstant(boolean on) throws ApiException, RemoteException;
 
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2017 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,34 +20,34 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.Collection;
 
 /**
- * A collection of items where changes to the items are directly performed in TPT
- *
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * An assessment variable is used to evaluate tests.
+ * 
+ * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
  */
-public interface RemoteCollection<E> extends Remote {
+public interface AssessmentVariable extends Declaration {
 
   /**
-   * @return Returns all items from this <code>RemoteCollection</code>. Any change to the returned
-   *         <code>Collection</code> are local and will not be sent to TPT.
+   * Get if the assessment variable should be recorded during test execution.
+   * 
+   * @return <code>true</code> if the assessment variable should be recorded, <code>false</code>
+   *         otherwise.
+   * @throws ApiException
+   * @throws RemoteException
    */
-  public Collection<E> getItems() throws ApiException, RemoteException;
+  boolean isRecord() throws ApiException, RemoteException;
 
   /**
-   * Delete an element from the list. This function directly deletes the corresponding
-   * <code>element</code> in TPT.
-   * <p>
+   * Set if the assessment variable should be recorded during test execution.
    * 
-   * If multiple {@link NamedObject NamedObjects} refer to the same TPT object, the TPT object will
-   * be deleted from the collection as soon as this method is called with any of those.
-   * 
-   * @param element
-   *          The element to remove.
+   * @param on
+   *          <code>true</code> if the assessment variable should be recorded, <code>false</code>
+   *          otherwise.
+   * @throws ApiException
+   * @throws RemoteException
    */
-  public void delete(E element) throws ApiException, RemoteException;
+  void setRecord(boolean on) throws ApiException, RemoteException;
 
 }

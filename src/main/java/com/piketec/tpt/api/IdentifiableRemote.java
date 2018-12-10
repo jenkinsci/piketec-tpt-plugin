@@ -25,13 +25,15 @@ import java.rmi.RemoteException;
 import java.rmi.server.ObjID;
 
 /**
- * Fuer API-Internen gebrauch. Dient der Identifikation eines Remoteobjekts um dieses wieder auf ein
- * lokales Objekt zurueckzufuehren.
+ * An object with an ID. It is used to map {@link Remote} objects of the API to the actual objects
+ * in TPT.
+ * 
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface IdentifiableRemote extends Remote {
 
   /**
-   * @return Den eindeutigen Identifier fuer dieses Objekt.
+   * @return The unique identfier for this object.
    */
   ObjID getIdentifier() throws RemoteException;
 

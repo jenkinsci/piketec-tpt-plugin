@@ -29,98 +29,105 @@ import com.piketec.tpt.api.NamedObject;
 import com.piketec.tpt.api.RemoteList;
 
 /**
- * Eine Transition ist ein uebergang von einem {@link DiagramNode} zu einem anderen.
+ * This object represents the graphical transtion between two {@link DiagramNode DiagramNodes}.
  */
 public interface Transition extends NamedObject, IdentifiableRemote {
 
   /**
-   * @return Den Startpunkt der Transition.
+   * @return The starting diagram node of the <code>Transition</code>
    */
   public DiagramNode getFrom() throws ApiException, RemoteException;
 
   /**
-   * @return Den Endpunkt der Transition.
+   * @return The end diagram node of the <code>Transition</code>
    */
   public DiagramNode getTo() throws ApiException, RemoteException;
 
   /**
-   * Setzt den Startpunkt der Transition.
+   * Set starting diagram node for this <code>Transition</code>
    * 
    * @param n
-   *          Der neue Startpunkt.
+   *          The new starting point
    * @throws RemoteException
-   *           Wenn <code>n</code> nicht von der angesprochenen TPT-Instanz stammt.
+   *           If <code>n</code> does not belong to the TPT instance represented by the API object.
    */
   public void setFrom(DiagramNode n) throws ApiException, RemoteException;
 
   /**
-   * Setzt den Endpunkt der Transition.
+   * Set end diagram node for this <code>Transition</code>
    * 
    * @param n
-   *          Der neue Endtpunkt.
+   *          The new end point
    * @throws RemoteException
-   *           Wenn <code>n</code> nicht von der angesprochenen TPT-Instanz stammt.
+   *           If <code>n</code> does not belong to the TPT instance represented by the API object.
    */
   public void setTo(DiagramNode n) throws ApiException, RemoteException;
 
   /**
-   * Um einer Transition im Diagram eine Kruvenverlauf zu geben anstatt einer gerade Linie kann eine
-   * Reihe von Hilfspunkten angeben werden, die bestimmen, wie sich die Transition verformen soll.
+   * Returns a list of auxiliary points for this transition that are used to define a curvy shape
+   * instead of a straight line for this transition.
    * 
-   * @return Die Liste der Hilfspunkte
+   * @return List of auxiliary {@link Point points}
    */
   public RemoteList<Point> getAuxPositions() throws ApiException, RemoteException;
 
   /**
-   * Fuegt einen neuen Hilfspunkt fuer die Transition ein.
+   * Add a new list of auxiliary point for this transition.
    *
    * @param p
-   *          Der neue Hilfspukt
+   *          The new auxiliary point
    * @param index
-   *          Die Position in der Liste der Hilfspunkte.
+   *          The position of the new auxiliary point in the list.
    * @throws ApiException
    * @throws RemoteException
    */
   public void addAuxPoint(Point p, int index) throws ApiException, RemoteException;
 
   /**
-   * Liefert die Menger der Transitionsspezifikationen oder der Gruppen, die dierekt dieser
-   * Transition untergeordnet sind.
+   * Returns the list of {@link TransitionSpec transition specifications} or
+   * {@link TransitionSpecGroup specification groups} directly assigned to this transition.
+   * <p>
+   * Since it can be either specifications or groups of specifications, it returns a list of
+   * {@link TransitionSpecOrGroup} that might represent a tree of specifications.
    * 
-   * @return Die Liste der TransitionsSpezifikationen und Gruppen.
+   * 
+   * @return The list of transition specifications or specification groups.
    */
   public RemoteList< ? extends TransitionSpecOrGroup> getTopLevelTransitionSpecOrGroup()
       throws ApiException, RemoteException;
 
   /**
-   * Erzeugt eine neue TransitionSpec. Die neue TransitionSpec wird in die angegebene Gruppe oder
-   * direkt unter diese Transition gehaengt.
+   * Create a new {@link TransitionSpec}. The new specification is either added to a given group,
+   * or, if no group given, directly to the list of specifications for this transition.
    *
    * @param name
-   *          Der Name der Transitionsspezfikation
+   *          The name for the new {@link TransitionSpec}
    * @param groupOrNull
-   *          Die Gruppe in der das neue TransitionSpec eingefuegt werden soll oder
-   *          <code>null</code> , wenn das neue TransitionSpec direkt unter der Transition haengen
-   *          soll.
-   * @return Die neuerzeugte Transitionsspezifikation
+   *          The {@link TransitionSpecGroup}, where the newly created specification sall be added
+   *          or <code>null</code> if it shall be directly added to the list of specifications of
+   *          this thansition.
+   * @return The newly created {@link TransitionSpec}.
    * @throws RemoteException
-   *           Wenn <code>groupOrNull</code> nicht von der angesprochenen TPT-Instanz stammt.
+   *           If <code>groupOrNull</code> does not belong to the TPT instance represented by the
+   *           API object.
    */
   public TransitionSpec createTransitionSpec(String name, TransitionSpecGroup groupOrNull)
       throws ApiException, RemoteException;
 
   /**
-   * Erzeugt eine neue TransitionSpecGroup. Die neue TransitionSpecGroup wird in die angegebene
-   * Gruppe oder direkt unter diese Transition gehaengt.
+   * Create a new {@link TransitionSpecGroup}. The new group is either added to a given group, or,
+   * if no group given, directly to the list of specifications for this transition.
    *
    * @param name
-   *          Der Name der Transitionsspezfikationen-Gruppe
+   *          The name for the new {@link TransitionSpecGroup}
    * @param groupOrNull
-   *          Die Gruppe in der das neue TransitionSpecGroup eingefuegt werden soll oder NULL wenn
-   *          das neue TransitionSpecGroup unter dem Transition haengen soll.
-   * @return Die neuerzeugte Transitionsspezifikationen-Gruppe
+   *          The {@link TransitionSpecGroup}, where the newly created specification sall be added
+   *          or <code>null</code> if it shall be directly added to the list of specifications of
+   *          this thansition.
+   * @return The newly created {@link TransitionSpecGroup}.
    * @throws RemoteException
-   *           Wenn <code>groupOrNull</code> nicht von der angesprochenen TPT-Instanz stammt.
+   *           If <code>groupOrNull</code> does not belong to the TPT instance represented by the
+   *           API object.
    */
 
   public TransitionSpecGroup createTransitionSpecGroup(String name, TransitionSpecGroup groupOrNull)

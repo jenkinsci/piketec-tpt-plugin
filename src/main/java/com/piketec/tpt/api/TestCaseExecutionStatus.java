@@ -25,53 +25,72 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 /**
- * Gibt die Moeglichkeit, den aktuellen Ausfuerhungszustand und die Log-Messages fuer einen TestCase
- * abzufragen.
+ * This object provides an interface to obtain the current state of execution as well as any log
+ * messages for the assigned test case.
  */
 public interface TestCaseExecutionStatus extends Remote {
 
   /**
-   * Der aktuelle Ausfuehrungszustand des Testfalls bzw. dessen Ergebnis.
+   * This enumeration represents all possible execution and result states for a test case.
+   * <p>
+   * The possible options are:
    * 
-   * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+   * <li>Pending</li>
+   * <li>Running</li>
+   * <li>ResultUnknown</li>
+   * <li>ResultSuccess</li>
+   * <li>ResultFailed</li>
+   * <li>ResultError</li>
+   * <li>ResultNoAsssessments <b>Deprecated:</b> Only listed to remain compatible to old TPT
+   * versions. Completely replaced by ResultUnkown.</li>
+   * 
    */
   public enum TestCaseStatus {
-    Pending, ResultUnknown, ResultSuccess, ResultFailed, ResultError, Running, ResultNoAsssessments
+    Pending, ResultUnknown, ResultSuccess, ResultFailed, ResultError, Running,
+    /**
+     * @deprecated Only listed to remain compatible to old TPT versions. Completely replaced by
+     *             ResultUnkown.
+     */
+    @Deprecated
+    ResultNoAsssessments
   }
 
   /**
-   * @return Den aktuellen Ausfuehrungszustand
+   * @return Returns the current state of execution as {@link TestCaseStatus}
    */
   public TestCaseStatus getStatus() throws ApiException, RemoteException;
 
   /**
-   * @return Die Liste der Logeintraege der Ausfuehrung
+   * @return Returns a list of log entries as <code>String</code>
    */
   public List<String> getStatusLog() throws ApiException, RemoteException;
 
   /**
-   * Setzt das Ergebnis manuell auf {@link TestCaseStatus#ResultSuccess} oder
-   * {@link TestCaseStatus#ResultFailed}. Das eigentliche Testergbnis wird dabei nicht
-   * ueberschrieben.
+   * Manuall set (reclassify) the execution status to either {@link TestCaseStatus#ResultSuccess} or
+   * {@link TestCaseStatus#ResultFailed} for the report. The actual test case result will not be
+   * overwritten by this operation.
+   * <p>
+   * This function corresponds to the "reclassify" button in the TPT GUI.
    * 
    * @param success
-   *          <code>true</code> wenn das Testergbnis als Erfolg reklassifiert werden soll
-   *          <code>false</code> wenn es als Misserfolg reklassifiert werden soll.
+   *          <li><code>true</code> if the test result should be reclassified to a succes</li>
+   *          <li><code>false</code> if the test result should be reclassified to a failure</li>
    * @param userName
-   *          Der Name desjenigen, der die Reklassifierung verantwortet
+   *          The name for the user that is responsible for the reclassification.
    * @param comment
-   *          Erklaerung zur Reklassifizierung.
+   *          A description/comment, why this reclassification is OK.
    */
   public void reclassify(boolean success, String userName, String comment)
       throws ApiException, RemoteException;
 
   /**
-   * @return Das {@link ExecutionConfigurationItem}, zu dem die Testausfuehrung gehoert.
+   * @return The {@link ExecutionConfigurationItem} in which the assigned test case was, is or
+   *         should be executed.
    */
   public ExecutionConfigurationItem getExecutionConfigurationItem() throws RemoteException;
 
   /**
-   * @return Den ausgefuehrten Testfall.
+   * @return The assigned test case.
    */
   public Scenario getTestcase() throws RemoteException;
 }

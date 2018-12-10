@@ -23,7 +23,9 @@ package com.piketec.tpt.api.diagram;
 import com.piketec.tpt.api.IdentifiableRemote;
 
 /**
- * Ein Bereich im Diagramm zur Darstellung vom Text.
+ * An area in the diagram that represents some text.
+ * 
+ * @see com.piketec.tpt.api.Testlet#createTextArea(String, java.awt.Point)
  */
 public interface TextArea extends Positioned, IdentifiableRemote {
 

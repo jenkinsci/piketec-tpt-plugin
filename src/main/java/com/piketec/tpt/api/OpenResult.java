@@ -24,16 +24,36 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Das Ergebnis, wenn ein Projekt geoeffnet wird. Enthaelt das Projekt und die Log-Meldungen.
+ * This object represents the result of an attempt to open a TPT project. It contains the project as
+ * well as any log messages occurred during the opening of the project.
+ * <p>
+ * Log messages can ocurr if the project file was created in a previous release of TPT or if it
+ * contains information for license options currently not available.
+ * 
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
+
 public class OpenResult implements Serializable {
 
   static final long serialVersionUID = 1L;
 
+  /**
+   * A handle to the open TPT project.
+   */
   public final Project project;
 
+  /**
+   * A list of messages occurred druring the open-operation.
+   */
   public final List<String> logs;
 
+  /**
+   * Constructor. Should not be called manually. Will be called from
+   * {@link TptApi#openProject(java.io.File)}.
+   * 
+   * @param project
+   * @param logs
+   */
   public OpenResult(Project project, List<String> logs) {
     super();
     this.project = project;
@@ -41,16 +61,16 @@ public class OpenResult implements Serializable {
   }
 
   /**
-   * Liefert eine Liste der Logmeldung, die beim einlesen der Datei aufgetreten sind.
+   * Returns a list of log entries that have occured during the parsing of the TPT file.
    * 
-   * @return Liste der Logs. Leere Liste wenn keine Fehler aufgetreten sind.
+   * @return List of log messesages. Empty if no errors/warning have occured.
    */
   public List<String> getLogs() {
     return logs;
   }
 
   /**
-   * @return Das geoeffnete Projekt
+   * @return The freshly opened TPT project
    */
   public Project getProject() {
     return project;

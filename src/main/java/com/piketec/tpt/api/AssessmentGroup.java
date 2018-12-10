@@ -21,8 +21,11 @@
 package com.piketec.tpt.api;
 
 /**
- * Eine Gruppe von AssessmentOrGroup. Die Gruppen-Eigenschaften werden ueber das {@link RemoteList}
- * Interface abgebildet
+ * A list of assessments and assessment groups {@link AssessmentOrGroup} in a list mapped to a
+ * {@link RemoteList}.
+ * 
+ * 
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface AssessmentGroup extends RemoteList<AssessmentOrGroup>, AssessmentOrGroup {
 

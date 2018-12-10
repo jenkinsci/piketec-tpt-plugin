@@ -24,20 +24,26 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 /**
- * Ein Objekt mit einem Namen.
+ * This class represent an object with a name.
+ * 
+ * @author Copyright (c) 2017 Piketec GmbH - All rights reserved.
+ *
  */
 public interface NamedObject extends Remote {
 
   /**
-   * @return Den aktuellen Namen des Objekts.
+   * @return the current name for the object.
    */
   public String getName() throws ApiException, RemoteException;
 
   /**
-   * Setzt den Namen des Objekts.
+   * Set a new name for the object.
    * 
    * @param newName
-   *          der neue Name
+   *          the new name
+   * 
+   * @throws ApiException
+   *           if <code>newName</code> is not a legal name.
    */
   public void setName(String newName) throws ApiException, RemoteException;
 

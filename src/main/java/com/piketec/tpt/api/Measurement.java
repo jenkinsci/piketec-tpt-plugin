@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2017 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,38 +18,13 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package com.piketec.tpt.api.steplist;
-
-import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
-import com.piketec.tpt.api.RemoteCollection;
-import com.piketec.tpt.api.Testlet;
-import com.piketec.tpt.api.diagram.DiagramTestlet;
+package com.piketec.tpt.api;
 
 /**
- * Ein <code>StepListTestlet</code> ist ein {@link Testlet}, dass eine Step-List enthaelt.
+ * A measurement is used to add additionally measured signals.
  * 
- * @see DiagramTestlet
+ * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
  */
-public interface StepListTestlet extends Testlet<StepListScenario>, RemoteCollection<Testlet> {
-
-  /**
-   * Erzeugt ein neues untergeordnetes {@link StepListTestlet}.
-   * 
-   * @param name
-   *          Der Name des Testlets
-   * @return Das neuerzeugte Testlet
-   */
-  public StepListTestlet createStepListTestlet(String name) throws ApiException, RemoteException;
-
-  /**
-   * Erzeugt ein neues untergeordnetes {@link DiagramTestlet}.
-   * 
-   * @param name
-   *          Der Name des Testlets
-   * @return Das neuerzeugte Testlet
-   */
-  public DiagramTestlet createDiagramState(String name) throws ApiException, RemoteException;
+public interface Measurement extends Declaration {
 
 }

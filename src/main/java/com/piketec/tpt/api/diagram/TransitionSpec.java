@@ -25,40 +25,42 @@ import java.rmi.RemoteException;
 import com.piketec.tpt.api.ApiException;
 
 /**
- * Eine Transitionsspezifikation beschreibt wann eine Transition ausgeloest werden darf (
- * {@link #getCondition()}) und was passiert, wenn sei ausgeloest wird ({@link #getActions()}).
+ * A {@link TransitionSpec transition specification} defines, when a transition is able to fire
+ * ({@link #getCondition()}) and which actions/stimulations have to be performed if the transition
+ * fires ({@link #getActions()}).
  */
 public interface TransitionSpec extends TransitionSpecOrGroup {
 
   /**
-   * Liefert die Vorbedingung, die erfuellt sein muss, damit die Transition ausgeloest werden darf.
+   * Returns the precondition that has to be satisfied for the transition to fire.
    * 
-   * @return Die formale Vorbedingung
+   * @return The formal precondition as {@link String}
    */
   public String getCondition() throws ApiException, RemoteException;
 
   /**
-   * Setzt die formale Vorbedingung, die erfuellt sein muss, damit die Transition ausgeloest werden
-   * darf. Zur Syntax siehe im TPT Handbuch "Transitions and transition specifications"
+   * Set the formal precondition to be satisfied for the transition to fire. For a syntax reference
+   * refer to the TPT User Guide, Section "Set a Transition Action"
    * 
    * @param condition
-   *          Die formale Vorbedingung als String
+   *          The formal condition as {@link String}. <code>Null</code> will be reduced to an empty
+   *          string.
    */
   public void setCondition(String condition) throws ApiException, RemoteException;
 
   /**
-   * Liefert die Aktionen, die beim Ausloesen der Transition stattfinden.
+   * Returns the actions to be executed when a transtion fires.
    * 
-   * @return Die Aktionen.
+   * @return The description of the actions as {@link String}
    */
   public String getActions() throws ApiException, RemoteException;
 
   /**
-   * Setzt die Aktionen, die beim ausloesend er Transition ausgefuehrt werden. Zur Syntax siehe im
-   * TPT Handbuch "Transitions and transition specifications"
+   * Set the actions to be executed when a transition is executed.For a Syntax reference refer to
+   * the TPT User Guide, Section "Set a Transition Action"
    * 
    * @param actions
-   *          Die Aktionen als String
+   *          The actions as {@link String}. <code>Null</code> will be reduced to an empty string.
    */
   public void setActions(String actions) throws ApiException, RemoteException;
 }

@@ -17,10 +17,11 @@
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */package com.piketec.tpt.api;
+ */
+package com.piketec.tpt.api;
 
 /**
- * Diese Exception tritt auf, wenn erkannt wird, dass die API fehlerhaft genutz wird.
+ * This exception indicates a misuse ot the TPT API.
  */
 public class ApiException extends Exception {
 

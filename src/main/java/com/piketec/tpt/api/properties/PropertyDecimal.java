@@ -23,7 +23,7 @@ package com.piketec.tpt.api.properties;
 import java.io.Serializable;
 
 /**
- * Eine Kommazahl.
+ * A decimal property value.
  */
 public class PropertyDecimal implements Property, Serializable {
 
@@ -33,14 +33,14 @@ public class PropertyDecimal implements Property, Serializable {
 
   /**
    * @param value
-   *          Der von dieser Proeprty repraesentierte Wert
+   *          the actual decimal value represented by this property.
    */
   public PropertyDecimal(double value) {
     this.value = value;
   }
 
   /**
-   * @return Der von dieser Proeprty repraesentierte Wert
+   * @return the decimal value represented by this property.
    */
   public double getValue() {
     return value;

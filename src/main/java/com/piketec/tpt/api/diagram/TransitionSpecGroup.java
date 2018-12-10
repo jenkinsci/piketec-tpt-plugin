@@ -23,7 +23,8 @@ package com.piketec.tpt.api.diagram;
 import com.piketec.tpt.api.RemoteList;
 
 /**
- * Eine Gruppe, die mehrer {@link TransitionSpec} und {@link TransitionSpecGroup} enthalten kann.
+ * The object represents a group of {@link TransitionSpec TransitionSpecs} and
+ * {@link TransitionSpecGroup TransitionSpecGroups}.
  */
 public interface TransitionSpecGroup
     extends RemoteList<TransitionSpecOrGroup>, TransitionSpecOrGroup {

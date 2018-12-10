@@ -24,7 +24,8 @@ import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.NamedObject;
 
 /**
- * Ueberklasse fuer alle DiagramElemente an denen eine Transition beginnen bzw. enden kann.
+ * This interface is implemented by all element that can be connected by a transition with each
+ * other.
  */
 public interface DiagramNode extends NamedObject, IdentifiableRemote {
 

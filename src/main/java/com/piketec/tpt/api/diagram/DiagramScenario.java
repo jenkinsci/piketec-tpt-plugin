@@ -21,6 +21,7 @@
 package com.piketec.tpt.api.diagram;
 
 import java.rmi.RemoteException;
+import java.rmi.server.RemoteObject;
 
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.RemoteCollection;
@@ -28,78 +29,94 @@ import com.piketec.tpt.api.Scenario;
 import com.piketec.tpt.api.Testlet;
 
 /**
- * Ein DiagramScenario ist eine Testcase-Spezifkation oder eine Variante von einem
- * {@link DiagramTestlet}.
+ * A {@link DiagramScenario} represents either a test case or a graphically specified Variant for a
+ * diagram {@link Testlet}. It specifies
+ * <li>a path through the automaton given by a set of (active) {@link Transition Transitions}</li>
+ * <li>a selected Variant ({@link Scenario}) for eacht Testlet in the path</li>
+ * <li>a slected {@link TransitionSpec} for each of the above {@link Transition Transitions}
+ * <li>
  * 
- * @see Testlet#createVariant(String, com.piketec.tpt.api.ScenarioGroup)
+ * @see Testlet#createDiagVariant(String, com.piketec.tpt.api.ScenarioGroup)
  */
 public interface DiagramScenario extends Scenario {
 
   /**
-   * Die Liste aller fuer dieses Scenario ausgewaehlten Transitionen.
+   * @return The list of all selected {@link Transition Transitions} for this variant.
    *
    */
   public RemoteCollection<Transition> getPath() throws ApiException, RemoteException;
 
   /**
-   * Fuegt eine Transition der Liste der fuer dieses Scenario ausgewaehlten Transitionen hinzu.
+   * Add a {@link Transition} to the list of selected <code>Transitions</code> for this
+   * <code>DiagramScenario</code>. Conflicting <code>Transitions</code> are automatically removed
+   * from the list.
    * 
    * @param t
-   *          Die in den Pfad aufzunehmende Transition.
+   *          The {@link Transition} to add to the path in the scenario.
    * @throws RemoteException
-   *           Wenn die uebergeben Transition kein Remoteobjekt ist, dass von der angesprochenen
-   *           TPT-Instance stammt.
+   *           If the given <code>Transition</code> object is not a {@link RemoteObject} or it does
+   *           not originate from the TPT instance represented by this API object.
    */
   public void addTransitionToPath(Transition t) throws ApiException, RemoteException;
 
   /**
-   * Die zu einem Zustand ausgewaehlte Variante oder <code>null</code>.
+   * Get the Variant that is currently selected for a given state in this {@link Scenario Variant}
+   * or <code>null</code>.
    * 
    * @param state
-   *          Der <code>State</code>, dessen ausgewaehlte Variante zurueckgeliefert werden soll.
-   * @return <code>null</code> wenn bisher keine Variante zu dem uebergebenene <code>State</code>
-   *         ausgewaehlt wurde, sonst das ausgewaehlte <code>Scenario</code>
+   *          The <code>State</code>, for wich the currently selected variant shall be examined.
+   * @return <code>null</code> if no Variant has been previously selected for this
+   *         <code>State</code> in the current Scenarion. The selected {@link Scenario Variant}
+   *         otherwise.
    * @throws RemoteException
-   *           Wenn der uebergeben State kein Remoteobjekt ist, dass von der angesprochenen
-   *           TPT-Instance stammt.
+   *           If the given <code>State</code> object is not a {@link RemoteObject} or it does not
+   *           originate from the TPT instance represented by this API object.
    */
-  public Scenario getSelectedVariant(State state) throws ApiException, RemoteException;
+  public Scenario getSelectedVariant(Testlet state) throws ApiException, RemoteException;
 
   /**
-   * Setzt die Variante fuer einen Zustand. Wenn <code>varian==null</code> ist, wird die Definition
-   * fuer den Zustand geloescht.
+   * Set a given {@link Scenario Variant} for a given {@link Testlet} in the current
+   * <code>Scenario>/code>.
+   * If <code>variant==null</code>, the currently selected varant will be deleted.
    *
    * @param state
-   *          Der Zustand, dem die Variante zugewiesen werden soll
+   *          Represents the <code>State</code>, for which a variant shall be set.
    * @param variant
-   *          Die Variante oder null wenn keine Variante gewaehlt sein soll
+   *          A {@link Scenario Variant} to be set or <code>null</code> to reset the variant for
+   *          this state.
    * @throws RemoteException
-   *           Wenn <code>state</code> oder <code>variant</code> kein Remoteobjekt ist, dass vond er
-   *           angesprochen TPT-Instanz stammt.
+   *           If the given <code>state</code> or <code>variant</code> objects are not a
+   *           {@link RemoteObject} or they do not originate from the TPT instance represented by
+   *           this API object.
    */
-  public void setSelectedVariant(State state, Scenario variant)
+  public void setSelectedVariant(Testlet state, Scenario variant)
       throws ApiException, RemoteException;
 
   /**
-   * Die fuer eine Transition gewaehlt Transitionsspezifikation oder <code>null</code>.
+   * Get the currently selected {@link TransitionSpec transition specification} for the given
+   * {@link Transition} or <code>null</code>.
    * 
    * @param transition
-   *          Die Transition, zu der die gewaehlte Transitionsspezifikation gesucht wird oder
-   *          <code>null</code>, wenn bisher keine gesetzt wurde.
+   *          The <code>Transition</code>, for which the {@link TransitionSpec} shall be examined.
+   * @return The currently selected {@link TransitionSpec} or <code>null</code> if none has been
+   *         selected so far.
    */
   public TransitionSpec getSelectedTransitionSpec(Transition transition)
       throws ApiException, RemoteException;
 
   /**
-   * Setzt die Transitionsspezifikation fuer die Transition.
+   * Select a {@link TransitionSpec transition specification} for the given {@link Transition} in
+   * the current <code>Scenario</code>.
    * 
    * @param transition
-   *          Die Transition, deren Transitionsspezifikation gesetzt werden soll.
+   *          The Transition, for which the new transtion specification shall be set.
    * @param transitionSpec
-   *          Die Transitionsspezifikation oder <code>null</code>
+   *          The new transition specification or <code>null</code> to selct none.
+   * 
    * @throws RemoteException
-   *           Wenn <code>transition</code> oder <code>transitionSpec</code> kein Remoteobjekt ist,
-   *           dass vond er angesprochen TPT-Instanz stammt.
+   *           If the given <code>transition</code> or <code>transitionSpec</code> objects are not a
+   *           {@link RemoteObject} or they do not originate from the TPT instance represented by
+   *           this API object.
    */
   public void setSelectedTransitionSpec(Transition transition, TransitionSpec transitionSpec)
       throws ApiException, RemoteException;

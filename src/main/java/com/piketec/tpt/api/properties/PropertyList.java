@@ -23,7 +23,8 @@ package com.piketec.tpt.api.properties;
 import java.util.ArrayList;
 
 /**
- * Eine Liste von Properties.
+ * A list of properties
+ * 
  */
 public class PropertyList extends ArrayList<Property> implements Property {
 

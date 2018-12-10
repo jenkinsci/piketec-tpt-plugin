@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2017 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,33 +23,56 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * A <code>TestSet</code> represents a set of test cases ({@link Scenario Scenarios})
+ * A parameter can change during a test execution but normaly holds the same value most time.
+ * 
+ * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
  */
-public interface TestSet extends NamedObject, IdentifiableRemote {
+public interface Parameter extends Declaration {
 
   /**
-   * @return The {@link RemoteCollection set} of all Testcases ({@link Scenario}) that are assigned
-   *         to this <code>TestSet</code>.
+   * Defines how parameter values will be exchanged between TPT and the SuT.
+   * 
+   * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
    */
-  public RemoteCollection<Scenario> getTestCases() throws ApiException, RemoteException;
+  enum ExchangeMode {
+    /**
+     * The value of the parameter will be neither written nor read.
+     */
+    LOCAL,
+    /**
+     * The value of the parameter will only be read but not written.
+     */
+    READONLY,
+    /**
+     * The value of the parameter will be written and read back.
+     */
+    EXCHANGE,
+    /**
+     * The value of the parameter will be written but not read.
+     */
+    WRITEONLY
+  }
 
   /**
-   * Add a new test case to the test set.
-   * <p>
-   * A test case is a {@link Scenario} that is placed directly or in any sub-group of the top level
-   * {@link ScenarioGroup} of the top level {@link Testlet} of a TPT project.
+   * Get the exchange mode of the parameter.
    * 
-   * @see ScenarioOrGroup#isTestcaseOrGroup()
-   * @see Project#getTopLevelTestlet()
-   * @see Testlet#getTopLevelScenarioOrGroup()
-   * 
-   * @param tc
-   *          The test case to be added to the <code>TestSet</code>
+   * @return The mode of the parameter.
    * @throws ApiException
-   *           If the given <code>Scenario</code> is not a test case.
    * @throws RemoteException
-   *           If the given <code>Scenario</code> is not an object from the current TPT instance.
+   * 
+   * @see ExchangeMode
    */
-  public void addTestCase(Scenario tc) throws ApiException, RemoteException;
+  ExchangeMode getMode() throws ApiException, RemoteException;
+
+  /**
+   * Sets the exchange mode of the parameter.
+   * 
+   * @param mode
+   *          The new exchange mode.
+   * @throws ApiException
+   *           If the given mode is unknown.
+   * @throws RemoteException
+   */
+  void setMode(ExchangeMode mode) throws ApiException, RemoteException;
 
 }

@@ -27,72 +27,82 @@ import java.util.Collection;
 import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
 
 /**
- * Interface zum Zugriff auf den aktuellen Status der Testausfuehrung. Das Interface spiegelt die
- * Informationen wieder, die der Progress-Dialog dem User darstellt.
+ * This object provides an interface to the current state of the test execution. <br>
+ * This interface basically represent the information as provided by the Run Progress Dialog.
+ *
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface ExecutionStatus extends Remote {
 
   /**
-   * @return ob die Testausfuehrung NOCH nicht gestartet wurde
+   * @return Indicates whether the test execution is still pending.
    *
    */
   public boolean isPending() throws ApiException, RemoteException;
 
   /**
-   * @return ob die Testausfuehrung noch laeuft.
+   * @return Indicates whether the test execution is currently running.
    *
    */
   public boolean isRunning() throws ApiException, RemoteException;
 
   /**
-   * Bricht eine laufende Testausfuehrung ab.
+   * Cancels the current test execution.
+   * <p>
+   * The outcome of this operation depends on the platform. In the most cases, the execution of the
+   * current test case is finished.
    */
   public void cancel() throws ApiException, RemoteException;
 
   /**
-   * Die Liste der Status fuer die einzelnen an der Testausfuehrung beteiligten Testfaelle.
+   * Returns a list containing the execution state ({@link TestCaseExecutionStatus} for each test
+   * case that are part of this test execution.
    *
-   * @return Die Liste oder eine leere Liste wenn keine Testausfuehrung gestartet wurde.
+   * @return A list conting the states of the executed test cases or an empty list, if no test
+   *         execution have been started so far.
    */
   public Collection<TestCaseExecutionStatus> getAllTestCases() throws ApiException, RemoteException;
 
   /**
-   * Die Anzahl aller an der Testausfuehrung beteiligten Testfaelle je Plattform. Taucht ein
-   * Testfall in zwei {@link ExecutionConfigurationItem} auf (z.B. weil ein Back2Back-Test gemacht
-   * wird), so wird der Testfall doppelt gezaehlt.
+   * Returns the number of all testcases of the current test execution. Test cases that are part of
+   * the test set in more that one {@link ExecutionConfigurationItem} (e.g. in a Back2Back test
+   * scenario), will be counted for each {@link ExecutionConfigurationItem} seperately.
    *
-   * @return Anzahl der Testfaelle
+   * @return Number of total test cases executed
    */
   public int getNumberOfAllTestCases() throws ApiException, RemoteException;
 
   /**
-   * Die Anzahl aller beteiligten Testfaelle die noch nicht abgeschlossen (also im Zustand
-   * {@link TestCaseStatus#Pending}) sind. Taucht ein Testfall in zwei
-   * {@link ExecutionConfigurationItem} auf (z.B. weil ein Back2Back-Test gemacht wird), so wird der
-   * Status pro {@link ExecutionConfigurationItem} einzeln betrachtet.
+   * Returns the number of test cases that are part of the current test execution that are currently
+   * not finished (with state {@link TestCaseStatus#Pending}). <br>
+   * Test cases that are part of the test set in more that one {@link ExecutionConfigurationItem}
+   * (e.g. in a Back2Back test scenario), will be counted for each
+   * {@link ExecutionConfigurationItem} separately.
    *
-   * @return Anzahl der noch nicht ausgefuehrten Testfaelle
+   * @return The number of currently not executed test cases.
    */
   public int getNumberOfPendingTestCases() throws ApiException, RemoteException;
 
   /**
-   * Liefert den gerade ausgefuehrten Testfall zurueck, also den Testfall, dessen Status
-   * {@link TestCaseStatus#Running} ist.
+   * Return the test case that is currently running (with the state {@link TestCaseStatus#Running}).
    * 
-   * @return Den gerade ausgefuehrten Tesfall oder <code>null</code>
+   * @return The currently executed test case or <code>null</code> if no test case is running.
    */
   public Scenario getCurrentTestCase() throws ApiException, RemoteException;
 
   /**
-   * Liefert zurueck, wie der bisherige Gesamtzustand der Testausfuehrung ist. Der Gesamtstatus ist
-   * der Status aller Testfaelle mit der hoechsten Prioritaet. Die Reihenfolge der Prioritaeten ist
-   * dabei folgende (hoch zu niedrig): ResultError, ResultFailed, ResultNoAsssessments,
-   * ResultUnknown, ResultSuccess, Running, Pending
+   * Returns the current (cumulative) execution state of the overall test execution.
+   * <p>
+   * The cumulative execution state of all test cases is derived from the following priority (from
+   * high to low): ResultError, ResultFailed, ResultUnknown, ResultSuccess, Running, Pending
+   * <p>
+   * The cumulative state is derived from at highest priority set for at least one of all test
+   * cases.
    * 
-   * @return Den Status mit der hoechsten Prioritaet
+   * @return The test case execution state with the highest priority.
    * 
    * @throws ApiException
-   *           Wenn die Anzahl der Testfaelle 0 ist und es somit keinen Status gibt
+   *           If there are no test in the executed test set.
    */
   public TestCaseStatus getTotalExecutionStatus() throws ApiException, RemoteException;
 

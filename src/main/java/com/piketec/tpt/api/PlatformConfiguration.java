@@ -22,90 +22,215 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.properties.Property;
 import com.piketec.tpt.api.properties.PropertyMap;
 
 /**
- * Die Konfuguration fuer eine Ausfuehrungsplatform. Die spezifischen Eigenschaften der
- * verschiedenen Platform-typen werden ueber die generischen Properties (vgl. {@link PropertyMap})
- * abgebildet.
+ * This object represents a configuration for a specific platform adapter.
+ * <p>
+ * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
+ *
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
+
+  /**
+   * Type String for ADTF Platform
+   */
+  public static final String ADTF_PLATFORM_TYPE = "adtf";
+
+  /**
+   * Type String for ASCET Platform
+   */
+  public static final String ASCET_PLATFORM_TYPE = "ascet";
+
+  /**
+   * Type String for ASCET@FUSION Platform
+   */
+  public static final String ASCET_AT_FUSION_PLATFORM_TYPE = "ascet2";
+
+  /**
+   * Type String for AUTOSAR Platform
+   */
+  public static final String AUTOSAR_PLATFORM_TYPE = "autosar";
+
+  /**
+   * Type String for Assessment Platform
+   */
+  public static final String ASSESSMENT_PLATFORM_TYPE = "assessment";
+
+  /**
+   * Type String for CANoe Platform
+   */
+  public static final String CANOE_PLATFORM_TYPE = "canoe";
+
+  /**
+   * Type String for CTB Platform
+   */
+  public static final String CTB_PLATFORM_TYPE = "daimler-ctb";
+
+  /**
+   * Type String for Concurrent HiL Platform
+   */
+  public static final String CONCURRENT_HIL_PLATFORM_TYPE = "concurrent-hil";
+
+  /**
+   * Type String for EXE Platform
+   */
+  public static final String EXE_PLATFORM_TYPE = "exe";
+
+  /**
+   * Type String for FUSION Platform
+   */
+  public static final String FUSION_PLATFORM_TYPE = "fusion";
+
+  /**
+   * Type String for LABCAR Platform
+   */
+  public static final String LABCAR_PLATFORM_TYPE = "labcar";
+
+  /**
+   * Type String for MATLAB/Simulink Platform
+   */
+  public static final String MATLAB_SIMULINK_PLATFORM_TYPE = "matlab";
+
+  /**
+   * Type String for RADARCAN Platform
+   */
+  public static final String RADARCAN_PLATFORM_TYPE = "radarcan";
+
+  /**
+   * Type String for Silver Platform
+   */
+  public static final String SILVER_PLATFORM_TYPE = "silver";
+
+  /**
+   * Type String for Simulink Real-Time Platform
+   */
+  public static final String SIMULINK_REAL_TIME_PLATFORM_TYPE = "matlab-rt";
+
+  /**
+   * Type String for Stand-alone Platform
+   */
+  public static final String STAND_ALONE_PLATFORM_TYPE = "stand-alone";
+
+  /**
+   * Type String for VW / Audi Platform
+   */
+  public static final String VW_AUDI_PLATFORM_TYPE = "vw-audi";
+
+  /**
+   * Type String for VeriStand Platform
+   */
+  public static final String VERISTAND_PLATFORM_TYPE = "veristand";
+
+  /**
+   * Type String for dSPACE HiL Platform
+   */
+  public static final String DSPACE_HIL_PLATFORM_TYPE = "dspace-hil";
+
+  /**
+   * Type String for dSPACE HiL@FUSION Platform
+   */
+  public static final String DSPACE_HIL_AT_FUSION_PLATFORM_TYPE = "dspaceXil";
+
+  /**
+   * Type String for dSPACE HiL@FUSION Platform
+   */
+  public static final String FEP = "fep";
 
   public String getType() throws ApiException, RemoteException;
 
   /**
-   * @return Timeout in Mikrosekunden.
+   * @return Returns the platform timeout in microseconds.
    *
    */
   public long getTimeOut() throws ApiException, RemoteException;
 
   /**
-   * Setzt den Timeout
+   * Set the platform timeout.
    * 
    * @param timeOut
-   *          Timeout in Mikrosekunden.
+   *          Timeout in microseconds.
    *
    */
   public void setTimeOut(long timeOut) throws ApiException, RemoteException;
 
   /**
-   * @return Schrittweite in Mikrosekunden.
+   * @return Returns the step size of the platform in microseconds.
    *
    */
   public long getStepSize() throws ApiException, RemoteException;
 
   /**
-   * Setzt die Schrittweite
+   * Set the step size for the platform.
    * 
    * @param stepSize
-   *          Schrittweite in Mikrosekunden.
+   *          Step size in microseconds.
    *
    */
   public void setStepSize(long stepSize) throws ApiException, RemoteException;
 
   /**
-   * @return Groesse des Ringspeichers fuer den Zugriff auf Signalwerte in der Vergangenheit in
-   *         Anzahl an Testschritten.
+   * @return Returns the size of the ring buffer (history) that is used to enable access to signal
+   *         values of preceding steps of a test case.
    *
    */
   public int getHistorySize() throws ApiException, RemoteException;
 
   /**
-   * Setzt die Groesse des Ringspeichers fuer den Zugriff auf Signalwerte in der Vergangenheit in
-   * Anzahl an Testschritten.
+   * Set the size of the ring buffer (history) that is used to enable access to signal values of
+   * preceding steps of a test case.
    * 
    * @param historySize
-   *          Die neue Groesse des Ringspeichers
+   *          The new size of the history in steps.
    */
   public void setHistorySize(int historySize) throws ApiException, RemoteException;
 
   /**
-   * Liefert eine ProptertyMap String -&gt; Property zur Darstellung der Properties. Eine Property
-   * ist entweder erneut eine PropertyMap, wodurch eine Baumstruktur entsteht oder ein String-Wert.
-   *
-   * @return die Properties
+   * Returns the properties of the platform adapter as {@link PropertyMap}.
+   * <p>
+   * A PropertyMap maps the properties as follows: {@link String} -&gt; {@link Property}. A
+   * <code>Property</code> is either a <code>ProperyMap</code> or a <code>String</code> value.
+   * <p>
+   * The structure of the PropertyMap depends on the type of the platform adapter.
+   * 
+   * @return A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} with the settings for
+   *         the platform adapter.
    */
   public PropertyMap getProperties() throws ApiException, RemoteException;
 
   /**
-   * Konfiguriert die PlatformConfig anhand der uebergebenen PropertyMap.
+   * Set the configuration for the platform adapter via {@link PropertyMap}.
+   * <p>
+   * Since an incomplete <code>PropertyMap</code> could lead to unpredictable behavior, it is
+   * genrally recommended to modify the <code>PropertyMap</code> returned by
+   * {@link #getProperties()}.
    *
    * @param properties
+   *          A PropertyMap for the respective platform adapter.
    */
   public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
 
   /**
-   * Fuehrt eine Funktion der Platformkonfiguration aus. Die Funktion wird ueber ihren Namen
-   * identifiziert. Die PropertyMap ermoeglicht es parameter zu uebergeben. Ist der angegeben
-   * Funktionsname nicht bekannt oder entspricht die PropertyMap nicht den Erwartungen wird eine
-   * ApiException ausgeloest. Die verfuegbaren Funktionen sind von der konkreten Platform abhaengig.
+   * Run a function of this particular platform adapter (e.g., import-interface, ...). The available
+   * functions depend on the actual platform represented by this object. Some platforms do not have
+   * functions.
+   * <p>
+   * The function is identified by its name. The {@link PropertyMap} can be used to provide
+   * additional parameters to the function.
+   * 
+   * If the function name is unknown or if the <code>PropertyMap</code> does not match the expected
+   * structure, an {@link ApiException} is invoked. Often exception message contains a hint which
+   * functions are available.
    * 
    * @param functionName
-   *          Der Name der aufzurufenden Funktion
+   *          Name of the function to be invoked
    * @param parameterOrNull
-   *          Die Parameter oder <code>null</code>
+   *          A <code>PropertyMap</code> representing the function arguments or <code>null</code>
    * @throws ApiException
-   *           Wenn die Parameter nicht den Erwartungen entsprechen oder die Funktion unbekannt ist.
+   *           If the function is not availabe or the PropertyMap is invalid for the invoked
+   *           function.
    */
   public void invoke(String functionName, PropertyMap parameterOrNull)
       throws ApiException, RemoteException;

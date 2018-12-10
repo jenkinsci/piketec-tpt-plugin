@@ -23,7 +23,7 @@ package com.piketec.tpt.api.properties;
 import java.io.Serializable;
 
 /**
- * Ein Bool'scher Wert.
+ * A Boolean property value.
  */
 public class PropertyBool implements Property, Serializable {
 
@@ -33,14 +33,14 @@ public class PropertyBool implements Property, Serializable {
 
   /**
    * @param value
-   *          Der von dieser Proeprty repraesentierte Wert
+   *          the actual boolean value represented by this property.
    */
   public PropertyBool(boolean value) {
     this.value = value;
   }
 
   /**
-   * @return Der von dieser Proeprty repraesentierte Wert
+   * @return the boolean value represented by this property.
    */
   public boolean getValue() {
     return value;

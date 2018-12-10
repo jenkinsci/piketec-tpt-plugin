@@ -21,7 +21,7 @@
 package com.piketec.tpt.api;
 
 /**
- * Ein TestCase oder eine Variante eines Testlets.
+ * Either a test case or a Diagram/StepList variant of a TestLet.
  */
 public interface Scenario extends ScenarioOrGroup {
 
