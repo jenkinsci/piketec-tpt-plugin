@@ -21,9 +21,8 @@
 package com.piketec.tpt.api;
 
 /**
- * The object represents a group of {@link Scenario} and <code>ScenrioGroup</code> objects stored
- * {@link AssessmentGroup} {@link ScenarioOrGroup}. Together with the sub-groups it represents a
- * tree.
+ * The object represents a list of {@link Scenario} and <code>ScenrioGroup</code> objects. Together
+ * with the sub-groups it represents a tree.
  */
 public interface ScenarioGroup extends ScenarioOrGroup, RemoteList<ScenarioOrGroup> {
 

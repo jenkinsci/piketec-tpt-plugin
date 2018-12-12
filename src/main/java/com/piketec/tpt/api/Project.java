@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2017 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,14 +23,18 @@ package com.piketec.tpt.api;
 import java.io.File;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import com.piketec.tpt.api.Requirement.RequirementType;
 
 /**
  * This object represents a TPT project. It has been either newly created with
  * {@link TptApi#newProject(File)} or opened via {@link TptApi#openProject(File)}.
  * 
  *
- * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
+ * @author Copyright (c) 2018 Piketec GmbH - MIT License (MIT)
  */
 public interface Project extends IdentifiableRemote {
 
@@ -39,7 +43,8 @@ public interface Project extends IdentifiableRemote {
    * <p>
    * It discards all changes since the last time the project has been saved. Closed projects cannot
    * be saved anymore.
-   *
+   * </p>
+   * 
    * @return <code>false</code> if the Project could not be closed.
    * @throws ApiException
    *           The project is not open/unknown
@@ -50,12 +55,16 @@ public interface Project extends IdentifiableRemote {
    * Saves the project in its assigned file. The file has been specified in one of the following
    * functions:
    * <p>
-   * {@link Project#saveAsProject(File)} <br>
-   * {@link TptApi#newProject(File)} <br>
+   * {@link Project#saveAsProject(File)}
+   * <p>
+   * </p>
+   * {@link TptApi#newProject(File)}
+   * <p>
+   * </p>
    * {@link TptApi#openProject(File)}
+   * </p>
    * 
-   * 
-   * @return A list of messages that have occured while saving the project.
+   * @return A list of messages that have occurred while saving the project.
    * @throws ApiException
    *           If the project is not opened or if the file cannot be written.
    */
@@ -67,12 +76,13 @@ public interface Project extends IdentifiableRemote {
    * basically represents the "Save as..." menu item.
    * <p>
    * The file extension defines the save format for the file (*.tpt, *.tptz, *.tptprj)
+   * </p>
    * 
    * @see Project#saveProject()
    * @see TptApi#newProject(File)
    * @see TptApi#openProject(File)
    *
-   * @return A list of messages that have occured during the save operation.
+   * @return A list of messages that have occurred during the save operation.
    * @throws ApiException
    *           If the project is not open or it the project cannot be written to the given file,
    */
@@ -118,6 +128,34 @@ public interface Project extends IdentifiableRemote {
   RemoteList<AssessmentOrGroup> getTopLevelAssessments() throws ApiException, RemoteException;
 
   /**
+   * Adds a new requirement to this project.
+   * 
+   * @param id
+   *          The unique ID of the requirement
+   * @param module
+   *          The module name or <code>null</code>.
+   * @param text
+   *          The describing requirement text.
+   * @param type
+   *          The type of the requirement.
+   * @return The newly created requirement.
+   * @throws ApiException
+   *           If a requirement with the same id already exists.
+   * @throws RemoteException
+   */
+  Requirement createRequirement(String id, String module, String text, RequirementType type)
+      throws ApiException, RemoteException;
+
+  /**
+   * Get the list of all requirements of this project.
+   * 
+   * @return The list of requirements.
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  RemoteList<Requirement> getRequirements() throws ApiException, RemoteException;
+
+  /**
    * Create a new {@link TestSet} with the given name.
    * 
    * @param name
@@ -129,8 +167,9 @@ public interface Project extends IdentifiableRemote {
   /**
    * Create a new type. The structure of the type is given by the <code>typeString</code> argument.
    * You can see this string in TPT in the type editor in the "Type String" field at the bottom or
-   * in an tptaif export. <br>
-   * <br>
+   * in an tptaif export.
+   * <p>
+   * </p>
    * Patterns:
    * <ul>
    * <li>Array : "primitive_type[]"</li>
@@ -141,7 +180,7 @@ public interface Project extends IdentifiableRemote {
    * </ul>
    * 
    * @param nameOrNull
-   *          The name of the declared type or <code>null</code> to creat an anonymous type.
+   *          The name of the declared type or <code>null</code> to create an anonymous type.
    * @param typeString
    *          The type definition in the same format as seen in tptaif or in the type editor.
    * @return the new created type object.
@@ -155,7 +194,7 @@ public interface Project extends IdentifiableRemote {
   /**
    * Get a collection of all known types. Anonymous and predefined types are not included. If you
    * call this method multiple times the returned lists will have different hashes and equals will
-   * return false when compairing these objects.
+   * return false when comparing these objects.
    * 
    * @return The collection of all explicitly declared types.
    * @throws ApiException
@@ -383,6 +422,7 @@ public interface Project extends IdentifiableRemote {
    * <p>
    * If <code>groupOrNull==null</code>, the newly created <code>AssessmentGroup</code> automatically
    * becomes a top level item.
+   * </p>
    * 
    * @param name
    *          The name for the new <code>AssessmentGroup</code>. <code>Null</code> will be reduced
@@ -418,11 +458,12 @@ public interface Project extends IdentifiableRemote {
       throws ApiException, RemoteException;
 
   /**
-   * This function returns the top level testlet of a TPT project for wich all other testlets are
+   * This function returns the top level testlet of a TPT project for which all other testlets are
    * child nodes.
    * <p>
    * In the project tree, this testlet is represented by the project node. Its variants are test
    * cases.
+   * </p>
    * 
    * @return The top level {@link Testlet} for this project.
    * 
@@ -449,7 +490,7 @@ public interface Project extends IdentifiableRemote {
    *          The type of the attribute as String
    * @return An newly created {@link TestCaseAttribute}
    * @throws ApiException
-   *           If there alread exists a {@link TestCaseAttribute} with the given name or
+   *           If there already exists a {@link TestCaseAttribute} with the given name or
    *           <code>name==null</code> or <code>type==null</code> or if the given <code>type</code>
    *           is unknown.
    * @throws RemoteException
@@ -469,8 +510,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    * @throws ApiException
-   *           If an extension has been found but is not availabe for the current TPT instance (e.g.
-   *           missing license option).
+   *           If an extension has been found but is not available for the current TPT instance
+   *           (e.g. missing license option).
    */
   Remote getExtensionOrNull(String key) throws RemoteException, ApiException;
 
@@ -534,13 +575,15 @@ public interface Project extends IdentifiableRemote {
    *          Add a wait stept that terminates the variant when the test data has been fully
    *          replayed.
    * @param assignParameters
-   *          Eable the assignment of parameter values to test cases, if those are present in the
+   *          Enable the assignment of parameter values to test cases, if those are present in the
    *          test data file and a respective mapping flavor is present.
    * @param updateExistingGeneratedScenarios
    *          If this argument is set to <code>true</code>, TPT tries to find an older import to
    *          update with the new data. If it finds an older import, TPT updates already existing
    *          test cases, adds missing test cases, and removes such test cases, that do not have
-   *          corresponding test data anymore. <br>
+   *          corresponding test data anymore.
+   *          <p>
+   *          </p>
    *          A older updateable import exists, if the testlet for the provided
    *          <code>scenarioGroup</code> contains exactly one child group that matches the name
    *          scheme <code>"Import DD.MM.YY HH:MM:SS - RootDirName"</code> and there exists a test
@@ -552,9 +595,9 @@ public interface Project extends IdentifiableRemote {
    *           <li>If <code>dir</code> cannot be read.</li>
    *           <li>If no mapping with the name <code>renameMappingNameOrNull</code> can be found or
    *           the Mapping does not have a Rename Flavor.
-   *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for wich
+   *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
    *           a Signal Comparison Assesslet could be created.</li>
-   *           <li>If an error occurs during the imort.</li>
+   *           <li>If an error occurs during the import.</li>
    *           </ul>
    * @throws RemoteException
    */
@@ -577,9 +620,9 @@ public interface Project extends IdentifiableRemote {
    * @param mappingOrNull
    *          The mapping where mapping information shall be imported or <code>null</code> if a new
    *          mapping should be created if needed.
-   * @return A list of warnings that occured during import.
+   * @return A list of warnings that occurred during import.
    * @throws ApiException
-   *           If an error occurrs during import or the file format is not supported.
+   *           If an error occurs during import or the file format is not supported.
    * @throws RemoteException
    */
   List<String> importIO(File f, Mapping mappingOrNull) throws ApiException, RemoteException;
@@ -604,4 +647,58 @@ public interface Project extends IdentifiableRemote {
    */
   String getCreatedWithTptVersionName() throws ApiException, RemoteException;
 
+  /**
+   * 
+   * @param f
+   *          {@link File} to be imported.
+   * @return {@link List} with warnings occurred during import.
+   */
+  List<String> importEquivalenceClasses(File f) throws ApiException, RemoteException;
+
+  /**
+   * 
+   * @param f
+   *          target-{@link File} for export.
+   * @return {@link List} with warnings occurred during import.
+   */
+  List<String> exportEquivalenceClasses(File f) throws ApiException, RemoteException;
+
+  /**
+   * This method provides the functionality to generate {@link Scenario test cases} from equivalence
+   * classes.
+   * 
+   * @param scenarioOrGroup
+   *          where generated {@link Scenario test cases} should be added.
+   * @param settings
+   *          for generation of {@link Scenario test cases} from equivalence classes.
+   * @param equivalenceClassMap
+   *          selected equivalence classes.
+   * @return A {@link List List<String>} with all warnings as a log.
+   */
+  List<String> generateTestCasesFromEquivalenceClasses(ScenarioOrGroup scenarioOrGroup,
+                                                       GenerateTestCasesFromEquivalenceClassessSettings settings,
+                                                       Map<Declaration, Collection<String>> equivalenceClassMap)
+      throws ApiException, RemoteException;
+
+  /**
+   * Get the default report section.
+   * 
+   * @return The default report section
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  Assessment getDefaultReportSection() throws ApiException, RemoteException;
+
+  /**
+   * Set the default report section. If the given argument is <code>null</code> the top level report
+   * section is set as the default.
+   * 
+   * @param reportSection
+   *          The report section to be set.
+   * @throws ApiException
+   *           if the report section is not part of the project or if it is not a report section
+   *           assesslet.
+   * @throws RemoteException
+   */
+  void setDefaultReportSection(Assessment reportSection) throws ApiException, RemoteException;
 }

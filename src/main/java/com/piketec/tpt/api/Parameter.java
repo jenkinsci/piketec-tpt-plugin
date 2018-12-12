@@ -23,7 +23,7 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * A parameter can change during a test execution but normaly holds the same value most time.
+ * A parameter can change during a test execution but normally holds the same value most time.
  * 
  * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
  */

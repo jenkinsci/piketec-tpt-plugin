@@ -57,7 +57,7 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    *          The old position of the element.
    * @param to
    *          The new position for the element given by <code>from</code>
-   * @return Returns a referens to the moved item.
+   * @return Returns a reference to the moved item.
    * @throws IndexOutOfBoundsException
    *           If <code>to &lt; 0 </code> or <code>from &lt; 0</code> or
    *           <code>to &gt;= getItems().size()</code> or <code>from &gt;= getItems().size()</code>

@@ -21,6 +21,7 @@
 package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
+import java.util.Set;
 
 import com.piketec.tpt.api.properties.PropertyMap;
 
@@ -182,14 +183,14 @@ public interface Assessment extends AssessmentOrGroup {
    * Returns a list of variants, for which the assessment is enabled. Returns an empty list, if the
    * assssement is enabled for all variants.
    *
-   * @return A list of variants and variant groups.
+   * @return A list of {@link Scenario variants}.
    */
   public RemoteCollection<Scenario> getSelectedVariants() throws ApiException, RemoteException;
 
   /**
    * Enable the assessment for a particular variant or variant group. If it the arguement is a
    * {@link ScenarioGroup} auto include will be enabled for this group and all children will be
-   * enabled recursivly. To disable the assessment again, use {@link #getSelectedVariants()} or
+   * enabled recursivly. To disable, use {@link #getSelectedVariants()} or
    * {@link #getAutoIncludeVariantGroups()} and remove the desired objects.
    * 
    * @param sog
@@ -200,26 +201,28 @@ public interface Assessment extends AssessmentOrGroup {
   public void enableForVariant(ScenarioOrGroup sog) throws ApiException, RemoteException;
 
   /**
-   * Returns a list of variant groups that will automatically select newly added variants and
-   * enables auto include for newly added variant groups.
+   * Returns a list of variant groups that will automatically select newly added {@link Scenario
+   * variants} and enables auto include for newly added {@link ScenarioGroup variant groups}. Look
+   * at {@link #enableAutoIncludeForVariantGroup(ScenarioGroup)} for disable variant groups.
    *
-   * @return A list of variant groups.
+   * @return A list of {@link ScenarioGroup variant groups}.
    */
   public RemoteCollection<ScenarioGroup> getAutoIncludeVariantGroups()
       throws ApiException, RemoteException;
 
   /**
-   * Enable the group to automatically select newly added variants and variant groups. To disable
-   * the assessment again, use {@link #getAutoIncludeVariantGroups()} and remove the desired
-   * objects.
+   * Enable the group to automatically select newly added {@link Scenario variants} and
+   * {@link ScenarioGroup variant groups}. To disable, use {@link #getAutoIncludeVariantGroups()}
+   * and remove the desired objects.
    * 
    * @see Assessment#enableForVariant(ScenarioOrGroup)
    * 
-   * @param sog
+   * @param scenarioGroup
+   *          for which auto include should be activated
    * @throws ApiException
    * @throws RemoteException
    */
-  public void enableAutoIncludeForVariantGroup(ScenarioGroup sog)
+  public void enableAutoIncludeForVariantGroup(ScenarioGroup scenarioGroup)
       throws ApiException, RemoteException;
 
   /**
@@ -228,7 +231,7 @@ public interface Assessment extends AssessmentOrGroup {
    * @return A list of test cases or test case groups ({@link com.piketec.tpt.api.ScenarioOrGroup
    *         ScenarioOrGroup})
    * 
-   * @deprecated Use {@link #getSelectedTestCases()} and #getA
+   * @deprecated Use {@link #getSelectedTestCases()} and {@link #getAutoIncludeTestCaseGroups()}
    */
   @Deprecated
   public RemoteCollection<ScenarioOrGroup> getEnabledTestCases()
@@ -237,16 +240,17 @@ public interface Assessment extends AssessmentOrGroup {
   /**
    * Returns a list of test cases for which the assessment is enabled.
    * 
-   * @return A list of test cases or test case groups ({@link com.piketec.tpt.api.ScenarioOrGroup
-   *         ScenarioOrGroup})
+   * @return A list of {@link Scenario test cases}
    */
   public RemoteCollection<Scenario> getSelectedTestCases() throws ApiException, RemoteException;
 
   /**
-   * Returns a list of test case groups that will automatically select newly added test cases and
-   * enables auto include for newly added test case groups.
+   * Returns a list of {@link ScenarioGroup test case groups} that will automatically select newly
+   * added {@link Scenario test cases} and enables auto include for newly added {@link ScenarioGroup
+   * test case groups}. For disable groups, look at
+   * {@link #enableAutoIncludeForTestCaseGroup(ScenarioGroup)}
    *
-   * @return A list of variant groups.
+   * @return A list of {@link ScenarioGroup test case groups}.
    */
   public RemoteCollection<ScenarioGroup> getAutoIncludeTestCaseGroups()
       throws ApiException, RemoteException;
@@ -263,16 +267,18 @@ public interface Assessment extends AssessmentOrGroup {
   public void enableForTestCase(ScenarioOrGroup sog) throws ApiException, RemoteException;
 
   /**
-   * Enable the group to automatically select newly added variants and variant groups. To disable,
-   * use {@link #getAutoIncludeTestCaseGroups()} and remove the desired objects.
+   * Enable the {@link ScenarioGroup test case group} to automatically select newly added
+   * {@link Scenario test cases} and {@link ScenarioGroup test case groups}. To disable, use
+   * {@link #getAutoIncludeTestCaseGroups()} and remove the desired objects.
    * 
-   * @see Assessment#enableForVariant(ScenarioOrGroup)
+   * @see Assessment#enableForTestCase(ScenarioOrGroup)
    * 
-   * @param sog
+   * @param scenarioGroup
+   *          for which auto include should be activated.
    * @throws ApiException
    * @throws RemoteException
    */
-  public void enableAutoIncludeForTestCaseGroup(ScenarioGroup sog)
+  public void enableAutoIncludeForTestCaseGroup(ScenarioGroup scenarioGroup)
       throws ApiException, RemoteException;
 
   /**
@@ -313,7 +319,7 @@ public interface Assessment extends AssessmentOrGroup {
    * A <code>PropertyMap</code> maps the properties as follows: {@link java.lang.String String}
    * -&gt; {@link com.piketec.tpt.api.properties.Property Property}. A <code>Property</code> is
    * either a <code>PropertyMap</code> or a <code>String</code> value.
-   * <p>
+   * </p>
    * The structure of the PropertyMap depends on the type of the assessment.
    * 
    * @return A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} with the settings for
@@ -333,4 +339,19 @@ public interface Assessment extends AssessmentOrGroup {
    */
   public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
 
+  /**
+   * Returns all active test cases with respect to the variant context.
+   */
+  public Set<Scenario> getActiveTestCases() throws ApiException, RemoteException;
+
+  /**
+   * Get all requirements currently linked to this assesslet. The content of the collection is only
+   * a snapshot of the current state but removing items from this list will remove the link in TPT
+   * anyway even if the link was created after receiving this collection.
+   * 
+   * @return The currently linked requirements.
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  RemoteCollection<Requirement> getLinkedRequirements() throws ApiException, RemoteException;
 }

@@ -20,7 +20,6 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
@@ -29,7 +28,7 @@ import java.util.Collection;
  *
  * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
-public interface RemoteCollection<E> extends Remote {
+public interface RemoteCollection<E> extends TptRemote {
 
   /**
    * @return Returns all items from this <code>RemoteCollection</code>. Any change to the returned
@@ -44,6 +43,7 @@ public interface RemoteCollection<E> extends Remote {
    * 
    * If multiple {@link NamedObject NamedObjects} refer to the same TPT object, the TPT object will
    * be deleted from the collection as soon as this method is called with any of those.
+   * </p>
    * 
    * @param element
    *          The element to remove.

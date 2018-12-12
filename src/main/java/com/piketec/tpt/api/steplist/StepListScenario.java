@@ -36,7 +36,7 @@ import com.piketec.tpt.api.Testlet;
 public interface StepListScenario extends Scenario {
 
   /**
-   * @return The list of {@link Step Steps} in thier given order.
+   * @return The list of {@link Step Steps} in their given order.
    */
   public RemoteList<Step> getSteps() throws ApiException, RemoteException;
 
@@ -44,7 +44,7 @@ public interface StepListScenario extends Scenario {
    * Create a step of a given type at the given position.
    * 
    * @param index
-   *          Indicates the position where the new step shall be insertet in the Steplist
+   *          Indicates the position where the new step shall be inserted in the step list
    *          represented by this object.
    * @param type
    *          The type of the newly created Step as String
@@ -53,5 +53,49 @@ public interface StepListScenario extends Scenario {
    *           If the given <code>type</code> does not exist.
    */
   public Step createStep(int index, String type) throws ApiException, RemoteException;
+
+  /**
+   * Set the do assessment variable from a step list scenario. When it is set to true, all the
+   * compare steps will be considered during the execution, otherwise they will be ignored. If the
+   * variable is set to false, it will automatically deactivate the report always variable.
+   * 
+   * @param active
+   *          true if the do assessment variable should be turned on.
+   * @throws ApiException
+   *           If the scenario is not a step list scenario
+   * @throws RemoteException
+   */
+  void setDoAssessment(boolean active) throws ApiException, RemoteException;
+
+  /**
+   * Get the value from the do assessment variable for the given scenario.
+   * 
+   * @return True if the do assessment variable is on, otherwise false.
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  boolean isDoAssessment() throws ApiException, RemoteException;
+
+  /**
+   * Set the report always variable from a step list scenario. When it is set to true, all the
+   * compare steps will be appear in the report, otherwise they will be ignored. If this variable is
+   * set to true, it will automatically activate the do assessment variable.
+   * 
+   * @param active
+   *          true if the report always variable should be turned on.
+   * @throws ApiException
+   *           If the scenario is not a step list scenario
+   * @throws RemoteException
+   */
+  void setReportAlways(boolean active) throws ApiException, RemoteException;
+
+  /**
+   * Get the value from the report always variable for the given scenario.
+   * 
+   * @return True if the report always variable is on, otherwise false.
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  boolean isReportAlways() throws ApiException, RemoteException;
 
 }

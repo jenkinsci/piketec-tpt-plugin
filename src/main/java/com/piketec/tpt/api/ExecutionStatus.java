@@ -20,28 +20,32 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.List;
 
 import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
 
 /**
- * This object provides an interface to the current state of the test execution. <br>
+ * This object provides an interface to the current state of the test execution.
+ * <p>
+ * </p>
  * This interface basically represent the information as provided by the Run Progress Dialog.
  *
  * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
-public interface ExecutionStatus extends Remote {
+public interface ExecutionStatus extends TptRemote {
 
   /**
-   * @return Indicates whether the test execution is still pending.
+   * @return Indicates whether the test execution is interrupted by user interaction, paused or has
+   *         not started yet.
    *
    */
   public boolean isPending() throws ApiException, RemoteException;
 
   /**
-   * @return Indicates whether the test execution is currently running.
+   * @return Indicates whether the test execution is currently running (and not queued, interrupted
+   *         or finished).
    *
    */
   public boolean isRunning() throws ApiException, RemoteException;
@@ -51,22 +55,23 @@ public interface ExecutionStatus extends Remote {
    * <p>
    * The outcome of this operation depends on the platform. In the most cases, the execution of the
    * current test case is finished.
+   * </p>
    */
   public void cancel() throws ApiException, RemoteException;
 
   /**
-   * Returns a list containing the execution state ({@link TestCaseExecutionStatus} for each test
+   * Returns a list containing the execution state ({@link TestCaseExecutionStatus}) for each test
    * case that are part of this test execution.
    *
-   * @return A list conting the states of the executed test cases or an empty list, if no test
+   * @return A list containing the states of the executed test cases or an empty list, if no test
    *         execution have been started so far.
    */
   public Collection<TestCaseExecutionStatus> getAllTestCases() throws ApiException, RemoteException;
 
   /**
-   * Returns the number of all testcases of the current test execution. Test cases that are part of
+   * Returns the number of all test cases of the current test execution. Test cases that are part of
    * the test set in more that one {@link ExecutionConfigurationItem} (e.g. in a Back2Back test
-   * scenario), will be counted for each {@link ExecutionConfigurationItem} seperately.
+   * scenario), will be counted for each {@link ExecutionConfigurationItem} separately.
    *
    * @return Number of total test cases executed
    */
@@ -74,7 +79,9 @@ public interface ExecutionStatus extends Remote {
 
   /**
    * Returns the number of test cases that are part of the current test execution that are currently
-   * not finished (with state {@link TestCaseStatus#Pending}). <br>
+   * not finished (with state {@link TestCaseStatus#Pending}).
+   * <p>
+   * </p>
    * Test cases that are part of the test set in more that one {@link ExecutionConfigurationItem}
    * (e.g. in a Back2Back test scenario), will be counted for each
    * {@link ExecutionConfigurationItem} separately.
@@ -95,7 +102,7 @@ public interface ExecutionStatus extends Remote {
    * <p>
    * The cumulative execution state of all test cases is derived from the following priority (from
    * high to low): ResultError, ResultFailed, ResultUnknown, ResultSuccess, Running, Pending
-   * <p>
+   * </p>
    * The cumulative state is derived from at highest priority set for at least one of all test
    * cases.
    * 
@@ -106,4 +113,10 @@ public interface ExecutionStatus extends Remote {
    */
   public TestCaseStatus getTotalExecutionStatus() throws ApiException, RemoteException;
 
+  /**
+   * @return Returns a list of log entries as <code>String</code>
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  public List<String> getExecutionLog() throws ApiException, RemoteException;
 }

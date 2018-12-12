@@ -27,8 +27,9 @@ import java.util.List;
  * This object represents the result of an attempt to open a TPT project. It contains the project as
  * well as any log messages occurred during the opening of the project.
  * <p>
- * Log messages can ocurr if the project file was created in a previous release of TPT or if it
+ * Log messages can occur if the project file was created in a previous release of TPT or if it
  * contains information for license options currently not available.
+ * </p>
  * 
  * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
@@ -40,12 +41,12 @@ public class OpenResult implements Serializable {
   /**
    * A handle to the open TPT project.
    */
-  public final Project project;
+  private final Project project;
 
   /**
-   * A list of messages occurred druring the open-operation.
+   * A list of messages occurred during the open-operation.
    */
-  public final List<String> logs;
+  private final List<String> logs;
 
   /**
    * Constructor. Should not be called manually. Will be called from
@@ -61,9 +62,9 @@ public class OpenResult implements Serializable {
   }
 
   /**
-   * Returns a list of log entries that have occured during the parsing of the TPT file.
+   * Returns a list of log entries that have occurred during the parsing of the TPT file.
    * 
-   * @return List of log messesages. Empty if no errors/warning have occured.
+   * @return List of log messages. Empty if no errors/warning have occurred.
    */
   public List<String> getLogs() {
     return logs;

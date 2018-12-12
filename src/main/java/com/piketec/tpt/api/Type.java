@@ -25,6 +25,18 @@ import java.rmi.RemoteException;
 /**
  * A type is the data type of a {@link Declaration}.
  * 
+ * 
+ * <p>
+ * 
+ * Anonymous types are copied so equals will return false:
+ * 
+ * <pre>
+ * Type anonymousType = project.createType(null, "float[]");
+ * Channel channel = project.createChannel("myChannel");
+ * channel.setType(anonymousType);
+ * return channel.getType().equals(anonymousType); // false
+ * </pre>
+ * </p>
  *
  * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT).
  */

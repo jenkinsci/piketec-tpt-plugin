@@ -23,7 +23,9 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * This object provides an interface to a Mapping in TPT. <br>
+ * This object provides an interface to a Mapping in TPT.
+ * <p>
+ * </p>
  * The Mapping itself contains a number of Mapping Flavors.
  *
  */
@@ -65,6 +67,8 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
 
   public static final String TASMO_INPUT_SPECIFICATION_FLAVOR = "TASMO Input Specification";
 
+  public static final String SOMEIP_FLAVOR = "SOME/IP Configuration";
+
   /**
    * Returns the list of all Mapping Flavors contained in this mapping.
    * 
@@ -79,8 +83,61 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    *          The name of the flavor.
    * @throws ApiException
    *           If <code>flavorName == null</code> or the mapping already contains the flavor or the
-   *           name of the flavor is unkown to TPT.
+   *           name of the flavor is unknown to TPT.
    */
   void addFlavor(String flavorName) throws ApiException, RemoteException;
+
+  /**
+   * Get the value of the given mapping flavor column.
+   * 
+   * @param decl
+   *          The {@link Declaration} from which you want to get the flavor.
+   * @param column
+   *          The name of the column of the flavor.
+   * @param allowDefaultValue
+   *          A flag which allows to get the default value from the flavor in case it is null.
+   * @return The String representation of the value from the given mapping flavor column.
+   * @throws ApiException
+   *           If the declaration or the column is null, if the declaration does not locally exists
+   *           or if the mapping does not have any flavor with the given column.
+   * @throws RemoteException
+   */
+  String getMappingFlavorColumnValue(Declaration decl, String column, boolean allowDefaultValue)
+      throws ApiException, RemoteException;
+
+  /**
+   * Set the value of the given mapping flavor column.
+   * 
+   * @param decl
+   *          The {@link Declaration} from which you want to set the flavor.
+   * @param column
+   *          The name of the column of the flavor.
+   * @param value
+   *          The value to be set
+   * @throws ApiException
+   *           If the declaration or the column is null, if the declaration does not locally exists,
+   *           if the mapping does not have any flavor with the given column or if the value can not
+   *           be parsed to the column type.
+   * @throws RemoteException
+   */
+  void setMappingFlavorColumnValue(Declaration decl, String column, String value)
+      throws ApiException, RemoteException;
+
+  /**
+   * 
+   * Get the default value of the given mapping flavor column for the given declaration.
+   * 
+   * @param decl
+   *          The {@link Declaration} from which you want to get the flavor.
+   * @param column
+   *          The name of the column of the flavor.
+   * @return The String representation of the default value from the flavor
+   * @throws ApiException
+   *           If the declaration or the column is null, if the declaration does not locally exists
+   *           or if the mapping does not have any flavor with the given column.
+   * @throws RemoteException
+   */
+  String getMappingFlavorColumnDefaultValue(Declaration decl, String column)
+      throws ApiException, RemoteException;
 
 }

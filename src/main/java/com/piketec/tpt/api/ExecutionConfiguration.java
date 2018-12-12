@@ -30,10 +30,11 @@ import java.util.Map;
  * An <code>ExecutionConfiguration</code> can be only created via
  * {@link Project#createExecutionConfiguration(String)}. The configuration consists of a number of
  * attributes as well as a list of {@link ExecutionConfigurationItem}. The attributes represent the
- * controls from the executution configuration GUI.
- * <p>
+ * controls from the execution configuration GUI.
+ * </p>
  * For a detailed description of the attributes please refer to the User Guide.
- *
+ * 
+ * 
  * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface ExecutionConfiguration
@@ -77,9 +78,14 @@ public interface ExecutionConfiguration
   public File getDataDir() throws ApiException, RemoteException;
 
   /**
-   * @return Returns the test data direcory as {@link String}
+   * @return Returns the test data directory as {@link String}
    */
   public String getDataDirPath() throws ApiException, RemoteException;
+
+  /**
+   * @return Returns the advanced report settings.
+   */
+  public AdvancedReportSettings getAdvancedReportSettings() throws RemoteException, ApiException;
 
   /**
    * @return The report directory.
@@ -116,9 +122,9 @@ public interface ExecutionConfiguration
   /**
    * Set the report directory.
    * <p>
-   * Optionally, specify the report direcory as {@link File}. Use <code>null</code> to set the data
-   * direcory.
-   * 
+   * Optionally, specify the report directory as {@link File}. Use <code>null</code> to set the data
+   * directory.
+   * </p>
    * 
    * @param f
    *          The report directory as <code>File</code> or <code>null</code>
@@ -131,8 +137,9 @@ public interface ExecutionConfiguration
   /**
    * Set the report directory.
    * <p>
-   * Optionally, specify the report direcory as {@link String}. Use <code>null</code> to set the
-   * data direcory.
+   * Optionally, specify the report directory as {@link String}. Use <code>null</code> to set the
+   * data directory.
+   * </p>
    * 
    * @param path
    *          The report directory as <code>String</code> or <code>null</code>
@@ -190,6 +197,7 @@ public interface ExecutionConfiguration
    *          Set whether a report should be generated.
    *          <p>
    *          Note that a report can be only generated if assessments have been executed.
+   *          </p>
    */
   public void setRunReport(boolean enabled) throws ApiException, RemoteException;
 
@@ -201,12 +209,12 @@ public interface ExecutionConfiguration
 
   /**
    * @param enabled
-   *          Enable the Dashboard during execution.
+   *          Enable the dashboard during execution.
    */
   public void setRunDashboard(boolean enabled) throws ApiException, RemoteException;
 
   /**
-   * Returns the addtional attributes for a Execution Configuration as specified by the user. This
+   * Returns the additional attributes for a Execution Configuration as specified by the user. This
    * map corresponds to the "Attributes" tab of the Execution Configuration GUI.
    * 
    * @return User attributes as map
@@ -216,7 +224,9 @@ public interface ExecutionConfiguration
 
   /**
    * Set a user-defined attribute given by <code>key</code> to the value given by the
-   * <code>value</code> parameter. <br>
+   * <code>value</code> parameter.
+   * <p>
+   * </p>
    * If <code>value==null</code>, the attribute <code>key</code> will be deleted.
    * 
    * @param key
@@ -262,7 +272,7 @@ public interface ExecutionConfiguration
    * @param dds
    *          The new directory structure.
    * @throws ApiException
-   *           if the given directory structure is unkown to the API.
+   *           if the given directory structure is unknown to the API.
    */
   public void setDataDirStructure(DataDirStructure dds) throws ApiException, RemoteException;
 
@@ -291,9 +301,9 @@ public interface ExecutionConfiguration
   /**
    * @return Returns <code>null</code> if "Pack report" is not enabled. Otherwise, the target file
    *         for the ZIP is returned.
-   * 
+   * @deprecated Use {@link AdvancedReportSettings#getCompressionPath()} instead.
    */
-
+  @Deprecated
   public String getReportPackPath() throws ApiException, RemoteException;
 
   /**
@@ -303,20 +313,27 @@ public interface ExecutionConfiguration
    * @param zipFile
    *          target file or <code>null</code>.
    * 
+   * @deprecated Use {@link AdvancedReportSettings#setCompressionPath(String)} instead.
    */
+  @Deprecated
   public void setReportPackPath(String zipFile) throws ApiException, RemoteException;
 
   /**
-   * @return Returns <code>true</code> if the riport directory should be deleted after it has been
+   * @return Returns <code>true</code> if the report directory should be deleted after it has been
    *         zipped by "Pack report".
+   * @deprecated Use {@link AdvancedReportSettings#isDeleteReportDirAfterCompression()} instead.
    */
+  @Deprecated
   public boolean isDeleteReportDirAfterPack() throws ApiException, RemoteException;
 
   /**
    * @param enable
    *          Enable or disable the automatic removal of the report directory if "Pack report" is
    *          enabled and after the report has been zipped.
+   * @deprecated Use {@link AdvancedReportSettings#setDeleteReportDirAfterCompression(boolean)}
+   *             instead.
    */
+  @Deprecated
   public void setDeleteReportDirAfterPack(boolean enable) throws ApiException, RemoteException;
 
 }

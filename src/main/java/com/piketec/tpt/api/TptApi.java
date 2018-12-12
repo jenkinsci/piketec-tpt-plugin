@@ -21,14 +21,13 @@
 package com.piketec.tpt.api;
 
 import java.io.File;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
 /**
  * Main entry point for the access to TPT via the Remote API
  */
-public interface TptApi extends Remote {
+public interface TptApi extends TptRemote {
 
   /**
    * Close the TPT instance represented by this object.
@@ -48,6 +47,7 @@ public interface TptApi extends Remote {
    * <p>
    * Any errors or warnings that occur during the open-operation are stored in the
    * {@link OpenResult#logs}.
+   * </p>
    * 
    * @param f
    *          The path to the TPT-file as {@link File}
@@ -105,7 +105,7 @@ public interface TptApi extends Remote {
    *           if there is already a running test execution or if the test execution could not be
    *           started
    * @throws RemoteException
-   *           If <code>config</code> is not part of the TPT instance prepresented by this object.
+   *           If <code>config</code> is not part of the TPT instance represented by this object.
    */
   public ExecutionStatus run(ExecutionConfiguration config) throws ApiException, RemoteException;
 
@@ -114,14 +114,15 @@ public interface TptApi extends Remote {
    * <p>
    * This function does not execute or asses the test cases specified in <code>config</code>. It
    * uses the existing result data and XML-files to generate a new overview report.
-   *
+   * </p>
+   * 
    * @param config
    *          The {@link ExecutionConfiguration} for which the overview report should be generated.
    * @throws ApiException
    *           if there is already a running test execution or if the test execution could not be
    *           started
    * @throws RemoteException
-   *           If <code>config</code> is not part of the TPT instance prepresented by this object.
+   *           If <code>config</code> is not part of the TPT instance represented by this object.
    */
   public ExecutionStatus reGenerateOverviewReport(ExecutionConfiguration config)
       throws ApiException, RemoteException;
@@ -143,6 +144,7 @@ public interface TptApi extends Remote {
    * <p>
    * This function returns <code>true</code> as soon as all plugins have been completely loaded and
    * TPT is ready for use.
+   * </p>
    * 
    * @return Whether TPT has finished its startup
    * @throws RemoteException

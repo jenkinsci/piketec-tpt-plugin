@@ -30,10 +30,10 @@ import java.rmi.server.ObjID;
  * 
  * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
-public interface IdentifiableRemote extends Remote {
+public interface IdentifiableRemote extends TptRemote {
 
   /**
-   * @return The unique identfier for this object.
+   * @return The unique identifier for this object.
    */
   ObjID getIdentifier() throws RemoteException;
 

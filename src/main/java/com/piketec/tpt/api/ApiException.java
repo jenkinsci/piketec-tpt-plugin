@@ -21,7 +21,7 @@
 package com.piketec.tpt.api;
 
 /**
- * This exception indicates a misuse ot the TPT API.
+ * This exception indicates a misuse of the TPT API.
  */
 public class ApiException extends Exception {
 

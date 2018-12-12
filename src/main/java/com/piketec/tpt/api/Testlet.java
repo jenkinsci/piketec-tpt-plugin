@@ -40,13 +40,14 @@ import com.piketec.tpt.api.steplist.StepListScenario;
  * <p>
  * It could contain variants for both, {@link StepListScenario StepListScenarios} or
  * {@link DiagramScenario DiagramScenarios}.
+ * </p>
  */
 public interface Testlet extends DiagramNode, Positioned {
 
   /**
    * @return Returns <code>true</code>, if this testlet has defined content. This means it is either
-   *         a testlet or a reference. Returns <code>false</code> if no content has be set if the
-   *         content has been deleted (for example by the context menu in the TPT GUI).
+   *         a testlet or a reference. Returns <code>false</code> if no content has been set or if
+   *         the content has been deleted (for example by the context menu in the TPT GUI).
    *
    */
   public boolean hasDefinedContent() throws ApiException, RemoteException;
@@ -81,7 +82,7 @@ public interface Testlet extends DiagramNode, Positioned {
 
   /**
    * Creates a new diagram variant ({@link DiagramScenario}) or a new test case (if the current
-   * <code>Testlet</code> is the toplevel <code>Testlet</code>). If the parameter
+   * <code>Testlet</code> is the top-level <code>Testlet</code>). If the parameter
    * <code>groupOrNull==null</code>, the newly created StepList variant is placed directly below the
    * Testlet ({@link Testlet#getTopLevelScenarioOrGroup()}). If a specific {@link ScenarioGroup} is
    * given, the newly created variant is placed there.
@@ -90,7 +91,7 @@ public interface Testlet extends DiagramNode, Positioned {
    *          The name of the new variant. <code>Null</code> will be reduced to an empty string.
    * @param groupOrNull
    *          Either the group where the newly created {@link DiagramScenario} should be added or
-   *          <code>null</code> to add it in the toplevel group of this <code>Testlet</code>.
+   *          <code>null</code> to add it in the top-level group of this <code>Testlet</code>.
    * @return the newly created {@link DiagramScenario}
    * @throws ApiException
    *           If the content of the <code>Testlet</code> is empty
@@ -165,6 +166,16 @@ public interface Testlet extends DiagramNode, Positioned {
   public RemoteCollection<Final> getFinals() throws ApiException, RemoteException;
 
   /**
+   * Get the top level group that contains all {@link ScenarioOrGroup ScenarioOrGroups} that are
+   * delivered by {@link #getTopLevelScenarioOrGroup()}. A call of
+   * {@link ScenarioOrGroup#getGroup()} on this group will deliver <code>null</code>.
+   * 
+   * @return the top-level scenario group or <code>null</code> if the testlet has no content
+   *         ({@link #hasDefinedContent()}).
+   */
+  ScenarioGroup getToplevelScenarioGroup() throws RemoteException, ApiException;
+
+  /**
    * Creates a new {@link Transition} from a node <code>from</code> to a node <code>to</code>. A
    * node can either be a {@link Transition}, a {@link Junction} or {@link ApiException}
    * {@link Final}.
@@ -199,7 +210,7 @@ public interface Testlet extends DiagramNode, Positioned {
   public Line createLine(int y) throws ApiException, RemoteException;
 
   /**
-   * Create a new {@link TextArea} at the position <code>pos</code> whith the content
+   * Create a new {@link TextArea} at the position <code>pos</code> with the content
    * <code>text</code>.
    * 
    * @param text
@@ -235,7 +246,7 @@ public interface Testlet extends DiagramNode, Positioned {
   public Testlet createTestlet(String name) throws ApiException, RemoteException;
 
   /**
-   * Create a new {@link Junction} at the given position <code>pos</pos>
+   * Create a new {@link Junction} at the given position <code>pos</code>
    * 
    * @param pos
    *          The position in the diagram given as {@link Point}.
@@ -251,5 +262,4 @@ public interface Testlet extends DiagramNode, Positioned {
    * @return The newly created {@link Final}
    */
   public Final createFinal(Point pos) throws ApiException, RemoteException;
-
 }

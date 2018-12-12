@@ -36,14 +36,16 @@ public interface TestCaseAttribute extends IdentifiableRemote {
 
   /**
    * Type String for URI Test Case Attribute
+   * 
+   * @deprecated since TPT13 all attributes are strings
    */
+  @Deprecated
   public static final String URI_TYPE = "URI";
 
   /**
-   * Returns the type of this attribute; currently it is either a <code>String</code> or a
-   * <code>URI</code>.
+   * Returns the type of this attribute; currently it is always {@link #STRING_TYPE}.
    * 
-   * @return The type as a <code>String</code>.
+   * @return The type as a <code>String</code> (which contains the text '<code>String</code>').
    * @throws ApiException
    * @throws RemoteException
    */
@@ -69,7 +71,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
 
   /**
    * Indicates whether the value of a <code>TestCaseAttribute</code> will be copied with the test
-   * case it is assigned to. In the TPT GUI this setting correponds to the check box in the
+   * case it is assigned to. In the TPT GUI this setting corresponds to the check box in the
    * <code>TestCaseAttribute</code> definition dialog.
    * 
    * @return <code>true</code>, if the <code>TestCaseAttribute</code> will be automatically copied

@@ -32,9 +32,8 @@ import com.piketec.tpt.api.Testlet;
  * A {@link DiagramScenario} represents either a test case or a graphically specified Variant for a
  * diagram {@link Testlet}. It specifies
  * <li>a path through the automaton given by a set of (active) {@link Transition Transitions}</li>
- * <li>a selected Variant ({@link Scenario}) for eacht Testlet in the path</li>
- * <li>a slected {@link TransitionSpec} for each of the above {@link Transition Transitions}
- * <li>
+ * <li>a selected Variant ({@link Scenario}) for each Testlet in the path</li>
+ * <li>a selected {@link TransitionSpec} for each of the above {@link Transition Transitions}</li>
  * 
  * @see Testlet#createDiagVariant(String, com.piketec.tpt.api.ScenarioGroup)
  */
@@ -64,9 +63,9 @@ public interface DiagramScenario extends Scenario {
    * or <code>null</code>.
    * 
    * @param state
-   *          The <code>State</code>, for wich the currently selected variant shall be examined.
+   *          The <code>State</code>, for which the currently selected variant shall be examined.
    * @return <code>null</code> if no Variant has been previously selected for this
-   *         <code>State</code> in the current Scenarion. The selected {@link Scenario Variant}
+   *         <code>State</code> in the current Scenario. The selected {@link Scenario Variant}
    *         otherwise.
    * @throws RemoteException
    *           If the given <code>State</code> object is not a {@link RemoteObject} or it does not
@@ -76,8 +75,8 @@ public interface DiagramScenario extends Scenario {
 
   /**
    * Set a given {@link Scenario Variant} for a given {@link Testlet} in the current
-   * <code>Scenario>/code>.
-   * If <code>variant==null</code>, the currently selected varant will be deleted.
+   * <code>Scenario</code>. If <code>variant==null</code>, the currently selected varant will be
+   * deleted.
    *
    * @param state
    *          Represents the <code>State</code>, for which a variant shall be set.
@@ -109,9 +108,9 @@ public interface DiagramScenario extends Scenario {
    * the current <code>Scenario</code>.
    * 
    * @param transition
-   *          The Transition, for which the new transtion specification shall be set.
+   *          The Transition, for which the new transition specification shall be set.
    * @param transitionSpec
-   *          The new transition specification or <code>null</code> to selct none.
+   *          The new transition specification or <code>null</code> to select none.
    * 
    * @throws RemoteException
    *           If the given <code>transition</code> or <code>transitionSpec</code> objects are not a

@@ -33,6 +33,27 @@ import java.util.Map;
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 
   /**
+   * Get the current back to back settings. If <code>createIfUnavailable</code> is <code>true</code>
+   * the return value is never <code>null</code> and new back to back settings are created with
+   * reference directory as reference if no settings are available yet.
+   * 
+   * @param createIfUnavailable
+   *          if <code>true</code> the result is never <code>null</code> and new setting are created
+   *          if none are set.
+   * 
+   * @return Returns the Back2BackSettings if already configured, creates and returns fresh settings
+   *         if set to "No Reference Platform" and <code>createIfUnavailable</code> is
+   *         <code>true</code>, <code>null</code> otherwise.
+   */
+  public Back2BackSettings getBack2BackSettings(boolean createIfUnavailable)
+      throws ApiException, RemoteException;
+
+  /**
+   * Removes the back to back settings of this item (set reference to "No Reference Platform").
+   */
+  public void removeBack2BackSettings() throws ApiException, RemoteException;
+
+  /**
    * @return The {@link ExecutionConfiguration} this instance belongs to.
    * 
    * @throws ApiException
@@ -95,7 +116,7 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * <p>
    * These variable could potentially overwrite variables defined in a parent scope. However, other
    * variables defined in a parent scope are not returned by this function.
-   * 
+   * </p>
    * 
    * @return A map containing the names of the "locally" defined variables and there "local" values.
    */
@@ -139,13 +160,16 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
   public void setParameterFilePath(String path) throws ApiException, RemoteException;
 
   /**
-   * Enable or disable whether assessments sould be executed for this
+   * Enable or disable whether assessments should be executed for this
    * <code>ExecutionConfigItem</code>.
    * <p>
    * This option enables the user to omit the assessments for a particular Platform Configuration
-   * although the execution of assessments is enabled for the Execution Configuration.<br>
+   * although the execution of assessments is enabled for the Execution Configuration.
+   * <p>
+   * </p>
    * However, in the opposite case, disabling the assessment in the Execution Configuration and
    * enabling it for the Platform will have no effect.
+   * </p>
    * 
    * @param run
    *          A Boolean indicating whether the assessments shall be run or not.
@@ -173,4 +197,5 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    *
    */
   public void setVariable(String name, String value) throws ApiException, RemoteException;
+
 }

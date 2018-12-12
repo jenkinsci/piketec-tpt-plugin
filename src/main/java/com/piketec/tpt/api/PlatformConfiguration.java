@@ -29,7 +29,8 @@ import com.piketec.tpt.api.properties.PropertyMap;
  * This object represents a configuration for a specific platform adapter.
  * <p>
  * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
- *
+ * </p>
+ * 
  * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
@@ -192,7 +193,7 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * <p>
    * A PropertyMap maps the properties as follows: {@link String} -&gt; {@link Property}. A
    * <code>Property</code> is either a <code>ProperyMap</code> or a <code>String</code> value.
-   * <p>
+   * </p>
    * The structure of the PropertyMap depends on the type of the platform adapter.
    * 
    * @return A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} with the settings for
@@ -204,9 +205,10 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * Set the configuration for the platform adapter via {@link PropertyMap}.
    * <p>
    * Since an incomplete <code>PropertyMap</code> could lead to unpredictable behavior, it is
-   * genrally recommended to modify the <code>PropertyMap</code> returned by
+   * generally recommended to modify the <code>PropertyMap</code> returned by
    * {@link #getProperties()}.
-   *
+   * </p>
+   * 
    * @param properties
    *          A PropertyMap for the respective platform adapter.
    */
@@ -219,7 +221,7 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * <p>
    * The function is identified by its name. The {@link PropertyMap} can be used to provide
    * additional parameters to the function.
-   * 
+   * </p>
    * If the function name is unknown or if the <code>PropertyMap</code> does not match the expected
    * structure, an {@link ApiException} is invoked. Often exception message contains a hint which
    * functions are available.
@@ -229,7 +231,7 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * @param parameterOrNull
    *          A <code>PropertyMap</code> representing the function arguments or <code>null</code>
    * @throws ApiException
-   *           If the function is not availabe or the PropertyMap is invalid for the invoked
+   *           If the function is not available or the PropertyMap is invalid for the invoked
    *           function.
    */
   public void invoke(String functionName, PropertyMap parameterOrNull)

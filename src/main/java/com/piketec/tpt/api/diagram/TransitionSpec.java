@@ -49,7 +49,7 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
   public void setCondition(String condition) throws ApiException, RemoteException;
 
   /**
-   * Returns the actions to be executed when a transtion fires.
+   * Returns the actions to be executed when a transition fires.
    * 
    * @return The description of the actions as {@link String}
    */

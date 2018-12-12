@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2018 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,34 +23,49 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * A <code>TestSet</code> represents a set of test cases ({@link Scenario Scenarios})
+ * A attachment is nothing more than a file name and some content.
  */
-public interface TestSet extends NamedObject, IdentifiableRemote {
+public interface Attachment extends IdentifiableRemote {
 
   /**
-   * @return The {@link RemoteCollection set} of all {@link Scenario test cases} that are assigned
-   *         to this <code>TestSet</code>.
-   */
-  public RemoteCollection<Scenario> getTestCases() throws ApiException, RemoteException;
-
-  /**
-   * Add a new test case to the test set.
-   * <p>
-   * A test case is a {@link Scenario} that is placed directly or in any sub-group of the top level
-   * {@link ScenarioGroup} of the top level {@link Testlet} of a TPT project.
-   * </p>
+   * Get the file name of the attachment.
    * 
-   * @see ScenarioOrGroup#isTestcaseOrGroup()
-   * @see Project#getTopLevelTestlet()
-   * @see Testlet#getTopLevelScenarioOrGroup()
-   * 
-   * @param tc
-   *          The test case to be added to the <code>TestSet</code>
+   * @return The file name
    * @throws ApiException
-   *           If the given <code>Scenario</code> is not a test case.
    * @throws RemoteException
-   *           If the given <code>Scenario</code> is not an object from the current TPT instance.
    */
-  public void addTestCase(Scenario tc) throws ApiException, RemoteException;
+  String getFileName() throws ApiException, RemoteException;
+
+  /**
+   * Set the file name of the attachment. The file name is used to create temporary files when
+   * viewing the attachment and will be shown as tooltip in TPT.
+   * 
+   * @param fileName
+   *          The new file name.
+   * @throws ApiException
+   *           If the new name is empty or null.
+   * @throws RemoteException
+   */
+  void setFileName(String fileName) throws ApiException, RemoteException;
+
+  /**
+   * Get the attachment content as a byte array.
+   * 
+   * @return The attachment content.
+   * @throws ApiException
+   * @throws RemoteException
+   */
+  byte[] getContent() throws ApiException, RemoteException;
+
+  /**
+   * Set the content of the attachment.
+   * 
+   * @param content
+   *          The new content of the attachment as byte array
+   * @throws ApiException
+   *           If the new content is <code>null</code>.
+   * @throws RemoteException
+   */
+  void setContent(byte[] content) throws ApiException, RemoteException;
 
 }

@@ -184,6 +184,7 @@ class TptPluginMasterJobExecutor {
     return success;
   }
 
+  @SuppressWarnings("deprecation") // support old TPT versions
   private boolean executeOneConfig(JenkinsConfiguration ec, TptApi api)
       throws InterruptedException {
     if (!ec.isEnableTest()) {

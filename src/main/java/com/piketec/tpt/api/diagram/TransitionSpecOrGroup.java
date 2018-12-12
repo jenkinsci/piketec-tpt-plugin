@@ -34,7 +34,7 @@ public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject {
 
   /**
    * Returns a {@link TransitionSpecGroup} if the object is a child object or <code>null</code> if
-   * the object is dircrectly contained by the {@link Transition}.
+   * the object is directly contained by the {@link Transition}.
    *
    * @return The parent group or <code>null</code>.
    */

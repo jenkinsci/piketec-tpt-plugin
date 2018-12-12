@@ -26,8 +26,8 @@ import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 
 /**
- * A horizontal line that divides a Diagram into two paralell regions. Each region needs to contain
- * a seperate, parallel automaton.
+ * A horizontal line that divides a Diagram into two parallel regions. Each region needs to contain
+ * a separate, parallel automaton.
  */
 public interface Line extends IdentifiableRemote {
 
@@ -39,7 +39,7 @@ public interface Line extends IdentifiableRemote {
   public int getPosition() throws ApiException, RemoteException;
 
   /**
-   * Set the vertical postion of a line in the drawing area.
+   * Set the vertical position of a line in the drawing area.
    * 
    * @param y
    *          The vertical (y-)position for the line.

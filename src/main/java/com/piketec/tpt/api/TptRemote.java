@@ -20,30 +20,13 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.RemoteException;
+import java.rmi.Remote;
 
 /**
- * This class represent an object with a name.
+ * All objects accessible as remote objects in the TPT API implement this interface.
  * 
- * @author Copyright (c) 2017 Piketec GmbH - All rights reserved.
- *
+ * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
  */
-public interface NamedObject extends TptRemote {
-
-  /**
-   * @return the current name for the object.
-   */
-  public String getName() throws ApiException, RemoteException;
-
-  /**
-   * Set a new name for the object.
-   * 
-   * @param newName
-   *          the new name
-   * 
-   * @throws ApiException
-   *           if <code>newName</code> is not a legal name.
-   */
-  public void setName(String newName) throws ApiException, RemoteException;
+public interface TptRemote extends Remote {
 
 }

@@ -147,6 +147,7 @@ class TptPluginSlaveExecutor {
    * 
    * @return true if the tpt execution has been successfully.
    */
+  @SuppressWarnings("deprecation") // support old TPT versions
   public boolean execute() {
     logger = new TptLogger(listener.getLogger());
     try {

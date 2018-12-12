@@ -23,8 +23,8 @@ package com.piketec.tpt.api.diagram;
 import com.piketec.tpt.api.Testlet;
 
 /**
- * A {@link Junction} where multiple transions could start or end. This node is not a
- * {@link Testlet} and, hence, does not cosume time during executions.
+ * A {@link Junction} where multiple transitions could start or end. This node is not a
+ * {@link Testlet} and, hence, does not consume time during executions.
  * 
  */
 public interface Junction extends DiagramNode, Positioned {

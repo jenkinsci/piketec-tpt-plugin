@@ -28,7 +28,7 @@ import java.rmi.RemoteException;
  * <p>
  * In TPT, it represents both the tree of variants and variant groups as well as the test cases and
  * test case groups. Both can be assigned with a description as well as parameters.
- * 
+ * </p>
  */
 public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
 
@@ -82,14 +82,17 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * @param parameterName
    *          The name of the {@link Parameter}.
    * @param value
-   *          The new value for the {@link Parameter} or <br>
+   *          The new value for the {@link Parameter} or
+   *          <p>
+   *          </p>
    *          <code>null</code> to remove a value specific to this <code>ScenarioOrGroup</code>.
    * @throws ApiException
    *           <lu>
    *           <li>if the name of the parameter does not exists or</li>
-   *           <li>the object identified by the name is not a Parameter or</li>
    *           <li>the parameter is READONLY.</li> </lu>
+   * @deprecated Will be removed in TPT 14. Replaced by {@link #setInitialValue(String, String)}
    */
+  @Deprecated
   public void setParameterDefinition(String parameterName, String value)
       throws ApiException, RemoteException;
 
@@ -104,17 +107,54 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * @throws ApiException
    *           <lu>
    *           <li>if the name of the parameter does not exists or</li>
-   *           <li>the object identified by the name is not a Parameter or</li>
    *           <li>the parameter is READONLY.</li> </lu>
+   * @deprecated Will be removed in TPT 14. Replaced by {@link #getInitialValue(String)}
    */
-  public String getParameterDefinition(String parameterName) throws ApiException, RemoteException;
+  @Deprecated
+  public String getParameterDefintion(String parameterName) throws ApiException, RemoteException;
+
+  /**
+   * Set a given initial <code>value</code> for a given <code>declarationName</code> for this
+   * <code>ScenarioOrGroup</code>. This corresponds to the initial values tab for test cases and
+   * variants. Child nodes inherit the setting from theire parent groups.
+   * 
+   * 
+   * @param declarationName
+   *          The name of the {@link Declaration}.
+   * @param value
+   *          The new value for the {@link Declaration} or
+   *          <p>
+   *          </p>
+   *          <code>null</code> to remove a value specific to this <code>ScenarioOrGroup</code>.
+   * @throws ApiException
+   *           <lu>
+   *           <li>if the name of the declaration does not exists or</li>
+   *           <li>the declaration is a read only parameter.</li> </lu>
+   */
+  public void setInitialValue(String declarationName, String value)
+      throws ApiException, RemoteException;
+
+  /**
+   * Returns the initial value for a given <code>declarationName</code> as defined for this
+   * <code>ScenarioOrGroup</code>. Returns <code>null</code> if no value has been set for this
+   * <code>ScenarioOrGroup</code>.
+   * 
+   * @param parameterName
+   *          Name of the {@link Declaration}
+   * @return <code>null</code> or the currently set value.
+   * @throws ApiException
+   *           <lu>
+   *           <li>if the name of the parameter does not exists or</li>
+   *           <li>the declaration is a read only parameter.</li> </lu>
+   */
+  public String getInitialValue(String declarationName) throws ApiException, RemoteException;
 
   /**
    * Returns the value for a given {@link TestCaseAttribute} that is defined for this Scenario.
    * <p>
-   * {@link TestCaseAttribute TestCaseAttributes} are only avalable for test cases. The type of the
+   * {@link TestCaseAttribute TestCaseAttributes} are only available for test cases. The type of the
    * Scenario can be determined using {@link ScenarioOrGroup#isTestcaseOrGroup()}.
-   * 
+   * </p>
    * 
    * @see Project#createTestCaseAttribute(String, String)
    * 
@@ -126,7 +166,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    *           name has been defined.
    * @throws RemoteException
    */
-  public Object getTestCaseAttributeValue(String name) throws ApiException, RemoteException;
+  public String getTestCaseAttributeValue(String name) throws ApiException, RemoteException;
 
   /**
    * Set the <code>value</code> for the {@link TestCaseAttribute} of a given <code>name</code> for
@@ -134,6 +174,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * <p>
    * {@link TestCaseAttribute TestCaseAttributes} are only available for test cases. The type of the
    * Scenario can be determined using {@link ScenarioOrGroup#isTestcaseOrGroup()}.
+   * </p>
    * 
    * @param name
    *          The <code>name</code> of the {@link TestCaseAttribute}
@@ -146,7 +187,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    *           {@link TestCaseAttribute#getType() type} of the attribute.
    * @throws RemoteException
    */
-  public void setTestCaseAttributeValue(String name, Object value)
+  public void setTestCaseAttributeValue(String name, String value)
       throws ApiException, RemoteException;
 
 }

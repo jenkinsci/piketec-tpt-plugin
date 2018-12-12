@@ -20,7 +20,6 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -28,22 +27,23 @@ import java.util.List;
  * This object provides an interface to obtain the current state of execution as well as any log
  * messages for the assigned test case.
  */
-public interface TestCaseExecutionStatus extends Remote {
+public interface TestCaseExecutionStatus extends TptRemote {
 
   /**
    * This enumeration represents all possible execution and result states for a test case.
    * <p>
    * The possible options are:
-   * 
+   * </p>
+   * <ul>
    * <li>Pending</li>
-   * <li>Running</li>
    * <li>ResultUnknown</li>
    * <li>ResultSuccess</li>
    * <li>ResultFailed</li>
    * <li>ResultError</li>
+   * <li>Running</li>
    * <li>ResultNoAsssessments <b>Deprecated:</b> Only listed to remain compatible to old TPT
    * versions. Completely replaced by ResultUnkown.</li>
-   * 
+   * </ul>
    */
   public enum TestCaseStatus {
     Pending, ResultUnknown, ResultSuccess, ResultFailed, ResultError, Running,
@@ -71,9 +71,10 @@ public interface TestCaseExecutionStatus extends Remote {
    * overwritten by this operation.
    * <p>
    * This function corresponds to the "reclassify" button in the TPT GUI.
+   * </p>
    * 
    * @param success
-   *          <li><code>true</code> if the test result should be reclassified to a succes</li>
+   *          <li><code>true</code> if the test result should be reclassified to a success</li>
    *          <li><code>false</code> if the test result should be reclassified to a failure</li>
    * @param userName
    *          The name for the user that is responsible for the reclassification.
@@ -87,10 +88,11 @@ public interface TestCaseExecutionStatus extends Remote {
    * @return The {@link ExecutionConfigurationItem} in which the assigned test case was, is or
    *         should be executed.
    */
-  public ExecutionConfigurationItem getExecutionConfigurationItem() throws RemoteException;
+  public ExecutionConfigurationItem getExecutionConfigurationItem()
+      throws ApiException, RemoteException;
 
   /**
    * @return The assigned test case.
    */
-  public Scenario getTestcase() throws RemoteException;
+  public Scenario getTestcase() throws ApiException, RemoteException;
 }

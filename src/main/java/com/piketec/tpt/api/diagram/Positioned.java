@@ -21,21 +21,21 @@
 package com.piketec.tpt.api.diagram;
 
 import java.awt.Point;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import com.piketec.tpt.api.ApiException;
+import com.piketec.tpt.api.TptRemote;
 
 /**
  * The class represents an object with a position (x- and y- coordinate) in the diagram like a state
  * or a junction.
  */
-public interface Positioned extends Remote {
+public interface Positioned extends TptRemote {
 
   /**
    * Return the current position of the object as a two-dimensional {@link Point}.
    * 
-   * @return A poin representing x-and y- coordinate of this object.
+   * @return A point representing x-and y- coordinate of this object.
    */
   public Point getPosition() throws ApiException, RemoteException;
 
@@ -43,7 +43,7 @@ public interface Positioned extends Remote {
    * Set the position of a object.
    * 
    * @param p
-   *          A {@link Point} represting the desired position of the object in the two-dimensional
+   *          A {@link Point} representing the desired position of the object in the two-dimensional
    *          drawing area.
    */
   public void setPosition(Point p) throws ApiException, RemoteException;

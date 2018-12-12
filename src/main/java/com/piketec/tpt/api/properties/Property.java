@@ -30,12 +30,13 @@ public interface Property {
    * nested) property values of this <code>Property</code> object.
    * 
    * <p>
-   * For that, the given String <code>indentation</code> is used initally and each additional
+   * For that, the given String <code>indentation</code> is used initially and each additional
    * element is shifted by additional whitespaces.
+   * </p>
    * 
    * @param buffer
    * @param indentation
-   *          String representing the current intendation.
+   *          String representing the current indentation.
    */
   void toString(StringBuffer buffer, String indentation);
 

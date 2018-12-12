@@ -48,7 +48,8 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
   void setGroup(String group) throws ApiException, RemoteException;
 
   /**
-   * @return The unit of the declaration, if unit was set.
+   * @return The unit of the declaration, if unit was set for primitive types, for complex types
+   *         units of subvariables are united.
    * @throws ApiException
    * @throws RemoteException
    */
@@ -57,18 +58,22 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
   /**
    * @return The unit of the declaration, if unit was set, else implicit unit, which unites units of
    *         subvariables.
+   * @deprecated Use {@link #getUnit()} instead.
    * @throws ApiException
    * @throws RemoteException
    */
+  @Deprecated
   String getImplicitUnit() throws ApiException, RemoteException;
 
   /**
-   * Set the unit of the declaration. structs, maps and curves cannot have units.
+   * Set the unit of the declaration. For structs, maps and curves provide a comma separated list of
+   * units in braces, which fits their structure.
    * 
    * @param unit
    *          The new unit of the declaration. <code>Null</code> will be reduced to an empty string.
    * @throws ApiException
-   *           If the type of the declaration is struct, map or curve.
+   *           If the provided string is not allowed as unit and, in case of structs, maps and
+   *           curves, if it does not fit their structure.
    * @throws RemoteException
    */
   void setUnit(String unit) throws ApiException, RemoteException;

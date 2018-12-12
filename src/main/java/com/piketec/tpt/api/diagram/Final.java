@@ -21,7 +21,7 @@
 package com.piketec.tpt.api.diagram;
 
 /**
- * A {@link DiagramNode} where {@link Transition Transions} can end but never. Reaching this node
+ * A {@link DiagramNode} where {@link Transition Transitions} can end but never. Reaching this node
  * during test execution will terminate the corresponding region in the automaton.
  */
 public interface Final extends DiagramNode, Positioned {

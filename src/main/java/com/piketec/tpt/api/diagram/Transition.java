@@ -29,7 +29,7 @@ import com.piketec.tpt.api.NamedObject;
 import com.piketec.tpt.api.RemoteList;
 
 /**
- * This object represents the graphical transtion between two {@link DiagramNode DiagramNodes}.
+ * This object represents the graphical transition between two {@link DiagramNode DiagramNodes}.
  */
 public interface Transition extends NamedObject, IdentifiableRemote {
 
@@ -89,7 +89,7 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * <p>
    * Since it can be either specifications or groups of specifications, it returns a list of
    * {@link TransitionSpecOrGroup} that might represent a tree of specifications.
-   * 
+   * </p>
    * 
    * @return The list of transition specifications or specification groups.
    */
@@ -103,9 +103,9 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * @param name
    *          The name for the new {@link TransitionSpec}
    * @param groupOrNull
-   *          The {@link TransitionSpecGroup}, where the newly created specification sall be added
+   *          The {@link TransitionSpecGroup}, where the newly created specification shall be added
    *          or <code>null</code> if it shall be directly added to the list of specifications of
-   *          this thansition.
+   *          this transition.
    * @return The newly created {@link TransitionSpec}.
    * @throws RemoteException
    *           If <code>groupOrNull</code> does not belong to the TPT instance represented by the
@@ -121,9 +121,9 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * @param name
    *          The name for the new {@link TransitionSpecGroup}
    * @param groupOrNull
-   *          The {@link TransitionSpecGroup}, where the newly created specification sall be added
+   *          The {@link TransitionSpecGroup}, where the newly created specification shall be added
    *          or <code>null</code> if it shall be directly added to the list of specifications of
-   *          this thansition.
+   *          this transition.
    * @return The newly created {@link TransitionSpecGroup}.
    * @throws RemoteException
    *           If <code>groupOrNull</code> does not belong to the TPT instance represented by the
