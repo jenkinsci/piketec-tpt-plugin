@@ -4,6 +4,9 @@ import java.rmi.RemoteException;
 
 public interface AdvancedReportSettings extends IdentifiableRemote {
 
+  /**
+   * Different settings whether assessment variables are shown in the report or not.
+   */
   enum ShowAssessmentVariables {
     /**
      * No assessment variable is shown in the report.
@@ -174,7 +177,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * there for structural reasons. If set to <code>false</code>, they are not shown in the report
    * (which might make it a bit smaller).
    * 
-   * @return get attribute showHeadings
+   * @return get attribute showRequirementHeadings
    */
   public boolean isShowRequirementHeadings() throws RemoteException, ApiException;
 
@@ -200,7 +203,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * is added to the report, showing all test cases with their status (e.g. stable, in progress,
    * new, ...)
    * 
-   * @return get attribute showTestCaseStatusInformation
+   * @return get attribute checkAndShowTestCaseStatusInformation
    */
   public boolean isCheckAndShowTestCaseStatusInformation() throws RemoteException, ApiException;
 
@@ -354,15 +357,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * report.
    * 
    * @param showAssessmentVariables
-   *          never: No assessment variable is shown in the report.
-   * 
-   *          passed_failed_only: Assessment variables are only shown in the report if they have a
-   *          result (passed, failed).
-   * 
-   *          always: Assessment variables are always shown in the report, even if they are
-   *          inconclusive.
+   *          the new attribute value
    */
-  public void setShowAssessmentVariables(com.piketec.tpt.api.AdvancedReportSettings.ShowAssessmentVariables showAssessmentVariables)
+  public void setShowAssessmentVariables(ShowAssessmentVariables showAssessmentVariables)
       throws RemoteException, ApiException;
 
   /**
@@ -389,7 +386,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
       throws RemoteException, ApiException;
 
   /**
-   * Changes if comments are shown in the requirements result table.
+   * Changes if comments are shown in the requirements results table.
    * 
    * @param showRequirementComments
    *          the new attribute value

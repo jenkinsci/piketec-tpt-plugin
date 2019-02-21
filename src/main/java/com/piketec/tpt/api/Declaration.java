@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2017 PikeTec GmbH
+ * Copyright (c) 2016-2019 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * A <code>Declaration</code> is either a signal or a parameter or a constant.
  * 
- * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
+ * @author Copyright (c) 2016-2019 Piketec GmbH - MIT License (MIT)
  */
 public interface Declaration extends NamedObject, IdentifiableRemote {
 

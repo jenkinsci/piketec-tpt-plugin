@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2017 PikeTec GmbH
+ * Copyright (c) 2016-2019 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * An assessment variable is used to evaluate tests.
  * 
- * @author Copyright (c) 2017 Piketec GmbH - MIT License (MIT)
+ * @author Copyright (c) 2016-2019 Piketec GmbH - MIT License (MIT)
  */
 public interface AssessmentVariable extends Declaration {
 

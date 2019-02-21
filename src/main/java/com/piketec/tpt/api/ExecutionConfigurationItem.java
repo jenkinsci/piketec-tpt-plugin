@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2016-2019 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import java.util.Map;
  * Configuration of the test execution for a particular platform, test set and parameter set. Part
  * of a {@link ExecutionConfiguration}
  *
- * @author Copyright (c) 2017 Piketec GmbH - All rights reserved.
+ * @author Copyright (c) 2016-2019 Piketec GmbH - All rights reserved.
  */
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 

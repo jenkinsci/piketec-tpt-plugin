@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016 PikeTec GmbH
+ * Copyright (c) 2016-2019 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -41,16 +41,11 @@ public interface Scenario extends ScenarioOrGroup {
 
   /**
    * Returns the test data directory of scenario for a given execution configuration item. Since
-   * ${tpt.date} and ${tpt.time} placeholders are only valid during runtime you can specify the
-   * value if needed. Otherwise they are not defined and ApiException will be thrown if used in the
-   * test data path.
+   * ${tpt.date} and ${tpt.time} placeholders are only valid during runtime they cannot be used in
+   * the test data path and an {@link ApiException} will be thrown.
    * 
    * @param execConfigItem
    *          The execution configuration item to calculate the test data directory.
-   * @param dateValueOrNull
-   *          The wanted value for ${tpt.date} or <code>null</code>.
-   * @param timeValueOrNull
-   *          The wanted value for ${tpt.time} or <code>null</code>.
    * @return The test data directory as an absolute file
    * @throws ApiException
    *           If the execution configuration does not belong to the model of the scenario, the
@@ -58,8 +53,7 @@ public interface Scenario extends ScenarioOrGroup {
    *           the execution configuration has unresolvable placeholder variables.
    * @throws RemoteException
    */
-  public File getTestDataDirectory(ExecutionConfigurationItem execConfigItem,
-                                   String dateValueOrNull, String timeValueOrNull)
+  public File getTestDataDirectory(ExecutionConfigurationItem execConfigItem)
       throws RemoteException, ApiException;
 
 }

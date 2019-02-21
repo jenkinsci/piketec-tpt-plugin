@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2016-2019 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -69,8 +69,7 @@ public interface Requirement extends IdentifiableRemote {
   RequirementType getType() throws ApiException, RemoteException;
 
   /**
-   * Set the type of the requirement. Only requirements with no links can be changed to heading or
-   * information.
+   * Set the type of the requirement.
    * 
    * @param type
    *          The new type of the Requirement
@@ -89,7 +88,7 @@ public interface Requirement extends IdentifiableRemote {
   String getID() throws ApiException, RemoteException;
 
   /**
-   * A requirement normally belongs to a module. The default module is an empty String.
+   * A requirement normally belongs to a module. The default module is an empty string.
    * 
    * @return The name of the module the requirement belongs to.
    * @throws ApiException

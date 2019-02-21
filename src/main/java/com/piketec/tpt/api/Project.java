@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2016-2019 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -34,7 +34,7 @@ import com.piketec.tpt.api.Requirement.RequirementType;
  * {@link TptApi#newProject(File)} or opened via {@link TptApi#openProject(File)}.
  * 
  *
- * @author Copyright (c) 2018 Piketec GmbH - MIT License (MIT)
+ * @author Copyright (c) 2016-2019 Piketec GmbH - MIT License (MIT)
  */
 public interface Project extends IdentifiableRemote {
 
@@ -694,7 +694,7 @@ public interface Project extends IdentifiableRemote {
    * section is set as the default.
    * 
    * @param reportSection
-   *          The report section to be set.
+   *          The report section to be set or <code>null</code> to set top level as default.
    * @throws ApiException
    *           if the report section is not part of the project or if it is not a report section
    *           assesslet.
