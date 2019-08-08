@@ -21,6 +21,7 @@
 package com.piketec.jenkins.plugins.tpt;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +29,7 @@ import java.util.Date;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -65,9 +67,10 @@ public class TestcaseParser extends DefaultHandler {
    *           If the Job is cancelled
    */
   public static Testcase parseXml(FilePath xmlFile) throws IOException, InterruptedException {
+    InputStream inputStream = xmlFile.read();
     try {
       TestcaseParser parser = new TestcaseParser();
-      SAXParserFactory.newInstance().newSAXParser().parse(xmlFile.read(), parser);
+      SAXParserFactory.newInstance().newSAXParser().parse(inputStream, parser);
       if (parser.ti == null) {
         throw new IOException(
             "XML file " + xmlFile + " does not contain tag <testcaseinformation>");
@@ -79,6 +82,8 @@ public class TestcaseParser extends DefaultHandler {
       throw new IOException("SAX error: " + e.getMessage());
     } catch (IOException e) {
       throw new IOException("I/O error: " + e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
   }
 

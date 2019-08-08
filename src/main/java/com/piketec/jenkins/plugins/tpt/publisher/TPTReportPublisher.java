@@ -197,8 +197,12 @@ public class TPTReportPublisher extends Notifier {
     FilePath summaryXMl = new FilePath(testDataDir, "test_summary.xml");
     if (summaryXMl.exists()) {
       InputStream inputStream = summaryXMl.read();
-      String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-      containsTestcaseInformation = result.contains("TestcaseInformation");
+      try {
+        String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        containsTestcaseInformation = result.contains("TestcaseInformation");
+      } finally {
+        IOUtils.closeQuietly(inputStream);
+      }
     }
     // File is only corrupt, when there arent any testcase_information and it does not contain any
     // testcaseinformation tag.

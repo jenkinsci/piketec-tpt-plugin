@@ -1,6 +1,7 @@
 package com.piketec.jenkins.plugins.tpt;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -40,9 +42,10 @@ public class TestcaseSummaryParser extends DefaultHandler {
    *           If the Job is cancelled
    */
   public static List<Testcase> parseXml(FilePath xmlFile) throws IOException, InterruptedException {
+    InputStream inputStream = xmlFile.read();
     try {
       TestcaseSummaryParser parser = new TestcaseSummaryParser();
-      SAXParserFactory.newInstance().newSAXParser().parse(xmlFile.read(), parser);
+      SAXParserFactory.newInstance().newSAXParser().parse(inputStream, parser);
       return parser.testCases;
     } catch (ParserConfigurationException e) {
       throw new IOException("XML parser config error: " + e.getMessage());
@@ -50,6 +53,8 @@ public class TestcaseSummaryParser extends DefaultHandler {
       throw new IOException("SAX error: " + e.getMessage());
     } catch (IOException e) {
       throw new IOException("I/O error: " + e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
   }
 
