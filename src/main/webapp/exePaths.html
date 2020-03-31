@@ -20,5 +20,10 @@
  -->
 <div>
     The path of the tpt.exe file on Jenkins (add &quot;\tpt.exe&quot; at the end). You can specifiy
-    multiple paths as a comma seperated list. In that case the first existing path found will be used.
+    multiple paths as a comma seperated list. In that case the first existing path found will be used.<br/>
+    
+	You can specify either an absolute path or a path relative to the workspace. <br/>
+	
+	If this is a distributed build, so if you use an Agent to execute this task, make sure the path is in 
+	the context of the Agent machine and not the Master machine.
 </div>

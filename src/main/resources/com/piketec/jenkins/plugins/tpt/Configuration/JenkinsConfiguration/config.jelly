@@ -61,13 +61,13 @@
 
 	<f:advanced>
 		<f:entry field="testdataDir" title="Test data directory"
-			help="/plugin/piketec-tpt/testdatadir.html"
+			help="/plugin/piketec-tpt/testdataDir.html"
 		>
 			<f:textbox value="${instance.testdataDir}" />
 		</f:entry>
 
 		<f:entry field="reportDir" title="Report directory"
-			help="/plugin/piketec-tpt/reportdir.html"
+			help="/plugin/piketec-tpt/reportDir.html"
 		>
 			<f:textbox value="${instance.reportDir}" />
 		</f:entry>

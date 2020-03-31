@@ -19,5 +19,10 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  -->
 <div>
-  The path relative to workspace where the test data will be saved.
+  The path where the test data will be saved.<br/>
+  
+  You can specify either an absolute path or a path relative to the workspace. <br/>
+	
+  If this is a distributed build, so if you use an Agent to execute this task, make sure the path is in 
+  the context of the Agent machine and not the Master machine.
 </div>
