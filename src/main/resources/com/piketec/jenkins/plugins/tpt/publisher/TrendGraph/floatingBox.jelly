@@ -41,7 +41,7 @@
   </div>
   </j:if>
   <j:if test="${trustSlaves}">
-  <iframe  id="knowledgeFrame" width="1650" height="410" frameborder="0" src="${it.getAbsoluteUrl()}/TPTtrendResults/index.html" ></iframe>
+  <iframe  id="knowledgeFrame" width="1650" height="410" frameborder="0" src="/${it.getUrl()}/TPTtrendResults/index.html" ></iframe>
   </j:if>
  </j:if>
 </j:jelly>

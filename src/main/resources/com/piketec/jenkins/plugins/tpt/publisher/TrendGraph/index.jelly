@@ -103,7 +103,7 @@
 <j:if test="${it.isTrustSlavesAndUsers()}">
 			<iframe sandbox="allow-scripts allow-popups allow-forms" id="knowledgeFrame" width="1650" height="400"
 				frameborder="0"
-				src="${it.project.getAbsoluteUrl()}/TPTtrendResults/index.html"></iframe>
+				src="/${it.project.getUrl()}/TPTtrendResults/index.html"></iframe>
 </j:if>
 <j:if test="${!it.isTrustSlavesAndUsers()}">
     <p style="color:#CCCC00">Cannot display the TPT trend graph. Please "Trust Slaves and User to modify Jenkins workspace" under <a href="${it.rootUrl}/configure">Jenkins Configuration</a></p>
@@ -119,11 +119,11 @@
 				</tr>
 				<j:forEach items="${it.historyData}" var="configuration">
 					<tr>
-						<td class="pane" ><a href="${it.project.getAbsoluteUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.buildNummer}</a></td>
-						<td class="pane" ><a href="${it.project.getAbsoluteUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.passed}</a></td>
-						<td class="pane" ><a href="${it.project.getAbsoluteUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.inconclusive}</a></td>
-						<td class="pane"><a href="${it.project.getAbsoluteUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.error}</a></td>
-						<td class="pane"><a href="${it.project.getAbsoluteUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.failed}</a></td>
+						<td class="pane" ><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.buildNummer}</a></td>
+						<td class="pane" ><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.passed}</a></td>
+						<td class="pane" ><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.inconclusive}</a></td>
+						<td class="pane"><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.error}</a></td>
+						<td class="pane"><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.failed}</a></td>
 					</tr>
 				</j:forEach>
 			</table>
