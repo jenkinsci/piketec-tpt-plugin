@@ -118,6 +118,7 @@ class TptPluginSingleJobExecutor {
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
       try {
+    	logger.info("Try to find TPT installation: "+f.getRemote());
         if (f.exists()) {
           exeFile = f;
           break;
@@ -136,18 +137,21 @@ class TptPluginSingleJobExecutor {
     // execute the sub-configuration
     for (JenkinsConfiguration ec : executionConfigs) {
       if (ec.isEnableTest()) {
-        String testdataDir = Utils.getGeneratedTestDataDir(ec);
+    	// Absolute paths are recognized as such, relative paths are resolved depending on the workspace directory,
+    	// or the unique sub folder created in the workspace for the current job. 
+    	String testdataDir = Utils.getGeneratedTestDataDir(ec);
         FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
         String reportDir = Utils.getGeneratedReportDir(ec);
         FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
-        File tptFile = Utils.getAbsolutePath(workspaceDir, new File(ec.getTptFile()));
+        FilePath tptFilePath = new FilePath(build.getWorkspace(),ec.getTptFile());
+        
         String configurationName = ec.getConfiguration();
         String tesSet = ec.getTestSet();
-        logger.info("*** Running TPT-File \"" + tptFile + //
+        logger.info("*** Running TPT-File \"" + tptFilePath + //
             "\" with configuration \"" + configurationName + "\" now. ***");
         if (Utils.createParentDir(new File(testdataDir), workspace)
             && Utils.createParentDir(new File(reportDir), workspace)) {
-          String cmd = buildCommand(exeFile, arguments, tptFile, testDataPath.getRemote(),
+          String cmd = buildCommand(exeFile, arguments, tptFilePath, testDataPath.getRemote(),
               reportPath.getRemote(), configurationName, tesSet);
           try {
             // run the test...
@@ -197,7 +201,7 @@ class TptPluginSingleJobExecutor {
    *          the name of the execution configuration to execute
    * @return The concatenated string to start the test execution via command line.
    */
-  private String buildCommand(FilePath exeFile, String arguments, File tptFile, String dataDir,
+  private String buildCommand(FilePath exeFile, String arguments, FilePath tptFile, String dataDir,
                               String reportDir, String configurationName, String testSet) {
     StringBuilder cmd = new StringBuilder();
     String exeString = exeFile.getRemote();
@@ -212,7 +216,7 @@ class TptPluginSingleJobExecutor {
     cmd.append(' ');
     cmd.append(arguments);
     cmd.append(' ');
-    String tptFileString = tptFile.toString();
+    String tptFileString = tptFile.getRemote();
     // surround path with ""
     if (!tptFileString.startsWith("\"")) {
       cmd.append('"');

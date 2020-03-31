@@ -335,7 +335,7 @@ public class TptPlugin extends Builder {
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
     for (int i = 0; i < expandedStringExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(launcher.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(build.getWorkspace(), environment.expand(expandedStringExePaths[i].trim()));
     }
     // expand arguments and report
     String expandedArguments = environment.expand(this.arguments);
@@ -374,7 +374,7 @@ public class TptPlugin extends Builder {
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
     for (int i = 0; i < expandedStringExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(launcher.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(build.getWorkspace(), environment.expand(expandedStringExePaths[i].trim()));
     }
     String jUnitXmlPath = environment.expand(jUnitreport);
     // expand and parse TPT RMI port
