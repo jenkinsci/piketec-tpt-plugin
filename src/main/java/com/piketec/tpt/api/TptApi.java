@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -33,20 +33,27 @@ public interface TptApi extends TptRemote {
    * Close the TPT instance represented by this object.
    *
    * @return <code>false</code> if the application cannot be closed. Possible reasons are:
+   *         <ul>
    *         <li>the user interrupts the close operation</li>
    *         <li>a test is currently running and is not been canceled</li>
    *         <li>other blocking operations prevent TPT from closing</li>
+   *         </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public boolean closeTpt() throws ApiException, RemoteException;
 
   /**
    * 
    * Try to open an already existing project and to return a handle for the project
-   * ({@link OpenResult#project}). If the project is already open, only the handle will be returned.
-   * The project is not re-opened. Changes will not been overwritten.
+   * ({@link OpenResult#getProject()}). If the project is already open, only the handle will be
+   * returned. The project is not re-opened. Changes will not been overwritten.
    * <p>
    * Any errors or warnings that occur during the open-operation are stored in the
-   * {@link OpenResult#logs}.
+   * {@link OpenResult#getLogs()}.
    * </p>
    * 
    * @param f
@@ -54,6 +61,9 @@ public interface TptApi extends TptRemote {
    * @return A {@link OpenResult} containing the handle to the project and the log messages occurred
    *         during the open-operation.
    *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If <code>f</code> do not exists or if <code>f</code> is not a TPT-file.
    */
@@ -68,7 +78,12 @@ public interface TptApi extends TptRemote {
    * @see Project#saveAsProject(File)
    * 
    * @param f
+   *          the file to use for this project
    *
+   * @return the newly created TPT project
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If the given File is already opened in TPT
    */
@@ -77,17 +92,32 @@ public interface TptApi extends TptRemote {
   /**
    * @return Returns the set of all {@link Project Projects} that are currently open in this TPT
    *         instance.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Collection<Project> getOpenProjects() throws ApiException, RemoteException;
 
   /**
    * @return Returns the version name of the TPT instance represented by this API object.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public String getTptVersion() throws ApiException, RemoteException;
 
   /**
    * @return Returns the version number of file format this TPT version will use to store *.tpt-,
    *         *.tptz- and *.tptprj-Files when calling save.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public int getFileFormatVersion() throws ApiException, RemoteException;
 
@@ -118,6 +148,8 @@ public interface TptApi extends TptRemote {
    * 
    * @param config
    *          The {@link ExecutionConfiguration} for which the overview report should be generated.
+   * @return the current status of report generation
+   * 
    * @throws ApiException
    *           if there is already a running test execution or if the test execution could not be
    *           started
@@ -130,10 +162,14 @@ public interface TptApi extends TptRemote {
   /**
    * Selects the object given by <code>obj</code> within the TPT GUI - if it is selectable (like a
    * {@link Scenario} or an {@link Assessment})
-   *
    * 
    * @param obj
    *          A object that implements the {@link IdentifiableRemote} interface
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void select(IdentifiableRemote obj) throws ApiException, RemoteException;
 
@@ -148,6 +184,7 @@ public interface TptApi extends TptRemote {
    * 
    * @return Whether TPT has finished its startup
    * @throws RemoteException
+   *           remote communication problem
    */
   public boolean isReady() throws RemoteException;
 }

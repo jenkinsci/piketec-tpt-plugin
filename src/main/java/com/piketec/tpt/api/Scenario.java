@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -34,8 +34,11 @@ public interface Scenario extends ScenarioOrGroup {
    * anyway even if the link was created after receiving this collection.
    * 
    * @return The currently linked requirements.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RemoteCollection<Requirement> getLinkedRequirements() throws ApiException, RemoteException;
 
@@ -52,6 +55,7 @@ public interface Scenario extends ScenarioOrGroup {
    *           execution configuration has no platform configuration set or the test data path of
    *           the execution configuration has unresolvable placeholder variables.
    * @throws RemoteException
+   *           remote communication problem
    */
   public File getTestDataDirectory(ExecutionConfigurationItem execConfigItem)
       throws RemoteException, ApiException;

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,8 +27,8 @@ import java.rmi.RemoteException;
  * 
  * 
  * <p>
- * 
  * Anonymous types are copied so equals will return false:
+ * </p>
  * 
  * <pre>
  * Type anonymousType = project.createType(null, "float[]");
@@ -36,9 +36,8 @@ import java.rmi.RemoteException;
  * channel.setType(anonymousType);
  * return channel.getType().equals(anonymousType); // false
  * </pre>
- * </p>
  *
- * @author Copyright (c) 2016-2019 Piketec GmbH - MIT License (MIT).
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Type extends IdentifiableRemote {
 
@@ -46,8 +45,11 @@ public interface Type extends IdentifiableRemote {
    * Get the name of the type.
    * 
    * @return The name of the type.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getName() throws ApiException, RemoteException;
 
@@ -60,6 +62,7 @@ public interface Type extends IdentifiableRemote {
    *           If the name is not legal identifier, a type with the given name already exists or the
    *           type is anonymous or predefined.
    * @throws RemoteException
+   *           remote communication problem
    */
   void setName(String name) throws ApiException, RemoteException;
 
@@ -67,8 +70,11 @@ public interface Type extends IdentifiableRemote {
    * Get the type definition as a string as seen in tptaif or in the type editor.
    * 
    * @return The type definition as a string.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getTypeString() throws ApiException, RemoteException;
 
@@ -76,8 +82,11 @@ public interface Type extends IdentifiableRemote {
    * Get if the type is predefined.
    * 
    * @return <code>true</code> if the type is predefined, <code>false</code> otherwise.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   boolean isPredefined() throws ApiException, RemoteException;
 
@@ -86,8 +95,11 @@ public interface Type extends IdentifiableRemote {
    * Get if the type is anonymous.
    * 
    * @return <code>true</code> if the type is anonymous, <code>false</code> otherwise.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   boolean isAnonymous() throws ApiException, RemoteException;
 

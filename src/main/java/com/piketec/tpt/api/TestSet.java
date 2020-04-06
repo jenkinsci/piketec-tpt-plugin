@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,11 +25,16 @@ import java.rmi.RemoteException;
 /**
  * A <code>TestSet</code> represents a set of test cases ({@link Scenario Scenarios})
  */
-public interface TestSet extends NamedObject, IdentifiableRemote {
+public interface TestSet extends TestSetOrGroup {
 
   /**
    * @return The {@link RemoteCollection set} of all {@link Scenario test cases} that are assigned
    *         to this <code>TestSet</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public RemoteCollection<Scenario> getTestCases() throws ApiException, RemoteException;
 
@@ -53,4 +58,37 @@ public interface TestSet extends NamedObject, IdentifiableRemote {
    */
   public void addTestCase(Scenario tc) throws ApiException, RemoteException;
 
+  /**
+   * Returns a list of {@link ScenarioGroup test case groups} that will automatically select newly
+   * added {@link Scenario test cases} and enables auto include for newly added {@link ScenarioGroup
+   * test case groups}. For disable groups, look at
+   * {@link #enableAutoIncludeForTestCaseGroup(ScenarioGroup)}
+   *
+   * @return A list of {@link ScenarioGroup test case groups}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public RemoteCollection<ScenarioGroup> getAutoIncludeTestCaseGroups()
+      throws ApiException, RemoteException;
+
+  /**
+   * Enable the {@link ScenarioGroup test case group} to automatically select newly added
+   * {@link Scenario test cases} and {@link ScenarioGroup test case groups}. To disable, use
+   * {@link #getAutoIncludeTestCaseGroups()} and remove the desired objects.
+   * 
+   * @see Assessment#enableForTestCase(ScenarioOrGroup)
+   * 
+   * @param scenarioGroup
+   *          for which auto include should be activated.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public void enableAutoIncludeForTestCaseGroup(ScenarioGroup scenarioGroup)
+      throws ApiException, RemoteException;
 }

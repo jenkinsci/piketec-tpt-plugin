@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * A channel carries the signal of a test stimulation.
  * 
- * @author Copyright (c) 2016-2019 Piketec GmbH - MIT License (MIT)
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Channel extends Declaration {
 
@@ -57,8 +57,11 @@ public interface Channel extends Declaration {
    * Get if the channel shall be recorded during test execution.
    * 
    * @return <code>true</code> if the channel should be recorded, <code>false</code> otherwise.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   boolean isRecord() throws ApiException, RemoteException;
 
@@ -67,8 +70,11 @@ public interface Channel extends Declaration {
    * 
    * @param on
    *          <code>true</code> if the channel should be recorded, <code>false</code> otherwise.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setRecord(boolean on) throws ApiException, RemoteException;
 
@@ -76,8 +82,11 @@ public interface Channel extends Declaration {
    * Get if the channel is an input, output, local or undefined.
    * 
    * @return The mode of the channel.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   ChannelMode getMode() throws ApiException, RemoteException;
 
@@ -86,8 +95,11 @@ public interface Channel extends Declaration {
    * 
    * @param mode
    *          The new mode of the channel.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setMode(ChannelMode mode) throws ApiException, RemoteException;
 

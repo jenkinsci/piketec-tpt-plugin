@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,26 +27,32 @@ import java.util.List;
 import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
 
 /**
- * This object provides an interface to the current state of the test execution.
- * <p>
- * </p>
- * This interface basically represent the information as provided by the Run Progress Dialog.
+ * This object provides an interface to the current state of the test execution which is the
+ * information as provided by the "Build Progress" Dialog.
  *
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionStatus extends TptRemote {
 
   /**
    * @return Indicates whether the test execution is interrupted by user interaction, paused or has
    *         not started yet.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public boolean isPending() throws ApiException, RemoteException;
 
   /**
    * @return Indicates whether the test execution is currently running (and not queued, interrupted
    *         or finished).
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public boolean isRunning() throws ApiException, RemoteException;
 
@@ -56,6 +62,11 @@ public interface ExecutionStatus extends TptRemote {
    * The outcome of this operation depends on the platform. In the most cases, the execution of the
    * current test case is finished.
    * </p>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void cancel() throws ApiException, RemoteException;
 
@@ -65,6 +76,11 @@ public interface ExecutionStatus extends TptRemote {
    *
    * @return A list containing the states of the executed test cases or an empty list, if no test
    *         execution have been started so far.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Collection<TestCaseExecutionStatus> getAllTestCases() throws ApiException, RemoteException;
 
@@ -74,6 +90,11 @@ public interface ExecutionStatus extends TptRemote {
    * scenario), will be counted for each {@link ExecutionConfigurationItem} separately.
    *
    * @return Number of total test cases executed
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public int getNumberOfAllTestCases() throws ApiException, RemoteException;
 
@@ -81,12 +102,17 @@ public interface ExecutionStatus extends TptRemote {
    * Returns the number of test cases that are part of the current test execution that are currently
    * not finished (with state {@link TestCaseStatus#Pending}).
    * <p>
-   * </p>
    * Test cases that are part of the test set in more that one {@link ExecutionConfigurationItem}
    * (e.g. in a Back2Back test scenario), will be counted for each
    * {@link ExecutionConfigurationItem} separately.
+   * </p>
    *
    * @return The number of currently not executed test cases.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public int getNumberOfPendingTestCases() throws ApiException, RemoteException;
 
@@ -94,6 +120,11 @@ public interface ExecutionStatus extends TptRemote {
    * Return the test case that is currently running (with the state {@link TestCaseStatus#Running}).
    * 
    * @return The currently executed test case or <code>null</code> if no test case is running.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Scenario getCurrentTestCase() throws ApiException, RemoteException;
 
@@ -108,6 +139,9 @@ public interface ExecutionStatus extends TptRemote {
    * 
    * @return The test case execution state with the highest priority.
    * 
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If there are no test in the executed test set.
    */
@@ -115,8 +149,12 @@ public interface ExecutionStatus extends TptRemote {
 
   /**
    * @return Returns a list of log entries as <code>String</code>
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public List<String> getExecutionLog() throws ApiException, RemoteException;
+
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,14 +25,17 @@ import java.rmi.RemoteException;
 /**
  * A <code>Declaration</code> is either a signal or a parameter or a constant.
  * 
- * @author Copyright (c) 2016-2019 Piketec GmbH - MIT License (MIT)
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Declaration extends NamedObject, IdentifiableRemote {
 
   /**
    * @return The group the declaration belongs to. Empty String if no Group is defined.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getGroup() throws ApiException, RemoteException;
 
@@ -42,49 +45,83 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * @param group
    *          The new group. <code>Null</code> or an string containing only whitespaces will be
    *          reduced to an empty string.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setGroup(String group) throws ApiException, RemoteException;
 
   /**
-   * @return The unit of the declaration, if unit was set for primitive types, for complex types
-   *         units of subvariables are united.
-   * @throws ApiException
+   * Returns the name of the unit of the declaration. For complex types units of subvariables are
+   * united. <br>
+   * For unstructured declarations it is recommended to use {@link #getUnitObject()}.
+   * 
+   * @return current unit as a string
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getUnit() throws ApiException, RemoteException;
 
   /**
-   * @return The unit of the declaration, if unit was set, else implicit unit, which unites units of
-   *         subvariables.
-   * @deprecated Use {@link #getUnit()} instead.
-   * @throws ApiException
+   * Returns the {@link Unit} set to this declaration. The method is only allowed on non-structured
+   * declarations. Use {@link #getUnit()} for structured declarations.
+   * 
+   * @return the unit for this declaration or <code>null</code> if no unit is set.
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If this declaration has a strcutured type.
    */
-  @Deprecated
-  String getImplicitUnit() throws ApiException, RemoteException;
+  Unit getUnitObject() throws ApiException, RemoteException;
 
   /**
    * Set the unit of the declaration. For structs, maps and curves provide a comma separated list of
-   * units in braces, which fits their structure.
+   * units in braces, which fits their structure. The units name and symbol can be used. <br>
+   * For unstructured declarations it is recommended to use {@link #setUnit(Unit)}.<br>
+   * <br>
+   * <b>Note:</b> At the moment single units without curly braces (e.g. "km") are accepted for
+   * curves and maps. In this case the unit of the value element will be set. In the future this
+   * might be rejected.
    * 
    * @param unit
    *          The new unit of the declaration. <code>Null</code> will be reduced to an empty string.
    * @throws ApiException
-   *           If the provided string is not allowed as unit and, in case of structs, maps and
-   *           curves, if it does not fit their structure.
+   *           If unit string format is invalid, structure does not match type of the declaration or
+   *           unit does not exist.
    * @throws RemoteException
+   *           remote communication problem
    */
   void setUnit(String unit) throws ApiException, RemoteException;
+
+  /**
+   * Set the unit of this declaration. The method is only allowed on unstructered declarations. Use
+   * {@link #setUnit(String)} for structured declarations.
+   * 
+   * @param unit
+   *          to be set or <code>null</code> to remove unit.
+   * @throws ApiException
+   *           If this declaration has a strcutured type.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setUnit(Unit unit) throws ApiException, RemoteException;
 
   /**
    * Get the default value of the declaration. The format is the same as seen in tptaif or the
    * declaration editor.
    * 
    * @return The default value string.
+   * 
    * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
+   *           remote communication problem
    */
   String getDefaultValue() throws ApiException, RemoteException;
 
@@ -94,9 +131,11 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @param defaultValue
    *          The new default value.
+   * 
    * @throws ApiException
    *           If the given <code>defaultValue</code> string could not be parsed.
    * @throws RemoteException
+   *           remote communication problem
    */
   void setDefaultValue(String defaultValue) throws ApiException, RemoteException;
 
@@ -104,8 +143,11 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * Get the type of the declaration.
    * 
    * @return The type of the declaration.
+   * 
    * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
+   *           remote communication problem
    */
   Type getType() throws ApiException, RemoteException;
 
@@ -128,6 +170,7 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * @throws ApiException
    *           If the given type is unknown in the TPT project.
    * @throws RemoteException
+   *           remote communication problem
    */
   void setType(Type type) throws ApiException, RemoteException;
 
@@ -135,8 +178,11 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * Get the description of the declaration.
    * 
    * @return The description of the declaration.
+   * 
    * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
+   *           remote communication problem
    */
   String getDescription() throws ApiException, RemoteException;
 
@@ -146,8 +192,11 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * @param description
    *          The new description of the declaration. <code>Null</code> will be reduced to an empty
    *          string.
+   * 
    * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
+   *           remote communication problem
    */
   void setDescription(String description) throws ApiException, RemoteException;
 

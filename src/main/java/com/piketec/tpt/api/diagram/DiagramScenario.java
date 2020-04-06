@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,9 +31,11 @@ import com.piketec.tpt.api.Testlet;
 /**
  * A {@link DiagramScenario} represents either a test case or a graphically specified Variant for a
  * diagram {@link Testlet}. It specifies
+ * <ul>
  * <li>a path through the automaton given by a set of (active) {@link Transition Transitions}</li>
  * <li>a selected Variant ({@link Scenario}) for each Testlet in the path</li>
  * <li>a selected {@link TransitionSpec} for each of the above {@link Transition Transitions}</li>
+ * </ul>
  * 
  * @see Testlet#createDiagVariant(String, com.piketec.tpt.api.ScenarioGroup)
  */
@@ -41,7 +43,11 @@ public interface DiagramScenario extends Scenario {
 
   /**
    * @return The list of all selected {@link Transition Transitions} for this variant.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public RemoteCollection<Transition> getPath() throws ApiException, RemoteException;
 
@@ -52,6 +58,9 @@ public interface DiagramScenario extends Scenario {
    * 
    * @param t
    *          The {@link Transition} to add to the path in the scenario.
+   * 
+   * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
    *           If the given <code>Transition</code> object is not a {@link RemoteObject} or it does
    *           not originate from the TPT instance represented by this API object.
@@ -67,6 +76,9 @@ public interface DiagramScenario extends Scenario {
    * @return <code>null</code> if no Variant has been previously selected for this
    *         <code>State</code> in the current Scenario. The selected {@link Scenario Variant}
    *         otherwise.
+   * 
+   * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
    *           If the given <code>State</code> object is not a {@link RemoteObject} or it does not
    *           originate from the TPT instance represented by this API object.
@@ -83,6 +95,9 @@ public interface DiagramScenario extends Scenario {
    * @param variant
    *          A {@link Scenario Variant} to be set or <code>null</code> to reset the variant for
    *          this state.
+   * 
+   * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
    *           If the given <code>state</code> or <code>variant</code> objects are not a
    *           {@link RemoteObject} or they do not originate from the TPT instance represented by
@@ -99,6 +114,11 @@ public interface DiagramScenario extends Scenario {
    *          The <code>Transition</code>, for which the {@link TransitionSpec} shall be examined.
    * @return The currently selected {@link TransitionSpec} or <code>null</code> if none has been
    *         selected so far.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public TransitionSpec getSelectedTransitionSpec(Transition transition)
       throws ApiException, RemoteException;
@@ -112,6 +132,8 @@ public interface DiagramScenario extends Scenario {
    * @param transitionSpec
    *          The new transition specification or <code>null</code> to select none.
    * 
+   * @throws ApiException
+   *           API constraint error
    * @throws RemoteException
    *           If the given <code>transition</code> or <code>transitionSpec</code> objects are not a
    *           {@link RemoteObject} or they do not originate from the TPT instance represented by

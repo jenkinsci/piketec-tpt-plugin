@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -35,6 +35,11 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * Returns the precondition that has to be satisfied for the transition to fire.
    * 
    * @return The formal precondition as {@link String}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public String getCondition() throws ApiException, RemoteException;
 
@@ -45,6 +50,11 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * @param condition
    *          The formal condition as {@link String}. <code>Null</code> will be reduced to an empty
    *          string.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setCondition(String condition) throws ApiException, RemoteException;
 
@@ -52,6 +62,11 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * Returns the actions to be executed when a transition fires.
    * 
    * @return The description of the actions as {@link String}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public String getActions() throws ApiException, RemoteException;
 
@@ -61,6 +76,11 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * 
    * @param actions
    *          The actions as {@link String}. <code>Null</code> will be reduced to an empty string.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setActions(String actions) throws ApiException, RemoteException;
 }

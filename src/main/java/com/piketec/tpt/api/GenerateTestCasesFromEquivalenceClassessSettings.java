@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -18,16 +18,14 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 package com.piketec.tpt.api;
 
 import java.io.Serializable;
 
 /**
  * Class to provide settings for generation of TestCases from EquivalenceClassess.
- * 
- * @author TNagel, PikeTec GmbH
  *
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public class GenerateTestCasesFromEquivalenceClassessSettings implements Serializable {
 
@@ -53,9 +51,6 @@ public class GenerateTestCasesFromEquivalenceClassessSettings implements Seriali
 
   /**
    * Enumeration for Combination-States.
-   * 
-   * @author TNagel, PikeTec GmbH
-   *
    */
   public static enum Combination {
     SINGLE, PAIRED

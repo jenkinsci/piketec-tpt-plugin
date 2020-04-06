@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,13 +26,21 @@ import java.util.Collection;
 /**
  * A collection of items where changes to the items are directly performed in TPT
  *
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * 
+ * @param <E>
+ *          type parameter for collection element data type
  */
 public interface RemoteCollection<E> extends TptRemote {
 
   /**
    * @return Returns all items from this <code>RemoteCollection</code>. Any change to the returned
    *         <code>Collection</code> are local and will not be sent to TPT.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Collection<E> getItems() throws ApiException, RemoteException;
 
@@ -47,6 +55,11 @@ public interface RemoteCollection<E> extends TptRemote {
    * 
    * @param element
    *          The element to remove.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void delete(E element) throws ApiException, RemoteException;
 

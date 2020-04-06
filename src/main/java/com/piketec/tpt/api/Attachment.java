@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,8 +31,11 @@ public interface Attachment extends IdentifiableRemote {
    * Get the file name of the attachment.
    * 
    * @return The file name
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getFileName() throws ApiException, RemoteException;
 
@@ -42,9 +45,11 @@ public interface Attachment extends IdentifiableRemote {
    * 
    * @param fileName
    *          The new file name.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If the new name is empty or null.
-   * @throws RemoteException
    */
   void setFileName(String fileName) throws ApiException, RemoteException;
 
@@ -52,8 +57,11 @@ public interface Attachment extends IdentifiableRemote {
    * Get the attachment content as a byte array.
    * 
    * @return The attachment content.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   byte[] getContent() throws ApiException, RemoteException;
 
@@ -62,9 +70,11 @@ public interface Attachment extends IdentifiableRemote {
    * 
    * @param content
    *          The new content of the attachment as byte array
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If the new content is <code>null</code>.
-   * @throws RemoteException
    */
   void setContent(byte[] content) throws ApiException, RemoteException;
 

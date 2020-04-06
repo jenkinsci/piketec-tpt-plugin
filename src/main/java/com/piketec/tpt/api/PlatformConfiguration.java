@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,7 +31,7 @@ import com.piketec.tpt.api.properties.PropertyMap;
  * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
  * </p>
  * 
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
 
@@ -60,10 +60,22 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    */
   public static final String ASSESSMENT_PLATFORM_TYPE = "assessment";
 
+  public static final String BOSCH_FUSION_PLATFORM_TYPE = "bosch-fusion";
+
   /**
    * Type String for CANoe Platform
    */
   public static final String CANOE_PLATFORM_TYPE = "canoe";
+
+  /**
+   * Type String for C Platform
+   */
+  public static final String C_PLATFORM_TYPE = "ccode";
+
+  /**
+   * Type String for CANoe@FUSION Platform
+   */
+  public static final String CANOE_AT_FUSION_PLATFORM_TYPE = "canoe@fusion";
 
   /**
    * Type String for CTB Platform
@@ -126,6 +138,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String VERISTAND_PLATFORM_TYPE = "veristand";
 
   /**
+   * Type String for VeriStand@FUSION Platform
+   */
+  public static final String VERISTAND_AT_FUSION_PLATFORM_TYPE = "veristand@fusion";
+
+  /**
    * Type String for dSPACE HiL Platform
    */
   public static final String DSPACE_HIL_PLATFORM_TYPE = "dspace-hil";
@@ -136,6 +153,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String DSPACE_HIL_AT_FUSION_PLATFORM_TYPE = "dspaceXil";
 
   /**
+   * Type String for ASAM XIL@FUSION Platform
+   */
+  public static final String XIL_AT_FUSION_PLATFORM_TYPE = "asamXil";
+
+  /**
    * Type String for dSPACE HiL@FUSION Platform
    */
   public static final String FEP = "fep";
@@ -144,7 +166,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
 
   /**
    * @return Returns the platform timeout in microseconds.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public long getTimeOut() throws ApiException, RemoteException;
 
@@ -153,13 +179,21 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @param timeOut
    *          Timeout in microseconds.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setTimeOut(long timeOut) throws ApiException, RemoteException;
 
   /**
    * @return Returns the step size of the platform in microseconds.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public long getStepSize() throws ApiException, RemoteException;
 
@@ -168,14 +202,22 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @param stepSize
    *          Step size in microseconds.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setStepSize(long stepSize) throws ApiException, RemoteException;
 
   /**
    * @return Returns the size of the ring buffer (history) that is used to enable access to signal
    *         values of preceding steps of a test case.
-   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public int getHistorySize() throws ApiException, RemoteException;
 
@@ -185,6 +227,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @param historySize
    *          The new size of the history in steps.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setHistorySize(int historySize) throws ApiException, RemoteException;
 
@@ -198,6 +245,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @return A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} with the settings for
    *         the platform adapter.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public PropertyMap getProperties() throws ApiException, RemoteException;
 
@@ -211,6 +263,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @param properties
    *          A PropertyMap for the respective platform adapter.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
 
@@ -230,6 +287,9 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    *          Name of the function to be invoked
    * @param parameterOrNull
    *          A <code>PropertyMap</code> representing the function arguments or <code>null</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If the function is not available or the PropertyMap is invalid for the invoked
    *           function.

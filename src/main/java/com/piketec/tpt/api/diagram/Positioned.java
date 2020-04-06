@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -36,6 +36,11 @@ public interface Positioned extends TptRemote {
    * Return the current position of the object as a two-dimensional {@link Point}.
    * 
    * @return A point representing x-and y- coordinate of this object.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Point getPosition() throws ApiException, RemoteException;
 
@@ -45,6 +50,11 @@ public interface Positioned extends TptRemote {
    * @param p
    *          A {@link Point} representing the desired position of the object in the two-dimensional
    *          drawing area.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setPosition(Point p) throws ApiException, RemoteException;
 

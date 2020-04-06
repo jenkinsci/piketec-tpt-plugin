@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -35,6 +35,11 @@ public interface Line extends IdentifiableRemote {
    * Get vertical position (y-position) of the line in the drawing area.
    * 
    * @return The y-Position
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public int getPosition() throws ApiException, RemoteException;
 
@@ -43,6 +48,11 @@ public interface Line extends IdentifiableRemote {
    * 
    * @param y
    *          The vertical (y-)position for the line.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setPosition(int y) throws ApiException, RemoteException;
 

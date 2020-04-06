@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,11 +23,8 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * This object provides an interface to a Mapping in TPT.
- * <p>
- * </p>
- * The Mapping itself contains a number of Mapping Flavors.
- *
+ * This object provides an interface to a mapping in TPT. The mapping consists of a number of
+ * mapping flavors.
  */
 public interface Mapping extends IdentifiableRemote, NamedObject {
 
@@ -73,6 +70,11 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * Returns the list of all Mapping Flavors contained in this mapping.
    * 
    * @return A {@link RemoteCollection} of Mapping Flavors.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RemoteCollection<String> getFlavors() throws ApiException, RemoteException;
 
@@ -81,6 +83,9 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * 
    * @param flavorName
    *          The name of the flavor.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    * @throws ApiException
    *           If <code>flavorName == null</code> or the mapping already contains the flavor or the
    *           name of the flavor is unknown to TPT.
@@ -93,14 +98,18 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * @param decl
    *          The {@link Declaration} from which you want to get the flavor.
    * @param column
-   *          The name of the column of the flavor.
+   *          The name of the column of the flavor. Valid column names are all mapping specific
+   *          column names from the declaration editor, such as <code>Min</code>, <code>Max</code>,
+   *          <code>Hidden</code>, <code>External_Name</code> etc.
    * @param allowDefaultValue
    *          A flag which allows to get the default value from the flavor in case it is null.
    * @return The String representation of the value from the given mapping flavor column.
+   * 
    * @throws ApiException
    *           If the declaration or the column is null, if the declaration does not locally exists
    *           or if the mapping does not have any flavor with the given column.
    * @throws RemoteException
+   *           remote communication problem
    */
   String getMappingFlavorColumnValue(Declaration decl, String column, boolean allowDefaultValue)
       throws ApiException, RemoteException;
@@ -111,14 +120,20 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * @param decl
    *          The {@link Declaration} from which you want to set the flavor.
    * @param column
-   *          The name of the column of the flavor.
+   *          The name of the column of the flavor. Valid column names are all mapping specific
+   *          column names from the declaration editor, such as <code>Min</code>, <code>Max</code>,
+   *          <code>Hidden</code>, <code>External_Name</code> etc.
    * @param value
-   *          The value to be set
+   *          The value to be set. Setting the value to the default value
+   *          ({@link #getMappingFlavorColumnDefaultValue(Declaration, String)}) will let the value
+   *          be null when the file is saved and loaded again.
+   * 
    * @throws ApiException
    *           If the declaration or the column is null, if the declaration does not locally exists,
    *           if the mapping does not have any flavor with the given column or if the value can not
    *           be parsed to the column type.
    * @throws RemoteException
+   *           remote communication problem
    */
   void setMappingFlavorColumnValue(Declaration decl, String column, String value)
       throws ApiException, RemoteException;
@@ -136,6 +151,7 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    *           If the declaration or the column is null, if the declaration does not locally exists
    *           or if the mapping does not have any flavor with the given column.
    * @throws RemoteException
+   *           remote communication problem
    */
   String getMappingFlavorColumnDefaultValue(Declaration decl, String column)
       throws ApiException, RemoteException;

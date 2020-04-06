@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -35,6 +35,11 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
   /**
    * @return Returns the textual description of this <code>ScenarioOrGroup</code> (displayed int the
    *         Description view of TPT).
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public String getDescription() throws ApiException, RemoteException;
 
@@ -44,20 +49,37 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * 
    * @param description
    *          The new description.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void setDescription(String description) throws ApiException, RemoteException;
 
   /**
    * Get the parent scenario group or <code>null</code> if this object reside on the top level
    * (meaning directly below the a {@link Testlet}).
-   *
+   * 
+   * @return the parent group or <code>null</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public ScenarioGroup getGroup() throws ApiException, RemoteException;
 
   /**
-   * @return Returns the {@link Testlet} this <code>ScenarioOrGroup</code> belongs to.
-   * @throws ApiException
+   * @return Returns the {@link Testlet} this <code>ScenarioOrGroup</code> belongs to. In case this
+   *         object is a test case (see {@link #isTestcaseOrGroup()}) the "main" testlet is
+   *         returned.
+   * 
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Testlet getTestlet() throws ApiException, RemoteException;
 
@@ -68,50 +90,15 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * is a variant in a one of the {@link Testlet#getStates() sub-testlets}.
    *
    * @return
+   *         <ul>
    *         <li><code>true</code> if it is a test case or test case group</li>
    *         <li><code>false</code> if it is a variant or variant group</li>
+   *         </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    */
   public boolean isTestcaseOrGroup() throws RemoteException;
-
-  /**
-   * Set a given <code>value</code> for a given <code>parameterName</code> for this
-   * <code>ScenarioOrGroup</code>. This corresponds to the parameter tab for test cases and
-   * variants. Child nodes inherit the setting from there parent groups.
-   * 
-   * 
-   * @param parameterName
-   *          The name of the {@link Parameter}.
-   * @param value
-   *          The new value for the {@link Parameter} or
-   *          <p>
-   *          </p>
-   *          <code>null</code> to remove a value specific to this <code>ScenarioOrGroup</code>.
-   * @throws ApiException
-   *           <lu>
-   *           <li>if the name of the parameter does not exists or</li>
-   *           <li>the parameter is READONLY.</li> </lu>
-   * @deprecated Will be removed in TPT 14. Replaced by {@link #setInitialValue(String, String)}
-   */
-  @Deprecated
-  public void setParameterDefinition(String parameterName, String value)
-      throws ApiException, RemoteException;
-
-  /**
-   * Returns the parameter value for a given <code>parameterName</code> as defined for this
-   * <code>ScenarioOrGroup</code>. Returns <code>null</code> if no value has been set for this
-   * <code>ScenarioOrGroup</code>.
-   * 
-   * @param parameterName
-   *          Name of the {@link Parameter}
-   * @return <code>null</code> or the currently set value.
-   * @throws ApiException
-   *           <lu>
-   *           <li>if the name of the parameter does not exists or</li>
-   *           <li>the parameter is READONLY.</li> </lu>
-   * @deprecated Will be removed in TPT 14. Replaced by {@link #getInitialValue(String)}
-   */
-  @Deprecated
-  public String getParameterDefintion(String parameterName) throws ApiException, RemoteException;
 
   /**
    * Set a given initial <code>value</code> for a given <code>declarationName</code> for this
@@ -122,14 +109,16 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * @param declarationName
    *          The name of the {@link Declaration}.
    * @param value
-   *          The new value for the {@link Declaration} or
-   *          <p>
-   *          </p>
-   *          <code>null</code> to remove a value specific to this <code>ScenarioOrGroup</code>.
+   *          The new value for the {@link Declaration} or <code>null</code> to remove a value
+   *          specific to this <code>ScenarioOrGroup</code>.
    * @throws ApiException
-   *           <lu>
+   *           <ul>
    *           <li>if the name of the declaration does not exists or</li>
-   *           <li>the declaration is a read only parameter.</li> </lu>
+   *           <li>the declaration is a read only parameter.</li>
+   *           </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    */
   public void setInitialValue(String declarationName, String value)
       throws ApiException, RemoteException;
@@ -139,13 +128,17 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * <code>ScenarioOrGroup</code>. Returns <code>null</code> if no value has been set for this
    * <code>ScenarioOrGroup</code>.
    * 
-   * @param parameterName
+   * @param declarationName
    *          Name of the {@link Declaration}
    * @return <code>null</code> or the currently set value.
    * @throws ApiException
-   *           <lu>
+   *           <ul>
    *           <li>if the name of the parameter does not exists or</li>
-   *           <li>the declaration is a read only parameter.</li> </lu>
+   *           <li>the declaration is a read only parameter.</li>
+   *           </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
    */
   public String getInitialValue(String declarationName) throws ApiException, RemoteException;
 
@@ -165,6 +158,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    *           If the <code>name == null</code> or if no {@link TestCaseAttribute} with the given
    *           name has been defined.
    * @throws RemoteException
+   *           remote communication problem
    */
   public String getTestCaseAttributeValue(String name) throws ApiException, RemoteException;
 
@@ -186,8 +180,32 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    *           given name or if the given value does not match the
    *           {@link TestCaseAttribute#getType() type} of the attribute.
    * @throws RemoteException
+   *           remote communication problem
    */
   public void setTestCaseAttributeValue(String name, String value)
       throws ApiException, RemoteException;
 
+  /**
+   * @return the scenario or scenario group ID.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public int getId() throws ApiException, RemoteException;
+
+  /**
+   * Moves this {@link ScenarioOrGroup} to a new position in the scenario tree.
+   * 
+   * @param newParent
+   *          the new parent {@link ScenarioGroup}.
+   * @param index
+   *          the new position under the new parent.
+   * @throws ApiException
+   *           If <code>newParent==null</code> or the new parent is for an other reason invalid.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void move(ScenarioGroup newParent, int index) throws ApiException, RemoteException;
 }

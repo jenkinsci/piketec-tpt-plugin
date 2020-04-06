@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,7 +27,7 @@ import java.rmi.RemoteException;
  * ({@link AssessmentGroup}). These objects can build up a tree where both, assessments and
  * assessment groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
 
@@ -36,12 +36,45 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
    * this is the top level object (i.e. it resides directly below the {@link Project}).
    *
    * @return The parent {@link AssessmentGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public AssessmentGroup getGroup() throws ApiException, RemoteException;
 
   /**
    * @return The parent TPT {@link Project} for this <code>AssessmentOrGroup</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Project getProject() throws ApiException, RemoteException;
 
+  /**
+   * @return the assessment or assessment group ID.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public int getId() throws ApiException, RemoteException;
+
+  /**
+   * Moves this {@link AssessmentOrGroup} to a new position in the assessment tree.
+   * 
+   * @param newParent
+   *          the new parent {@link AssessmentGroup} or <code>null</code> to move it to top level.
+   * @param index
+   *          the new position under the new parent.
+   * @throws ApiException
+   *           If the new parent is invalid.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void move(AssessmentGroup newParent, int index) throws ApiException, RemoteException;
 }

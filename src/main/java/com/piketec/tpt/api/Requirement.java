@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,11 +23,16 @@ package com.piketec.tpt.api;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * RMI representation of a requirement. This interface allows more manipulation than the user can do
- * from the UI. The UI only allows globally removing an attribute and editing the comment.
- *
+ * from the UI. The UI only allows globally removing an attribute and editing the comment. <br>
+ * <br>
+ * <b>Note:</b> Changing the requirement via API - in contrast to changing it by importing
+ * requirements - will not lead to a "modified" state of the requirement. Only UI actions that lead
+ * to a "modified" state will do so via API as well, e.g. setting status to "deleted". Otherwise use
+ * {@link #markAsModified()} to set the status to modified explicitly.
  */
 public interface Requirement extends IdentifiableRemote {
 
@@ -35,6 +40,7 @@ public interface Requirement extends IdentifiableRemote {
    * We distinguish between three types of requirements. Two of them are only informative.
    */
   enum RequirementType {
+
     /**
      * A real requirement.
      */
@@ -59,12 +65,42 @@ public interface Requirement extends IdentifiableRemote {
     }
   }
 
+  enum RequirementStatus {
+
+    /**
+     * A new requirement.
+     */
+    NEW("New"),
+    /**
+     * A normal requirement.
+     */
+    NORMAL("Normal"),
+    /**
+     * A deleted requirement.
+     */
+    DELETED("Deleted");
+
+    private final String displayName;
+
+    RequirementStatus(String name) {
+      this.displayName = name;
+    }
+
+    public String getDiplayableName() {
+      return displayName;
+    }
+
+  }
+
   /**
    * Get the type of the requirement.
    * 
    * @return The type of the requirement.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RequirementType getType() throws ApiException, RemoteException;
 
@@ -73,8 +109,11 @@ public interface Requirement extends IdentifiableRemote {
    * 
    * @param type
    *          The new type of the Requirement
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setType(RequirementType type) throws ApiException, RemoteException;
 
@@ -82,8 +121,11 @@ public interface Requirement extends IdentifiableRemote {
    * Every requirement has a unique ID.
    * 
    * @return The unique ID.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getID() throws ApiException, RemoteException;
 
@@ -91,8 +133,11 @@ public interface Requirement extends IdentifiableRemote {
    * A requirement normally belongs to a module. The default module is an empty string.
    * 
    * @return The name of the module the requirement belongs to.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getModule() throws ApiException, RemoteException;
 
@@ -100,8 +145,11 @@ public interface Requirement extends IdentifiableRemote {
    * Get the describing text a requirement normally has.
    * 
    * @return The describing text of the requirement.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getText() throws ApiException, RemoteException;
 
@@ -110,8 +158,11 @@ public interface Requirement extends IdentifiableRemote {
    * 
    * @param text
    *          The new describing text. <code>Null</code> will be reduced to an empty string.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setText(String text) throws ApiException, RemoteException;
 
@@ -119,8 +170,11 @@ public interface Requirement extends IdentifiableRemote {
    * Get the comment of the requirement. This comment is also editable from the UI.
    * 
    * @return The comment of the requirement.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getComment() throws ApiException, RemoteException;
 
@@ -130,8 +184,11 @@ public interface Requirement extends IdentifiableRemote {
    * @param comment
    *          The new comment of the requirement. <code>Null</code> will be reduced to an empty
    *          string.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setComment(String comment) throws ApiException, RemoteException;
 
@@ -140,8 +197,11 @@ public interface Requirement extends IdentifiableRemote {
    * displayed in the UI.
    * 
    * @return The URI of the requirement or <code>null</code>.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   URI getURI() throws ApiException, RemoteException;
 
@@ -151,8 +211,11 @@ public interface Requirement extends IdentifiableRemote {
    * 
    * @param uri
    *          The new URI or <code>null</code> to remove the link.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setURI(URI uri) throws ApiException, RemoteException;
 
@@ -161,8 +224,11 @@ public interface Requirement extends IdentifiableRemote {
    * additional attributes. Each attribute has a value associated for the requirement.
    * 
    * @return A map from attribute name to value.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   Map<String, String> getAttributes() throws ApiException, RemoteException;
 
@@ -176,8 +242,11 @@ public interface Requirement extends IdentifiableRemote {
    *          the name of the attribute.
    * @param value
    *          The new value or <code>null</code> to remove the attribute from the requirement.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setAttribute(String attributeName, String value) throws ApiException, RemoteException;
 
@@ -187,8 +256,11 @@ public interface Requirement extends IdentifiableRemote {
    * {@link #getAttributeAttachments(String)}.
    * 
    * @return The List of attachments of the requirement.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RemoteList<Attachment> getRequirementAttachments() throws ApiException, RemoteException;
 
@@ -203,8 +275,11 @@ public interface Requirement extends IdentifiableRemote {
    * @param content
    *          The content of the attachment.
    * @return The newly created attachment
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   Attachment createRequirementAttachment(String fileName, byte[] content)
       throws ApiException, RemoteException;
@@ -218,8 +293,11 @@ public interface Requirement extends IdentifiableRemote {
    *          The name of the attribute.
    * @return The List of attachments of the given attribute. Returns <code>null</code> if the
    *         attribute is not defined for the requirement.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RemoteList<Attachment> getAttributeAttachments(String attributeName)
       throws ApiException, RemoteException;
@@ -239,8 +317,11 @@ public interface Requirement extends IdentifiableRemote {
    * @param content
    *          The content of the attachment.
    * @return The newly created attachment
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   Attachment createAttributeAttachment(String attributeName, String fileName, byte[] content)
       throws ApiException, RemoteException;
@@ -249,8 +330,11 @@ public interface Requirement extends IdentifiableRemote {
    * Get all assesslets linked to this requirement.
    * 
    * @return The list of linked assessments.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RemoteCollection<Assessment> getLinkedAssessments() throws ApiException, RemoteException;
 
@@ -262,9 +346,10 @@ public interface Requirement extends IdentifiableRemote {
    * @param aog
    *          The {@link Assessment} or {@link AssessmentGroup} to create links to this requirement.
    * @throws ApiException
-   *           If the {@link type RequirementType} of the requirement is not linkable or if aog is
+   *           If the {@link RequirementType type} of the requirement is not linkable or if aog is
    *           not of the same project as the requirement.
    * @throws RemoteException
+   *           remote communication problem
    */
   void linkAssessment(AssessmentOrGroup aog) throws ApiException, RemoteException;
 
@@ -272,8 +357,11 @@ public interface Requirement extends IdentifiableRemote {
    * Get all test cases and variants linked to this requirement.
    * 
    * @return The list of linked test cases and variants.
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   RemoteCollection<Scenario> getLinkedScenarios() throws ApiException, RemoteException;
 
@@ -282,13 +370,89 @@ public interface Requirement extends IdentifiableRemote {
    * {@link ScenarioGroup} all scenarios of the group will be added recursively. You can remove a
    * link by removing the <code>Scenario</code> from {@link #getLinkedScenarios()}.
    * 
-   * @param aog
+   * @param sog
    *          The {@link Scenario} or {@link ScenarioOrGroup} to create links to this requirement.
    * @throws ApiException
-   *           If the {@link type RequirementType} of the requirement is not linkable or if sog is
+   *           If the {@link RequirementType type} of the requirement is not linkable or if sog is
    *           not of the same project as the requirement.
    * @throws RemoteException
+   *           remote communication problem
    */
   void linkScenario(ScenarioOrGroup sog) throws ApiException, RemoteException;
+
+  /**
+   * Sets the requirement status.
+   * 
+   * @param status
+   *          to be set.
+   * @throws ApiException
+   *           If the the given status is not allowed or <code>null</code>.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setStatus(RequirementStatus status) throws ApiException, RemoteException;
+
+  /**
+   * Returns the current requirement status.
+   * 
+   * @return the current requirement status.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  RequirementStatus getStatus() throws ApiException, RemoteException;
+
+  /**
+   * Marks this requirement as modified.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   * 
+   * @see #markAsReviewed()
+   */
+  void markAsModified() throws ApiException, RemoteException;
+
+  /**
+   * Marks this requirement as reviewed.
+   * 
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   * @see #markAsModified()
+   */
+  void markAsReviewed() throws ApiException, RemoteException;
+
+  /**
+   * Returns <code>true</code> if the requirement is marked as modified, otherwise
+   * <code>false</code>.
+   * 
+   * @return <code>true</code> if requirement is marked as modified, otherwise <code>false</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  boolean isModified() throws ApiException, RemoteException;
+
+  /**
+   * Returns all (explicit and implicit) to this {@link Requirement} linked {@link Scenario test
+   * cases}.
+   * 
+   * @return all (explicit and implicit) to this {@link Requirement} linked {@link Scenario test
+   *         cases}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  Set<Scenario> getLinkedTestCases() throws ApiException, RemoteException;
 
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,6 +24,9 @@ import java.rmi.RemoteException;
 
 /**
  * A sorted set of (Remote) elements. Changes to this list will be done directly in TPT.
+ * 
+ * @param <E>
+ *          type parameter for list element data type
  */
 public interface RemoteList<E> extends RemoteCollection<E> {
 
@@ -33,8 +36,13 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    * @param index
    *          The position of the element in the list.
    * @return The element that is at this position.
+   * 
    * @throws IndexOutOfBoundsException
    *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public E get(int index) throws ApiException, IndexOutOfBoundsException, RemoteException;
 
@@ -43,8 +51,13 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    * 
    * @param index
    *          The position of the item that should be deleted.
+   * 
    * @throws IndexOutOfBoundsException
    *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void delete(int index) throws ApiException, IndexOutOfBoundsException, RemoteException;
 
@@ -58,9 +71,14 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    * @param to
    *          The new position for the element given by <code>from</code>
    * @return Returns a reference to the moved item.
+   * 
    * @throws IndexOutOfBoundsException
    *           If <code>to &lt; 0 </code> or <code>from &lt; 0</code> or
    *           <code>to &gt;= getItems().size()</code> or <code>from &gt;= getItems().size()</code>
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public E move(int from, int to) throws ApiException, IndexOutOfBoundsException, RemoteException;
 

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,13 +25,17 @@ import java.rmi.RemoteException;
 /**
  * This class represent an object with a name.
  * 
- * @author Copyright (c) 2016-2019 Piketec GmbH - All rights reserved.
- *
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface NamedObject extends TptRemote {
 
   /**
    * @return the current name for the object.
+   * 
+   * @throws ApiException
+   *           API constraint error
+   * @throws RemoteException
+   *           remote communication error
    */
   public String getName() throws ApiException, RemoteException;
 
@@ -43,6 +47,8 @@ public interface NamedObject extends TptRemote {
    * 
    * @throws ApiException
    *           if <code>newName</code> is not a legal name.
+   * @throws RemoteException
+   *           remote communication error
    */
   public void setName(String newName) throws ApiException, RemoteException;
 

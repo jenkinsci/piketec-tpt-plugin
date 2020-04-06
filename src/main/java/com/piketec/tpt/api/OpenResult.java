@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,7 +31,7 @@ import java.util.List;
  * contains information for license options currently not available.
  * </p>
  * 
- * @author Copyright (c) 2014 Piketec GmbH - All rights reserved.
+ * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 
 public class OpenResult implements Serializable {
@@ -53,7 +53,9 @@ public class OpenResult implements Serializable {
    * {@link TptApi#openProject(java.io.File)}.
    * 
    * @param project
+   *          the TPT project
    * @param logs
+   *          list of log messages
    */
   public OpenResult(Project project, List<String> logs) {
     super();

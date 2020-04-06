@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -65,6 +65,54 @@ public class PropertyMap implements Property, Serializable {
   }
 
   /**
+   * Shorthand for <code>setValue(key, new PropertyBool(value))</code>
+   * 
+   * @param key
+   *          The property key
+   * @param value
+   *          The boolean value that shall be assigned to this key.
+   */
+  public void setValue(String key, boolean value) {
+    map.put(key, new PropertyBool(value));
+  }
+
+  /**
+   * Shorthand for <code>setValue(key, new PropertyDecimal(value))</code>
+   * 
+   * @param key
+   *          The property key
+   * @param value
+   *          The double value that shall be assigned to this key.
+   */
+  public void setValue(String key, double value) {
+    map.put(key, new PropertyDecimal(value));
+  }
+
+  /**
+   * Shorthand for <code>setValue(key, new PropertyInt(value))</code>
+   * 
+   * @param key
+   *          The property key
+   * @param value
+   *          The integer property value that shall be assigned to this key.
+   */
+  public void setValue(String key, int value) {
+    map.put(key, new PropertyInt(value));
+  }
+
+  /**
+   * Shorthand for <code>setValue(key, new PropertyLong(value))</code>
+   * 
+   * @param key
+   *          The property key
+   * @param value
+   *          The long integer property value that shall be assigned to this key.
+   */
+  public void setValue(String key, long value) {
+    map.put(key, new PropertyLong(value));
+  }
+
+  /**
    * Shorthand for <code>setValue(key, new PropertyString(value))</code>
    * 
    * @param key
@@ -109,4 +157,35 @@ public class PropertyMap implements Property, Serializable {
     buffer.append(indentation);
     buffer.append('}');
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((map == null) ? 0 : map.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    PropertyMap other = (PropertyMap)obj;
+    if (map == null) {
+      if (other.map != null) {
+        return false;
+      }
+    } else if (!map.equals(other.map)) {
+      return false;
+    }
+    return true;
+  }
+
 }

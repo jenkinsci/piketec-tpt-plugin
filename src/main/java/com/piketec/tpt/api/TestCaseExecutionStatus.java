@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -57,11 +57,21 @@ public interface TestCaseExecutionStatus extends TptRemote {
 
   /**
    * @return Returns the current state of execution as {@link TestCaseStatus}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public TestCaseStatus getStatus() throws ApiException, RemoteException;
 
   /**
    * @return Returns a list of log entries as <code>String</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public List<String> getStatusLog() throws ApiException, RemoteException;
 
@@ -74,12 +84,19 @@ public interface TestCaseExecutionStatus extends TptRemote {
    * </p>
    * 
    * @param success
+   *          <ul>
    *          <li><code>true</code> if the test result should be reclassified to a success</li>
    *          <li><code>false</code> if the test result should be reclassified to a failure</li>
+   *          </ul>
    * @param userName
    *          The name for the user that is responsible for the reclassification.
    * @param comment
    *          A description/comment, why this reclassification is OK.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public void reclassify(boolean success, String userName, String comment)
       throws ApiException, RemoteException;
@@ -87,12 +104,22 @@ public interface TestCaseExecutionStatus extends TptRemote {
   /**
    * @return The {@link ExecutionConfigurationItem} in which the assigned test case was, is or
    *         should be executed.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public ExecutionConfigurationItem getExecutionConfigurationItem()
       throws ApiException, RemoteException;
 
   /**
    * @return The assigned test case.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public Scenario getTestcase() throws ApiException, RemoteException;
 }

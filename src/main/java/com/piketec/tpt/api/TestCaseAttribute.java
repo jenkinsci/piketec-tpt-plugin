@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -46,15 +46,21 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * Returns the type of this attribute; currently it is always {@link #STRING_TYPE}.
    * 
    * @return The type as a <code>String</code> (which contains the text '<code>String</code>').
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getType() throws ApiException, RemoteException;
 
   /**
    * @return Returns the name of this <code>TestCaseAttribute</code>
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   String getName() throws ApiException, RemoteException;
 
@@ -66,6 +72,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * @throws ApiException
    *           If <code>newName==null</code> or <code>newName</code> does already exist.
    * @throws RemoteException
+   *           remote communication problem
    */
   void setName(String newName) throws ApiException, RemoteException;
 
@@ -75,8 +82,11 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * <code>TestCaseAttribute</code> definition dialog.
    * 
    * @return <code>true</code>, if the <code>TestCaseAttribute</code> will be automatically copied
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   boolean isCopyable() throws ApiException, RemoteException;
 
@@ -87,8 +97,11 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * 
    * @param on
    *          <code>true</code>, if TestCaseAttribute should be "copyable".
-   * @throws ApiException
+   * 
    * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   void setCopyable(boolean on) throws ApiException, RemoteException;
 

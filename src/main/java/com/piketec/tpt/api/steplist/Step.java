@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2016-2019 PikeTec GmbH
+ * Copyright (c) 2014-2020 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -107,9 +107,9 @@ public interface Step extends IdentifiableRemote {
   public static final String PARAMETER = "parameter";
 
   /**
-   * Type String for ramp-channel-step
+   * Type String for ramp-step
    */
-  public static final String RAMP_CHANNEL = "ramp-channel";
+  public static final String RAMP = "ramp-channel";
 
   /**
    * Type String for reset-all-parameters-step
@@ -157,7 +157,12 @@ public interface Step extends IdentifiableRemote {
   public static final String WHILE_EXPRESSION = "while-expression";
 
   /**
-   * @return The name of the step type.
+   * @return the name of the step type.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
   public String getType() throws ApiException, RemoteException;
 
@@ -166,15 +171,83 @@ public interface Step extends IdentifiableRemote {
    * step type. A Property is either a Child-{@link PropertyMap}, which creates a tree-like
    * structure, or a {@link String} value.
    *
-   * @return All properties for the step represented by this object.
+   * @return all properties for the step represented by this object.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
+  @Deprecated
   public PropertyMap getProperties() throws ApiException, RemoteException;
 
   /**
    * Configures the step with the given <code>PropertyMap</code>.
    *
    * @param properties
+   *          properties to apply this this step
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
    */
+  @Deprecated
   public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
+
+  /**
+   * TPT offers the possibility to assign some objects comments which are added to the report. This
+   * method provides the possibility to define such a {@link String}.
+   * 
+   * @param documentation
+   *          a {@link String} which will be added as a comment to the report.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public void setDocumentation(String documentation) throws ApiException, RemoteException;
+
+  /**
+   * @return a {@link String} which will be added as a comment to the report.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getDocumentation() throws RemoteException;
+
+  /**
+   * @return the {@link StepListScenario} which contains this step.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public StepListScenario getStepList() throws RemoteException, ApiException;
+
+  /**
+   * Sets if this step is enabled.
+   * 
+   * @param value
+   *          <code>true</code> if this step is active/enabled
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           API constraint error
+   */
+  public void setActive(boolean value) throws ApiException, RemoteException;
+
+  /**
+   * Determines if this step is enabled.
+   *
+   * @return <code>true</code> if this step is active/enabled
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isActive() throws RemoteException;
 
 }
