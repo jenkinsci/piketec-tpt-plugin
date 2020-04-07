@@ -20,15 +20,18 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.Project;
 
+import hudson.Launcher;
 import hudson.model.AbstractBuild;
 
 /**
@@ -40,8 +43,8 @@ import hudson.model.AbstractBuild;
 public class CleanUpTask {
 
   private static Map<Object, List<CleanUpTask>> registry = new HashMap<Object, List<CleanUpTask>>();
-
-  private Project prj;
+	private CleanUpCallable cleanUpCallable;
+	private Launcher launcher;
 
   /**
    * @param project
@@ -49,11 +52,10 @@ public class CleanUpTask {
    * @param masterId
    *          Abstractbuild as unique Id
    */
-  public CleanUpTask(Project project, AbstractBuild masterId) {
-    prj = project;
-    if (prj != null) {
-      register(this, masterId);
-    }
+  public CleanUpTask(AbstractBuild masterId, CleanUpCallable cleanUpCallable, Launcher launcher) {
+  	this.cleanUpCallable = cleanUpCallable;
+  	this.launcher = launcher;
+  	register(this, masterId);
   }
 
   /**
@@ -61,16 +63,21 @@ public class CleanUpTask {
    * 
    * @return true if it was possible to close the project.
    */
-  public boolean clean() {
+  public boolean clean(TptLogger logger) {
+  	boolean success = false;
     try {
-      return prj.closeProject();
-    } catch (ApiException e) {
-      // not open
-      return true;
+    	success = launcher.getChannel().call(cleanUpCallable);
     } catch (RemoteException e) {
+    	logger.error("RemoteException while cleaning "+e.getMessage());
       return false;
-
-    }
+    } catch (IOException e) {
+    	logger.error("IOException while cleaning "+e.getMessage());
+			return false;
+		} catch (InterruptedException e) {
+			logger.error("InterruptedException while cleaning "+e.getMessage());
+			return false;
+		}
+    return success;
   }
 
   /**
@@ -97,7 +104,7 @@ public class CleanUpTask {
    *          to identify to which registry the task is going to be removed
    * @return true if it was possible to erase the tasks.
    */
-  public static synchronized boolean cleanUp(Object masterId) {
+  public static synchronized boolean cleanUp(Object masterId, TptLogger logger) {
     List<CleanUpTask> tasks = registry.remove(masterId);
     if (tasks == null) {
       // nothing to clean up
@@ -105,8 +112,9 @@ public class CleanUpTask {
     }
     boolean success = true;
     for (CleanUpTask task : tasks) {
-      success &= task.clean();
+      success &= task.clean(logger);
     }
+    logger.info("Clean up worked: "+success);
     return success;
   }
 }

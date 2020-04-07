@@ -1,0 +1,133 @@
+package com.piketec.jenkins.plugins.tpt.api.callables;
+
+import java.io.File;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.rmi.UnknownHostException;
+import java.util.ArrayList;
+
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.remoting.RoleChecker;
+
+import com.piketec.jenkins.plugins.tpt.TptLogger;
+import com.piketec.tpt.api.ApiException;
+import com.piketec.tpt.api.ExecutionConfiguration;
+import com.piketec.tpt.api.ExecutionConfigurationItem;
+import com.piketec.tpt.api.ExecutionStatus;
+import com.piketec.tpt.api.OpenResult;
+import com.piketec.tpt.api.RemoteCollection;
+import com.piketec.tpt.api.TestSet;
+import com.piketec.tpt.api.TptApi;
+
+import hudson.FilePath;
+import hudson.model.TaskListener;
+
+/**
+ * This class creates the tpt overview report. The code is executed on the Jenkins Agent and uses the TPT API.
+ * NOTE: This is not the report that is shown in Jenkins, but only the local TPT Report. To create a report
+ * in Jenkins, use the Report Plugin. 
+ */
+public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
+
+	private static final long serialVersionUID = 1L;
+
+	private FilePath tptFilePath;
+	private String executionConfigName;
+	private String testSet;
+	private FilePath reportPath;
+	private FilePath testDataPath;
+
+
+	public RunOverviewReportCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
+			FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath, String executionConfigName, String testSet, 
+			FilePath reportPath, FilePath testdataPath) {
+		super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
+		this.tptFilePath = tptFilePath;
+		this.executionConfigName = executionConfigName;
+		this.testSet = testSet;
+		this.reportPath = reportPath;
+		this.testDataPath = testdataPath;
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public Boolean call() throws UnknownHostException {
+		TptLogger logger = getLogger();
+		TptApi api = getApi();
+    OpenResult openProject = getOpenProject(logger, api, tptFilePath);
+
+    try {
+    	 // Get the execution cofig that should be executed
+      ExecutionConfiguration executionConfig = getExecutionConfigByName(openProject.getProject(), executionConfigName);
+      if (executionConfig == null) {
+        logger.error("Could not find config");
+        return false;
+      }
+    	
+      File oldTestDataFile = executionConfig.getDataDir();
+      File oldReportDir = executionConfig.getReportDir();
+      executionConfig.setDataDir(new File(testDataPath.getRemote()));
+      executionConfig.setReportDir(new File(reportPath.getRemote()));
+      
+      // set explicit defined test set for all items
+      // This is done, because the slaves don't execute the testsets that were set originally in the file
+      // but the one that is defined in Jenkins.
+      ArrayList<TestSet> oldTestSets = new ArrayList<>();
+      if (StringUtils.isNotEmpty(testSet)) {
+        RemoteCollection<TestSet> allTestSets = openProject.getProject().getTestSets();
+        TestSet newTestSet = null;
+        for (TestSet t : allTestSets.getItems()) {
+          if (t.getName().equals(testSet)) {
+            newTestSet = t;
+          }
+        }
+        if (newTestSet == null) {
+          logger.error("Test set \"" + testSet + "\" not found.");
+          return false;
+        }
+        for (ExecutionConfigurationItem item : executionConfig.getItems()) {
+          oldTestSets.add(item.getTestSet());
+          item.setTestSet(newTestSet);
+        }
+      }
+      
+      ExecutionStatus execStatus = api.reGenerateOverviewReport(executionConfig);
+      while (execStatus.isRunning() || execStatus.isPending()) {
+        try {
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          execStatus.cancel();
+          return false;
+        }
+      }
+      executionConfig.setDataDir(oldTestDataFile);
+      executionConfig.setReportDir(oldReportDir);
+      
+      // reset test sets to old values to maintain the file as it was before
+      if (StringUtils.isNotEmpty(testSet)) {
+        for (ExecutionConfigurationItem item : executionConfig.getItems()) {
+        	TestSet oldTestSet = oldTestSets.remove(0);
+        	// This happenes because of a bug in the TPT API.
+        	if(oldTestSet!=null) {
+        		item.setTestSet(oldTestSet);
+        	}
+        }
+      }
+      return true;
+    } catch (RemoteException e) {
+      logger.error("RemoteException: "+ e.getMessage());
+      return false;
+    } catch (ApiException e) {
+      logger.error("ApiException: "+e.getMessage());
+      return false;
+    } catch (IOException e) {
+      logger.error("IOException: " + e.getMessage());
+      return false;
+    }
+	}
+	
+	@Override
+	public void checkRoles(RoleChecker arg0) throws SecurityException {
+	}
+}

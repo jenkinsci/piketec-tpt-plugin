@@ -135,7 +135,7 @@ public class TptPluginSlave extends Builder {
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
     for (int i = 0; i < expandedExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(launcher.getChannel(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(build.getWorkspace(), environment.expand(expandedStringExePaths[i].trim()));
     }
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {
@@ -195,7 +195,7 @@ public class TptPluginSlave extends Builder {
     }
 
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
-        expandedExePaths, expandedTptPort, expandedTptBindingName, new File(fileNameFromWorkload),
+        expandedExePaths, expandedTptPort, expandedTptBindingName, new FilePath(build.getWorkspace(),fileNameFromWorkload),
         exeConfigFromWorkload, testDataDirFromWorload, reportDirFromWorkload, testCasesFromWorkload,
         expandedTptStartupWaitTime, masterId, testSetFromWorkload, masterWorkspace);
 

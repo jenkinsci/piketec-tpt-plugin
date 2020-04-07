@@ -22,11 +22,6 @@ package com.piketec.jenkins.plugins.tpt;
 
 import java.io.File;
 import java.io.IOException;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -36,12 +31,8 @@ import org.apache.commons.io.FilenameUtils;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
-import com.piketec.tpt.api.ApiException;
-import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.AbstractBuild;
 import jenkins.model.Jenkins;
 
 /**
@@ -187,127 +178,6 @@ public class Utils {
   }
 
   /**
-   * Checks of the existance of Tpt and tries to start tpt through the api. The process is run by
-   * Launcher.ProcStarter.
-   * 
-   * @param build
-   * @param launcher
-   * @param logger
-   * @param exePaths
-   * @param port
-   * @param bindingName
-   * @param startupWaitTime
-   * @return
-   * @throws InterruptedException
-   */
-  private static boolean startTpt(AbstractBuild< ? , ? > build, Launcher launcher, TptLogger logger,
-                                  FilePath[] exePaths, int port, String bindingName,
-                                  long startupWaitTime)
-      throws InterruptedException {
-    FilePath exeFile = null;
-    for (FilePath f : exePaths) {
-      try {
-        if (f.exists()) {
-          exeFile = f;
-          break;
-        }
-      } catch (IOException e) {
-        // NOP, just try next file
-      }
-    }
-    try {
-      if (exeFile == null || !exeFile.exists()) {
-        logger.error("TPT exe not found.");
-        return false;
-      }
-    } catch (IOException e1) {
-      logger.error("Could not dertmine existence of TPT.");
-      return false;
-    }
-    Launcher.ProcStarter starter = launcher.new ProcStarter();
-    starter.cmds(exeFile.getRemote(), "--apiPort", Integer.toString(port), "--apiBindingName",
-        bindingName);
-    try {
-      starter.start();
-    } catch (IOException e) {
-      logger.error("Could not start TPT.");
-      return false;
-    }
-    logger.info("Waiting " + startupWaitTime / 1000 + "s for TPT to start.");
-    Thread.sleep(startupWaitTime);
-    return true;
-  }
-
-  /**
-   * Conects to the Tpt Api through a registry. It looks for a host with the channel from the
-   * launcher. Then it creates a registry with the host and the port, and finally it binds the
-   * registry with the TptApi through the tpt binding name.
-   * 
-   * @param build
-   *          The current Jenkins build
-   * @param launcher
-   *          The launcher
-   * @param logger
-   *          The logger to displax messages
-   * @param exePaths
-   *          The paths to TPT executables
-   * @param tptPort
-   *          the TPTRMI port
-   * @param tptBindingName
-   *          the TPT RMI binding name
-   * @param startupWaitTime
-   *          The wait time to start up TPT
-   * @return Tpt Api that allows accessing tpt through the api.
-   * @throws InterruptedException
-   *           If the Job is cancelled
-   */
-  public static TptApi getTptApi(AbstractBuild< ? , ? > build, Launcher launcher, TptLogger logger,
-                                 FilePath[] exePaths, int tptPort, String tptBindingName,
-                                 long startupWaitTime)
-      throws InterruptedException {
-    String hostName = null;
-    try {
-      hostName = launcher.getChannel().call(new GetHostNameCallable());
-    } catch (IOException e1) {
-      logger.error("Could not retrive host name: " + e1.getMessage());
-      return null;
-    }
-    logger.info("Try to connect to " + hostName + ":" + tptPort);
-    logger.info("TPT Binding name: " + tptBindingName);
-    try {
-      return connectToTPT(logger, tptPort, tptBindingName, hostName);
-    } catch (RemoteException | NotBoundException e) {
-      // NOP, start TPT and try again
-    }
-    // start TPT and try again
-    if (!startTpt(build, launcher, logger, exePaths, tptPort, tptBindingName, startupWaitTime)) {
-      logger.error("Could not start TPT");
-      return null;
-    }
-    try {
-      return connectToTPT(logger, tptPort, tptBindingName, hostName);
-    } catch (RemoteException | NotBoundException e) {
-      logger.error(e.getMessage());
-      return null;
-    }
-  }
-
-  private static TptApi connectToTPT(TptLogger logger, int tptPort, String tptBindingName,
-                                     String hostName)
-      throws RemoteException, NotBoundException, AccessException {
-    Registry registry;
-    registry = LocateRegistry.getRegistry(hostName, tptPort);
-    TptApi remoteApi = (TptApi)registry.lookup(tptBindingName);
-    try {
-      logger.info("Connected to TPT \"" + remoteApi.getTptVersion() + "\"");
-    } catch (ApiException e) {
-      logger.error(e.getMessage());
-      // should not happen
-    }
-    return remoteApi;
-  }
-
-  /**
    * Publishes the Junit XML , it creates the folder for the XML and then it publishes the XML by
    * calling Publish.publishJUnitResults,
    * {@link Publish#publishJUnitResults(JenkinsConfiguration, FilePath, FilePath, TptLogger, LogLevel)
@@ -379,7 +249,7 @@ public class Utils {
     return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
   }
 
-  static <T> String toString(Collection<T> list, String delimeter) {
+  public static <T> String toString(Collection<T> list, String delimeter) {
     StringBuilder sb = new StringBuilder();
     for (T obj : list) {
       if (sb.length() > 0 && delimeter != null) {
@@ -395,7 +265,7 @@ public class Utils {
    * multicore execution and prevents the deletion of test data directory. This method only deletes
    * the files in a directory recursively if {@link FilePath#path.deleteContents()} fails.
    */
-  static void deleteFiles(FilePath path) throws IOException, InterruptedException {
+  public static void deleteFiles(FilePath path) throws IOException, InterruptedException {
     if (path.exists()) {
       if (path.isDirectory()) {
         try {

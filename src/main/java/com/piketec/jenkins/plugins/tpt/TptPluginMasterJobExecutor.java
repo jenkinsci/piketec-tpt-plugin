@@ -20,29 +20,18 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.io.File;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
+import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
-import com.piketec.tpt.api.ApiException;
-import com.piketec.tpt.api.ExecutionConfiguration;
-import com.piketec.tpt.api.ExecutionConfigurationItem;
-import com.piketec.tpt.api.ExecutionStatus;
-import com.piketec.tpt.api.OpenResult;
-import com.piketec.tpt.api.Project;
-import com.piketec.tpt.api.RemoteCollection;
-import com.piketec.tpt.api.Scenario;
-import com.piketec.tpt.api.TestSet;
-import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
 import hudson.Launcher;
@@ -147,55 +136,61 @@ class TptPluginMasterJobExecutor {
    * @return true if the execution from slaves and master were successful.
    */
   boolean execute() {
-    TptApi api = null;
-    boolean success = true;
-    try {
-      api = Utils.getTptApi(build, launcher, logger, exePaths, tptPort, tptBindingName,
-          tptStartupWaitTime);
-      if (api == null) {
-        return false;
+  		TptApiAccess tptApiAccess = new TptApiAccess(launcher, logger, exePaths,  tptPort, tptBindingName, tptStartupWaitTime);
+  		boolean success = true;
+      // We delete the JUnit results before iterating ofver the jenkinsConfigs
+      try {
+				removeJUnitData();
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage());
+			}
+      try {
+      	for (JenkinsConfiguration ec : executionConfigs) {
+					success &= executeOneConfig(ec, tptApiAccess);
+				}
+      } catch (InterruptedException e) {
+      	logger.error("Execution did not work: "+ e.getMessage());
+      } finally {
+      	logger.info("Close open TPT project on master and slaves.");
+      	if (!CleanUpTask.cleanUp(build, logger)) {
+      		logger.error("Could not close all open TPT files. "
+      				+ "There is no guarantee next run will be be done with correct file version.");
+      		return false;
+      	}
       }
-      // Wir loeschen die JUnit Daten bevor die iteration ueber die jenkinsConfigs
-      if (!StringUtils.isBlank(jUnitXmlPath)) {
-        FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
-        logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
-        try {
-          path.mkdirs();
-          path.deleteContents();
-        } catch (IOException e) {
-          logger.error("Could not create and/or clear JUnit XML directory " + path.getRemote());
-        }
-      }
-      for (JenkinsConfiguration ec : executionConfigs) {
-        success &= executeOneConfig(ec, api);
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      logger.interrupt(e.getMessage());
-      return false;
-    } finally {
-      logger.info("Close open TPT project on master and slaves.");
-      if (!CleanUpTask.cleanUp(build)) {
-        logger.error("Could not close all open TPT files. "
-            + "There is no guarantee next run will be be done with correct file version.");
-        return false;
-      }
-    }
-    return success;
+      return success;
   }
 
-  @SuppressWarnings("deprecation") // support old TPT versions
-  private boolean executeOneConfig(JenkinsConfiguration ec, TptApi api)
+	private void removeJUnitData() throws InterruptedException {
+		if (!StringUtils.isBlank(jUnitXmlPath)) {
+	    FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
+	    logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
+	    try {
+	      path.mkdirs();
+	      path.deleteContents();
+	    } catch (IOException e) {
+	      logger.error("Could not create and/or clear JUnit XML directory " + path.getRemote());
+	    }
+	  }
+	}
+
+	/**
+	 * This method collects all testcases that are supposed to be executed via the TPT API, divides them into
+	 * different workloads and calls the slave Agents to execute these. Then it collects their results.
+	 */
+  private boolean executeOneConfig(JenkinsConfiguration ec, TptApiAccess tptApiAccess)
       throws InterruptedException {
     if (!ec.isEnableTest()) {
       return true;
     }
+
+    // Get necessery paths the user added in the job configuration:
     Collection<String> testCases = null;
-    ExecutionConfiguration executionConfig;
     String testdataDir = Utils.getGeneratedTestDataDir(ec);
     FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
     String reportDir = Utils.getGeneratedReportDir(ec);
     FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
+    FilePath tptFilePath = new FilePath(build.getWorkspace(),ec.getTptFile());
     try {
       logger.info("Create and/or clean test data directory \"" + testDataPath.getRemote() + "\"");
       testDataPath.mkdirs();
@@ -207,52 +202,20 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not create or clear directories on master: " + e.getMessage());
       return false;
     }
-    OpenResult openProject;
-    try {
-      openProject = api.openProject(new File(ec.getTptFile()));
-      if (openProject.getProject() == null) {
-        logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
-        return false;
-      }
-      new CleanUpTask(openProject.getProject(), build);
-
-      executionConfig = getExecutionConfigByName(openProject.getProject(), ec.getConfiguration());
-      if (executionConfig == null) {
-        logger.error("Could not find config");
-        return false;
-      }
-      if (StringUtils.isNotEmpty(ec.getTestSet())) {
-        boolean testSetFound = false;
-        for (TestSet definedTestset : openProject.getProject().getTestSets().getItems()) {
-          if (definedTestset.getName().equals(ec.getTestSet())) {
-            testSetFound = true;
-            testCases = new ArrayList<>();
-            for (Scenario testcase : definedTestset.getTestCases().getItems()) {
-              testCases.add(testcase.getName());
-            }
-            break;
-          }
-        }
-        if (!testSetFound) {
-          logger.error("Could not find test set \"" + ec.getTestSet() + "\"");
-          return false;
-        }
-      } else {
-        testCases = getTestCaseNames(executionConfig);
-      }
-    } catch (RemoteException e) {
-      logger.error(e.getMessage());
-      return false;
-    } catch (ApiException e) {
-      logger.error(e.getMessage());
-      return false;
+    
+    // Register cleanup task that is called in the end to close remote TPT Project
+    CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort, tptBindingName, 
+    		exePaths, tptStartupWaitTime, tptFilePath);
+    new CleanUpTask(build, cleanUpCallable, launcher);
+    
+    // Get the list of testcases via the TPT API
+    testCases = tptApiAccess.getTestCases(tptFilePath,	ec.getConfiguration(), ec.getTestSet());
+    if(testCases == null) {
+    	logger.error("Getting test cases via the TPT API did not work!");
+    	return false;
     }
-    // check if found test cases to execute
-    if (testCases == null || testCases.isEmpty()) {
-      logger.error(
-          "No test cases are found to execute. It is possible that \"selected Test Cases \" is configured as test set. If so please change it to another existing test set");
-      return false;
-    }
+    
+    // Divide testcases into Workloads for the slave jobs to execute
     ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
     // create test sets for slave jobs
     int slaveJobSize;
@@ -311,49 +274,15 @@ class TptPluginMasterJobExecutor {
         return false;
       }
     }
-    // now combine the reports of the different test executions
+
+    // Build Overview report:
+    boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath, ec.getConfiguration(), 
+    		ec.getTestSet(), reportPath, testDataPath);
+    if(!buildingReportWorked) {
+    	logger.error("Building overview report did not work!");
+    }
+     
     try {
-      File oldTestDataFile = executionConfig.getDataDir();
-      File oldReportDir = executionConfig.getReportDir();
-      executionConfig.setDataDir(new File(testDataPath.getRemote()));
-      executionConfig.setReportDir(new File(reportPath.getRemote()));
-      // set explicit defined test set for all items
-      ArrayList<TestSet> oldTestSets = new ArrayList<>();
-      if (StringUtils.isNotEmpty(ec.getTestSet())) {
-        RemoteCollection<TestSet> allTestSets = openProject.getProject().getTestSets();
-        TestSet newTestSet = null;
-        for (TestSet t : allTestSets.getItems()) {
-          if (t.getName().equals(ec.getTestSet())) {
-            newTestSet = t;
-          }
-        }
-        if (newTestSet == null) {
-          logger.error("Test set \"" + ec.getTestSet() + "\" not found.");
-          return false;
-        }
-        for (ExecutionConfigurationItem item : executionConfig.getItems()) {
-          oldTestSets.add(item.getTestSet());
-          item.setTestSet(newTestSet);
-        }
-      }
-      ExecutionStatus execStatus = api.reGenerateOverviewReport(executionConfig);
-      while (execStatus.isRunning() || execStatus.isPending()) {
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          execStatus.cancel();
-          return false;
-        }
-      }
-      executionConfig.setDataDir(oldTestDataFile);
-      executionConfig.setReportDir(oldReportDir);
-      // reset test sets to old values
-      if (StringUtils.isNotEmpty(ec.getTestSet())) {
-        for (ExecutionConfigurationItem item : executionConfig.getItems()) {
-          item.setTestSet(oldTestSets.remove(0));
-        }
-      }
       int foundTestData = 0;
       if (enableJunit) {
         foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), ec, testDataPath,
@@ -372,9 +301,6 @@ class TptPluginMasterJobExecutor {
         return false;
       }
     } catch (RemoteException e) {
-      logger.error(e.getMessage());
-      return false;
-    } catch (ApiException e) {
       logger.error(e.getMessage());
       return false;
     } catch (IOException e) {
@@ -411,49 +337,5 @@ class TptPluginMasterJobExecutor {
     return testSets;
   }
 
-  /**
-   * Looks in the Tpt project if there is such Execution Configuration
-   * 
-   * @param project
-   *          , TptProject
-   * @param exeConfigName
-   *          , the name of the Execution Configuration
-   * 
-   * @return the ExecutionConfiguration if found, null otherwise
-   */
-  private ExecutionConfiguration getExecutionConfigByName(Project project, String exeConfigName)
-      throws RemoteException, ApiException {
-    Collection<ExecutionConfiguration> execConfigs =
-        project.getExecutionConfigurations().getItems();
-    for (ExecutionConfiguration elem : execConfigs) {
-      if (elem.getName().equals(exeConfigName)) {
-        return elem;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Get the testcases from an Execution configuration.
-   * 
-   * @param execution
-   *          configuration , we will iterate over its items in order to get the testcases
-   * 
-   * @return a list with the test cases
-   */
-  private Collection<String> getTestCaseNames(ExecutionConfiguration config)
-      throws RemoteException, ApiException {
-    HashSet<String> result = new HashSet<String>();
-    for (ExecutionConfigurationItem item : config.getItems()) {
-      if (item.getTestSet() == null || item.getTestSet().getTestCases() == null
-          || item.getTestSet().getTestCases().getItems() == null) {
-        return null;
-      }
-      for (Scenario testcase : item.getTestSet().getTestCases().getItems()) {
-        result.add(testcase.getName());
-      }
-    }
-    return result;
-  }
 
 }

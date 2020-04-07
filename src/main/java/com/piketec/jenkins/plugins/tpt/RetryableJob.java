@@ -23,6 +23,7 @@ package com.piketec.jenkins.plugins.tpt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -94,12 +95,11 @@ class RetryableJob {
             EnvVars env = build.getEnvironment(listener);
             env.overrideAll(build.getBuildVariables());
             // To be able to enqueue the same build multiple times, they have to be made
-            // artificially different. We do that by adding a random parameter (random name and
-            // random value). Everything else did not work.
+            // artificially different. We do that by adding a UUID. Everything else did not work.
             ArrayList<Action> parameterActions = new ArrayList<>();
             ArrayList<ParameterValue> parameterValues = new ArrayList<>();
-            parameterValues.add(new StringParameterValue(String.valueOf(Math.random()),
-                String.valueOf(Math.random())));
+            parameterValues.add(new StringParameterValue(UUID.randomUUID().toString(),
+            		UUID.randomUUID().toString()));
             parameterActions.add(new ParametersAction(parameterValues));
 
             final Future<Run> scheduled = schedule(build, slaveJob,
