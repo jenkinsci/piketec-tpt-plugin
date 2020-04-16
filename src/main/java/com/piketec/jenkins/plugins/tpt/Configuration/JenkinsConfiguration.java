@@ -170,6 +170,11 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   /**
+   * 
+   * This method resolves all variables that are used for the definition of the test set and the execution
+   * configuration, but not for the directories. These are resolved on the respective agent machine with 
+   * the respective environment variables.
+   * 
    * @param environment
    *          The map of environment variables and their values
    * @return A {@link JenkinsConfiguration} where all "${}"-Variables are replaced by their value if

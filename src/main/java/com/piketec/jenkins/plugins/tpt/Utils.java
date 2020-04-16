@@ -32,7 +32,10 @@ import org.apache.commons.io.FilenameUtils;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.EnvVars;
 import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.AbstractBuild;
 import jenkins.model.Jenkins;
 
 /**
@@ -83,48 +86,6 @@ public class Utils {
     synchronized (format) {
       return format.format(date);
     }
-  }
-
-  static boolean createParentDir(File directory, FilePath workspace) {
-    File parentDir = directory.getParentFile();
-    if (parentDir == null) {
-      return true;
-    }
-    try {
-      new FilePath(workspace, parentDir.getPath()).mkdirs();
-      return new FilePath(workspace, parentDir.getPath()).isDirectory();
-    } catch (IOException e) {
-      // NOP
-    } catch (InterruptedException e) {
-      // NOP
-    }
-    return false;
-  }
-
-  /**
-   * Creates a File (workspace) with a FilePath.
-   * 
-   * @param workspace
-   *          The workspace of the jenkisn job
-   * @param logger
-   *          To print some messages
-   * @return The worksapce as a native Java file.
-   * @throws InterruptedException
-   *           If the current Job is cancelled
-   */
-  public static File getWorkspaceDir(FilePath workspace, TptLogger logger)
-      throws InterruptedException {
-    File workspaceDir = null;
-    if (workspace == null) {
-      logger.info("Location of the workspace is unknown.");
-    } else {
-      try {
-        workspaceDir = new File(workspace.toURI());
-      } catch (IOException ioe) {
-        logger.info("Failed to get the workspace directory - reason: " + ioe);
-      }
-    }
-    return workspaceDir;
   }
 
   /**
@@ -297,5 +258,44 @@ public class Utils {
       }
     }
   }
-
+  
+  /**
+   * Copies all files from a remote location to another remote location. 
+   * 
+   * FilePath.copyRecursiveTo is not able to do that. See https://issues.jenkins-ci.org/browse/JENKINS-2126
+   */
+  public static void copyRecursive(FilePath from, FilePath to, TptLogger logger) throws IOException, InterruptedException {
+  	
+  	if(!from.exists()) {
+  		logger.error(from.getRemote() +" does not exist!");
+  		return;
+  	}
+  	if(!from.isDirectory()) {
+  		logger.error(from.getRemote() +" is not a directory!");
+  		return;
+  	}
+  	for(FilePath f : from.list()){
+  		if(f.isDirectory()) {
+  			copyRecursive(f, new FilePath(to, f.getName()), logger);
+  		}else {
+  			FilePath toFile = new FilePath(to, f.getName());
+  			f.copyTo(toFile);
+  		}
+  	}
+  }
+  
+  /**
+   * @return the environment variables from the agent machine the code is running on
+   * @throws InterruptedException 
+   */
+  public static EnvVars getEnvironment(AbstractBuild<?, ?> build, Launcher launcher, TptLogger logger) throws InterruptedException {
+  	EnvVars environment;
+    try {
+      environment = build.getEnvironment(launcher.getListener());
+    } catch (IOException e) {
+      environment = new EnvVars();
+      logger.error(e.getLocalizedMessage());
+    } 
+    return environment;
+  }
 }

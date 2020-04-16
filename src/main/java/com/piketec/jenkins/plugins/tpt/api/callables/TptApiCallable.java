@@ -106,6 +106,7 @@ public abstract class TptApiCallable<S> implements  Callable<S, UnknownHostExcep
 		FilePath exeFile = null;
     for (FilePath f : exePaths) {
       try {
+      	logger.info("Try to use TPT: "+f.getRemote());
         if (f.exists()) {
           exeFile = f;
           break;
@@ -115,12 +116,15 @@ public abstract class TptApiCallable<S> implements  Callable<S, UnknownHostExcep
       }
     }
     try {
-      if (exeFile == null || !exeFile.exists()) {
-        logger.error("TPT exe not found.");
+      if (exeFile == null) {
+        logger.error("TPT exe not found: null");
+        return false;
+      }else if( !exeFile.exists()) {
+      	logger.error("TPT exe not found: "+exeFile.getRemote());
         return false;
       }
     } catch (IOException | InterruptedException e1) {
-      logger.error("Could not dertmine existence of TPT.");
+      logger.error("Could not dertmine existence of TPT: "+exeFile.getRemote());
       return false;
     }
 		ProcessBuilder builder = new ProcessBuilder(

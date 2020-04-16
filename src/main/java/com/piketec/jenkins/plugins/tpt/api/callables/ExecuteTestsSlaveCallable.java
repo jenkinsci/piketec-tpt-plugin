@@ -38,7 +38,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 	private FilePath slaveReportPath;
 	private FilePath slaveDataPath;
 	private String execCfg;
-	private List<String> testSetString;
+	private List<String> testSetList;
 	private String testSetName;
 
 	public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
@@ -49,7 +49,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 		this.slaveReportPath = slaveReportPath;
 		this.slaveDataPath = slaveDataPath;
 		this.execCfg = executionConfigName;
-		this.testSetString = testSet;
+		this.testSetList = testSet;
 		this.testSetName = testSetName;
 	}
 
@@ -75,15 +75,15 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
         return false;
       }
       // adjust config to execute only the given one test case
-      File oldReportDir = config.getReportDir();
-      File oldTestDataDir = config.getDataDir();
-
+      String oldReportDir = config.getReferenceDirPath();
+      String oldTestDataDir = config.getDataDirPath();
+      
       Collection<Scenario> foundScenearios = new HashSet<>();
       find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
-          testSetString, foundScenearios);
-      if (foundScenearios.size() != testSetString.size()) {
+          testSetList, foundScenearios);
+      if (foundScenearios.size() != testSetList.size()) {
         logger.error(
-            "Could only find " + foundScenearios.size() + " of " + testSetString.size() + ".");
+            "Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
         return false;
       }
 
@@ -158,10 +158,10 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       		item.setTestSet(oldTestSet);
       	}
       }
-      logger.info("reset test data and report directory to " + oldTestDataDir.getPath() + " and "
-          + oldReportDir.getPath());
-      config.setDataDir(oldTestDataDir);
-      config.setReportDir(oldReportDir);
+      logger.info("reset test data and report directory to \"" + oldTestDataDir + "\" and \""
+          + oldReportDir+"\"");
+      config.setDataDirPath(oldTestDataDir);
+      config.setReportDirPath(oldReportDir);
       for (TestSet testSet : newTestSets) {
         logger.info("delete temporary test set \"" + testSet.getName() + "\"");
         openProject.getProject().getTestSets().delete(testSet);

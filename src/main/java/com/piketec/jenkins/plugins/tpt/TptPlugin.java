@@ -288,24 +288,11 @@ public class TptPlugin extends Builder {
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
     logger = new TptLogger(listener.getLogger());
-    EnvVars environment;
-    try {
-      environment = build.getEnvironment(launcher.getListener());
-    } catch (IOException e) {
-      environment = new EnvVars();
-      logger.error(e.getLocalizedMessage());
-    } catch (InterruptedException e) {
-      logger.error(e.getLocalizedMessage());
-      return false;
-    }
-    ArrayList<JenkinsConfiguration> normalizedConfigs = new ArrayList<JenkinsConfiguration>();
-    for (JenkinsConfiguration ec : executionConfiguration) {
-      normalizedConfigs.add(ec.replaceAndNormalize(environment));
-    }
+    EnvVars environment = Utils.getEnvironment(build, launcher, logger);
     if (isTptMaster) {
-      return performAsMaster(build, launcher, listener, environment, normalizedConfigs);
+      return performAsMaster(build, launcher, listener, environment, executionConfiguration);
     } else {
-      return performWithoutSlaves(build, launcher, listener, environment, normalizedConfigs);
+      return performWithoutSlaves(build, launcher, listener, environment, executionConfiguration);
     }
   }
 
@@ -323,13 +310,13 @@ public class TptPlugin extends Builder {
    *          The listener
    * @param environment
    *          The map of envrionment varibales and their value
-   * @param normalizedConfigs
-   *          The configs with already replaced $-variables
+   * @param configs
+   *          The configs with unresolved $-variables
    * @return true if it was possible to execute the TptPluginSingleJobExecutor.
    */
   public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launcher,
                                       BuildListener listener, EnvVars environment,
-                                      ArrayList<JenkinsConfiguration> normalizedConfigs) {
+                                      ArrayList<JenkinsConfiguration> configs) {
     // split and expand list of ptahs to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
@@ -343,7 +330,7 @@ public class TptPlugin extends Builder {
     // start execution
     TptPluginSingleJobExecutor executor =
         new TptPluginSingleJobExecutor(build, launcher, listener, expandedExePaths,
-            expandedArguments, normalizedConfigs, jUnitXmlPath, jUnitLogLevel, enableJunit);
+            expandedArguments, configs, jUnitXmlPath, jUnitLogLevel, enableJunit);
     return executor.execute();
 
   }
@@ -362,13 +349,13 @@ public class TptPlugin extends Builder {
    *          The listener
    * @param environment
    *          The map of envrionment varibales and their value
-   * @param normalizedConfigs
-   *          The configs with already replaced $-variables
+   * @param configs
+   *          The configs with unresolved $-variables
    * @return true if the execution from slaves and master were successful.
    */
   public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
                                  BuildListener listener, EnvVars environment,
-                                 ArrayList<JenkinsConfiguration> normalizedConfigs) {
+                                 ArrayList<JenkinsConfiguration> configs) {
     // split and expand list of paths to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
@@ -435,7 +422,7 @@ public class TptPlugin extends Builder {
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
     TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
-        expandedExePaths, normalizedConfigs, expandedTptPort, expandedTptBindingName,
+        expandedExePaths,configs, expandedTptPort, expandedTptBindingName,
         expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries,
         jUnitXmlPath, jUnitLogLevel, enableJunit);
     try {

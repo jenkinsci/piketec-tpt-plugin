@@ -64,10 +64,10 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
         return false;
       }
     	
-      File oldTestDataFile = executionConfig.getDataDir();
-      File oldReportDir = executionConfig.getReportDir();
-      executionConfig.setDataDir(new File(testDataPath.getRemote()));
-      executionConfig.setReportDir(new File(reportPath.getRemote()));
+      String oldTestDataFile = executionConfig.getDataDirPath();
+      String oldReportDir = executionConfig.getReportDirPath();
+      executionConfig.setDataDirPath(testDataPath.getRemote());
+      executionConfig.setReportDirPath(reportPath.getRemote());
       
       // set explicit defined test set for all items
       // This is done, because the slaves don't execute the testsets that were set originally in the file
@@ -101,14 +101,14 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
           return false;
         }
       }
-      executionConfig.setDataDir(oldTestDataFile);
-      executionConfig.setReportDir(oldReportDir);
+      executionConfig.setDataDirPath(oldTestDataFile);
+      executionConfig.setReportDirPath(oldReportDir);
       
       // reset test sets to old values to maintain the file as it was before
       if (StringUtils.isNotEmpty(testSet)) {
         for (ExecutionConfigurationItem item : executionConfig.getItems()) {
         	TestSet oldTestSet = oldTestSets.remove(0);
-        	// This happenes because of a bug in the TPT API.
+        	// This happens because of a bug in the TPT API.
         	if(oldTestSet!=null) {
         		item.setTestSet(oldTestSet);
         	}

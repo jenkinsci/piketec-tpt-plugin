@@ -138,7 +138,7 @@ class TptPluginMasterJobExecutor {
   boolean execute() {
   		TptApiAccess tptApiAccess = new TptApiAccess(launcher, logger, exePaths,  tptPort, tptBindingName, tptStartupWaitTime);
   		boolean success = true;
-      // We delete the JUnit results before iterating ofver the jenkinsConfigs
+      // We delete the JUnit results before iterating over the jenkinsConfigs
       try {
 				removeJUnitData();
 			} catch (InterruptedException e) {
@@ -178,19 +178,22 @@ class TptPluginMasterJobExecutor {
 	 * This method collects all testcases that are supposed to be executed via the TPT API, divides them into
 	 * different workloads and calls the slave Agents to execute these. Then it collects their results.
 	 */
-  private boolean executeOneConfig(JenkinsConfiguration ec, TptApiAccess tptApiAccess)
+  private boolean executeOneConfig(JenkinsConfiguration unresolvedConfig, TptApiAccess tptApiAccess)
       throws InterruptedException {
-    if (!ec.isEnableTest()) {
+    if (!unresolvedConfig.isEnableTest()) {
       return true;
     }
 
+    // Resolve $-vars in paths, test set and execution config names 
+    JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+    
     // Get necessery paths the user added in the job configuration:
+    // These paths are resolved to work on the master.
     Collection<String> testCases = null;
-    String testdataDir = Utils.getGeneratedTestDataDir(ec);
-    FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
-    String reportDir = Utils.getGeneratedReportDir(ec);
-    FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
-    FilePath tptFilePath = new FilePath(build.getWorkspace(),ec.getTptFile());
+    FilePath testDataPath = new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(resolvedConfig));
+    FilePath reportPath = new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(resolvedConfig));
+    FilePath tptFilePath = new FilePath(build.getWorkspace(), resolvedConfig.getTptFile());
+    
     try {
       logger.info("Create and/or clean test data directory \"" + testDataPath.getRemote() + "\"");
       testDataPath.mkdirs();
@@ -209,7 +212,7 @@ class TptPluginMasterJobExecutor {
     new CleanUpTask(build, cleanUpCallable, launcher);
     
     // Get the list of testcases via the TPT API
-    testCases = tptApiAccess.getTestCases(tptFilePath,	ec.getConfiguration(), ec.getTestSet());
+    testCases = tptApiAccess.getTestCases(tptFilePath,	resolvedConfig.getConfiguration(), resolvedConfig.getTestSet());
     if(testCases == null) {
     	logger.error("Getting test cases via the TPT API did not work!");
     	return false;
@@ -249,8 +252,7 @@ class TptPluginMasterJobExecutor {
       logger.info("Create job for \"" + subTestSet + "\"");
 
       // creates the workloads for the slaves, with the smaller chunks of testsets
-      WorkLoad workloadToAdd = new WorkLoad(ec.getTptFile(), ec.getConfiguration(), testdataDir,
-          reportDir, ec.getTestSet(), subTestSet, build.getWorkspace(), build);
+      WorkLoad workloadToAdd = new WorkLoad(unresolvedConfig, subTestSet, build.getWorkspace(), build, testDataPath, reportPath);
       // it adds the workloads to an static HashMap.
       WorkLoad.putWorkLoad(slaveJobName, workloadToAdd);
       // Creates a retryable job , there are the builds scheduled. So the logic is : We put a
@@ -276,8 +278,8 @@ class TptPluginMasterJobExecutor {
     }
 
     // Build Overview report:
-    boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath, ec.getConfiguration(), 
-    		ec.getTestSet(), reportPath, testDataPath);
+    boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath, resolvedConfig.getConfiguration(), 
+    		resolvedConfig.getTestSet(), reportPath, testDataPath);
     if(!buildingReportWorked) {
     	logger.error("Building overview report did not work!");
     }
@@ -285,7 +287,7 @@ class TptPluginMasterJobExecutor {
     try {
       int foundTestData = 0;
       if (enableJunit) {
-        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), ec, testDataPath,
+        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), resolvedConfig, testDataPath,
             jUnitXmlPath, jUnitLogLevel, logger);
       } else {
         try {
@@ -307,7 +309,7 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not publish result: " + e.getMessage());
       return false;
     }
-    TPTBuildStepEntries.addEntry(ec, build);
+    TPTBuildStepEntries.addEntry(unresolvedConfig, build);
     return true;
   }
 

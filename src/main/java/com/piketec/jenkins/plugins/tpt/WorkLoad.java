@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 
+import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
+
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 
@@ -40,31 +42,21 @@ public class WorkLoad {
 
   private static HashMap<String, LinkedList<WorkLoad>> workloads = new HashMap<>();
 
-  private String fileName;
-
-  private String dataDir;
-
-  private String reportDir;
-
-  private String testSetName;
-
-  private String exeConfig;
-
   private List<String> testCases;
 
-  private AbstractBuild masterId;
+  private AbstractBuild<?, ?> masterId;
 
   private FilePath masterWorkspace;
 
+	private FilePath masterDataDir;
+
+	private FilePath masterReportDir;
+
+	private JenkinsConfiguration jenkinsConfig;
+
   /**
-   * @param fileName
-   *          tpt file name
-   * @param exeConfig
-   *          tpt execution configuration
-   * @param dataDir
-   *          the path to test data dir
-   * @param reportDir
-   *          the path to the report dir
+   * @param unresolvedConfig
+   *          JenkinsConfiguration that contains paths and tpt file names with unresolved $-vars
    * @param testSetName
    *          the name of the test set if given
    * @param testCases
@@ -74,53 +66,21 @@ public class WorkLoad {
    * @param masterId
    *          the current build, used in order to get an unique id
    */
-  public WorkLoad(String fileName, String exeConfig, String dataDir, String reportDir,
-                  String testSetName, List<String> testCases, FilePath masterWorkspace,
-                  AbstractBuild masterId) {
-
-    this.fileName = fileName;
-    this.exeConfig = exeConfig;
-    this.dataDir = dataDir;
-    this.reportDir = reportDir;
-    this.testSetName = testSetName;
-    this.testCases = testCases;
+  public WorkLoad(JenkinsConfiguration unresolvedConfig, List<String> subTestSet,FilePath masterWorkspace,
+      AbstractBuild<?, ?> masterId, FilePath masterDataDir, FilePath masterReportDir) {
+  	this.jenkinsConfig = unresolvedConfig;
+    this.testCases = subTestSet;
     this.masterId = masterId;
     this.masterWorkspace = masterWorkspace;
+    this.masterDataDir = masterDataDir;
+    this.masterReportDir = masterReportDir;
   }
 
   /**
-   * @return get the tpt file name
+   * @return the jenkins configuration that contains paths and tpt file names with unresolved $-vars
    */
-  public String getFileName() {
-    return fileName;
-  }
-
-  /**
-   * @return get the test data dir
-   */
-  public String getDataDir() {
-    return dataDir;
-  }
-
-  /**
-   * @return get the report dir
-   */
-  public String getReportDir() {
-    return reportDir;
-  }
-
-  /**
-   * @return the name of the given test Set
-   */
-  public String getTestSetName() {
-    return testSetName;
-  }
-
-  /**
-   * @return the name of the tpt execution configuration
-   */
-  public String getExeConfig() {
-    return exeConfig;
+  public JenkinsConfiguration getJenkinsConfig() {
+    return jenkinsConfig;
   }
 
   /**
@@ -140,10 +100,24 @@ public class WorkLoad {
   /**
    * @return the current build, used to get an unique Id
    */
-  public AbstractBuild getMasterId() {
+  public AbstractBuild<?, ?> getMasterId() {
     return masterId;
   }
 
+  /**
+   * @return the path to the data directory on the master
+   */
+	public FilePath getMasterDataDir() {
+		return this.masterDataDir;
+	}
+
+  /**
+   * @return the path to the report directory on the master
+   */
+	public FilePath getMasterReportDir() {
+		return this.masterReportDir;
+	}
+  
   /**
    * Adds a workload to the static HashMap. This method is used when the masterJob put the workload
    * here and then triggers the slave job.
@@ -189,7 +163,7 @@ public class WorkLoad {
    * @param masterBuild
    *          the build of the master job
    */
-  public static synchronized void clean(String jobName, AbstractBuild masterBuild) {
+  public static synchronized void clean(String jobName, AbstractBuild<?, ?> masterBuild) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
     if (queue == null) {
       return;

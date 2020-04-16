@@ -45,6 +45,7 @@ import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -112,6 +113,8 @@ public class TPTReportPublisher extends Notifier {
     }
 
     for (JenkinsConfiguration cfg : jenkinsConfigurationsToPublishForThisWorkspace) {
+      // Replace $-vars used in the config:
+    	cfg = cfg.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
       // make file in build und copy report dir
       String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
       File dir = new File(piketectptDir.getAbsolutePath() + File.separator + tptFileName);
@@ -129,7 +132,7 @@ public class TPTReportPublisher extends Notifier {
       FilePath reportDir = new FilePath(workspace, Utils.getGeneratedReportDir(cfg));
       FilePath testDataDir = new FilePath(workspace, Utils.getGeneratedTestDataDir(cfg));
       if (reportDir.exists()) {
-        reportDir.copyRecursiveTo(new FilePath(dirExConfig));
+      	Utils.copyRecursive(reportDir,new FilePath(dirExConfig), logger);
       }
       FilePath reportXML = new FilePath(testDataDir, "test_summary.xml");
       if (reportXML.exists()) {

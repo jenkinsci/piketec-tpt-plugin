@@ -27,6 +27,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
+
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -121,16 +123,7 @@ public class TptPluginSlave extends Builder {
       throws InterruptedException, IOException {
 
     TptLogger logger = new TptLogger(listener.getLogger());
-    EnvVars environment;
-    try {
-      environment = build.getEnvironment(launcher.getListener());
-    } catch (IOException e) {
-      environment = new EnvVars();
-      logger.error(e.getLocalizedMessage());
-    } catch (InterruptedException e) {
-      logger.error(e.getLocalizedMessage());
-      return false;
-    }
+    EnvVars environment = Utils.getEnvironment(build, launcher, logger);
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
     for (int i = 0; i < expandedExePaths.length; i++) {
@@ -176,28 +169,31 @@ public class TptPluginSlave extends Builder {
       return false;
     }
 
-    String fileNameFromWorkload = workloadToDo.getFileName();
-    String exeConfigFromWorkload = workloadToDo.getExeConfig();
-    String testDataDirFromWorload = workloadToDo.getDataDir();
-    String reportDirFromWorkload = workloadToDo.getReportDir();
+    JenkinsConfiguration unresolvedConfig = workloadToDo.getJenkinsConfig();
     List<String> testCasesFromWorkload = workloadToDo.getTestCases();
-    String testSetFromWorkload = workloadToDo.getTestSetName();
     AbstractBuild masterId = workloadToDo.getMasterId();
     FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
-
-    logger.info("File Name :               " + fileNameFromWorkload);
-    logger.info("Execution Configuration : " + exeConfigFromWorkload);
-    logger.info("Test Data directory :     " + testDataDirFromWorload);
-    logger.info("Report directory :        " + reportDirFromWorkload);
+    FilePath masterDataDir  = workloadToDo.getMasterDataDir();
+    FilePath masterReportDir = workloadToDo.getMasterReportDir();
+    
+    // Replace $-Vars:
+	  JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(environment);
+	  
+    logger.info("File Name :               " + resolvedConfig.getTptFile());
+    logger.info("Execution Configuration : " + resolvedConfig.getConfiguration());
+    logger.info("Test Data directory :     " + resolvedConfig.getTestdataDir());
+    logger.info("Report directory :        " + resolvedConfig.getReportDir());
     logger.info("Test Cases :              " + testCasesFromWorkload);
-    if (StringUtils.isNotEmpty(testSetFromWorkload)) {
-      logger.info("Test Set :                " + testSetFromWorkload);
+    if (StringUtils.isNotEmpty(unresolvedConfig.getTestSet())) {
+      logger.info("Test Set :                " + resolvedConfig.getTestSet());
     }
+    for (FilePath f : expandedExePaths) {
+    	logger.info("Path to tpt.exe :         " + f.getRemote());
+		}
 
     TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
-        expandedExePaths, expandedTptPort, expandedTptBindingName, new FilePath(build.getWorkspace(),fileNameFromWorkload),
-        exeConfigFromWorkload, testDataDirFromWorload, reportDirFromWorkload, testCasesFromWorkload,
-        expandedTptStartupWaitTime, masterId, testSetFromWorkload, masterWorkspace);
+        expandedExePaths, expandedTptPort, expandedTptBindingName, resolvedConfig, testCasesFromWorkload,
+        expandedTptStartupWaitTime, masterId, masterWorkspace, masterDataDir, masterReportDir);
 
     boolean result = executor.execute();
     if (!result) {
