@@ -115,7 +115,7 @@ public class TPTReportPublisher extends Notifier {
     for (JenkinsConfiguration cfg : jenkinsConfigurationsToPublishForThisWorkspace) {
       // Replace $-vars used in the config:
     	cfg = cfg.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
-      // make file in build und copy report dir
+      // make file in build and copy report dir
       String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
       File dir = new File(piketectptDir.getAbsolutePath() + File.separator + tptFileName);
       if (!dir.isDirectory()) {
@@ -232,7 +232,7 @@ public class TPTReportPublisher extends Notifier {
     try {
       SAXParser saxParser = saxParserFactory.newSAXParser();
       TPTReportSAXHandler handler = new TPTReportSAXHandler(tptFile, failedTests, reportDirOnRemote,
-          executionConfiguration, isFileCorrupt);
+          executionConfiguration, isFileCorrupt, logger);
       InputStream inputStream = xmlFile.read();
       try {
         saxParser.parse(inputStream, handler);

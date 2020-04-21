@@ -37,7 +37,7 @@ import hudson.model.DirectoryBrowserSupport;
 import hudson.util.HttpResponses;
 
 /**
- * Avtion to open a TPT report of a failed test case
+ * Action to open a TPT report of a failed test case
  * 
  * @author FInfantino, PikeTec GmbH
  */
@@ -82,7 +82,7 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
                                        String reportFile, String id, String exConfig,
                                        String platform, String date) {
     this.id = id;
-    name = fileName;
+    this.name = fileName;
     this.platform = platform;
     this.executionConfiguration = exConfig;
     this.build = build;
@@ -121,6 +121,10 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   /**
    * This method is called when an object from this class is created.
    * 
+   * When clicking on a failed test case, the overview report should be opened, with the navigation on the
+   * left and the failed test case report on the right.
+   * 
+   * It maps the URL the user sees to the file path where the corresponding html document lies.
    * 
    * @param req
    *          The request

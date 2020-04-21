@@ -20,8 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +28,9 @@ import java.util.Map;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.piketec.jenkins.plugins.tpt.TptLogger;
+
 
 /**
  * Parser for paring the TPT test_summary.xml file.
@@ -58,6 +59,8 @@ class TPTReportSAXHandler extends DefaultHandler {
 
   private boolean isFileCorrupt;
 
+	private TptLogger logger;
+
   /**
    * This class is an XML Parser for parsing the "test_summary.xml" and extract all the relevant
    * data from it.
@@ -76,12 +79,13 @@ class TPTReportSAXHandler extends DefaultHandler {
    */
   public TPTReportSAXHandler(TPTFile tptFile, ArrayList<TPTTestCase> failedTests,
                              String reportDirOnRemote, String executionConfiguration,
-                             boolean isFileCorrupt) {
+                             boolean isFileCorrupt, TptLogger logger) {
     this.reportDir = reportDirOnRemote;
     this.tptFile = tptFile;
     this.failedTests = failedTests;
     this.executionConfiguration = executionConfiguration;
     this.isFileCorrupt = isFileCorrupt;
+    this.logger = logger;
     nameAndId = new HashMap<>();
     resultCount = new HashMap<>();
     // Adding the start values
@@ -133,9 +137,8 @@ class TPTReportSAXHandler extends DefaultHandler {
         t.setExecutionDate(executionDate);
         t.setResult(result);
         t.setFileName(fileName);
-        reportFile = getLinkToFailedReport(reportFile, reportDir);
-        t.setPlatform(getPlatformName(reportFile));
-        t.setReportFile(reportFile);
+        t.setPlatform(getPlatformName(reportFile, reportDir));
+        t.setReportFile(getLinkToFailedReport(reportFile, reportDir));
         t.setExecutionConfiguration(this.executionConfiguration);
         t.setTestCaseName(nameAndId.get(id));
         failedTests.add(t);
@@ -158,21 +161,40 @@ class TPTReportSAXHandler extends DefaultHandler {
     tptFile.setTotal(total);
   }
 
-  private String getPlatformName(String reportFile) {
-    int index = reportFile.indexOf("\\");
-    if (index < 0) {
-      return reportFile;
-    }
-    return reportFile.substring(0, index);
+  
+  /**
+   * This method extracts the platform name from the report path.
+   * It is assumed, that both input Strings represent absolute paths.
+   */
+  private String getPlatformName(String reportFile, String reportDir){
+  	String relativePath = getLinkToFailedReport(reportFile, reportDir);
+  	if(relativePath.isEmpty()) {
+  		logger.error("Could not extract the platform name!");
+  		return "";
+  	}
+  	// This is handled with String-methods, because these are Windows Paths and if we'd use path.relativize
+  	// while Jenkins is running on a Linux machine, it wouldn't work.
+  	return relativePath.substring(0, relativePath.indexOf("\\"));
   }
 
-  private String getLinkToFailedReport(String reportFile, String reportDir) {
-    if (reportFile.equals("")) {
-      return "";
-    }
-    Path path = Paths.get(reportDir);
-    return path.relativize(Paths.get(reportFile)).toFile().getPath();
-
+  /**
+   * This method returns the relative path from the report file depending on the report directory.
+   * It is assumed, that both input Strings represent absolute paths.
+   */
+  private String getLinkToFailedReport(String reportFile, String reportDir)  {
+  	if(!reportFile.startsWith(reportDir)) {
+  		logger.error("Can't extract relative path to test case report. At least one of the "
+  				+ "following paths is not an absolute path: reportFile = "+reportFile+", reportDirectory = "+reportDir);
+  		return "";
+  	}
+  	if(reportFile.equals(reportDir)) {
+  		logger.error("Can't extract relative path to test case report. They are equal, "
+  				+ "even though they shouldn't be: reportFile = "+reportFile+", reportDirectory = "+reportDir);
+  		return "";
+  	}
+  	// This is handled with String-methods, because these are Windows Paths and if we'd use path.relativize
+  	// while Jenkins is running on a Linux machine, it wouldn't work.
+  	return reportFile.substring(reportDir.length()+1, reportFile.length());
   }
 
 }
