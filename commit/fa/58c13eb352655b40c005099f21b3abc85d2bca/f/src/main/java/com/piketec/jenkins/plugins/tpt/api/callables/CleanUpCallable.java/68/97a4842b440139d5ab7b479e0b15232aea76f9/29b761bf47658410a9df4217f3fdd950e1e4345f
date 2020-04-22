@@ -1,0 +1,8 @@
+id: 6897a4842b440139d5ab7b479e0b15232aea76f9
+replaces: 2b7dcfe1b7683adc63afc317cf58e70c43b880ea,53777b23d977c5513a308694a1008e56a02a5df9
+commit-date: 2020-04-07 05:09:01
+created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587553537550	120
+new-position: 34
+updated: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587561440875	120
+content
+@MBO: Wenn das Projekt also bereits geschlossen war, öffnest du es wieder nur um es dann gleich wieder zu schließen? Besser wäre hier zu prüfen, ob das Projekt denn noch offen ist und wenn nein, direkt success zurück zuliefern. Via TptApi.getOpenProjects() und Project.getFile() sollte das zu schließene Projekt doch zu finden sein. Ebenso muss TPT nicht extra gestartet werden. Wenn keine Verbidnung zu TPT aufgebaut werden kann, ist es entweder geschlossen = alles ist gut oder irgendein anderer Fehler = auch kein Problem, dasss durch starten eines neuen TPTs lösbar wäre
