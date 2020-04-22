@@ -1,0 +1,6 @@
+id: 6897a4842b440139d5ab7b479e0b15232aea76f9
+commit-date: 2020-04-07 05:09:01
+created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587553537550	120
+new-position: 34
+content
+@MBO: Wenn das Projekt also bereits geschlossen war, öffnest du es wieder nur um es dann gleich wieder zu schließen? Besser wäre hier zu prüfen, ob das Projekt denn noch offen ist via TptApi.getOpenProjects und Project.getFile()
