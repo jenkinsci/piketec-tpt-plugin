@@ -1,0 +1,6 @@
+id: e873a0080fa19960cfa6bbbfd989b134b1c4294a
+commit-date: 2020-04-07 05:09:01
+created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587555043698	120
+new-position: 70
+content
+@MBO: Du hast anscheinenend keine Eclipse-Perefences importirt. Dadurch sind z.B. hier Tabs zur Einrückung drin und kein Auto Format Code an etc.
