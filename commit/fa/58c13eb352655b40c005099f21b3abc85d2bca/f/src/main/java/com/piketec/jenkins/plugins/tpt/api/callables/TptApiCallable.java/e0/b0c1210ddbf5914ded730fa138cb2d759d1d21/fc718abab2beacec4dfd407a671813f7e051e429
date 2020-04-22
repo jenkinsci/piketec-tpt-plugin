@@ -1,0 +1,6 @@
+id: e0b0c1210ddbf5914ded730fa138cb2d759d1d21
+commit-date: 2020-04-07 05:09:01
+created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587561571657	120
+new-position: 79
+content
+@MBO: Du lieferst hier null zurück (das ist ok), aber keine der Aufrufstellen scheitn ein nullcheck zu machen.
