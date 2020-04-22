@@ -1,0 +1,8 @@
+id: e65ed6fa3f9b6a3037b777e0802992a017b5112a
+replaces: 4b4884eb8143463f53501dc1c3e1fb1930fc2bd8
+commit-date: 2020-04-07 05:09:01
+created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587555575662	120
+new-position: 150
+updated: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587555989201	120
+content
+@MBO: InterruptedException gefangen -> Thread.currentThread().interrupt(); aufrufen. success sollte dann schon mal auf false gesetzt werden. Dass danach noch das CelanUp versucht wird,halte ich für richtig, allerdings darf dann Thread.currentThread().interrupt(); erst danach aufgerufen werden (sonst fleigt da sofort die nächste InterruptedException).
