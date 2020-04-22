@@ -1,6 +1,0 @@
-id: 3b6f257d7c0b92bbe872f4a3bc93449b3daead70
-commit-date: 2020-04-07 05:09:01
-created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587555550572	120
-new-position: 143
-content
-@MBO: InterruptedException gefangen -> Thread.currentThread().interrupt(); aufrufen
