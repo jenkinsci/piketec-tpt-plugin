@@ -1,0 +1,6 @@
+id: d65cead1899e90536cb52f7b652007904b17a278
+commit-date: 2020-04-16 12:00:56
+created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587564866021	120
+new-position: 275
+content
+@MBO: Muss nicht auch sichergestellt werden, dass "to" ein directory ist (falls es existiert) oder wird das vom f.copyTo() eh behandelt (vermutlich)
