@@ -1,8 +1,0 @@
-id: 2b59e868f6e98c1f607ee65b6fd836937d342737
-replaces: c1bdb9ec96daae56357a2fe14ac6dc66fa7af6ae
-commit-date: 2020-04-16 12:00:56
-created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587643253260	120
-new-position: 119
-updated: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587643358278	120
-content
-@MBO: Das "null" wird dem Nutzer nicht wirklich weiterhelfen.
