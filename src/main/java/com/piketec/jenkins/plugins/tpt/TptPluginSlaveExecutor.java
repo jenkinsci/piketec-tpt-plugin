@@ -164,14 +164,9 @@ class TptPluginSlaveExecutor {
 		  return false;
 		}
 
-		// Execute Tests on slava:
+		// Execute Tests on slave:
 		boolean executionResult = tptApiAccess.executeTestsSlave(tptFilePath, jenkinsConfig.getConfiguration(), 
 				jenkinsConfig.getTestSet(), slaveReportPath, slaveDataPath, testSetList);
-		if(executionResult) {
-			logger.info("Execution worked");
-		}else {
-			logger.error("Execution failed!");
-		}
 		
 		// Copy tpt-testresults back to master, so the master can build the report
 		try {

@@ -49,13 +49,15 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
 		this.testDataPath = testdataPath;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public Boolean call() throws UnknownHostException {
 		TptLogger logger = getLogger();
 		TptApi api = getApi();
+		if(api==null) {
+			logger.error("Could not establish connection to the TPT API.");
+			return false;
+		}
     OpenResult openProject = getOpenProject(logger, api, tptFilePath);
-
     try {
     	 // Get the execution cofig that should be executed
       ExecutionConfiguration executionConfig = getExecutionConfigByName(openProject.getProject(), executionConfigName);

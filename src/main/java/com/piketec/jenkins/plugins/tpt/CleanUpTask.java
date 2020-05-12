@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
-import com.piketec.tpt.api.ApiException;
-import com.piketec.tpt.api.Project;
 
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.Computer;
 
 /**
  * Task to execute after executing a builder. Usually done in a finally block
@@ -52,7 +51,7 @@ public class CleanUpTask {
    * @param masterId
    *          Abstractbuild as unique Id
    */
-  public CleanUpTask(AbstractBuild masterId, CleanUpCallable cleanUpCallable, Launcher launcher) {
+  public CleanUpTask(AbstractBuild<?, ?> masterId, CleanUpCallable cleanUpCallable, Launcher launcher) {
   	this.cleanUpCallable = cleanUpCallable;
   	this.launcher = launcher;
   	register(this, masterId);
@@ -68,13 +67,16 @@ public class CleanUpTask {
     try {
     	success = launcher.getChannel().call(cleanUpCallable);
     } catch (RemoteException e) {
-    	logger.error("RemoteException while cleaning "+e.getMessage());
+    	logger.error("RemoteException while cleaning "+cleanUpCallable.getFilePath().getRemote()
+    			+" on Agent "+cleanUpCallable.getFilePath().toComputer().getName()+": "+e.getMessage());
       return false;
     } catch (IOException e) {
-    	logger.error("IOException while cleaning "+e.getMessage());
+    	logger.error("IOException while cleaning "+cleanUpCallable.getFilePath().getRemote()
+    			+" on Agent "+cleanUpCallable.getFilePath().toComputer().getName()+": "+e.getMessage());
 			return false;
 		} catch (InterruptedException e) {
-			logger.error("InterruptedException while cleaning "+e.getMessage());
+			logger.error("InterruptedException while cleaning "+cleanUpCallable.getFilePath().getRemote()
+    			+" on Agent "+cleanUpCallable.getFilePath().toComputer().getName()+": "+e.getMessage());
 			return false;
 		}
     return success;
@@ -88,7 +90,7 @@ public class CleanUpTask {
    * @param masterId
    *          to identify to which registry the task is going to be added
    */
-  private static synchronized void register(CleanUpTask task, AbstractBuild masterId) {
+  private static synchronized void register(CleanUpTask task, AbstractBuild<?, ?> masterId) {
     List<CleanUpTask> list = registry.get(masterId);
     if (list == null) {
       list = new ArrayList<CleanUpTask>();
@@ -114,7 +116,6 @@ public class CleanUpTask {
     for (CleanUpTask task : tasks) {
       success &= task.clean(logger);
     }
-    logger.info("Clean up worked: "+success);
     return success;
   }
 }

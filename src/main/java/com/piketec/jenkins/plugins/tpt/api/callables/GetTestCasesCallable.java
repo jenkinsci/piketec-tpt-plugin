@@ -51,6 +51,10 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
 	public Collection<String> call() throws UnknownHostException {
 		TptLogger logger = getLogger();
 		TptApi api = getApi();
+		if(api==null) {
+			logger.error("Could not establish connection to the TPT API.");
+			return null;
+		}
 		Collection<String> testCases = null;
 		
     //Open the TPT Project via the TPT-API

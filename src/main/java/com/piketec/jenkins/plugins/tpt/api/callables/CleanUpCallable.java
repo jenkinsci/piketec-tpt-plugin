@@ -11,6 +11,7 @@ import com.piketec.tpt.api.OpenResult;
 import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
+import hudson.model.Computer;
 import hudson.model.TaskListener;
 
 /**
@@ -21,7 +22,7 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
 	private static final long serialVersionUID = 1L;
 	
 	private FilePath tptFilePath;
-
+	
 	public CleanUpCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
 			FilePath[] exePaths, long tptStartUpTime, FilePath tptFilePath) {
 		super(listener, hostName, tptPort, tptBindingName, exePaths, tptStartUpTime);
@@ -32,6 +33,10 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
 	public Boolean call() throws UnknownHostException {
 		TptLogger logger = getLogger();
 		TptApi api = getApi();
+		if(api==null) {
+			logger.error("Could not establish connection to the TPT API.");
+			return false;
+		}
 		OpenResult openResult = getOpenProject(logger, api, tptFilePath);
 		boolean success = false;
 		try {
@@ -45,5 +50,9 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
 
 	@Override
 	public void checkRoles(RoleChecker arg0) throws SecurityException {
+	}
+	
+	public FilePath getFilePath() {
+		return tptFilePath;
 	}
 }

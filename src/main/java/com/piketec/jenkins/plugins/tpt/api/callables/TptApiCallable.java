@@ -65,7 +65,7 @@ public abstract class TptApiCallable<S> implements  Callable<S, UnknownHostExcep
 	/**
 	 * @return a TPT API connection for the settings given in the constructor
 	 */
-  public TptApi getApi() throws UnknownHostException  {
+  protected TptApi getApi() throws UnknownHostException  {
   	TptLogger logger = getLogger();
   	logger.info("Try to connect to " + hostName + ":" + tptPort);
   	logger.info("TPT Binding name: " + tptBindingName);
@@ -117,7 +117,7 @@ public abstract class TptApiCallable<S> implements  Callable<S, UnknownHostExcep
     }
     try {
       if (exeFile == null) {
-        logger.error("TPT exe not found: null");
+        logger.error("TPT exe not found!");
         return false;
       }else if( !exeFile.exists()) {
       	logger.error("TPT exe not found: "+exeFile.getRemote());
