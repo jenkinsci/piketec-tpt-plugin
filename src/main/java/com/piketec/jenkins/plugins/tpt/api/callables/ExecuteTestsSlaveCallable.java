@@ -28,42 +28,49 @@ import hudson.FilePath;
 import hudson.model.TaskListener;
 
 /**
- * The Callable executes tpt test cases on a Jenkins Agent via the TPT API. 
+ * The Callable executes tpt test cases on a Jenkins Agent via the TPT API.
  */
 public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 
-	private static final long serialVersionUID = 1L;
-	
-	private FilePath tptFilePath;
-	private FilePath slaveReportPath;
-	private FilePath slaveDataPath;
-	private String execCfg;
-	private List<String> testSetList;
-	private String testSetName;
+  private static final long serialVersionUID = 1L;
 
-	public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
-			FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath, FilePath slaveReportPath, FilePath slaveDataPath,
-			String executionConfigName,  List<String> testSet, String testSetName) {
-		super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
-		this.tptFilePath = tptFilePath;
-		this.slaveReportPath = slaveReportPath;
-		this.slaveDataPath = slaveDataPath;
-		this.execCfg = executionConfigName;
-		this.testSetList = testSet;
-		this.testSetName = testSetName;
-	}
+  private FilePath tptFilePath;
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public Boolean call() throws UnknownHostException {
-		TptLogger logger = getLogger();
-		TptApi api = getApi();
-		if(api==null) {
-			logger.error("Could not establish connection to the TPT API.");
-			return false;
-		}
-		OpenResult openProject = getOpenProject(logger, api, tptFilePath);
-		try {
+  private FilePath slaveReportPath;
+
+  private FilePath slaveDataPath;
+
+  private String execCfg;
+
+  private List<String> testSetList;
+
+  private String testSetName;
+
+  public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort,
+                                   String tptBindingName, FilePath[] exePaths, long startUpWaitTime,
+                                   FilePath tptFilePath, FilePath slaveReportPath,
+                                   FilePath slaveDataPath, String executionConfigName,
+                                   List<String> testSet, String testSetName) {
+    super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
+    this.tptFilePath = tptFilePath;
+    this.slaveReportPath = slaveReportPath;
+    this.slaveDataPath = slaveDataPath;
+    this.execCfg = executionConfigName;
+    this.testSetList = testSet;
+    this.testSetName = testSetName;
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public Boolean call() throws UnknownHostException {
+    TptLogger logger = getLogger();
+    TptApi api = getApi();
+    if (api == null) {
+      logger.error("Could not establish connection to the TPT API.");
+      return false;
+    }
+    OpenResult openProject = getOpenProject(logger, api, tptFilePath);
+    try {
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
           openProject.getProject().getExecutionConfigurations().getItems();
@@ -81,13 +88,13 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       // adjust config to execute only the given one test case
       String oldReportDir = config.getReferenceDirPath();
       String oldTestDataDir = config.getDataDirPath();
-      
+
       Collection<Scenario> foundScenearios = new HashSet<>();
       find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
           testSetList, foundScenearios);
       if (foundScenearios.size() != testSetList.size()) {
-        logger.error(
-            "Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
+        logger
+            .error("Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
         return false;
       }
 
@@ -141,7 +148,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
           }
         }
       }
-      
+
       // execute test
       ExecutionStatus execStatus = api.run(config);
       while (execStatus.isRunning() || execStatus.isPending()) {
@@ -156,14 +163,14 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       // undo changes
       logger.info("Set test sets in execution config to old values.");
       for (ExecutionConfigurationItem item : config.getItems()) {
-      	TestSet oldTestSet = oldTestSets.remove(0);
-      	// This happens because of a bug in the TPT API.
-      	if(oldTestSet!=null) {
-      		item.setTestSet(oldTestSet);
-      	}
+        TestSet oldTestSet = oldTestSets.remove(0);
+        // This happens because of a bug in the TPT API.
+        if (oldTestSet != null) {
+          item.setTestSet(oldTestSet);
+        }
       }
       logger.info("reset test data and report directory to \"" + oldTestDataDir + "\" and \""
-          + oldReportDir+"\"");
+          + oldReportDir + "\"");
       config.setDataDirPath(oldTestDataDir);
       config.setReportDirPath(oldReportDir);
       for (TestSet testSet : newTestSets) {
@@ -184,12 +191,11 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       return false;
     }
     return true;
-	}
+  }
 
-	@Override
-	public void checkRoles(RoleChecker arg0) throws SecurityException {
-	}
-	
+  @Override
+  public void checkRoles(RoleChecker arg0) throws SecurityException {
+  }
 
   /**
    * Finds all the test cases of a given test set
@@ -239,7 +245,6 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
     }
     return result;
   }
-  
 
   /**
    * Convert the given test cases to a String

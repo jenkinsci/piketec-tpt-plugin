@@ -258,44 +258,48 @@ public class Utils {
       }
     }
   }
-  
+
   /**
-   * Copies all files from a remote location to another remote location. 
+   * Copies all files from a remote location to another remote location.
    * 
-   * FilePath.copyRecursiveTo is not able to do that. See https://issues.jenkins-ci.org/browse/JENKINS-2126
+   * FilePath.copyRecursiveTo is not able to do that. See
+   * https://issues.jenkins-ci.org/browse/JENKINS-2126
    */
-  public static void copyRecursive(FilePath from, FilePath to, TptLogger logger) throws IOException, InterruptedException {
-  	
-  	if(!from.exists()) {
-  		logger.error(from.getRemote() +" does not exist!");
-  		return;
-  	}
-  	if(!from.isDirectory()) {
-  		logger.error(from.getRemote() +" is not a directory!");
-  		return;
-  	}
-  	for(FilePath f : from.list()){
-  		if(f.isDirectory()) {
-  			copyRecursive(f, new FilePath(to, f.getName()), logger);
-  		}else {
-  			FilePath toFile = new FilePath(to, f.getName());
-  			f.copyTo(toFile);
-  		}
-  	}
+  public static void copyRecursive(FilePath from, FilePath to, TptLogger logger)
+      throws IOException, InterruptedException {
+
+    if (!from.exists()) {
+      logger.error(from.getRemote() + " does not exist!");
+      return;
+    }
+    if (!from.isDirectory()) {
+      logger.error(from.getRemote() + " is not a directory!");
+      return;
+    }
+    for (FilePath f : from.list()) {
+      if (f.isDirectory()) {
+        copyRecursive(f, new FilePath(to, f.getName()), logger);
+      } else {
+        FilePath toFile = new FilePath(to, f.getName());
+        f.copyTo(toFile);
+      }
+    }
   }
-  
+
   /**
    * @return the environment variables from the agent machine the code is running on
-   * @throws InterruptedException 
+   * @throws InterruptedException
    */
-  public static EnvVars getEnvironment(AbstractBuild<?, ?> build, Launcher launcher, TptLogger logger) throws InterruptedException {
-  	EnvVars environment;
+  public static EnvVars getEnvironment(AbstractBuild< ? , ? > build, Launcher launcher,
+                                       TptLogger logger)
+      throws InterruptedException {
+    EnvVars environment;
     try {
       environment = build.getEnvironment(launcher.getListener());
     } catch (IOException e) {
       environment = new EnvVars();
       logger.error(e.getLocalizedMessage());
-    } 
+    }
     return environment;
   }
 }

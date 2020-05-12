@@ -99,7 +99,7 @@ class RetryableJob {
             ArrayList<Action> parameterActions = new ArrayList<>();
             ArrayList<ParameterValue> parameterValues = new ArrayList<>();
             parameterValues.add(new StringParameterValue(UUID.randomUUID().toString(),
-            		UUID.randomUUID().toString()));
+                UUID.randomUUID().toString()));
             parameterActions.add(new ParametersAction(parameterValues));
 
             final Future<Run> scheduled = schedule(build, slaveJob,
@@ -183,7 +183,7 @@ class RetryableJob {
   protected Future<Run> schedule(@Nonnull AbstractBuild< ? , ? > build, @Nonnull final Job project,
                                  int quietPeriod, @Nonnull List<Action> list) {
     Cause cause = new UpstreamCause((Run)build);
-    List<Action> queueActions = new ArrayList<Action>(list);
+    List<Action> queueActions = new ArrayList<>(list);
     queueActions.add(new CauseAction(cause));
 
     // Includes both traditional projects via AbstractProject and Workflow Job

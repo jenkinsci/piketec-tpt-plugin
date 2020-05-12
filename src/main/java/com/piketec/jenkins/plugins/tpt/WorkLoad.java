@@ -44,15 +44,15 @@ public class WorkLoad {
 
   private List<String> testCases;
 
-  private AbstractBuild<?, ?> masterId;
+  private AbstractBuild< ? , ? > masterId;
 
   private FilePath masterWorkspace;
 
-	private FilePath masterDataDir;
+  private FilePath masterDataDir;
 
-	private FilePath masterReportDir;
+  private FilePath masterReportDir;
 
-	private JenkinsConfiguration jenkinsConfig;
+  private JenkinsConfiguration jenkinsConfig;
 
   /**
    * @param unresolvedConfig
@@ -66,9 +66,10 @@ public class WorkLoad {
    * @param masterId
    *          the current build, used in order to get an unique id
    */
-  public WorkLoad(JenkinsConfiguration unresolvedConfig, List<String> subTestSet,FilePath masterWorkspace,
-      AbstractBuild<?, ?> masterId, FilePath masterDataDir, FilePath masterReportDir) {
-  	this.jenkinsConfig = unresolvedConfig;
+  public WorkLoad(JenkinsConfiguration unresolvedConfig, List<String> subTestSet,
+                  FilePath masterWorkspace, AbstractBuild< ? , ? > masterId, FilePath masterDataDir,
+                  FilePath masterReportDir) {
+    this.jenkinsConfig = unresolvedConfig;
     this.testCases = subTestSet;
     this.masterId = masterId;
     this.masterWorkspace = masterWorkspace;
@@ -100,24 +101,24 @@ public class WorkLoad {
   /**
    * @return the current build, used to get an unique Id
    */
-  public AbstractBuild<?, ?> getMasterId() {
+  public AbstractBuild< ? , ? > getMasterId() {
     return masterId;
   }
 
   /**
    * @return the path to the data directory on the master
    */
-	public FilePath getMasterDataDir() {
-		return this.masterDataDir;
-	}
+  public FilePath getMasterDataDir() {
+    return this.masterDataDir;
+  }
 
   /**
    * @return the path to the report directory on the master
    */
-	public FilePath getMasterReportDir() {
-		return this.masterReportDir;
-	}
-  
+  public FilePath getMasterReportDir() {
+    return this.masterReportDir;
+  }
+
   /**
    * Adds a workload to the static HashMap. This method is used when the masterJob put the workload
    * here and then triggers the slave job.
@@ -163,7 +164,7 @@ public class WorkLoad {
    * @param masterBuild
    *          the build of the master job
    */
-  public static synchronized void clean(String jobName, AbstractBuild<?, ?> masterBuild) {
+  public static synchronized void clean(String jobName, AbstractBuild< ? , ? > masterBuild) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
     if (queue == null) {
       return;

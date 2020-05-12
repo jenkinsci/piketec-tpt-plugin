@@ -121,8 +121,8 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   /**
    * This method is called when an object from this class is created.
    * 
-   * When clicking on a failed test case, the overview report should be opened, with the navigation on the
-   * left and the failed test case report on the right.
+   * When clicking on a failed test case, the overview report should be opened, with the navigation
+   * on the left and the failed test case report on the right.
    * 
    * It maps the URL the user sees to the file path where the corresponding html document lies.
    * 
@@ -139,13 +139,13 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
       throws IOException, ServletException {
 
     File indexFromFile = new File(
-        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator + name
-            + File.separator + executionConfiguration + File.separator + "index.html");
+        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator
+            + name + File.separator + executionConfiguration + File.separator + "index.html");
     String indexFromFileAsString = FileUtils.readFileToString(indexFromFile);
     String failedHtmlAsString = indexFromFileAsString.replace("overview.html", reportFile);
     File failedHTML = new File(
-        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator + name
-            + File.separator + executionConfiguration + File.separator + "failedTest.html");
+        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator
+            + name + File.separator + executionConfiguration + File.separator + "failedTest.html");
 
     FileUtils.writeStringToFile(failedHTML, failedHtmlAsString);
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,

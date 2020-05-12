@@ -20,7 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -173,12 +172,12 @@ public class TptPluginSlave extends Builder {
     List<String> testCasesFromWorkload = workloadToDo.getTestCases();
     AbstractBuild masterId = workloadToDo.getMasterId();
     FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
-    FilePath masterDataDir  = workloadToDo.getMasterDataDir();
+    FilePath masterDataDir = workloadToDo.getMasterDataDir();
     FilePath masterReportDir = workloadToDo.getMasterReportDir();
-    
+
     // Replace $-Vars:
-	  JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(environment);
-	  
+    JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(environment);
+
     logger.info("File Name :               " + resolvedConfig.getTptFile());
     logger.info("Execution Configuration : " + resolvedConfig.getConfiguration());
     logger.info("Test Data directory :     " + resolvedConfig.getTestdataDir());
@@ -188,12 +187,13 @@ public class TptPluginSlave extends Builder {
       logger.info("Test Set :                " + resolvedConfig.getTestSet());
     }
     for (FilePath f : expandedExePaths) {
-    	logger.info("Path to tpt.exe :         " + f.getRemote());
-		}
+      logger.info("Path to tpt.exe :         " + f.getRemote());
+    }
 
-    TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, build, listener,
-        expandedExePaths, expandedTptPort, expandedTptBindingName, resolvedConfig, testCasesFromWorkload,
-        expandedTptStartupWaitTime, masterId, masterWorkspace, masterDataDir, masterReportDir);
+    TptPluginSlaveExecutor executor =
+        new TptPluginSlaveExecutor(launcher, build, listener, expandedExePaths, expandedTptPort,
+            expandedTptBindingName, resolvedConfig, testCasesFromWorkload,
+            expandedTptStartupWaitTime, masterId, masterWorkspace, masterDataDir, masterReportDir);
 
     boolean result = executor.execute();
     if (!result) {

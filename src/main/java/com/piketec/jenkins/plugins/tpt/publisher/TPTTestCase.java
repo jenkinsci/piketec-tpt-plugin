@@ -52,7 +52,6 @@ public class TPTTestCase {
    */
   public TPTTestCase() {
     setFailedSince(1);
-
   }
 
   /**

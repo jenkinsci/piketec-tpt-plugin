@@ -328,9 +328,8 @@ public class TptPlugin extends Builder {
     String expandedArguments = environment.expand(this.arguments);
     String jUnitXmlPath = environment.expand(jUnitreport);
     // start execution
-    TptPluginSingleJobExecutor executor =
-        new TptPluginSingleJobExecutor(build, launcher, listener, expandedExePaths,
-            expandedArguments, configs, jUnitXmlPath, jUnitLogLevel, enableJunit);
+    TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launcher, listener,
+        expandedExePaths, expandedArguments, configs, jUnitXmlPath, jUnitLogLevel, enableJunit);
     return executor.execute();
 
   }
@@ -422,9 +421,9 @@ public class TptPlugin extends Builder {
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
     TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
-        expandedExePaths,configs, expandedTptPort, expandedTptBindingName,
-        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries,
-        jUnitXmlPath, jUnitLogLevel, enableJunit);
+        expandedExePaths, configs, expandedTptPort, expandedTptBindingName, expandedSlaveJobName,
+        expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries, jUnitXmlPath,
+        jUnitLogLevel, enableJunit);
     try {
       return executor.execute();
     } finally {

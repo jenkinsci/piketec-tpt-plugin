@@ -31,7 +31,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 
-
 /**
  * Parser for paring the TPT test_summary.xml file.
  * 
@@ -59,7 +58,7 @@ class TPTReportSAXHandler extends DefaultHandler {
 
   private boolean isFileCorrupt;
 
-	private TptLogger logger;
+  private TptLogger logger;
 
   /**
    * This class is an XML Parser for parsing the "test_summary.xml" and extract all the relevant
@@ -161,40 +160,43 @@ class TPTReportSAXHandler extends DefaultHandler {
     tptFile.setTotal(total);
   }
 
-  
   /**
-   * This method extracts the platform name from the report path.
-   * It is assumed, that both input Strings represent absolute paths.
+   * This method extracts the platform name from the report path. It is assumed, that both input
+   * Strings represent absolute paths.
    */
-  private String getPlatformName(String reportFile, String reportDir){
-  	String relativePath = getLinkToFailedReport(reportFile, reportDir);
-  	if(relativePath.isEmpty()) {
-  		logger.error("Could not extract the platform name!");
-  		return "";
-  	}
-  	// This is handled with String-methods, because these are Windows Paths and if we'd use path.relativize
-  	// while Jenkins is running on a Linux machine, it wouldn't work.
-  	return relativePath.substring(0, relativePath.indexOf("\\"));
+  private String getPlatformName(String reportFile, String reportDir) {
+    String relativePath = getLinkToFailedReport(reportFile, reportDir);
+    if (relativePath.isEmpty()) {
+      logger.error("Could not extract the platform name!");
+      return "";
+    }
+    // This is handled with String-methods, because these are Windows Paths and if we'd use
+    // path.relativize
+    // while Jenkins is running on a Linux machine, it wouldn't work.
+    return relativePath.substring(0, relativePath.indexOf("\\"));
   }
 
   /**
    * This method returns the relative path from the report file depending on the report directory.
    * It is assumed, that both input Strings represent absolute paths.
    */
-  private String getLinkToFailedReport(String reportFile, String reportDir)  {
-  	if(!reportFile.startsWith(reportDir)) {
-  		logger.error("Can't extract relative path to test case report. At least one of the "
-  				+ "following paths is not an absolute path: reportFile = "+reportFile+", reportDirectory = "+reportDir);
-  		return "";
-  	}
-  	if(reportFile.equals(reportDir)) {
-  		logger.error("Can't extract relative path to test case report. They are equal, "
-  				+ "even though they shouldn't be: reportFile = "+reportFile+", reportDirectory = "+reportDir);
-  		return "";
-  	}
-  	// This is handled with String-methods, because these are Windows Paths and if we'd use path.relativize
-  	// while Jenkins is running on a Linux machine, it wouldn't work.
-  	return reportFile.substring(reportDir.length()+1, reportFile.length());
+  private String getLinkToFailedReport(String reportFile, String reportDir) {
+    if (!reportFile.startsWith(reportDir)) {
+      logger.error("Can't extract relative path to test case report. At least one of the "
+          + "following paths is not an absolute path: reportFile = " + reportFile
+          + ", reportDirectory = " + reportDir);
+      return "";
+    }
+    if (reportFile.equals(reportDir)) {
+      logger.error("Can't extract relative path to test case report. They are equal, "
+          + "even though they shouldn't be: reportFile = " + reportFile + ", reportDirectory = "
+          + reportDir);
+      return "";
+    }
+    // This is handled with String-methods, because these are Windows Paths and if we'd use
+    // path.relativize
+    // while Jenkins is running on a Linux machine, it wouldn't work.
+    return reportFile.substring(reportDir.length() + 1, reportFile.length());
   }
 
 }

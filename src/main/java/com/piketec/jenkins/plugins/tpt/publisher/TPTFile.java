@@ -52,7 +52,6 @@ public class TPTFile {
   public TPTFile(String fileName, String configuration) {
     this.fileName = fileName;
     this.configuration = configuration;
-
   }
 
   /**

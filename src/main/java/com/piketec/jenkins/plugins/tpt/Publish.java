@@ -124,9 +124,9 @@ public final class Publish {
    */
   public static List<Testcase> getTestcases(FilePath testDataDir, TptLogger logger)
       throws IOException, InterruptedException {
-    Collection<FilePath> files = new HashSet<FilePath>();
+    Collection<FilePath> files = new HashSet<>();
     find(testDataDir, "testcase_information.xml", files);
-    List<Testcase> testcases = new ArrayList<Testcase>(files.size());
+    List<Testcase> testcases = new ArrayList<>(files.size());
     // Wenn es kein testcase_information.xml gibt bedeutet nicht, dass es keine Tests gibt. (Es ist
     // wegen den GenerateOverviewReport bug)
     if (files.size() == 0) {

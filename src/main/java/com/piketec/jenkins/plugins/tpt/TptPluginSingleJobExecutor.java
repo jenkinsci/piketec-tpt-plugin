@@ -110,7 +110,7 @@ class TptPluginSingleJobExecutor {
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
       try {
-    	logger.info("Try to find TPT installation: "+f.getRemote());
+        logger.info("Try to find TPT installation: " + f.getRemote());
         if (f.exists()) {
           exeFile = f;
           break;
@@ -129,35 +129,38 @@ class TptPluginSingleJobExecutor {
     // execute the sub-configuration
     for (JenkinsConfiguration ec : executionConfigs) {
       if (ec.isEnableTest()) {
-      	try {
-					ec = ec.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
-				} catch (InterruptedException e2) {
-					logger.error(e2.getMessage());
-					return false;
-				}
-	    	// Absolute paths are recognized as such, relative paths are resolved depending on the workspace directory,
-	    	// or the unique sub folder created in the workspace for the current job. 
-        FilePath testDataPath = new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(ec));
+        try {
+          ec = ec.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+        } catch (InterruptedException e2) {
+          logger.error(e2.getMessage());
+          return false;
+        }
+        // Absolute paths are recognized as such, relative paths are resolved depending on the
+        // workspace directory,
+        // or the unique sub folder created in the workspace for the current job.
+        FilePath testDataPath =
+            new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(ec));
         FilePath reportPath = new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(ec));
-        FilePath tptFilePath = new FilePath(build.getWorkspace(),ec.getTptFile());
+        FilePath tptFilePath = new FilePath(build.getWorkspace(), ec.getTptFile());
         String configurationName = ec.getConfiguration();
         String tesSet = ec.getTestSet();
         logger.info("*** Running TPT-File \"" + tptFilePath + //
             "\" with configuration \"" + configurationName + "\" now. ***");
-        
+
         try {
-					testDataPath.mkdirs();
-					reportPath.mkdirs();
-				} catch (IOException | InterruptedException e1) {
-					logger.error("Failed to create parent directories for " + testDataPath.getRemote() + " and/or " +reportPath.getRemote());
-					return false;
-				}
-        
+          testDataPath.mkdirs();
+          reportPath.mkdirs();
+        } catch (IOException | InterruptedException e1) {
+          logger.error("Failed to create parent directories for " + testDataPath.getRemote()
+              + " and/or " + reportPath.getRemote());
+          return false;
+        }
+
         String cmd = buildCommand(exeFile, arguments, tptFilePath, testDataPath.getRemote(),
             reportPath.getRemote(), configurationName, tesSet);
         try {
           // run the test...
-        	boolean successOnlyForOneConfig = launchTPT(launcher, listener, cmd, ec.getTimeout());
+          boolean successOnlyForOneConfig = launchTPT(launcher, listener, cmd, ec.getTimeout());
           success &= successOnlyForOneConfig;
           if (successOnlyForOneConfig) {
             TPTBuildStepEntries.addEntry(ec, build);

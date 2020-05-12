@@ -63,7 +63,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   private transient Run< ? , ? > run;
 
-  private ArrayList<Integer> failedBuilds = new ArrayList<Integer>();
+  private ArrayList<Integer> failedBuilds = new ArrayList<>();
 
   private int passed;
 
@@ -378,7 +378,8 @@ public class TrendGraph implements RunAction2, StaplerProxy {
   private void generateJson() throws IOException, InterruptedException {
     File oldIndexHTML =
         new File(Utils.getTptPluginRootDir(), "TrendGraph" + File.separator + "index.html");
-    File utilsJs = new File(Utils.getTptPluginRootDir(), "TrendGraph" + File.separator + "utils.js");
+    File utilsJs =
+        new File(Utils.getTptPluginRootDir(), "TrendGraph" + File.separator + "utils.js");
 
     File buildDir = actualBuild.getRootDir();
 
