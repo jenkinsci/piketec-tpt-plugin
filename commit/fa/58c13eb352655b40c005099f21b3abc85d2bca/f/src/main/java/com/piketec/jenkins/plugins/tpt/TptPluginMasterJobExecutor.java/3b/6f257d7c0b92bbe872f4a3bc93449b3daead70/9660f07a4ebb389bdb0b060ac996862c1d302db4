@@ -1,8 +1,0 @@
-id: 3b6f257d7c0b92bbe872f4a3bc93449b3daead70
-replaces: 707a0c9e66a88ab5f4ec0a3d6d64072617ec7ead
-commit-date: 2020-04-07 05:09:01
-created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587555550572	120
-new-position: 143
-updated: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587555827573	120
-content
-@MBO: InterruptedException gefangen -> Thread.currentThread().interrupt(); aufrufen. Außerdem sollte dann direkt ein "return false" gemacht werden.

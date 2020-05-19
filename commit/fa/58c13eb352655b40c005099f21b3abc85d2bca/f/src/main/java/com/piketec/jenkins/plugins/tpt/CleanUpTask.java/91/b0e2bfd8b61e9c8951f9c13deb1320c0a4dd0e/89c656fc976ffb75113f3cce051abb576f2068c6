@@ -1,6 +1,0 @@
-id: 91b0e2bfd8b61e9c8951f9c13deb1320c0a4dd0e
-commit-date: 2020-04-07 05:09:01
-created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587554345210	120
-new-position: 75
-content
-@MBO: Wenn man eine InterruptedException fängt, sollte man im catch-Block immer "Thread.currentThread().interrupt()" aufrufen

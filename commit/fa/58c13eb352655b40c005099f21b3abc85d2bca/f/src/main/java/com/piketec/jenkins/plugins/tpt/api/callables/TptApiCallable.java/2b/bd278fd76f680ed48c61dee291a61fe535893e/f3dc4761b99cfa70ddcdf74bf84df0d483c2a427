@@ -1,8 +1,0 @@
-id: 2bbd278fd76f680ed48c61dee291a61fe535893e
-replaces: 1e4700571aa89779e0f91e8ff8d98fa8bc0670e3,e31c7aedf2c3b7755191f6cd7f19a0a033e08fdb
-commit-date: 2020-04-07 05:09:01
-created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587561872845	120
-new-position: 112
-updated: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587562191542	120
-content
-@MBO: InterruptedException sollte zum Abbruch führen (und nicht Thread.currentThread().interrupt() vergessen). Giltauch für alle anderen IterruptedException-catchs
