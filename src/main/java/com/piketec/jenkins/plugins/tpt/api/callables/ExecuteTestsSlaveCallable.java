@@ -1,6 +1,5 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
-import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,7 +58,6 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
     this.testSetName = testSetName;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public Boolean call() throws InterruptedException {
     TptLogger logger = getLogger();
@@ -98,9 +96,9 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       }
 
       logger.info("Setting test data directory to " + slaveDataPath.getRemote());
-      config.setDataDir(new File(slaveDataPath.getRemote()));
+      config.setDataDirPath(slaveDataPath.getRemote());
       logger.info("Setting report directory to " + slaveReportPath.getRemote());
-      config.setReportDir(new File(slaveReportPath.getRemote()));
+      config.setReportDirPath(slaveReportPath.getRemote());
 
       // store information to undo changes
       List<TestSet> oldTestSets = new ArrayList<>();

@@ -196,7 +196,11 @@ class TPTReportSAXHandler extends DefaultHandler {
     // This is handled with String-methods, because these are Windows Paths and if we'd use
     // path.relativize
     // while Jenkins is running on a Linux machine, it wouldn't work.
-    return reportFile.substring(reportDir.length() + 1, reportFile.length());
+    String substring = reportFile.substring(reportDir.length());
+    if (substring.startsWith("\\")) {
+      substring = substring.substring(1);
+    }
+    return substring;
   }
 
 }
