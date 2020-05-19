@@ -316,7 +316,8 @@ public class TptPlugin extends Builder {
    */
   public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launcher,
                                       BuildListener listener, EnvVars environment,
-                                      ArrayList<JenkinsConfiguration> configs) {
+                                      ArrayList<JenkinsConfiguration> configs)
+      throws InterruptedException {
     // split and expand list of ptahs to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
@@ -354,7 +355,8 @@ public class TptPlugin extends Builder {
    */
   public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
                                  BuildListener listener, EnvVars environment,
-                                 ArrayList<JenkinsConfiguration> configs) {
+                                 ArrayList<JenkinsConfiguration> configs)
+      throws InterruptedException {
     // split and expand list of paths to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];

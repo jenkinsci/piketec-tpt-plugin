@@ -2,7 +2,6 @@ package com.piketec.jenkins.plugins.tpt.api.callables;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.util.ArrayList;
 
 import org.apache.commons.lang.StringUtils;
@@ -53,7 +52,7 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
   }
 
   @Override
-  public Boolean call() throws UnknownHostException {
+  public Boolean call() throws InterruptedException {
     TptLogger logger = getLogger();
     TptApi api = getApi();
     if (api == null) {

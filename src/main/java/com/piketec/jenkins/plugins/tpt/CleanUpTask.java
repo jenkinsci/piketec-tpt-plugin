@@ -63,8 +63,9 @@ public class CleanUpTask {
    * Close the tpt project
    * 
    * @return true if it was possible to close the project.
+   * @throws InterruptedException
    */
-  public boolean clean(TptLogger logger) {
+  public boolean clean(TptLogger logger) throws InterruptedException {
     boolean success = false;
     try {
       success = launcher.getChannel().call(cleanUpCallable);
@@ -77,11 +78,6 @@ public class CleanUpTask {
       logger.error(
           "IOException while cleaning " + cleanUpCallable.getFilePath().getRemote() + " on Agent "
               + cleanUpCallable.getFilePath().toComputer().getName() + ": " + e.getMessage());
-      return false;
-    } catch (InterruptedException e) {
-      logger.error("InterruptedException while cleaning "
-          + cleanUpCallable.getFilePath().getRemote() + " on Agent "
-          + cleanUpCallable.getFilePath().toComputer().getName() + ": " + e.getMessage());
       return false;
     }
     return success;
@@ -110,8 +106,10 @@ public class CleanUpTask {
    * @param masterId
    *          to identify to which registry the task is going to be removed
    * @return true if it was possible to erase the tasks.
+   * @throws InterruptedException
    */
-  public static synchronized boolean cleanUp(Object masterId, TptLogger logger) {
+  public static synchronized boolean cleanUp(Object masterId, TptLogger logger)
+      throws InterruptedException {
     List<CleanUpTask> tasks = registry.remove(masterId);
     if (tasks == null) {
       // nothing to clean up

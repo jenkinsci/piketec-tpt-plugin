@@ -125,8 +125,9 @@ class TptPluginSlaveExecutor {
    * then it copies the results to the master workspace.
    * 
    * @return true if the tpt execution has been successfully.
+   * @throws InterruptedException
    */
-  public boolean execute() {
+  public boolean execute() throws InterruptedException {
     TptApiAccess tptApiAccess =
         new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
 
@@ -151,9 +152,6 @@ class TptPluginSlaveExecutor {
     } catch (IOException e) {
       logger.error("Could not create or clear test data dir " + slaveDataPath.getRemote());
       return false;
-    } catch (InterruptedException e) {
-      logger.interrupt(e.getMessage());
-      return false;
     }
     try {
       if (!masterWorkspace.equals(workspace)) {
@@ -163,9 +161,6 @@ class TptPluginSlaveExecutor {
       }
     } catch (IOException e) {
       logger.error(e.getMessage());
-      return false;
-    } catch (InterruptedException e) {
-      logger.interrupt(e.getMessage());
       return false;
     }
 
@@ -180,9 +175,6 @@ class TptPluginSlaveExecutor {
       Utils.copyRecursive(slaveReportPath, masterReportPath, logger);
       logger.info("Copied all data to master from File " + tptFilePath.getName() + " to "
           + masterWorkspace.getRemote());
-    } catch (InterruptedException e) {
-      logger.interrupt("could not copy results to master: " + e.getMessage());
-      return false;
     } catch (IOException e) {
       logger.error("could not copy results to master: " + e.getMessage());
     }

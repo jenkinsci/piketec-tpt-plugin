@@ -2,15 +2,15 @@ package com.piketec.jenkins.plugins.tpt.api.callables;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Collection;
 import java.util.HashSet;
+
+import javax.annotation.Nullable;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
@@ -35,7 +35,7 @@ import hudson.remoting.Callable;
  *          is the return type of the call method, i.e. the type of whatever you want to get from
  *          the TPT API. NOTE: This type must be Serializable
  */
-public abstract class TptApiCallable<S> implements Callable<S, UnknownHostException>, Serializable {
+public abstract class TptApiCallable<S> implements Callable<S, InterruptedException> {
 
   private static final long serialVersionUID = 1L;
 
@@ -69,26 +69,35 @@ public abstract class TptApiCallable<S> implements Callable<S, UnknownHostExcept
   }
 
   /**
-   * @return a TPT API connection for the settings given in the constructor
+   * Starts TPT if necessary and returns a TPT API connection for the settings given in the
+   * constructor
    */
-  protected TptApi getApi() throws UnknownHostException {
+  protected @Nullable TptApi getApi() throws InterruptedException {
     TptLogger logger = getLogger();
     logger.info("Try to connect to " + hostName + ":" + tptPort);
     logger.info("TPT Binding name: " + tptBindingName);
-    try {
-      return connectToTPT();
-    } catch (RemoteException | NotBoundException e) {
-      // NOP, start TPT and try again
+    TptApi api = getApiIfTptIsOpen();
+    if (api != null) {
+      return api;
     }
     // start TPT and try again
     if (!startTpt(startUpWaitTime)) {
       logger.error("Could not start TPT");
       return null;
     }
+    return getApiIfTptIsOpen();
+  }
+
+  /**
+   * Only returns the TPT API if TPT is already running. Otherwise it returns null.
+   */
+  protected @Nullable TptApi getApiIfTptIsOpen() {
     try {
       return connectToTPT();
     } catch (RemoteException | NotBoundException e) {
-      logger.error(e.getMessage());
+      // That's fine, TPT is not running.
+      TptLogger logger = getLogger();
+      logger.info("TPT is not running with the needed settings.");
       return null;
     }
   }
@@ -107,7 +116,7 @@ public abstract class TptApiCallable<S> implements Callable<S, UnknownHostExcept
     return remoteApi;
   }
 
-  private boolean startTpt(long startupWaitTime) {
+  private boolean startTpt(long startupWaitTime) throws InterruptedException {
     TptLogger logger = getLogger();
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
@@ -117,7 +126,7 @@ public abstract class TptApiCallable<S> implements Callable<S, UnknownHostExcept
           exeFile = f;
           break;
         }
-      } catch (IOException | InterruptedException e) {
+      } catch (IOException e) {
         // NOP, just try next file
       }
     }
@@ -129,7 +138,7 @@ public abstract class TptApiCallable<S> implements Callable<S, UnknownHostExcept
         logger.error("TPT exe not found: " + exeFile.getRemote());
         return false;
       }
-    } catch (IOException | InterruptedException e1) {
+    } catch (IOException e1) {
       logger.error("Could not dertmine existence of TPT: " + exeFile.getRemote());
       return false;
     }
@@ -142,11 +151,7 @@ public abstract class TptApiCallable<S> implements Callable<S, UnknownHostExcept
       logger.error("Could not start TPT.");
       return false;
     }
-    try {
-      Thread.sleep(startupWaitTime);
-    } catch (InterruptedException e) {
-      logger.error("Interrupt: " + e.getMessage());
-    }
+    Thread.sleep(startupWaitTime);
     return true;
   }
 
@@ -173,6 +178,30 @@ public abstract class TptApiCallable<S> implements Callable<S, UnknownHostExcept
       logger.error("IOException " + e.getMessage());
       return null;
     }
+  }
+
+  /**
+   * Close the given TPT Project if it is open.
+   */
+  boolean closeProject(TptLogger logger, TptApi api, FilePath tptFilePath) {
+    // Open the TPT Project via the TPT-API
+    File file = new File(tptFilePath.getRemote());
+    try {
+      Collection<Project> openProjects = api.getOpenProjects();
+      for (Project project : openProjects) {
+        if (!project.getFile().equals(file)) {
+          continue;
+        }
+        logger.info("Close project " + project.getFile().getName());
+        project.closeProject();
+        return true;
+      }
+    } catch (RemoteException | ApiException e) {
+      logger.error("Could not close " + file.getName() + ": " + e.getMessage());
+      return false;
+    }
+    logger.info(file.getName() + " was already closed.");
+    return true;
   }
 
   /**

@@ -63,16 +63,18 @@ public class TptApiAccess {
    * @param testSet
    *          - test set from which to get the test cases
    * @return a list of test case names for the given settings
+   * @throws InterruptedException
    */
   public Collection<String> getTestCases(FilePath tptFilePath, String executionConfigName,
-                                         String testSet) {
+                                         String testSet)
+      throws InterruptedException {
     GetTestCasesCallable callable =
         new GetTestCasesCallable(launcher.getListener(), "localhost", tptPort, tptBindingName,
             exePaths, startUpWaitTime, tptFilePath, executionConfigName, testSet);
     Collection<String> testCases = null;
     try {
       testCases = launcher.getChannel().call(callable);
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       logger.error("Getting test cases did not work: " + e.getMessage());
     }
     return testCases;
@@ -91,19 +93,20 @@ public class TptApiAccess {
    * @param testDataPath
    *          - path to the test data that is needed to build the overview report
    * @return true if the report generation was successful, false otherwise.
+   * @throws InterruptedException
    */
   public Boolean runOverviewReport(FilePath tptFilePath, String executionConfigName, String testSet,
-                                   FilePath reportPath, FilePath testDataPath) {
+                                   FilePath reportPath, FilePath testDataPath)
+      throws InterruptedException {
     RunOverviewReportCallable callable = new RunOverviewReportCallable(launcher.getListener(),
         "localhost", tptPort, tptBindingName, exePaths, startUpWaitTime, tptFilePath,
         executionConfigName, testSet, reportPath, testDataPath);
     Boolean worked = false;
     try {
       worked = launcher.getChannel().call(callable);
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       logger.error("Running overview report did not work: " + e.getMessage());
     }
-    logger.info("Run Overview Report worked: " + worked);
     return worked;
   }
 
@@ -120,20 +123,21 @@ public class TptApiAccess {
    *          - path to where the test data shall be put
    * @param testSetList
    * @return true if the execution was successful, false otherwise.
+   * @throws InterruptedException
    */
   public Boolean executeTestsSlave(FilePath tptFilePath, String executionConfigName,
                                    String testSetName, FilePath slaveReportPath,
-                                   FilePath slaveDataPath, List<String> testSetList) {
+                                   FilePath slaveDataPath, List<String> testSetList)
+      throws InterruptedException {
     ExecuteTestsSlaveCallable callable = new ExecuteTestsSlaveCallable(launcher.getListener(),
         "localhost", tptPort, tptBindingName, exePaths, startUpWaitTime, tptFilePath,
         slaveReportPath, slaveDataPath, executionConfigName, testSetList, testSetName);
     Boolean worked = false;
     try {
       worked = launcher.getChannel().call(callable);
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       logger.error("Executing tests on slave did not work: " + e.getMessage());
     }
-    logger.info("Execute Tests on Slave worked: " + worked);
     return worked;
   }
 }

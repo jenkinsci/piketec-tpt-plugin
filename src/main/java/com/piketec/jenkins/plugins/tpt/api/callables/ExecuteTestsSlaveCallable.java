@@ -2,7 +2,6 @@ package com.piketec.jenkins.plugins.tpt.api.callables;
 
 import java.io.File;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -62,7 +61,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 
   @SuppressWarnings("deprecation")
   @Override
-  public Boolean call() throws UnknownHostException {
+  public Boolean call() throws InterruptedException {
     TptLogger logger = getLogger();
     TptApi api = getApi();
     if (api == null) {
@@ -151,35 +150,36 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 
       // execute test
       ExecutionStatus execStatus = api.run(config);
-      while (execStatus.isRunning() || execStatus.isPending()) {
-        try {
+      try {
+        while (execStatus.isRunning() || execStatus.isPending()) {
           Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          logger.interrupt(e.getMessage());
-          execStatus.cancel();
-          break;
         }
-      }
-      // undo changes
-      logger.info("Set test sets in execution config to old values.");
-      for (ExecutionConfigurationItem item : config.getItems()) {
-        TestSet oldTestSet = oldTestSets.remove(0);
-        // This happens because of a bug in the TPT API.
-        if (oldTestSet != null) {
-          item.setTestSet(oldTestSet);
+      } catch (InterruptedException e) {
+        logger.interrupt(e.getMessage());
+        execStatus.cancel();
+        throw e;
+      } finally {
+        // undo changes
+        logger.info("Set test sets in execution config to old values.");
+        for (ExecutionConfigurationItem item : config.getItems()) {
+          TestSet oldTestSet = oldTestSets.remove(0);
+          // This happens because of a bug in the TPT API.
+          if (oldTestSet != null) {
+            item.setTestSet(oldTestSet);
+          }
         }
-      }
-      logger.info("reset test data and report directory to \"" + oldTestDataDir + "\" and \""
-          + oldReportDir + "\"");
-      config.setDataDirPath(oldTestDataDir);
-      config.setReportDirPath(oldReportDir);
-      for (TestSet testSet : newTestSets) {
-        logger.info("delete temporary test set \"" + testSet.getName() + "\"");
-        openProject.getProject().getTestSets().delete(testSet);
-      }
-      logger.info("Reactivate temporary deactivated execution config items.");
-      for (ExecutionConfigurationItem item : deactivated) {
-        item.setActive(true);
+        logger.info("reset test data and report directory to \"" + oldTestDataDir + "\" and \""
+            + oldReportDir + "\"");
+        config.setDataDirPath(oldTestDataDir);
+        config.setReportDirPath(oldReportDir);
+        for (TestSet testSet : newTestSets) {
+          logger.info("delete temporary test set \"" + testSet.getName() + "\"");
+          openProject.getProject().getTestSets().delete(testSet);
+        }
+        logger.info("Reactivate temporary deactivated execution config items.");
+        for (ExecutionConfigurationItem item : deactivated) {
+          item.setActive(true);
+        }
       }
     } catch (RemoteException e) {
       logger.error(e.getLocalizedMessage());

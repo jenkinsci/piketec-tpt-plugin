@@ -120,6 +120,7 @@ class RetryableJob {
                 success = true;
               }
               if (future.isCancelled()) {
+                logger.error("Execution of test slave was canceled.");
                 tries = 0;
               }
             }

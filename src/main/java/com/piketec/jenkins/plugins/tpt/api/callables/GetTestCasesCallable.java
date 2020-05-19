@@ -2,7 +2,6 @@ package com.piketec.jenkins.plugins.tpt.api.callables;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -48,7 +47,7 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
   }
 
   @Override
-  public Collection<String> call() throws UnknownHostException {
+  public Collection<String> call() throws InterruptedException {
     TptLogger logger = getLogger();
     TptApi api = getApi();
     if (api == null) {

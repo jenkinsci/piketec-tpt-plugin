@@ -102,8 +102,9 @@ class TptPluginSingleJobExecutor {
    * runs that command through the launcher and publish the Junit XML if necessary.
    * 
    * @return true if the execution from the tpt file was successful.
+   * @throws InterruptedException
    */
-  boolean execute() {
+  boolean execute() throws InterruptedException {
     boolean success = true;
     FilePath workspace = build.getWorkspace();
     // use first found (existing) TPT installation
@@ -117,9 +118,6 @@ class TptPluginSingleJobExecutor {
         }
       } catch (IOException e) {
         // NOP, just try next file
-      } catch (InterruptedException e) {
-        logger.interrupt(e.getMessage());
-        return false;
       }
     }
     if (exeFile == null) {
@@ -129,12 +127,7 @@ class TptPluginSingleJobExecutor {
     // execute the sub-configuration
     for (JenkinsConfiguration ec : executionConfigs) {
       if (ec.isEnableTest()) {
-        try {
-          ec = ec.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
-        } catch (InterruptedException e2) {
-          logger.error(e2.getMessage());
-          return false;
-        }
+        ec = ec.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
         // Absolute paths are recognized as such, relative paths are resolved depending on the
         // workspace directory,
         // or the unique sub folder created in the workspace for the current job.
@@ -150,7 +143,7 @@ class TptPluginSingleJobExecutor {
         try {
           testDataPath.mkdirs();
           reportPath.mkdirs();
-        } catch (IOException | InterruptedException e1) {
+        } catch (IOException e1) {
           logger.error("Failed to create parent directories for " + testDataPath.getRemote()
               + " and/or " + reportPath.getRemote());
           return false;
@@ -175,9 +168,6 @@ class TptPluginSingleJobExecutor {
           logger.error(e.getMessage());
           success = false;
           // continue with next config in case of I/O error
-        } catch (InterruptedException e) {
-          logger.interrupt(e.getMessage());
-          return false;
         }
       }
     }

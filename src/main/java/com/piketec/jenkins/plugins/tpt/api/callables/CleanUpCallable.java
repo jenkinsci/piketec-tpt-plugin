@@ -1,13 +1,8 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
-import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
-
 import org.jenkinsci.remoting.RoleChecker;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
-import com.piketec.tpt.api.ApiException;
-import com.piketec.tpt.api.OpenResult;
 import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
@@ -29,22 +24,14 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
   }
 
   @Override
-  public Boolean call() throws UnknownHostException {
+  public Boolean call() throws InterruptedException {
     TptLogger logger = getLogger();
-    TptApi api = getApi();
+    TptApi api = getApiIfTptIsOpen();
     if (api == null) {
-      logger.error("Could not establish connection to the TPT API.");
-      return false;
+      logger.info("TPT is already closed.");
+      return true;
     }
-    OpenResult openResult = getOpenProject(logger, api, tptFilePath);
-    boolean success = false;
-    try {
-      success = openResult.getProject().closeProject();
-    } catch (RemoteException | ApiException e) {
-      logger.error("Closing Project " + tptFilePath.getName() + " did not work: " + e.getMessage());
-      return false;
-    }
-    return success;
+    return closeProject(logger, api, tptFilePath);
   }
 
   @Override

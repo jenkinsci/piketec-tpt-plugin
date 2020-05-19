@@ -134,29 +134,24 @@ class TptPluginMasterJobExecutor {
    * temporary settings to the original values.
    * 
    * @return true if the execution from slaves and master were successful.
+   * @throws InterruptedException
    */
-  boolean execute() {
+  boolean execute() throws InterruptedException {
     TptApiAccess tptApiAccess =
         new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
     boolean success = true;
     // We delete the JUnit results before iterating over the jenkinsConfigs
-    try {
-      removeJUnitData();
-    } catch (InterruptedException e) {
-      logger.error(e.getMessage());
-    }
+    removeJUnitData();
     try {
       for (JenkinsConfiguration ec : executionConfigs) {
         success &= executeOneConfig(ec, tptApiAccess);
       }
-    } catch (InterruptedException e) {
-      logger.error("Execution did not work: " + e.getMessage());
     } finally {
       logger.info("Close open TPT project on master and slaves.");
       if (!CleanUpTask.cleanUp(build, logger)) {
         logger.error("Could not close all open TPT files. "
             + "There is no guarantee next run will be be done with correct file version.");
-        return false;
+        success = false;
       }
     }
     return success;
@@ -274,17 +269,17 @@ class TptPluginMasterJobExecutor {
       try {
         retryableJob.join();
       } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        logger.interrupt(e.getMessage());
         logger.info("Stopping slave jobs.");
+        logger.interrupt(e.getMessage());
         for (RetryableJob retryableJobToCancle : retryableJobs) {
           retryableJobToCancle.cancel();
         }
-        return false;
+        throw e;
       }
     }
 
     // Build Overview report:
+    logger.info("Building overview report.");
     boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath,
         resolvedConfig.getConfiguration(), resolvedConfig.getTestSet(), reportPath, testDataPath);
     if (!buildingReportWorked) {
@@ -297,13 +292,7 @@ class TptPluginMasterJobExecutor {
         foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), resolvedConfig,
             testDataPath, jUnitXmlPath, jUnitLogLevel, logger);
       } else {
-        try {
-          foundTestData = Publish.getTestcases(testDataPath, logger).size();
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          logger.interrupt("Interrupted while parsing the \"test_summary.xml\" of the testcases.");
-          return false;
-        }
+        foundTestData = Publish.getTestcases(testDataPath, logger).size();
       }
       if (foundTestData != testCases.size()) {
         logger.error("Found only " + foundTestData + " of " + testCases.size() + " test results.");
