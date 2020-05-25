@@ -102,8 +102,7 @@ public class TPTReportPublisher extends Notifier {
     ArrayList<TPTTestCase> failedTests = new ArrayList<>();
     // global file in Build
     FilePath workspace = build.getWorkspace();
-    File piketectptDir =
-        new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT");
+    File piketectptDir = TPTReportUtils.getPikeTecDir(build);
     if (!piketectptDir.exists()) {
       if (!piketectptDir.mkdirs()) {
         throw new IOException(
@@ -115,27 +114,20 @@ public class TPTReportPublisher extends Notifier {
       // Replace $-vars used in the config:
       cfg = cfg.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
       // make file in build and copy report dir
-      String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
-      File dir = new File(piketectptDir.getAbsolutePath() + File.separator + tptFileName);
-      if (!dir.isDirectory()) {
-        if (!dir.mkdirs()) {
-          throw new IOException("Could not create directory \"" + dir.getAbsolutePath() + "\"");
-        }
-      }
-      File dirExConfig = new File(piketectptDir.getAbsolutePath() + File.separator + tptFileName
-          + File.separator + cfg.getConfiguration());
+      File dirExConfig = TPTReportUtils.getReportDir(piketectptDir, cfg.getId());
       if (!dirExConfig.mkdirs()) {
         throw new IOException(
             "Could not create directory \"" + dirExConfig.getAbsolutePath() + "\"");
       }
       FilePath reportDir = new FilePath(workspace, Utils.getGeneratedReportDir(cfg));
       FilePath testDataDir = new FilePath(workspace, Utils.getGeneratedTestDataDir(cfg));
+      String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
       if (reportDir.exists()) {
         Utils.copyRecursive(reportDir, new FilePath(dirExConfig), logger);
       }
       FilePath reportXML = new FilePath(testDataDir, "test_summary.xml");
       if (reportXML.exists()) {
-        TPTFile newTPTFile = new TPTFile(tptFileName, cfg.getConfiguration());
+        TPTFile newTPTFile = new TPTFile(tptFileName, cfg.getConfiguration(), cfg.getId());
         // get the remote path, then cut the path and get just what is needed (the last part),
         // see getLinkToFailedReport() in TPTReportSAXHandler.
         // Because of the GenerateOverviewReport bug, we should check if there are

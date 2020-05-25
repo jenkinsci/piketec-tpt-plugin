@@ -117,6 +117,7 @@ class TPTReportSAXHandler extends DefaultHandler {
         t.setReportFile("Corrupted File");
         t.setExecutionConfiguration(this.executionConfiguration);
         t.setTestCaseName(name);
+        t.setJenkinsConfigId(tptFile.getJenkinsConfigId());
         failedTests.add(t);
         setResultsToTPTFile();
       }
@@ -140,6 +141,7 @@ class TPTReportSAXHandler extends DefaultHandler {
         t.setReportFile(getLinkToFailedReport(reportFile, reportDir));
         t.setExecutionConfiguration(this.executionConfiguration);
         t.setTestCaseName(nameAndId.get(id));
+        t.setJenkinsConfigId(tptFile.getJenkinsConfigId());
         failedTests.add(t);
       }
       // set the result
@@ -181,13 +183,13 @@ class TPTReportSAXHandler extends DefaultHandler {
    * It is assumed, that both input Strings represent absolute paths.
    */
   private String getLinkToFailedReport(String reportFile, String reportDir) {
-    if (!reportFile.startsWith(reportDir)) {
+    if (!reportFile.toLowerCase().startsWith(reportDir.toLowerCase())) {
       logger.error("Can't extract relative path to test case report. At least one of the "
           + "following paths is not an absolute path: reportFile = " + reportFile
           + ", reportDirectory = " + reportDir);
       return "";
     }
-    if (reportFile.equals(reportDir)) {
+    if (reportFile.equalsIgnoreCase(reportDir)) {
       logger.error("Can't extract relative path to test case report. They are equal, "
           + "even though they shouldn't be: reportFile = " + reportFile + ", reportDirectory = "
           + reportDir);

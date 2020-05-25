@@ -31,6 +31,8 @@ public class TPTFile {
 
   private String configuration;
 
+  private String jenkinsConfigId;
+
   private int passed;
 
   private int inconclusive;
@@ -49,9 +51,10 @@ public class TPTFile {
    * @param configuration
    *          the name of the execution configuration
    */
-  public TPTFile(String fileName, String configuration) {
+  public TPTFile(String fileName, String configuration, String jenkinsConfigId) {
     this.fileName = fileName;
     this.configuration = configuration;
+    this.jenkinsConfigId = jenkinsConfigId;
   }
 
   /**
@@ -74,6 +77,13 @@ public class TPTFile {
 
   void setConfiguration(String configuration) {
     this.configuration = configuration;
+  }
+
+  /**
+   * @return The unique id of the jenkins configuration
+   */
+  public String getJenkinsConfigId() {
+    return this.jenkinsConfigId;
   }
 
   /**

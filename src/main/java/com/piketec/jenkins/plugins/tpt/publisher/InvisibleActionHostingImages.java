@@ -20,7 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -106,11 +105,8 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
    */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
-    DirectoryBrowserSupport dbs =
-        new DirectoryBrowserSupport(this,
-            new FilePath(new File(build.getRootDir().getAbsolutePath() + File.separator
-                + "Piketec-TPT" + File.separator + "Images")),
-            "TPT Report", "clipboard.png", false);
+    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
+        new FilePath(TPTReportUtils.getImageDir(build)), "TPT Report", "clipboard.png", false);
     if (req.getRestOfPath().equals("")) {
       throw HttpResponses.forwardToView(this, "index.jelly");
     }

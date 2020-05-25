@@ -23,7 +23,9 @@ package com.piketec.jenkins.plugins.tpt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
@@ -38,6 +40,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -288,12 +291,40 @@ public class TptPlugin extends Builder {
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
     logger = new TptLogger(listener.getLogger());
+
+    if (!areIdsUnique(build)) {
+      logger.error("Ids are not unique!");
+      return false;
+    }
     EnvVars environment = Utils.getEnvironment(build, launcher, logger);
     if (isTptMaster) {
       return performAsMaster(build, launcher, listener, environment, executionConfiguration);
     } else {
       return performWithoutSlaves(build, launcher, listener, environment, executionConfiguration);
     }
+  }
+
+  /**
+   * @param jenkinsConfigurations
+   * @return if all Ids are unique as they should be
+   */
+  private boolean areIdsUnique(AbstractBuild< ? , ? > build) {
+    Set<String> ids = new HashSet<String>();
+    List buildSteps = ((Project)build.getParent()).getBuilders();
+    for (Object object : buildSteps) {
+      if (object instanceof TptPlugin) {
+        List<JenkinsConfiguration> jenkinsConfigurations =
+            ((TptPlugin)object).getExecutionConfiguration();
+        for (JenkinsConfiguration config : jenkinsConfigurations) {
+          if (ids.contains(config.getId())) {
+            logger.error("Id \"" + config.getId() + "\" exists twice.");
+            return false;
+          }
+          ids.add(config.getId());
+        }
+      }
+    }
+    return true;
   }
 
   /**

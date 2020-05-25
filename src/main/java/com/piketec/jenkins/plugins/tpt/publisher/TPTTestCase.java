@@ -47,6 +47,8 @@ public class TPTTestCase {
 
   private String platform;
 
+  private String jenkinsConfigId;
+
   /**
    * Creates a new TPTTestCase data container
    */
@@ -208,6 +210,23 @@ public class TPTTestCase {
    */
   public void setPlatform(String platform) {
     this.platform = platform;
+  }
+
+  /**
+   * @return The name of the executed platform
+   */
+  public String getJenkinsConfigId() {
+    return jenkinsConfigId;
+  }
+
+  /**
+   * Set the unique id of the jenkins configuartion that test case ran on.
+   * 
+   * @param jenkinsConfigId
+   *          The unique id
+   */
+  public void setJenkinsConfigId(String jenkinsConfigId) {
+    this.jenkinsConfigId = jenkinsConfigId;
   }
 
 }

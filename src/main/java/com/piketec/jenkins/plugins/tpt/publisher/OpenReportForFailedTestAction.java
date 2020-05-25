@@ -55,7 +55,7 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
 
   private String date;
 
-  private String platform;
+  private String jenkinsConfigId;
 
   /**
    * This class is made for generating the failed html on the TPTReportPage. We open the index.html
@@ -79,16 +79,15 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
    *          the execution date
    */
   public OpenReportForFailedTestAction(AbstractBuild< ? , ? > build, String fileName,
-                                       String reportFile, String id, String exConfig,
-                                       String platform, String date) {
+                                       String reportFile, String id, String exConfig, String date,
+                                       String jenkinsConfigId) {
     this.id = id;
     this.name = fileName;
-    this.platform = platform;
     this.executionConfiguration = exConfig;
     this.build = build;
     this.reportFile = reportFile;
     this.date = date;
-
+    this.jenkinsConfigId = jenkinsConfigId;
   }
 
   @Override
@@ -119,6 +118,13 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   }
 
   /**
+   * @return The path to the html file
+   */
+  private File pathToHtml() {
+    return TPTReportUtils.getReportDir(TPTReportUtils.getPikeTecDir(build), jenkinsConfigId);
+  }
+
+  /**
    * This method is called when an object from this class is created.
    * 
    * When clicking on a failed test case, the overview report should be opened, with the navigation
@@ -138,19 +144,17 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
 
-    File indexFromFile = new File(
-        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator
-            + name + File.separator + executionConfiguration + File.separator + "index.html");
+    // TODO: Hier muss das mit der ID und der executioNDate drin bleiben glaub ich, weil sonst
+    // können wir die Testcases nicht auseinander halten
+
+    File indexFromFile = new File(pathToHtml(), "index.html");
+
     String indexFromFileAsString = FileUtils.readFileToString(indexFromFile);
     String failedHtmlAsString = indexFromFileAsString.replace("overview.html", reportFile);
-    File failedHTML = new File(
-        build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator
-            + name + File.separator + executionConfiguration + File.separator + "failedTest.html");
+    File failedHTML = new File(pathToHtml(), "failedTest.html");
 
     FileUtils.writeStringToFile(failedHTML, failedHtmlAsString);
-    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
-        new FilePath(new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT"
-            + File.separator + name + File.separator + executionConfiguration)),
+    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml()),
         "TPT Report", "clipboard.png", false);
 
     if (req.getRestOfPath().equals("")) {
@@ -176,22 +180,4 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   public void setExecutionConfiguration(String executionConfiguration) {
     this.executionConfiguration = executionConfiguration;
   }
-
-  /**
-   * @return The name of the TPT platform configuration
-   */
-  public String getPlatform() {
-    return platform;
-  }
-
-  /**
-   * Set the name of the TPT platform configuration
-   * 
-   * @param platform
-   *          The name of the TPT platform configuration
-   */
-  public void setPlatform(String platform) {
-    this.platform = platform;
-  }
-
 }

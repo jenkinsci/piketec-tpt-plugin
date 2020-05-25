@@ -47,6 +47,12 @@
 	</f:entry>
 	
 	
+	 <f:entry field="id" title="Unique configuration ID"
+    help="/plugin/piketec-tpt/id.html"
+  >
+    <f:textbox value="${instance.id}" />
+  </f:entry>
+	
 	<f:entry field="tptFile" title="TPT file"
 		help="/plugin/piketec-tpt/tptFile.html"
 	>
