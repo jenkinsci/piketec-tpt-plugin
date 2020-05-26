@@ -545,14 +545,24 @@ public class TptPlugin extends Builder {
      * @return The validation of the form
      */
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {
-      FormValidation formValidator = null;
-
       if ((arguments == null) || (arguments.trim().length() == 0)) {
-        formValidator = FormValidation.error("At least type \"--run build\".");
+        return FormValidation.error("At least type \"--run build\".");
       } else {
-        formValidator = FormValidation.ok();
+        return FormValidation.ok();
       }
-      return formValidator;
+    }
+
+    /**
+     * Basic validation of the entered paths to tpt.exe. At least one must exist.
+     * 
+     * @param exePaths
+     */
+    public static FormValidation doCheckExePaths(@QueryParameter String exePaths) {
+      if ((exePaths == null) || (exePaths.trim().length() == 0)) {
+        return FormValidation.error("Enter at least one path to a tpt.exe");
+      } else {
+        return FormValidation.ok();
+      }
     }
 
     @Override
