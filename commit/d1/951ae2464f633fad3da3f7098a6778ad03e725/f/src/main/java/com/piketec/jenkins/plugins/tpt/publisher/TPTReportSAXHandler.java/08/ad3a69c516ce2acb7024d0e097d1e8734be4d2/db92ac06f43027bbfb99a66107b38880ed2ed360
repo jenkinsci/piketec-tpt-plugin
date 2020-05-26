@@ -1,6 +1,0 @@
-id: 08ad3a69c516ce2acb7024d0e097d1e8734be4d2
-commit-date: 2020-04-21 03:02:09
-created: Joachim Kuhnert	joachim.kuhnert@piketec.com	1587564105703	120
-new-position: 196
-content
-@MBO: Wenn reportDir nicht mit "\" endet, beginnt der neue relative Pfad mit "\". Das ist prinzipiell ok, den Fall hast du aber nicht in getPlatformName berücksichtigt.
