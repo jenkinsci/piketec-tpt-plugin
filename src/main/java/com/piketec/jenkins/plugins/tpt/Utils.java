@@ -268,6 +268,9 @@ public class Utils {
   public static void copyRecursive(FilePath from, FilePath to, TptLogger logger)
       throws IOException, InterruptedException {
 
+    if (from.equals(to)) {
+      return;
+    }
     if (!from.exists()) {
       logger.error(from.getRemote() + " does not exist!");
       return;

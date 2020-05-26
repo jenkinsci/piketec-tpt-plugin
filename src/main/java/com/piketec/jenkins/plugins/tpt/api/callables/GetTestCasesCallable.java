@@ -63,7 +63,7 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
       ExecutionConfiguration executionConfig =
           getExecutionConfigByName(openProject.getProject(), executionConfigName);
       if (executionConfig == null) {
-        logger.error("Could not find config");
+        logger.error("Could not find execution configuration " + executionConfigName);
         return null;
       }
 

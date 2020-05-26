@@ -79,7 +79,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
         }
       }
       if (config == null) {
-        logger.error("Could not find config");
+        logger.error("Could not find execution configuration " + execCfg);
         return false;
       }
       // adjust config to execute only the given one test case
