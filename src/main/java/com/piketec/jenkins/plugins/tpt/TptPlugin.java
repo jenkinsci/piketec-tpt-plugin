@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -316,11 +317,17 @@ public class TptPlugin extends Builder {
         List<JenkinsConfiguration> jenkinsConfigurations =
             ((TptPlugin)object).getExecutionConfiguration();
         for (JenkinsConfiguration config : jenkinsConfigurations) {
-          if (ids.contains(config.getId())) {
-            logger.error("Id \"" + config.getId() + "\" exists twice.");
+          String id = config.getId();
+          if (id == null || id.isEmpty()) {
+            id = RandomStringUtils.randomAlphanumeric(6);
+            config.setId(id);
+            logger.info("Missing Id is generated: " + id);
+          }
+          if (ids.contains(id)) {
+            logger.error("Id \"" + id + "\" exists twice.");
             return false;
           }
-          ids.add(config.getId());
+          ids.add(id);
         }
       }
     }

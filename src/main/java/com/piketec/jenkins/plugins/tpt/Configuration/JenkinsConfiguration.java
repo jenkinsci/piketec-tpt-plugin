@@ -55,7 +55,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   private final String reportDir;
 
-  private final String id;
+  private String id;
 
   /**
    * the execution configuration is used by tpt to determine which file and which arguments is used.
@@ -176,6 +176,14 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   public String getId() {
     return id;
+  }
+
+  /**
+   * @param id
+   *          set the unique id of this configuration.
+   */
+  public void setId(String id) {
+    this.id = id;
   }
 
   /**
