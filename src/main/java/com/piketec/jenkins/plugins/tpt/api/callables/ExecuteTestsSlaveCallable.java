@@ -83,7 +83,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
         return false;
       }
       // adjust config to execute only the given one test case
-      String oldReportDir = config.getReferenceDirPath();
+      String oldReportDir = config.getReportDirPath();
       String oldTestDataDir = config.getDataDirPath();
 
       Collection<Scenario> foundScenearios = new HashSet<>();
