@@ -142,8 +142,8 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
       logger.error("Could not dertmine existence of TPT: " + exeFile.getRemote());
       return false;
     }
-    ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", exeFile.getRemote() + " --apiPort "
-        + Integer.toString(tptPort) + " --apiBindingName " + tptBindingName);
+    ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", exeFile.getRemote(), "--apiPort",
+        Integer.toString(tptPort), "--apiBindingName", tptBindingName);
     try {
       logger.info("Waiting " + startupWaitTime / 1000 + "s for TPT to start.");
       builder.start();
