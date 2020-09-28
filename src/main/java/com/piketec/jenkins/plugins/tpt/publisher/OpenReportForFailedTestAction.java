@@ -144,9 +144,6 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
 
-    // TODO: Hier muss das mit der ID und der executioNDate drin bleiben glaub ich, weil sonst
-    // können wir die Testcases nicht auseinander halten
-
     File indexFromFile = new File(pathToHtml(), "index.html");
 
     String indexFromFileAsString = FileUtils.readFileToString(indexFromFile);

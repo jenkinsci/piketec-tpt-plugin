@@ -1,6 +1,5 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,9 +91,6 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
       return null;
     } catch (ApiException e) {
       logger.error("ApiException: " + e.getMessage());
-      return null;
-    } catch (IOException e) {
-      logger.error("IOException " + e.getMessage());
       return null;
     }
     if (testCases == null || testCases.isEmpty()) {

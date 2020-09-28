@@ -1,6 +1,5 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -126,9 +125,6 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
       return false;
     } catch (ApiException e) {
       logger.error("ApiException: " + e.getMessage());
-      return false;
-    } catch (IOException e) {
-      logger.error("IOException: " + e.getMessage());
       return false;
     }
   }

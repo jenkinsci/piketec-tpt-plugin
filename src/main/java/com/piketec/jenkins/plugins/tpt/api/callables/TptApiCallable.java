@@ -174,9 +174,6 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
     } catch (ApiException e) {
       logger.error("ApiException: " + e.getMessage());
       return null;
-    } catch (IOException e) {
-      logger.error("IOException " + e.getMessage());
-      return null;
     }
   }
 
