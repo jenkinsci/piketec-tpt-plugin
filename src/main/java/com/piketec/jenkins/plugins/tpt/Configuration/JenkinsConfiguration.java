@@ -128,13 +128,6 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   /**
-   * @return the configuration with replaced whitespace. <code> " " -&gt; "_"</code>
-   */
-  public String getConfigurationWithUnderscore() {
-    return configuration.replace(" ", "_");
-  }
-
-  /**
    * @return the whole configuration string defined in the jenkins conf
    */
   public String getConfiguration() {

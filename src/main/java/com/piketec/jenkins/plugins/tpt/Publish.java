@@ -71,8 +71,8 @@ public final class Publish {
 
     try {
       String classname = FilenameUtils.getBaseName(jenkinsConfig.getTptFile());
-      FilePath jUnitXMLFile = new FilePath(jUnitOutputDir,
-          classname + "." + jenkinsConfig.getConfigurationWithUnderscore() + ".xml");
+      FilePath jUnitXMLFile =
+          new FilePath(jUnitOutputDir, jenkinsConfig.getId().replace(" ", "_") + ".xml");
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(jUnitXMLFile);
       xmlPub.writeTestsuite(classname);

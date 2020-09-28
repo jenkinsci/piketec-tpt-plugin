@@ -27,8 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
@@ -93,14 +91,13 @@ public class Utils {
    * build workspace
    * 
    * @param ec
-   *          through the jenkins configuration we get the name and the configuration of the file.
-   *          Used to create an unique path.
+   *          through the jenkins configuration we get the id of the configuration, which is used to
+   *          create a unique path.
    * @return a String with the folders for the test data dir.
    */
   public static String getGeneratedTestDataDir(JenkinsConfiguration ec) {
     if (ec.getTestdataDir() == null || ec.getTestdataDir().trim().isEmpty()) {
-      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile())
-          + File.separator + ec.getConfiguration() + File.separator + "testdata";
+      return "Piketec" + File.separator + ec.getId() + File.separator + "testdata";
     } else {
       return ec.getTestdataDir();
     }
@@ -111,14 +108,13 @@ public class Utils {
    * workspace
    * 
    * @param ec
-   *          through the jenkins configuration we get the name and the configuration of the file.
-   *          Used to create an unique path.
+   *          through the jenkins configuration we get the id of the configuration, which is used to
+   *          create a unique path.
    * @return a String with the folders for the report dir.
    */
   public static String getGeneratedReportDir(JenkinsConfiguration ec) {
     if (ec.getReportDir() == null || ec.getReportDir().trim().isEmpty()) {
-      return "Piketec" + File.separator + FilenameUtils.getBaseName(ec.getTptFile())
-          + File.separator + ec.getConfiguration() + File.separator + "report";
+      return "Piketec" + File.separator + ec.getId() + File.separator + "report";
     } else {
       return ec.getReportDir();
     }
