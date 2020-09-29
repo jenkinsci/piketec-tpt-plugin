@@ -28,7 +28,7 @@
 
 	<groupId>com.piketec.jenkins.plugins</groupId>
 	<artifactId>piketec-tpt</artifactId>
-	<version>8.8</version>
+	<version>8.9-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
 	<licenses>
@@ -122,7 +122,7 @@
 		<url>https://github.com/jenkinsci/piketec-tpt-plugin</url>
 		<connection>scm:git:git://github.com/jenkinsci/piketec-tpt-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:jenkinsci/piketec-tpt-plugin.git</developerConnection>
-		<tag>piketec-tpt-8.8</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<url>https://github.com/jenkinsci/piketec-tpt-plugin</url>
 </project>
