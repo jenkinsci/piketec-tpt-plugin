@@ -50,6 +50,8 @@ public class TPTFile {
    *          The name of the TPT file
    * @param configuration
    *          the name of the execution configuration
+   * @param jenkinsConfigId
+   *          The unique ID of the configuration to create unique paths
    */
   public TPTFile(String fileName, String configuration, String jenkinsConfigId) {
     this.fileName = fileName;
@@ -98,7 +100,7 @@ public class TPTFile {
   }
 
   /**
-   * @return @return the number of inconclusive tests
+   * @return the number of inconclusive tests
    */
   public int getInconclusive() {
     return inconclusive;

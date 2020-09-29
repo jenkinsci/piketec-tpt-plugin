@@ -351,6 +351,8 @@ public class TptPlugin extends Builder {
    * @param configs
    *          The configs with unresolved $-variables
    * @return true if it was possible to execute the TptPluginSingleJobExecutor.
+   * @throws InterruptedException
+   *           If thread was interrupted
    */
   public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launcher,
                                       BuildListener listener, EnvVars environment,
@@ -390,6 +392,8 @@ public class TptPlugin extends Builder {
    * @param configs
    *          The configs with unresolved $-variables
    * @return true if the execution from slaves and master were successful.
+   * @throws InterruptedException
+   *           If thread was interrupted
    */
   public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
                                  BuildListener listener, EnvVars environment,
@@ -556,6 +560,8 @@ public class TptPlugin extends Builder {
      * Basic validation of the entered paths to tpt.exe. At least one must exist.
      * 
      * @param exePaths
+     *          The tpt installation paths
+     * @return The validation of the form
      */
     public static FormValidation doCheckExePaths(@QueryParameter String exePaths) {
       if ((exePaths == null) || (exePaths.trim().length() == 0)) {

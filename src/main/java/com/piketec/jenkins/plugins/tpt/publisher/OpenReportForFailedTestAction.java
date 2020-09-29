@@ -72,11 +72,11 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
    * @param id
    *          the test case id
    * @param exConfig
-   *          the name of the execution configuration
-   * @param platform
-   *          the name of the platform
+   *          the name of the execution configurationm
    * @param date
    *          the execution date
+   * @param jenkinsConfigId
+   *          The unique ID of the configuration to create unique paths
    */
   public OpenReportForFailedTestAction(AbstractBuild< ? , ? > build, String fileName,
                                        String reportFile, String id, String exConfig, String date,

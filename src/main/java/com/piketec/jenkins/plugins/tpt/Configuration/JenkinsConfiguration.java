@@ -62,20 +62,22 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    * later on, the back 2 back test determine the reference files with this.
    * 
    * @param tptFile
-   *          - path to an executable tpt file <tt>*.tpt</tt>
+   *          path to an executable tpt file
    * @param configuration
-   *          - arguments and configuration (configuration in double quotes)
+   *          arguments and configuration (configuration in double quotes)
    * @param testdataDir
    *          Testdata directory, if empty, path from the configuration will used.
    * @param reportDir
    *          Report directory, if empty, path from the configuration will used.
    * @param enableTest
-   *          - true if you want to skip this configuration
+   *          true if you want to skip this configuration
    * @param timeout
    *          how long the execution of this test run is allwoed to take at max
    * @param testSet
    *          the name of test set that should be used, <code>null</code> or empty if the test set
    *          defined in the file should be used.
+   * @param id
+   *          The unique ID of the configuration to create unique paths
    */
   @DataBoundConstructor
   public JenkinsConfiguration(String tptFile, String configuration, String testdataDir,
@@ -220,8 +222,6 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     /**
      * @param configuration
      *          The name of the execution configuration
-     * @param project
-     *          The jenkins project
      * @return An error
      */
     public static FormValidation doCheckConfiguration(@QueryParameter String configuration) {

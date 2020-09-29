@@ -35,15 +35,17 @@ public class TptApiAccess {
    * methods, get them here already.
    * 
    * @param launcher
+   *          The launcher
    * @param logger
+   *          for dumping messages
    * @param exePaths
-   *          - paths to the tpt.exe files, usually set in the Jenkins UI
+   *          paths to the tpt.exe files, usually set in the Jenkins UI
    * @param tptPort
-   *          - port that the TPT API should use to connect.
+   *          port that the TPT API should use to connect.
    * @param tptBindingName
-   *          - binding name that the TPT API should use to connect.
+   *          binding name that the TPT API should use to connect.
    * @param tptStartupWaitTime
-   *          - time that Jenkins waits for TPT to start up if it is not running already
+   *          time that Jenkins waits for TPT to start up if it is not running already
    */
   public TptApiAccess(Launcher launcher, TptLogger logger, FilePath[] exePaths, int tptPort,
                       String tptBindingName, long tptStartupWaitTime) {
@@ -56,14 +58,18 @@ public class TptApiAccess {
   }
 
   /**
+   * Get all test cases for the given test set. If the test set is <code>null</code> or empty, the
+   * test sets of the execution configuration are evaluated.
+   * 
    * @param tptFilePath
-   *          - tpt file from which to get the test cases
+   *          tpt file from which to get the test cases
    * @param executionConfigName
-   *          - execution configuration
+   *          execution configuration
    * @param testSet
-   *          - test set from which to get the test cases
+   *          test set from which to get the test cases
    * @return a list of test case names for the given settings
    * @throws InterruptedException
+   *           If thread was interrupted
    */
   public Collection<String> getTestCases(FilePath tptFilePath, String executionConfigName,
                                          String testSet)
@@ -81,6 +87,8 @@ public class TptApiAccess {
   }
 
   /**
+   * Creates an overview report for already available test data.
+   * 
    * @param tptFilePath
    *          - tpt file for which the overview report should be built
    * @param executionConfigName
@@ -94,6 +102,7 @@ public class TptApiAccess {
    *          - path to the test data that is needed to build the overview report
    * @return true if the report generation was successful, false otherwise.
    * @throws InterruptedException
+   *           If thread was interrupted
    */
   public Boolean runOverviewReport(FilePath tptFilePath, String executionConfigName, String testSet,
                                    FilePath reportPath, FilePath testDataPath)
@@ -111,6 +120,8 @@ public class TptApiAccess {
   }
 
   /**
+   * Executes all test cases named in <code>testSetList</code> as a sub set of the given test set.
+   * 
    * @param tptFilePath
    *          - tpt file that should be executed
    * @param executionConfigName
@@ -122,8 +133,10 @@ public class TptApiAccess {
    * @param slaveDataPath
    *          - path to where the test data shall be put
    * @param testSetList
+   *          The list of test cases to execute
    * @return true if the execution was successful, false otherwise.
    * @throws InterruptedException
+   *           If thread was interrupted
    */
   public Boolean executeTestsSlave(FilePath tptFilePath, String executionConfigName,
                                    String testSetName, FilePath slaveReportPath,

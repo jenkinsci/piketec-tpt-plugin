@@ -71,6 +71,10 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
   /**
    * Starts TPT if necessary and returns a TPT API connection for the settings given in the
    * constructor
+   * 
+   * @return the handle to the api
+   * @throws InterruptedException
+   *           If thread was interrupted
    */
   protected @Nullable TptApi getApi() throws InterruptedException {
     TptLogger logger = getLogger();
@@ -90,6 +94,8 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
 
   /**
    * Only returns the TPT API if TPT is already running. Otherwise it returns null.
+   * 
+   * @return the handle to the api
    */
   protected @Nullable TptApi getApiIfTptIsOpen() {
     try {

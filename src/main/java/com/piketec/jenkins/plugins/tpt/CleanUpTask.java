@@ -48,10 +48,15 @@ public class CleanUpTask {
   private Launcher launcher;
 
   /**
-   * @param project
-   *          Tpt Project
+   * Creates and enqueues an clean up taks that will be executed when calling
+   * {@link #cleanUp(AbstractBuild, TptLogger)}
+   * 
    * @param masterId
-   *          Abstractbuild as unique Id
+   *          abstract build as id
+   * @param cleanUpCallable
+   *          the callable to execute for clean up
+   * @param launcher
+   *          the launcher
    */
   public CleanUpTask(AbstractBuild< ? , ? > masterId, CleanUpCallable cleanUpCallable,
                      Launcher launcher) {
@@ -63,10 +68,13 @@ public class CleanUpTask {
   /**
    * Close the tpt project
    * 
-   * @return true if it was possible to close the project.
+   * @param logger
+   *          for dumping error messages
+   * @return <code>true</code> if it was possible to execute the task.
    * @throws InterruptedException
+   *           If thread was interrupted
    */
-  public boolean clean(TptLogger logger) throws InterruptedException {
+  private boolean clean(TptLogger logger) throws InterruptedException {
     boolean success = false;
     Computer computer = cleanUpCallable.getFilePath().toComputer();
     String agentString = computer == null ? "" : " on Agent " + computer.getName();
@@ -102,14 +110,17 @@ public class CleanUpTask {
   }
 
   /**
-   * removes a list of CleanUpTask from the registry
+   * removes and executes a list of CleanUpTask from the registry
    * 
    * @param masterId
    *          to identify to which registry the task is going to be removed
-   * @return true if it was possible to erase the tasks.
+   * @param logger
+   *          for dumping error messages
+   * @return true if it was possible to execute the tasks.
    * @throws InterruptedException
+   *           If thread was interrupted
    */
-  public static synchronized boolean cleanUp(Object masterId, TptLogger logger)
+  public static synchronized boolean cleanUp(AbstractBuild< ? , ? > masterId, TptLogger logger)
       throws InterruptedException {
     List<CleanUpTask> tasks = registry.remove(masterId);
     if (tasks == null) {

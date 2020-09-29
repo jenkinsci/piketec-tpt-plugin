@@ -126,6 +126,7 @@ class TptPluginSlaveExecutor {
    * 
    * @return true if the tpt execution has been successfully.
    * @throws InterruptedException
+   *           If thread was interrupted
    */
   public boolean execute() throws InterruptedException {
     TptApiAccess tptApiAccess =

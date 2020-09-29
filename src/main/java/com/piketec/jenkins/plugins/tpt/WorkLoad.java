@@ -57,14 +57,16 @@ public class WorkLoad {
   /**
    * @param unresolvedConfig
    *          JenkinsConfiguration that contains paths and tpt file names with unresolved $-vars
-   * @param testSetName
-   *          the name of the test set if given
-   * @param testCases
+   * @param subTestSet
    *          the test cases that should be executed by the slave
    * @param masterWorkspace
    *          the workspace from master, used for knowing where to copy the results
    * @param masterId
    *          the current build, used in order to get an unique id
+   * @param masterDataDir
+   *          The test data directory on the agent the master job is running on
+   * @param masterReportDir
+   *          The report directory on the agent the master job is running on
    */
   public WorkLoad(JenkinsConfiguration unresolvedConfig, List<String> subTestSet,
                   FilePath masterWorkspace, AbstractBuild< ? , ? > masterId, FilePath masterDataDir,

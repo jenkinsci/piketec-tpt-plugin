@@ -220,7 +220,14 @@ public class Utils {
   /**
    * TPT changes its workind directory during execution, fails to set it back correctly after
    * multicore execution and prevents the deletion of test data directory. This method only deletes
-   * the files in a directory recursively if {@link FilePath#path.deleteContents()} fails.
+   * the files in a directory recursively if {@link FilePath#deleteContents()} fails.
+   * 
+   * @param path
+   *          The paths to delete
+   * @throws IOException
+   *           If path could not be deleted
+   * @throws InterruptedException
+   *           If thread was interrupted
    */
   public static void deleteFiles(FilePath path) throws IOException, InterruptedException {
     if (path.exists()) {
@@ -242,8 +249,11 @@ public class Utils {
    * Delete the files from a given Filepath
    * 
    * @param path
+   *          The path to delete
    * @throws IOException
+   *           If paths could not be deleted
    * @throws InterruptedException
+   *           If thread was interrupted
    */
   private static void deleteFilesRecursive(FilePath path) throws IOException, InterruptedException {
     for (FilePath subPath : path.list()) {
@@ -260,6 +270,17 @@ public class Utils {
    * 
    * FilePath.copyRecursiveTo is not able to do that. See
    * https://issues.jenkins-ci.org/browse/JENKINS-2126
+   * 
+   * @param from
+   *          Target path
+   * @param to
+   *          Source path
+   * @param logger
+   *          for dumping messages
+   * @throws IOException
+   *           If an IO error occurs
+   * @throws InterruptedException
+   *           If thread was interrupted
    */
   public static void copyRecursive(FilePath from, FilePath to, TptLogger logger)
       throws IOException, InterruptedException {
@@ -286,8 +307,17 @@ public class Utils {
   }
 
   /**
+   * Get the environment variables for a build.s
+   * 
+   * @param build
+   *          The build
+   * @param launcher
+   *          The launcher
+   * @param logger
+   *          for dumping messages
    * @return the environment variables from the agent machine the code is running on
    * @throws InterruptedException
+   *           If thread was interrupted
    */
   public static EnvVars getEnvironment(AbstractBuild< ? , ? > build, Launcher launcher,
                                        TptLogger logger)

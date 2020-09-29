@@ -44,6 +44,35 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 
   private String testSetName;
 
+  /**
+   * Created a new callable to execute a subset of tests of a given test set as part of a complete
+   * test execution.
+   * 
+   * @param listener
+   *          The task listener
+   * @param hostName
+   *          The host name for TPT RMI API calls
+   * @param tptPort
+   *          The port for TPT RMI API calls
+   * @param tptBindingName
+   *          The binding name for TPT RMI API calls
+   * @param exePaths
+   *          Paths to look for TPT installations
+   * @param startUpWaitTime
+   *          Timeto wait for TPT start up
+   * @param tptFilePath
+   *          The TPT file which tests shall be executeds
+   * @param slaveReportPath
+   *          Path where the report shall be stored in the workspace
+   * @param slaveDataPath
+   *          Path where the test data shall be stored in the workspace
+   * @param executionConfigName
+   *          The execution configuration to execute
+   * @param testSet
+   *          List of test cases to executes
+   * @param testSetName
+   *          The test set to execute
+   */
   public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort,
                                    String tptBindingName, FilePath[] exePaths, long startUpWaitTime,
                                    FilePath tptFilePath, FilePath slaveReportPath,
