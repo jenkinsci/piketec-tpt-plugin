@@ -31,6 +31,7 @@ import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.Computer;
 
 /**
  * Task to execute after executing a builder. Usually done in a finally block
@@ -67,17 +68,17 @@ public class CleanUpTask {
    */
   public boolean clean(TptLogger logger) throws InterruptedException {
     boolean success = false;
+    Computer computer = cleanUpCallable.getFilePath().toComputer();
+    String agentString = computer == null ? "" : " on Agent " + computer.getName();
     try {
       success = launcher.getChannel().call(cleanUpCallable);
     } catch (RemoteException e) {
       logger.error("RemoteException while cleaning " + cleanUpCallable.getFilePath().getRemote()
-          + " on Agent " + cleanUpCallable.getFilePath().toComputer().getName() + ": "
-          + e.getMessage());
+          + agentString + ": " + e.getMessage());
       return false;
     } catch (IOException e) {
-      logger.error(
-          "IOException while cleaning " + cleanUpCallable.getFilePath().getRemote() + " on Agent "
-              + cleanUpCallable.getFilePath().toComputer().getName() + ": " + e.getMessage());
+      logger.error("IOException while cleaning " + cleanUpCallable.getFilePath().getRemote()
+          + agentString + ": " + e.getMessage());
       return false;
     }
     return success;

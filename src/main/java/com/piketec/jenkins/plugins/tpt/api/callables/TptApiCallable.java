@@ -57,7 +57,7 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
     this.hostName = hostName;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
-    this.exePaths = exePaths;
+    this.exePaths = exePaths.clone();
     this.startUpWaitTime = startUpWaitTime;
   }
 

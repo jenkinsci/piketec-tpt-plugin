@@ -49,7 +49,7 @@ public class TptApiAccess {
                       String tptBindingName, long tptStartupWaitTime) {
     this.launcher = launcher;
     this.logger = logger;
-    this.exePaths = exePaths;
+    this.exePaths = exePaths.clone();
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
     this.startUpWaitTime = tptStartupWaitTime;
