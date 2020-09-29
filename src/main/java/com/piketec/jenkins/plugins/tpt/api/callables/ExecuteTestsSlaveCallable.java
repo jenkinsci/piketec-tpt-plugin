@@ -1,8 +1,6 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
-import java.io.File;
 import java.rmi.RemoteException;
-import java.rmi.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,38 +26,48 @@ import hudson.FilePath;
 import hudson.model.TaskListener;
 
 /**
- * The Callable executes tpt test cases on a Jenkins Agent via the TPT API. 
+ * The Callable executes tpt test cases on a Jenkins Agent via the TPT API.
  */
 public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
 
-	private static final long serialVersionUID = 1L;
-	
-	private FilePath tptFilePath;
-	private FilePath slaveReportPath;
-	private FilePath slaveDataPath;
-	private String execCfg;
-	private List<String> testSetString;
-	private String testSetName;
+  private static final long serialVersionUID = 1L;
 
-	public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
-			FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath, FilePath slaveReportPath, FilePath slaveDataPath,
-			String executionConfigName,  List<String> testSet, String testSetName) {
-		super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
-		this.tptFilePath = tptFilePath;
-		this.slaveReportPath = slaveReportPath;
-		this.slaveDataPath = slaveDataPath;
-		this.execCfg = executionConfigName;
-		this.testSetString = testSet;
-		this.testSetName = testSetName;
-	}
+  private FilePath tptFilePath;
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public Boolean call() throws UnknownHostException {
-		TptLogger logger = getLogger();
-		TptApi api = getApi();
-		OpenResult openProject = getOpenProject(logger, api, tptFilePath);
-		try {
+  private FilePath slaveReportPath;
+
+  private FilePath slaveDataPath;
+
+  private String execCfg;
+
+  private List<String> testSetList;
+
+  private String testSetName;
+
+  public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort,
+                                   String tptBindingName, FilePath[] exePaths, long startUpWaitTime,
+                                   FilePath tptFilePath, FilePath slaveReportPath,
+                                   FilePath slaveDataPath, String executionConfigName,
+                                   List<String> testSet, String testSetName) {
+    super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
+    this.tptFilePath = tptFilePath;
+    this.slaveReportPath = slaveReportPath;
+    this.slaveDataPath = slaveDataPath;
+    this.execCfg = executionConfigName;
+    this.testSetList = testSet;
+    this.testSetName = testSetName;
+  }
+
+  @Override
+  public Boolean call() throws InterruptedException {
+    TptLogger logger = getLogger();
+    TptApi api = getApi();
+    if (api == null) {
+      logger.error("Could not establish connection to the TPT API.");
+      return false;
+    }
+    OpenResult openProject = getOpenProject(logger, api, tptFilePath);
+    try {
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
           openProject.getProject().getExecutionConfigurations().getItems();
@@ -71,26 +79,26 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
         }
       }
       if (config == null) {
-        logger.error("Could not find config");
+        logger.error("Could not find execution configuration " + execCfg);
         return false;
       }
       // adjust config to execute only the given one test case
-      File oldReportDir = config.getReportDir();
-      File oldTestDataDir = config.getDataDir();
+      String oldReportDir = config.getReportDirPath();
+      String oldTestDataDir = config.getDataDirPath();
 
       Collection<Scenario> foundScenearios = new HashSet<>();
       find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
-          testSetString, foundScenearios);
-      if (foundScenearios.size() != testSetString.size()) {
-        logger.error(
-            "Could only find " + foundScenearios.size() + " of " + testSetString.size() + ".");
+          testSetList, foundScenearios);
+      if (foundScenearios.size() != testSetList.size()) {
+        logger
+            .error("Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
         return false;
       }
 
       logger.info("Setting test data directory to " + slaveDataPath.getRemote());
-      config.setDataDir(new File(slaveDataPath.getRemote()));
+      config.setDataDirPath(slaveDataPath.getRemote());
       logger.info("Setting report directory to " + slaveReportPath.getRemote());
-      config.setReportDir(new File(slaveReportPath.getRemote()));
+      config.setReportDirPath(slaveReportPath.getRemote());
 
       // store information to undo changes
       List<TestSet> oldTestSets = new ArrayList<>();
@@ -137,38 +145,39 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
           }
         }
       }
-      
+
       // execute test
       ExecutionStatus execStatus = api.run(config);
-      while (execStatus.isRunning() || execStatus.isPending()) {
-        try {
+      try {
+        while (execStatus.isRunning() || execStatus.isPending()) {
           Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          logger.interrupt(e.getMessage());
-          execStatus.cancel();
-          break;
         }
-      }
-      // undo changes
-      logger.info("Set test sets in execution config to old values.");
-      for (ExecutionConfigurationItem item : config.getItems()) {
-      	TestSet oldTestSet = oldTestSets.remove(0);
-      	// This happens because of a bug in the TPT API.
-      	if(oldTestSet!=null) {
-      		item.setTestSet(oldTestSet);
-      	}
-      }
-      logger.info("reset test data and report directory to " + oldTestDataDir.getPath() + " and "
-          + oldReportDir.getPath());
-      config.setDataDir(oldTestDataDir);
-      config.setReportDir(oldReportDir);
-      for (TestSet testSet : newTestSets) {
-        logger.info("delete temporary test set \"" + testSet.getName() + "\"");
-        openProject.getProject().getTestSets().delete(testSet);
-      }
-      logger.info("Reactivate temporary deactivated execution config items.");
-      for (ExecutionConfigurationItem item : deactivated) {
-        item.setActive(true);
+      } catch (InterruptedException e) {
+        logger.interrupt(e.getMessage());
+        execStatus.cancel();
+        throw e;
+      } finally {
+        // undo changes
+        logger.info("Set test sets in execution config to old values.");
+        for (ExecutionConfigurationItem item : config.getItems()) {
+          TestSet oldTestSet = oldTestSets.remove(0);
+          // This happens because of a bug in the TPT API.
+          if (oldTestSet != null) {
+            item.setTestSet(oldTestSet);
+          }
+        }
+        logger.info("reset test data and report directory to \"" + oldTestDataDir + "\" and \""
+            + oldReportDir + "\"");
+        config.setDataDirPath(oldTestDataDir);
+        config.setReportDirPath(oldReportDir);
+        for (TestSet testSet : newTestSets) {
+          logger.info("delete temporary test set \"" + testSet.getName() + "\"");
+          openProject.getProject().getTestSets().delete(testSet);
+        }
+        logger.info("Reactivate temporary deactivated execution config items.");
+        for (ExecutionConfigurationItem item : deactivated) {
+          item.setActive(true);
+        }
       }
     } catch (RemoteException e) {
       logger.error(e.getLocalizedMessage());
@@ -180,12 +189,11 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       return false;
     }
     return true;
-	}
+  }
 
-	@Override
-	public void checkRoles(RoleChecker arg0) throws SecurityException {
-	}
-	
+  @Override
+  public void checkRoles(RoleChecker arg0) throws SecurityException {
+  }
 
   /**
    * Finds all the test cases of a given test set
@@ -235,7 +243,6 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
     }
     return result;
   }
-  
 
   /**
    * Convert the given test cases to a String

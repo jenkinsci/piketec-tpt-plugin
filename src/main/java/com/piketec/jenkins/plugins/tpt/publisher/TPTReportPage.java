@@ -297,15 +297,15 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
       return new InvisibleActionHostingImages(build);
     }
     for (TPTTestCase t : failedTests) {
-      if (name.equals(t.getFileName() + t.getExecutionConfiguration() + t.getId() + t.getPlatform()
-          + t.getExecutionDate())) {
+      if (name.equals(t.getJenkinsConfigId() + t.getFileName() + t.getExecutionConfiguration()
+          + t.getId() + t.getPlatform() + t.getExecutionDate())) {
         return new OpenReportForFailedTestAction(build, t.getFileName(), t.getReportFile(),
-            t.getId(), t.getExecutionConfiguration(), t.getPlatform(), t.getExecutionDate());
+            t.getId(), t.getExecutionConfiguration(), t.getExecutionDate(), t.getJenkinsConfigId());
       }
     }
     for (TPTFile t : this.tptFiles) {
-      if (name.equals(t.getFileName() + t.getConfiguration())) {
-        return new InvisibleActionHostingHtml(build, t.getFileName(), t.getConfiguration());
+      if (name.equals(t.getJenkinsConfigId())) {
+        return new InvisibleActionHostingHtml(build, t.getJenkinsConfigId());
       }
     }
     return null;

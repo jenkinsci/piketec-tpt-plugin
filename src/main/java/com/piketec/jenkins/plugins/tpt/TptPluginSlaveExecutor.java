@@ -23,6 +23,7 @@ package com.piketec.jenkins.plugins.tpt;
 import java.io.IOException;
 import java.util.List;
 
+import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 
 import hudson.FilePath;
@@ -51,23 +52,19 @@ class TptPluginSlaveExecutor {
 
   private String tptBindingName;
 
-  private FilePath tptFile;
-
-  private String execCfg;
-
-  private String testDataDir;
-
-  private String reportDir;
-
-  private List<String> testSetString;
+  private List<String> testSetList;
 
   private long tptStartupWaitTime;
 
-  private AbstractBuild<?,?> masterId;
-
-  private String testSetName;
+  private AbstractBuild< ? , ? > masterId;
 
   private FilePath masterWorkspace;
+
+  private FilePath masterDataPath;
+
+  private FilePath masterReportPath;
+
+  private JenkinsConfiguration jenkinsConfig;
 
   /**
    * @param launcher
@@ -100,10 +97,11 @@ class TptPluginSlaveExecutor {
    *          the workspace from the master, to know where to copy the results
    */
   TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
-                         FilePath[] exePaths, int tptPort, String tptBindingName, FilePath tptFile,
-                         String execCfg, String testDataDir, String reportDir, List<String> testSet,
-                         long tptStartupWaitTime, AbstractBuild<?,?> masterId, String testSetName,
-                         FilePath masterWorkspace) {
+                         FilePath[] exePaths, int tptPort, String tptBindingName,
+                         JenkinsConfiguration jenkinsConfig, List<String> testSet,
+                         long tptStartupWaitTime, AbstractBuild< ? , ? > masterId,
+                         FilePath masterWorkspace, FilePath masterDataPath,
+                         FilePath masterReportPath) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -111,15 +109,13 @@ class TptPluginSlaveExecutor {
     this.exePaths = exePaths;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
-    this.tptFile = tptFile;
-    this.execCfg = execCfg;
-    this.testDataDir = testDataDir;
-    this.reportDir = reportDir;
-    this.testSetString = testSet;
+    this.jenkinsConfig = jenkinsConfig;
+    this.testSetList = testSet;
     this.tptStartupWaitTime = tptStartupWaitTime;
     this.masterId = masterId;
-    this.testSetName = testSetName;
     this.masterWorkspace = masterWorkspace;
+    this.masterDataPath = masterDataPath;
+    this.masterReportPath = masterReportPath;
   }
 
   /**
@@ -129,69 +125,59 @@ class TptPluginSlaveExecutor {
    * then it copies the results to the master workspace.
    * 
    * @return true if the tpt execution has been successfully.
+   * @throws InterruptedException
    */
-  public boolean execute() {
-    TptApiAccess tptApiAccess = new TptApiAccess(launcher, logger, exePaths,  tptPort, tptBindingName, tptStartupWaitTime);
-    
-    // Register cleanup task that is called in the end to close remote TPT Project
-    CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort, tptBindingName, 
-    		exePaths, tptStartupWaitTime, tptFile);
-    new CleanUpTask(masterId, cleanUpCallable, launcher);
-    
-    FilePath slaveReportPath = new FilePath(build.getWorkspace(), reportDir);
-		FilePath slaveDataPath = new FilePath(build.getWorkspace(), testDataDir);
-		FilePath masterDataPath = new FilePath(masterWorkspace, testDataDir);
-		FilePath masterReportPath = new FilePath(masterWorkspace, reportDir);
-		FilePath workspace = build.getWorkspace();
-		
-		// Clean and setup the report and testdata directoires
-		try {
-		  if (!masterWorkspace.equals(workspace)) {
-		    logger.info("Creating and/or cleaning test data directory "+slaveDataPath.getRemote());
-		    Utils.deleteFiles(slaveDataPath);
-		  }
-		} catch (IOException e) {
-		  logger.error("Could not create or clear test data dir "+slaveDataPath.getRemote());
-		  return false;
-		} catch (InterruptedException e) {
-		  logger.interrupt(e.getMessage());
-		  return false;
-		}
-		try {
-		  if (!masterWorkspace.equals(workspace)) {
-		    logger.info("Creating and/or cleaning report directory "+slaveReportPath.getRemote());
-//		    slaveReportPath.mkdirs();
-		    slaveReportPath.deleteContents();
-		  }
-		} catch (IOException e) {
-		  logger.error(e.getMessage());
-		  return false;
-		} catch (InterruptedException e) {
-		  logger.interrupt(e.getMessage());
-		  return false;
-		}
+  public boolean execute() throws InterruptedException {
+    TptApiAccess tptApiAccess =
+        new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
 
-		// Execute Tests on slava:
-		boolean executionResult = tptApiAccess.executeTestsSlave(tptFile, execCfg, testSetName, slaveReportPath, 
-				slaveDataPath, testSetString);
-		if(executionResult) {
-			logger.info("Execution worked");
-		}else {
-			logger.error("Execution failed!");
-		}
-		
-		// Copy tpt-testresults back to master, so the master can build the report
-		try {
-		  slaveDataPath.copyRecursiveTo(masterDataPath);
-		  slaveReportPath.copyRecursiveTo(masterReportPath);
-		  logger.info("Copied all data to master from File " + tptFile.getName() + " to "
-		      + masterWorkspace.getRemote());
-		} catch (InterruptedException e) {
-		  logger.interrupt("could not copy results to master: "+e.getMessage());
-		  return false;
-		} catch (IOException e) {
-		  logger.error("could not copy results to master: " + e.getMessage());
-		}
-		return executionResult;
+    FilePath slaveReportPath =
+        new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(jenkinsConfig));
+    FilePath slaveDataPath =
+        new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(jenkinsConfig));
+    FilePath tptFilePath = new FilePath(build.getWorkspace(), jenkinsConfig.getTptFile());
+    FilePath workspace = build.getWorkspace();
+
+    // Register cleanup task that is called in the end to close remote TPT Project
+    CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort,
+        tptBindingName, exePaths, tptStartupWaitTime, tptFilePath);
+    new CleanUpTask(masterId, cleanUpCallable, launcher);
+
+    // Clean and setup the report and testdata directoires
+    try {
+      if (!masterWorkspace.equals(workspace)) {
+        logger.info("Creating and/or cleaning test data directory " + slaveDataPath.getRemote());
+        Utils.deleteFiles(slaveDataPath);
+      }
+    } catch (IOException e) {
+      logger.error("Could not create or clear test data dir " + slaveDataPath.getRemote());
+      return false;
+    }
+    try {
+      if (!masterWorkspace.equals(workspace)) {
+        logger.info("Creating and/or cleaning report directory " + slaveReportPath.getRemote());
+        slaveReportPath.mkdirs();
+        slaveReportPath.deleteContents();
+      }
+    } catch (IOException e) {
+      logger.error(e.getMessage());
+      return false;
+    }
+
+    // Execute Tests on slave:
+    boolean executionResult =
+        tptApiAccess.executeTestsSlave(tptFilePath, jenkinsConfig.getConfiguration(),
+            jenkinsConfig.getTestSet(), slaveReportPath, slaveDataPath, testSetList);
+
+    // Copy tpt-testresults back to master, so the master can build the report
+    try {
+      Utils.copyRecursive(slaveDataPath, masterDataPath, logger);
+      Utils.copyRecursive(slaveReportPath, masterReportPath, logger);
+      logger.info("Copied all data to master from File " + tptFilePath.getName() + " to "
+          + masterWorkspace.getRemote());
+    } catch (IOException e) {
+      logger.error("could not copy results to master: " + e.getMessage());
+    }
+    return executionResult;
   }
 }

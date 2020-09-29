@@ -30,8 +30,8 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
-import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
+import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 
 import hudson.FilePath;
 import hudson.Launcher;
@@ -134,63 +134,66 @@ class TptPluginMasterJobExecutor {
    * temporary settings to the original values.
    * 
    * @return true if the execution from slaves and master were successful.
+   * @throws InterruptedException
    */
-  boolean execute() {
-  		TptApiAccess tptApiAccess = new TptApiAccess(launcher, logger, exePaths,  tptPort, tptBindingName, tptStartupWaitTime);
-  		boolean success = true;
-      // We delete the JUnit results before iterating ofver the jenkinsConfigs
-      try {
-				removeJUnitData();
-			} catch (InterruptedException e) {
-				logger.error(e.getMessage());
-			}
-      try {
-      	for (JenkinsConfiguration ec : executionConfigs) {
-					success &= executeOneConfig(ec, tptApiAccess);
-				}
-      } catch (InterruptedException e) {
-      	logger.error("Execution did not work: "+ e.getMessage());
-      } finally {
-      	logger.info("Close open TPT project on master and slaves.");
-      	if (!CleanUpTask.cleanUp(build, logger)) {
-      		logger.error("Could not close all open TPT files. "
-      				+ "There is no guarantee next run will be be done with correct file version.");
-      		return false;
-      	}
+  boolean execute() throws InterruptedException {
+    TptApiAccess tptApiAccess =
+        new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
+    boolean success = true;
+    // We delete the JUnit results before iterating over the jenkinsConfigs
+    removeJUnitData();
+    try {
+      for (JenkinsConfiguration ec : executionConfigs) {
+        success &= executeOneConfig(ec, tptApiAccess);
       }
-      return success;
+    } finally {
+      logger.info("Close open TPT project on master and slaves.");
+      if (!CleanUpTask.cleanUp(build, logger)) {
+        logger.error("Could not close all open TPT files. "
+            + "There is no guarantee next run will be be done with correct file version.");
+        success = false;
+      }
+    }
+    return success;
   }
 
-	private void removeJUnitData() throws InterruptedException {
-		if (!StringUtils.isBlank(jUnitXmlPath)) {
-	    FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
-	    logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
-	    try {
-	      path.mkdirs();
-	      path.deleteContents();
-	    } catch (IOException e) {
-	      logger.error("Could not create and/or clear JUnit XML directory " + path.getRemote());
-	    }
-	  }
-	}
+  private void removeJUnitData() throws InterruptedException {
+    if (!StringUtils.isBlank(jUnitXmlPath)) {
+      FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
+      logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
+      try {
+        path.mkdirs();
+        path.deleteContents();
+      } catch (IOException e) {
+        logger.error("Could not create and/or clear JUnit XML directory " + path.getRemote());
+      }
+    }
+  }
 
-	/**
-	 * This method collects all testcases that are supposed to be executed via the TPT API, divides them into
-	 * different workloads and calls the slave Agents to execute these. Then it collects their results.
-	 */
-  private boolean executeOneConfig(JenkinsConfiguration ec, TptApiAccess tptApiAccess)
+  /**
+   * This method collects all testcases that are supposed to be executed via the TPT API, divides
+   * them into different workloads and calls the slave Agents to execute these. Then it collects
+   * their results.
+   */
+  private boolean executeOneConfig(JenkinsConfiguration unresolvedConfig, TptApiAccess tptApiAccess)
       throws InterruptedException {
-    if (!ec.isEnableTest()) {
+    if (!unresolvedConfig.isEnableTest()) {
       return true;
     }
 
+    // Resolve $-vars in paths, test set and execution config names
+    JenkinsConfiguration resolvedConfig =
+        unresolvedConfig.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+
     // Get necessery paths the user added in the job configuration:
+    // These paths are resolved to work on the master.
     Collection<String> testCases = null;
-    String testdataDir = Utils.getGeneratedTestDataDir(ec);
-    FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
-    String reportDir = Utils.getGeneratedReportDir(ec);
-    FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
-    FilePath tptFilePath = new FilePath(build.getWorkspace(),ec.getTptFile());
+    FilePath testDataPath =
+        new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(resolvedConfig));
+    FilePath reportPath =
+        new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(resolvedConfig));
+    FilePath tptFilePath = new FilePath(build.getWorkspace(), resolvedConfig.getTptFile());
+
     try {
       logger.info("Create and/or clean test data directory \"" + testDataPath.getRemote() + "\"");
       testDataPath.mkdirs();
@@ -202,19 +205,20 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not create or clear directories on master: " + e.getMessage());
       return false;
     }
-    
+
     // Register cleanup task that is called in the end to close remote TPT Project
-    CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort, tptBindingName, 
-    		exePaths, tptStartupWaitTime, tptFilePath);
+    CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort,
+        tptBindingName, exePaths, tptStartupWaitTime, tptFilePath);
     new CleanUpTask(build, cleanUpCallable, launcher);
-    
+
     // Get the list of testcases via the TPT API
-    testCases = tptApiAccess.getTestCases(tptFilePath,	ec.getConfiguration(), ec.getTestSet());
-    if(testCases == null) {
-    	logger.error("Getting test cases via the TPT API did not work!");
-    	return false;
+    testCases = tptApiAccess.getTestCases(tptFilePath, resolvedConfig.getConfiguration(),
+        resolvedConfig.getTestSet());
+    if (testCases == null) {
+      logger.error("Getting test cases via the TPT API did not work!");
+      return false;
     }
-    
+
     // Divide testcases into Workloads for the slave jobs to execute
     ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
     // create test sets for slave jobs
@@ -249,8 +253,8 @@ class TptPluginMasterJobExecutor {
       logger.info("Create job for \"" + subTestSet + "\"");
 
       // creates the workloads for the slaves, with the smaller chunks of testsets
-      WorkLoad workloadToAdd = new WorkLoad(ec.getTptFile(), ec.getConfiguration(), testdataDir,
-          reportDir, ec.getTestSet(), subTestSet, build.getWorkspace(), build);
+      WorkLoad workloadToAdd = new WorkLoad(unresolvedConfig, subTestSet, build.getWorkspace(),
+          build, testDataPath, reportPath);
       // it adds the workloads to an static HashMap.
       WorkLoad.putWorkLoad(slaveJobName, workloadToAdd);
       // Creates a retryable job , there are the builds scheduled. So the logic is : We put a
@@ -265,36 +269,30 @@ class TptPluginMasterJobExecutor {
       try {
         retryableJob.join();
       } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        logger.interrupt(e.getMessage());
         logger.info("Stopping slave jobs.");
+        logger.interrupt(e.getMessage());
         for (RetryableJob retryableJobToCancle : retryableJobs) {
           retryableJobToCancle.cancel();
         }
-        return false;
+        throw e;
       }
     }
 
     // Build Overview report:
-    boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath, ec.getConfiguration(), 
-    		ec.getTestSet(), reportPath, testDataPath);
-    if(!buildingReportWorked) {
-    	logger.error("Building overview report did not work!");
+    logger.info("Building overview report.");
+    boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath,
+        resolvedConfig.getConfiguration(), resolvedConfig.getTestSet(), reportPath, testDataPath);
+    if (!buildingReportWorked) {
+      logger.error("Building overview report did not work!");
     }
-     
+
     try {
       int foundTestData = 0;
       if (enableJunit) {
-        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), ec, testDataPath,
-            jUnitXmlPath, jUnitLogLevel, logger);
+        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), resolvedConfig,
+            testDataPath, jUnitXmlPath, jUnitLogLevel, logger);
       } else {
-        try {
-          foundTestData = Publish.getTestcases(testDataPath, logger).size();
-        } catch (InterruptedException e) {
-          Thread.currentThread().interrupt();
-          logger.interrupt("Interrupted while parsing the \"test_summary.xml\" of the testcases.");
-          return false;
-        }
+        foundTestData = Publish.getTestcases(testDataPath, logger).size();
       }
       if (foundTestData != testCases.size()) {
         logger.error("Found only " + foundTestData + " of " + testCases.size() + " test results.");
@@ -307,7 +305,7 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not publish result: " + e.getMessage());
       return false;
     }
-    TPTBuildStepEntries.addEntry(ec, build);
+    TPTBuildStepEntries.addEntry(unresolvedConfig, build);
     return true;
   }
 
@@ -336,6 +334,5 @@ class TptPluginMasterJobExecutor {
     }
     return testSets;
   }
-
 
 }

@@ -28,11 +28,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
-import com.piketec.tpt.api.ApiException;
-import com.piketec.tpt.api.Project;
 
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.Computer;
 
 /**
  * Task to execute after executing a builder. Usually done in a finally block
@@ -42,9 +41,11 @@ import hudson.model.AbstractBuild;
  */
 public class CleanUpTask {
 
-  private static Map<Object, List<CleanUpTask>> registry = new HashMap<Object, List<CleanUpTask>>();
-	private CleanUpCallable cleanUpCallable;
-	private Launcher launcher;
+  private static Map<Object, List<CleanUpTask>> registry = new HashMap<>();
+
+  private CleanUpCallable cleanUpCallable;
+
+  private Launcher launcher;
 
   /**
    * @param project
@@ -52,31 +53,34 @@ public class CleanUpTask {
    * @param masterId
    *          Abstractbuild as unique Id
    */
-  public CleanUpTask(AbstractBuild masterId, CleanUpCallable cleanUpCallable, Launcher launcher) {
-  	this.cleanUpCallable = cleanUpCallable;
-  	this.launcher = launcher;
-  	register(this, masterId);
+  public CleanUpTask(AbstractBuild< ? , ? > masterId, CleanUpCallable cleanUpCallable,
+                     Launcher launcher) {
+    this.cleanUpCallable = cleanUpCallable;
+    this.launcher = launcher;
+    register(this, masterId);
   }
 
   /**
    * Close the tpt project
    * 
    * @return true if it was possible to close the project.
+   * @throws InterruptedException
    */
-  public boolean clean(TptLogger logger) {
-  	boolean success = false;
+  public boolean clean(TptLogger logger) throws InterruptedException {
+    boolean success = false;
+    Computer computer = cleanUpCallable.getFilePath().toComputer();
+    String agentString = computer == null ? "" : " on Agent " + computer.getName();
     try {
-    	success = launcher.getChannel().call(cleanUpCallable);
+      success = launcher.getChannel().call(cleanUpCallable);
     } catch (RemoteException e) {
-    	logger.error("RemoteException while cleaning "+e.getMessage());
+      logger.error("RemoteException while cleaning " + cleanUpCallable.getFilePath().getRemote()
+          + agentString + ": " + e.getMessage());
       return false;
     } catch (IOException e) {
-    	logger.error("IOException while cleaning "+e.getMessage());
-			return false;
-		} catch (InterruptedException e) {
-			logger.error("InterruptedException while cleaning "+e.getMessage());
-			return false;
-		}
+      logger.error("IOException while cleaning " + cleanUpCallable.getFilePath().getRemote()
+          + agentString + ": " + e.getMessage());
+      return false;
+    }
     return success;
   }
 
@@ -88,10 +92,10 @@ public class CleanUpTask {
    * @param masterId
    *          to identify to which registry the task is going to be added
    */
-  private static synchronized void register(CleanUpTask task, AbstractBuild masterId) {
+  private static synchronized void register(CleanUpTask task, AbstractBuild< ? , ? > masterId) {
     List<CleanUpTask> list = registry.get(masterId);
     if (list == null) {
-      list = new ArrayList<CleanUpTask>();
+      list = new ArrayList<>();
       registry.put(masterId, list);
     }
     list.add(task);
@@ -103,8 +107,10 @@ public class CleanUpTask {
    * @param masterId
    *          to identify to which registry the task is going to be removed
    * @return true if it was possible to erase the tasks.
+   * @throws InterruptedException
    */
-  public static synchronized boolean cleanUp(Object masterId, TptLogger logger) {
+  public static synchronized boolean cleanUp(Object masterId, TptLogger logger)
+      throws InterruptedException {
     List<CleanUpTask> tasks = registry.remove(masterId);
     if (tasks == null) {
       // nothing to clean up
@@ -114,7 +120,6 @@ public class CleanUpTask {
     for (CleanUpTask task : tasks) {
       success &= task.clean(logger);
     }
-    logger.info("Clean up worked: "+success);
     return success;
   }
 }

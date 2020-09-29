@@ -43,11 +43,9 @@ import hudson.util.HttpResponses;
  */
 public class InvisibleActionHostingHtml implements Action, StaplerProxy {
 
-  private String name;
-
   private AbstractBuild< ? , ? > build;
 
-  private String exeConfig;
+  private String id;
 
   /**
    * This class is for hosting the HTML Report in an action. After requesting the url in the
@@ -56,17 +54,12 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    * 
    * @param build
    *          to locate where the file is
-   * @param urlFileName
-   *          to know which file it is
-   * @param exeConfig
-   *          to know which file it is , the path is made by a filename and a execution config
+   * @param id
+   *          unique id of the jenkins configuration
    */
-  public InvisibleActionHostingHtml(AbstractBuild< ? , ? > build, String urlFileName,
-                                    String exeConfig) {
-    this.name = urlFileName;
+  public InvisibleActionHostingHtml(AbstractBuild< ? , ? > build, String id) {
     this.build = build;
-    this.exeConfig = exeConfig;
-
+    this.id = id;
   }
 
   @Override
@@ -81,7 +74,7 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
 
   @Override
   public String getUrlName() {
-    return name + exeConfig;
+    return id;
   }
 
   @Override
@@ -90,18 +83,17 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
   }
 
   /**
-   * @return The name of the TPT file
+   * @return The uique id of the execution item
    */
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
   /**
    * @return The path to the html file
    */
-  public String path() {
-    return build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT" + File.separator
-        + name + File.separator + exeConfig;
+  private File pathToHtml() {
+    return TPTReportUtils.getReportDir(TPTReportUtils.getPikeTecDir(build), id);
   }
 
   /**
@@ -119,11 +111,10 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
-
-    File f = new File(path() + File.separator + "index.html");
+    File f = new File(pathToHtml(), "index.html");
     FileUtils.touch(f); // refresh the index if security changed
     // this displays the "index.html" in the given path
-    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(new File(path())),
+    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml()),
         "TPT Report", "clipboard.png", false);
     if (req.getRestOfPath().equals("")) {
       throw HttpResponses.forwardToView(this, "index.jelly");

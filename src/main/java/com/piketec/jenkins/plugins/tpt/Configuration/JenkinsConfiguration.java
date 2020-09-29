@@ -22,14 +22,12 @@ package com.piketec.jenkins.plugins.tpt.Configuration;
 
 import java.io.File;
 
-import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.Util;
-import hudson.model.AbstractProject;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
@@ -57,6 +55,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
   private final String reportDir;
 
+  private String id;
+
   /**
    * the execution configuration is used by tpt to determine which file and which arguments is used.
    * later on, the back 2 back test determine the reference files with this.
@@ -79,7 +79,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   @DataBoundConstructor
   public JenkinsConfiguration(String tptFile, String configuration, String testdataDir,
-                              String reportDir, boolean enableTest, long timeout, String testSet) {
+                              String reportDir, boolean enableTest, long timeout, String testSet,
+                              String id) {
     this.tptFile = tptFile;
     this.configuration = configuration;
     this.testdataDir = testdataDir;
@@ -87,6 +88,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     this.enableTest = enableTest;
     this.timeout = timeout;
     this.testSet = testSet;
+    this.id = id;
   }
 
   protected Object readResolve() {
@@ -123,13 +125,6 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   public String getTestSet() {
     return testSet;
-  }
-
-  /**
-   * @return the configuration with replaced whitespace. <code> " " -&gt; "_"</code>
-   */
-  public String getConfigurationWithUnderscore() {
-    return configuration.replace(" ", "_");
   }
 
   /**
@@ -170,6 +165,26 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   /**
+   * @return the unique id of this configuration
+   */
+  public String getId() {
+    return id;
+  }
+
+  /**
+   * @param id
+   *          set the unique id of this configuration.
+   */
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  /**
+   * 
+   * This method resolves all variables that are used for the definition of the test set and the
+   * execution configuration, but not for the directories. These are resolved on the respective
+   * agent machine with the respective environment variables.
+   * 
    * @param environment
    *          The map of environment variables and their values
    * @return A {@link JenkinsConfiguration} where all "${}"-Variables are replaced by their value if
@@ -179,7 +194,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
     return new JenkinsConfiguration(Util.replaceMacro(tptFile, environment),
         Util.replaceMacro(configuration, environment), Util.replaceMacro(testdataDir, environment),
         Util.replaceMacro(reportDir, environment), enableTest, timeout,
-        Util.replaceMacro(testSet, environment));
+        Util.replaceMacro(testSet, environment), this.id);
   }
 
   /**
@@ -209,8 +224,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
      *          The jenkins project
      * @return An error
      */
-    public static FormValidation doCheckConfiguration(@QueryParameter String configuration,
-                                                      @AncestorInPath AbstractProject project) {
+    public static FormValidation doCheckConfiguration(@QueryParameter String configuration) {
       if ((configuration == null) || (configuration.trim().length() == 0)) {
         return FormValidation.error("Enter a configuration name.");
       } else {

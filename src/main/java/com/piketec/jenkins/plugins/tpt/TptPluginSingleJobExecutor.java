@@ -20,7 +20,6 @@
  */
 package com.piketec.jenkins.plugins.tpt;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -103,31 +102,22 @@ class TptPluginSingleJobExecutor {
    * runs that command through the launcher and publish the Junit XML if necessary.
    * 
    * @return true if the execution from the tpt file was successful.
+   * @throws InterruptedException
    */
-  boolean execute() {
+  boolean execute() throws InterruptedException {
     boolean success = true;
     FilePath workspace = build.getWorkspace();
-    File workspaceDir;
-    try {
-      workspaceDir = Utils.getWorkspaceDir(workspace, logger);
-    } catch (InterruptedException e) {
-      logger.interrupt(e.getMessage());
-      return false;
-    }
     // use first found (existing) TPT installation
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
       try {
-    	logger.info("Try to find TPT installation: "+f.getRemote());
+        logger.info("Try to find TPT installation: " + f.getRemote());
         if (f.exists()) {
           exeFile = f;
           break;
         }
       } catch (IOException e) {
         // NOP, just try next file
-      } catch (InterruptedException e) {
-        logger.interrupt(e.getMessage());
-        return false;
       }
     }
     if (exeFile == null) {
@@ -137,47 +127,47 @@ class TptPluginSingleJobExecutor {
     // execute the sub-configuration
     for (JenkinsConfiguration ec : executionConfigs) {
       if (ec.isEnableTest()) {
-    	// Absolute paths are recognized as such, relative paths are resolved depending on the workspace directory,
-    	// or the unique sub folder created in the workspace for the current job. 
-    	String testdataDir = Utils.getGeneratedTestDataDir(ec);
-        FilePath testDataPath = new FilePath(build.getWorkspace(), testdataDir);
-        String reportDir = Utils.getGeneratedReportDir(ec);
-        FilePath reportPath = new FilePath(build.getWorkspace(), reportDir);
-        FilePath tptFilePath = new FilePath(build.getWorkspace(),ec.getTptFile());
-        
+        ec = ec.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+        // Absolute paths are recognized as such, relative paths are resolved depending on the
+        // workspace directory,
+        // or the unique sub folder created in the workspace for the current job.
+        FilePath testDataPath =
+            new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(ec));
+        FilePath reportPath = new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(ec));
+        FilePath tptFilePath = new FilePath(build.getWorkspace(), ec.getTptFile());
         String configurationName = ec.getConfiguration();
         String tesSet = ec.getTestSet();
         logger.info("*** Running TPT-File \"" + tptFilePath + //
             "\" with configuration \"" + configurationName + "\" now. ***");
-        if (Utils.createParentDir(new File(testdataDir), workspace)
-            && Utils.createParentDir(new File(reportDir), workspace)) {
-          String cmd = buildCommand(exeFile, arguments, tptFilePath, testDataPath.getRemote(),
-              reportPath.getRemote(), configurationName, tesSet);
-          try {
-            // run the test...
-            boolean successOnlyForOneConfig = launchTPT(launcher, listener, cmd, ec.getTimeout());
-            success &= successOnlyForOneConfig;
-            if (successOnlyForOneConfig) {
-              TPTBuildStepEntries.addEntry(ec, build);
-            }
-            if (enableJunit) {
-              // transform TPT results into JUnit results
-              logger.info("*** Publishing results now ***");
-              Utils.publishAsJUnitResults(workspace, ec, testDataPath, jUnitXmlPath, jUnitLogLevel,
-                  logger);
-            }
-          } catch (IOException e) {
-            logger.error(e.getMessage());
-            success = false;
-            // continue with next config in case of I/O error
-          } catch (InterruptedException e) {
-            logger.interrupt(e.getMessage());
-            return false;
+
+        try {
+          testDataPath.mkdirs();
+          reportPath.mkdirs();
+        } catch (IOException e1) {
+          logger.error("Failed to create parent directories for " + testDataPath.getRemote()
+              + " and/or " + reportPath.getRemote());
+          return false;
+        }
+
+        String cmd = buildCommand(exeFile, arguments, tptFilePath, testDataPath.getRemote(),
+            reportPath.getRemote(), configurationName, tesSet);
+        try {
+          // run the test...
+          boolean successOnlyForOneConfig = launchTPT(launcher, listener, cmd, ec.getTimeout());
+          success &= successOnlyForOneConfig;
+          if (successOnlyForOneConfig) {
+            TPTBuildStepEntries.addEntry(ec, build);
           }
-        } else {
-          logger.error(
-              "Failed to create parent directories for " + testdataDir + " and/or " + reportDir);
+          if (enableJunit) {
+            // transform TPT results into JUnit results
+            logger.info("*** Publishing results now ***");
+            Utils.publishAsJUnitResults(workspace, ec, testDataPath, jUnitXmlPath, jUnitLogLevel,
+                logger);
+          }
+        } catch (IOException e) {
+          logger.error(e.getMessage());
           success = false;
+          // continue with next config in case of I/O error
         }
       }
     }

@@ -23,8 +23,11 @@ package com.piketec.jenkins.plugins.tpt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -38,6 +41,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Project;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
@@ -288,25 +292,46 @@ public class TptPlugin extends Builder {
   public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
       throws InterruptedException, IOException {
     logger = new TptLogger(listener.getLogger());
-    EnvVars environment;
-    try {
-      environment = build.getEnvironment(launcher.getListener());
-    } catch (IOException e) {
-      environment = new EnvVars();
-      logger.error(e.getLocalizedMessage());
-    } catch (InterruptedException e) {
-      logger.error(e.getLocalizedMessage());
+
+    if (!areIdsUnique(build)) {
+      logger.error("Ids are not unique!");
       return false;
     }
-    ArrayList<JenkinsConfiguration> normalizedConfigs = new ArrayList<JenkinsConfiguration>();
-    for (JenkinsConfiguration ec : executionConfiguration) {
-      normalizedConfigs.add(ec.replaceAndNormalize(environment));
-    }
+    EnvVars environment = Utils.getEnvironment(build, launcher, logger);
     if (isTptMaster) {
-      return performAsMaster(build, launcher, listener, environment, normalizedConfigs);
+      return performAsMaster(build, launcher, listener, environment, executionConfiguration);
     } else {
-      return performWithoutSlaves(build, launcher, listener, environment, normalizedConfigs);
+      return performWithoutSlaves(build, launcher, listener, environment, executionConfiguration);
     }
+  }
+
+  /**
+   * @param jenkinsConfigurations
+   * @return if all Ids are unique as they should be
+   */
+  private boolean areIdsUnique(AbstractBuild< ? , ? > build) {
+    Set<String> ids = new HashSet<String>();
+    List buildSteps = ((Project)build.getParent()).getBuilders();
+    for (Object object : buildSteps) {
+      if (object instanceof TptPlugin) {
+        List<JenkinsConfiguration> jenkinsConfigurations =
+            ((TptPlugin)object).getExecutionConfiguration();
+        for (JenkinsConfiguration config : jenkinsConfigurations) {
+          String id = config.getId();
+          if (id == null || id.isEmpty()) {
+            id = RandomStringUtils.randomAlphanumeric(6);
+            config.setId(id);
+            logger.info("Missing Id is generated: " + id);
+          }
+          if (ids.contains(id)) {
+            logger.error("Id \"" + id + "\" exists twice.");
+            return false;
+          }
+          ids.add(id);
+        }
+      }
+    }
+    return true;
   }
 
   /**
@@ -323,13 +348,14 @@ public class TptPlugin extends Builder {
    *          The listener
    * @param environment
    *          The map of envrionment varibales and their value
-   * @param normalizedConfigs
-   *          The configs with already replaced $-variables
+   * @param configs
+   *          The configs with unresolved $-variables
    * @return true if it was possible to execute the TptPluginSingleJobExecutor.
    */
   public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launcher,
                                       BuildListener listener, EnvVars environment,
-                                      ArrayList<JenkinsConfiguration> normalizedConfigs) {
+                                      ArrayList<JenkinsConfiguration> configs)
+      throws InterruptedException {
     // split and expand list of ptahs to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
@@ -341,9 +367,8 @@ public class TptPlugin extends Builder {
     String expandedArguments = environment.expand(this.arguments);
     String jUnitXmlPath = environment.expand(jUnitreport);
     // start execution
-    TptPluginSingleJobExecutor executor =
-        new TptPluginSingleJobExecutor(build, launcher, listener, expandedExePaths,
-            expandedArguments, normalizedConfigs, jUnitXmlPath, jUnitLogLevel, enableJunit);
+    TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launcher, listener,
+        expandedExePaths, expandedArguments, configs, jUnitXmlPath, jUnitLogLevel, enableJunit);
     return executor.execute();
 
   }
@@ -362,13 +387,14 @@ public class TptPlugin extends Builder {
    *          The listener
    * @param environment
    *          The map of envrionment varibales and their value
-   * @param normalizedConfigs
-   *          The configs with already replaced $-variables
+   * @param configs
+   *          The configs with unresolved $-variables
    * @return true if the execution from slaves and master were successful.
    */
   public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
                                  BuildListener listener, EnvVars environment,
-                                 ArrayList<JenkinsConfiguration> normalizedConfigs) {
+                                 ArrayList<JenkinsConfiguration> configs)
+      throws InterruptedException {
     // split and expand list of paths to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
@@ -435,9 +461,9 @@ public class TptPlugin extends Builder {
     String expandedSlaveJobName = environment.expand(slaveJob);
     // start execution
     TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
-        expandedExePaths, normalizedConfigs, expandedTptPort, expandedTptBindingName,
-        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries,
-        jUnitXmlPath, jUnitLogLevel, enableJunit);
+        expandedExePaths, configs, expandedTptPort, expandedTptBindingName, expandedSlaveJobName,
+        expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries, jUnitXmlPath,
+        jUnitLogLevel, enableJunit);
     try {
       return executor.execute();
     } finally {
@@ -519,14 +545,24 @@ public class TptPlugin extends Builder {
      * @return The validation of the form
      */
     public static FormValidation doCheckArguments(@QueryParameter String arguments) {
-      FormValidation formValidator = null;
-
       if ((arguments == null) || (arguments.trim().length() == 0)) {
-        formValidator = FormValidation.error("At least type \"--run build\".");
+        return FormValidation.error("At least type \"--run build\".");
       } else {
-        formValidator = FormValidation.ok();
+        return FormValidation.ok();
       }
-      return formValidator;
+    }
+
+    /**
+     * Basic validation of the entered paths to tpt.exe. At least one must exist.
+     * 
+     * @param exePaths
+     */
+    public static FormValidation doCheckExePaths(@QueryParameter String exePaths) {
+      if ((exePaths == null) || (exePaths.trim().length() == 0)) {
+        return FormValidation.error("Enter at least one path to a tpt.exe");
+      } else {
+        return FormValidation.ok();
+      }
     }
 
     @Override

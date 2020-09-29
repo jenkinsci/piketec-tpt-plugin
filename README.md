@@ -117,6 +117,21 @@ the publisher.
 
 # Release History
 
+### Version 8.8
+
+-   **Master slave mode now needs at least TPT 11**
+-   Fixed problems with paths when Jenkins controller runs on Linux.
+-   Fixed problems with realative paths when using master slave mode.
+-   Introduced uniqe IDs for each configured test execution. These
+    IDs are used to generate unique paths to store test data and report
+    data. **History of old runs will be lost.**
+-   Environment variables are now expanded in context of the agent and
+    not the Jenkins controller.
+-   TPT API calls made in master slave mode are now done directly on
+    the agents. So instead of doing calls from the jenkins controller
+    via an addictional network connection, the calls are now done via
+    localhost.
+
 ### Version 8.7
 
 -   File descriptor leaks fixed that could prevent the plugin running
