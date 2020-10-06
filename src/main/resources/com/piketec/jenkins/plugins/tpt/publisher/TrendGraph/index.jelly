@@ -100,14 +100,9 @@
         }
 			</style>
 			<h1>Trend of Builds</h1>
-<j:if test="${it.isTrustSlavesAndUsers()}">
 			<iframe sandbox="allow-scripts allow-popups allow-forms" id="knowledgeFrame" width="1650" height="400"
 				frameborder="0"
 				src="/${it.project.getUrl()}/TPTtrendResults/index.html"></iframe>
-</j:if>
-<j:if test="${!it.isTrustSlavesAndUsers()}">
-    <p style="color:#CCCC00">Cannot display the TPT trend graph. Please "Trust Slaves and User to modify Jenkins workspace" under <a href="${it.rootUrl}/configure">Jenkins Configuration</a></p>
-</j:if>
 			<h2>Last successfully Builds</h2>
 			<table class="pane sortable bigtable stripped" id="tests">
 				<tr>

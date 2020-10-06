@@ -90,7 +90,6 @@
 			</style>
 			<h1>TPT Report</h1>
 			<h2>All Tests</h2>
-			<j:if test="${it.isTrustSlavesAndUsers()}">
 			<table class="pane sortable bigtable stripped" id="tests">
 				<tr>
 					<th class="pane-header" id="whiteT">${%TPT File}</th>
@@ -145,63 +144,6 @@
 					</tr>
 				</j:forEach>
 			</table>
-			</j:if>
-			<j:if test="${!it.isTrustSlavesAndUsers()}">
-			     <table class="pane sortable bigtable stripped" id="tests">
-        <tr>
-          <th class="pane-header" id="whiteT">${%TPT File}</th>
-          <th class="pane-header" id="whiteT">${%Execution Configuration}</th>
-          <th class="pane-header" id="passed">${%Passed}</th>
-          <th class="pane-header" id="inconclused">${%Inconclusive}</th>
-          <th class="pane-header" id="failed">${%Failed}</th>
-          <th class="pane-header" id="executionE">${%Execution Error}</th>
-          <th class="pane-header" id="whiteT">${%Total}</th>
-        </tr>
-        <j:forEach items="${it.tptFiles}" var="file">
-          <tr>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.fileName}</a></td>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.configuration}</a></td>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.passed}</a></td>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.inconclusive}</a></td>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.failed}</a></td>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.executionError}</a></td>
-            <td class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${file.total}</a></td>
-          </tr>
-        </j:forEach>
-      </table>
-      <h2 align="middle">Result from Build</h2>
-      <p style="text-align:center;">
-        <img
-          src="/${it.build.getUrl()}/TPT_Report/Images/pieChart.png"
-          width="616" height="308" align="middle" />
-      </p>
-      <h3>All Failed Tests</h3>
-      <table class="pane sortable bigtable stripped" id="tests">
-        <tr>
-          <th class="pane-header" >${%Build Step ID}</th>
-          <th class="pane-header" >${%ID}</th>
-          <th class="pane-header" >${%Test Case}</th>
-          <th class="pane-header" >${%Result}</th>
-          <th class="pane-header" >${%Failed Since}</th>
-          <th class="pane-header" >${%File}</th>
-          <th class="pane-header" >${%Execution Configuration}</th>
-          <th class="pane-header" >${%Execution Date}</th>
-        </tr>
-        <j:forEach items="${it.failedTests}" var="failedTests">
-          <tr>
-              <!-- <a href="${it.rootUrl}/job/${it.build.getProject().getName()}/ws/Builds/${it.build.getNumber()}/${failedTests.reportFile}/${failedTests.}">${failedTests.id}</a> -->
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.jenkinsConfigId}</a></td>
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.id}</a></td>
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.testCaseName}</a></td>
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.result}</a></td>
-              <td  class="pane" ><a href="/${it.build.project.getUrl()}/${it.getNumberFromHistory(failedTests.failedSince)}/TPT_Report">${failedTests.failedSince}</a></td>
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.fileName}</a></td>
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.executionConfiguration}</a></td>
-              <td  class="pane" ><a href="/${it.build.getUrl()}/TPT_Report/SecurityError">${failedTests.executionDate}</a></td>
-          </tr>
-        </j:forEach>
-      </table>
-    </j:if>
 		</l:main-panel>
 	</l:layout>
 </j:jelly>

@@ -36,7 +36,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.xml.sax.SAXException;
 
 import com.piketec.jenkins.plugins.tpt.Publish;
@@ -64,15 +63,6 @@ import hudson.tasks.Publisher;
  * @author FInfantino, PikeTec GmbH
  */
 public class TPTReportPublisher extends Notifier {
-
-  /**
-   * Creates a TPTReportPublisher
-   */
-  @DataBoundConstructor
-  public TPTReportPublisher() {
-    // allow to display HTML files
-    TPTGlobalConfiguration.setSecurity();
-  }
 
   /**
    * Creates the directories on the build directory, loops over all JenkinsConfigurations and
@@ -157,7 +147,7 @@ public class TPTReportPublisher extends Notifier {
     TPTReportPage lastTptFilesAction =
         (lastSuccBuild == null) ? null : lastSuccBuild.getAction(TPTReportPage.class);
     if (lastTptFilesAction != null) {
-      HashMap<FailedTestKey, TPTTestCase> prevFailed = new HashMap<FailedTestKey, TPTTestCase>();
+      HashMap<FailedTestKey, TPTTestCase> prevFailed = new HashMap<>();
       for (TPTTestCase tptTestCase : lastTptFilesAction.getFailedTests()) {
         prevFailed.put(new FailedTestKey(tptTestCase.getId(), tptTestCase.getFileName(),
             tptTestCase.getExecutionConfiguration(), tptTestCase.getPlatform()), tptTestCase);
@@ -185,7 +175,7 @@ public class TPTReportPublisher extends Notifier {
 
   private boolean checkForTestCaseInformation(FilePath testDataDir)
       throws IOException, InterruptedException {
-    Collection<FilePath> files = new HashSet<FilePath>();
+    Collection<FilePath> files = new HashSet<>();
     Publish.find(testDataDir, "testcase_information.xml", files);
     boolean containsTestcaseInformation = false;
     FilePath summaryXMl = new FilePath(testDataDir, "test_summary.xml");

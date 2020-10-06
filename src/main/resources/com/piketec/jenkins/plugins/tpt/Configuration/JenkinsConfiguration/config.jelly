@@ -31,16 +31,6 @@
    
 </l:header>
 
-  
-  
-    <j:invokeStatic className="com.piketec.jenkins.plugins.tpt.publisher.TPTGlobalConfiguration" method="isTrustSlavesAndUsers" var="trustSlaves"/>
-  <j:if test="${!trustSlaves}">
-  <p style="color:#8B8B00">Please "Trust Slaves and User to modify Jenkins workspace" under <a href="${it.rootUrl}/configure">Jenkins Configuration</a></p>
-  </j:if>
-  
-  
-    
-
 	<!-- exentds repeatable part in ValidationSuite jelly -->
 	<f:entry field="enableTest" title="Enable test">
 		<f:checkbox value="${instance.enableTest}" default="${descriptor.defaultEnableTest}" />

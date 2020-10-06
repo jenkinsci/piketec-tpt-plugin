@@ -253,14 +253,6 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
   }
 
   /**
-   * @return Has the user activated the "trust slaves and users" check box in the global Jenkins
-   *         configurations
-   */
-  public boolean isTrustSlavesAndUsers() {
-    return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
-  }
-
-  /**
    * Used to calculate the actual build number of the 'failed since' build, failed since is always
    * &gt;=1
    * 
@@ -290,9 +282,6 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
    * @return an new Action that is going to be host
    */
   public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
-    if (name.equals("SecurityError")) {
-      return new SecurityErrorAction();
-    }
     if (name.equals("Images")) {
       return new InvisibleActionHostingImages(build);
     }

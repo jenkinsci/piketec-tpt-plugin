@@ -89,14 +89,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
   }
 
   /**
-   * @return true if the security has been set. (By security is meant the "trust slaves and user to
-   *         modify the jenkins workspace option).
-   */
-  public boolean isTrustSlavesAndUsers() {
-    return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
-  }
-
-  /**
    * Gets the last successful build and gets the data (passed, inconclusive, error and failed tests)
    * from there. We need this method although we have the setHistoryIterativ method because in the
    * setHistoryIterativ method the call actualBuild.getPreviousBuildsOverThreshold doesnt get the
@@ -354,7 +346,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     if (actualBuild == null) {
       return;
     }
-    TPTGlobalConfiguration.setSecurity();
     generateJson();
     File buildDir = actualBuild.getRootDir();
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
