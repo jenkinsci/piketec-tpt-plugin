@@ -388,11 +388,12 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     }
     // replace the place holder "toReplace" by actual json script
     String jsonScript = getResultArray(historyData);
-    String newIndexHTMLWithJson = FileUtils.readFileToString(oldIndexHTML);
+    String newIndexHTMLWithJson =
+        FileUtils.readFileToString(oldIndexHTML, Charset.forName("UTF-8"));
     newIndexHTMLWithJson = newIndexHTMLWithJson.replace("toReplace", jsonScript);
     File newIndexHTML = new File(
         buildDir.getAbsolutePath() + File.separator + "TrendGraph" + File.separator + "index.html");
-    FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson);
+    FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson, Charset.forName("UTF-8"));
 
   }
 

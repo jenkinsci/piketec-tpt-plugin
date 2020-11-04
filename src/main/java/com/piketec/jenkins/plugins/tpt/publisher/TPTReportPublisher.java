@@ -186,12 +186,9 @@ public class TPTReportPublisher extends Notifier {
     boolean containsTestcaseInformation = false;
     FilePath summaryXMl = new FilePath(testDataDir, "test_summary.xml");
     if (summaryXMl.exists()) {
-      InputStream inputStream = summaryXMl.read();
-      try {
+      try (InputStream inputStream = summaryXMl.read()) {
         String result = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         containsTestcaseInformation = result.contains("TestcaseInformation");
-      } finally {
-        IOUtils.closeQuietly(inputStream);
       }
     }
     // File is only corrupt, when there arent any testcase_information and it does not contain any
@@ -220,11 +217,8 @@ public class TPTReportPublisher extends Notifier {
       SAXParser saxParser = saxParserFactory.newSAXParser();
       TPTReportSAXHandler handler = new TPTReportSAXHandler(tptFile, failedTests, reportDirOnRemote,
           executionConfiguration, isFileCorrupt, logger);
-      InputStream inputStream = xmlFile.read();
-      try {
+      try (InputStream inputStream = xmlFile.read()) {
         saxParser.parse(inputStream, handler);
-      } finally {
-        IOUtils.closeQuietly(inputStream);
       }
     } catch (ParserConfigurationException | SAXException | IOException e) {
       logger.error(e.getMessage());

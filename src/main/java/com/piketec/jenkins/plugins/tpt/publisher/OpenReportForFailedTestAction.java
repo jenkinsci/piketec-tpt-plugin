@@ -22,6 +22,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import javax.servlet.ServletException;
 
@@ -146,11 +147,12 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
 
     File indexFromFile = new File(pathToHtml(), "index.html");
 
-    String indexFromFileAsString = FileUtils.readFileToString(indexFromFile);
+    String indexFromFileAsString =
+        FileUtils.readFileToString(indexFromFile, Charset.forName("UTF-8"));
     String failedHtmlAsString = indexFromFileAsString.replace("overview.html", reportFile);
     File failedHTML = new File(pathToHtml(), "failedTest.html");
 
-    FileUtils.writeStringToFile(failedHTML, failedHtmlAsString);
+    FileUtils.writeStringToFile(failedHTML, failedHtmlAsString, Charset.forName("UTF-8"));
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml()),
         "TPT Report", "clipboard.png", false);
 

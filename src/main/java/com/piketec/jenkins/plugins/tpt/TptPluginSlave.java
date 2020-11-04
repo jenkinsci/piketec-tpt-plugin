@@ -125,9 +125,14 @@ public class TptPluginSlave extends Builder {
     EnvVars environment = Utils.getEnvironment(build, launcher, logger);
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
     for (int i = 0; i < expandedExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(build.getWorkspace(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
     }
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {

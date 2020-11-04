@@ -141,7 +141,12 @@ class TptPluginMasterJobExecutor {
         new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
     boolean success = true;
     // We delete the JUnit results before iterating over the jenkinsConfigs
-    removeJUnitData();
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
+    removeJUnitData(workspace);
     try {
       for (JenkinsConfiguration ec : executionConfigs) {
         success &= executeOneConfig(ec, tptApiAccess);
@@ -157,9 +162,9 @@ class TptPluginMasterJobExecutor {
     return success;
   }
 
-  private void removeJUnitData() throws InterruptedException {
+  private void removeJUnitData(FilePath workspace) throws InterruptedException {
     if (!StringUtils.isBlank(jUnitXmlPath)) {
-      FilePath path = new FilePath(build.getWorkspace(), jUnitXmlPath);
+      FilePath path = new FilePath(workspace, jUnitXmlPath);
       logger.info("Create and/or clear JUnit XML directory " + path.getRemote());
       try {
         path.mkdirs();
@@ -188,11 +193,14 @@ class TptPluginMasterJobExecutor {
     // Get necessery paths the user added in the job configuration:
     // These paths are resolved to work on the master.
     Collection<String> testCases = null;
-    FilePath testDataPath =
-        new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(resolvedConfig));
-    FilePath reportPath =
-        new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(resolvedConfig));
-    FilePath tptFilePath = new FilePath(build.getWorkspace(), resolvedConfig.getTptFile());
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
+    FilePath testDataPath = new FilePath(workspace, Utils.getGeneratedTestDataDir(resolvedConfig));
+    FilePath reportPath = new FilePath(workspace, Utils.getGeneratedReportDir(resolvedConfig));
+    FilePath tptFilePath = new FilePath(workspace, resolvedConfig.getTptFile());
 
     try {
       logger.info("Create and/or clean test data directory \"" + testDataPath.getRemote() + "\"");
@@ -234,7 +242,7 @@ class TptPluginMasterJobExecutor {
     ArrayList<List<String>> subTestSets = getSubTestSets(testCases, slaveJobSize, remainer);
     // start one job for every test set
     Job slaveJob = null;
-    Jenkins jenkinsInstance = Jenkins.getInstance();
+    Jenkins jenkinsInstance = Jenkins.getInstanceOrNull();
     if (jenkinsInstance == null) {
       logger.error("No jenkins instance found");
       return false;
@@ -289,8 +297,8 @@ class TptPluginMasterJobExecutor {
     try {
       int foundTestData = 0;
       if (enableJunit) {
-        foundTestData = Utils.publishAsJUnitResults(build.getWorkspace(), resolvedConfig,
-            testDataPath, jUnitXmlPath, jUnitLogLevel, logger);
+        foundTestData = Utils.publishAsJUnitResults(workspace, resolvedConfig, testDataPath,
+            jUnitXmlPath, jUnitLogLevel, logger);
       } else {
         foundTestData = Publish.getTestcases(testDataPath, logger).size();
       }

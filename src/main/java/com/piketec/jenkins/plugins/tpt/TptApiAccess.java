@@ -10,6 +10,7 @@ import com.piketec.jenkins.plugins.tpt.api.callables.RunOverviewReportCallable;
 
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.remoting.VirtualChannel;
 
 /**
  * Since the TPT API should be used only on the localshost and not via a remote connection, all API
@@ -79,7 +80,12 @@ public class TptApiAccess {
             exePaths, startUpWaitTime, tptFilePath, executionConfigName, testSet);
     Collection<String> testCases = null;
     try {
-      testCases = launcher.getChannel().call(callable);
+      VirtualChannel channel = launcher.getChannel();
+      if (channel == null) {
+        logger.error("Getting test cases did not work: Agent does not support virtual channels.");
+        return testCases;
+      }
+      testCases = channel.call(callable);
     } catch (IOException e) {
       logger.error("Getting test cases did not work: " + e.getMessage());
     }
@@ -112,7 +118,13 @@ public class TptApiAccess {
         executionConfigName, testSet, reportPath, testDataPath);
     Boolean worked = false;
     try {
-      worked = launcher.getChannel().call(callable);
+      VirtualChannel channel = launcher.getChannel();
+      if (channel == null) {
+        logger.error(
+            "Running overview report did not work: Agent does not support virtual channels.");
+        return worked;
+      }
+      worked = channel.call(callable);
     } catch (IOException e) {
       logger.error("Running overview report did not work: " + e.getMessage());
     }
@@ -147,9 +159,15 @@ public class TptApiAccess {
         slaveReportPath, slaveDataPath, executionConfigName, testSetList, testSetName);
     Boolean worked = false;
     try {
-      worked = launcher.getChannel().call(callable);
+      VirtualChannel channel = launcher.getChannel();
+      if (channel == null) {
+        logger.error(
+            "Executing tests on agent did not work: Agent does not support virtual channels.");
+        return worked;
+      }
+      worked = channel.call(callable);
     } catch (IOException e) {
-      logger.error("Executing tests on slave did not work: " + e.getMessage());
+      logger.error("Executing tests on agent did not work: " + e.getMessage());
     }
     return worked;
   }
