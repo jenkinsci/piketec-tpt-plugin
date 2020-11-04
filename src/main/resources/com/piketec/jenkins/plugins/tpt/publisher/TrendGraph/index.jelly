@@ -100,9 +100,9 @@
         }
 			</style>
 			<h1>Trend of Builds</h1>
-			<iframe sandbox="allow-scripts allow-popups allow-forms" id="knowledgeFrame" width="1650" height="400"
+			<!-- iframe sandbox="allow-scripts allow-popups allow-forms" id="knowledgeFrame" width="1650" height="400"
 				frameborder="0"
-				src="/${it.project.getUrl()}/TPTtrendResults/index.html"></iframe>
+				src="/${it.project.getUrl()}/TPTtrendResults/index.html"></iframe -->
 			<h2>Last successfully Builds</h2>
 			<table class="pane sortable bigtable stripped" id="tests">
 				<tr>
@@ -114,11 +114,11 @@
 				</tr>
 				<j:forEach items="${it.historyData}" var="configuration">
 					<tr>
-						<td class="pane" ><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.buildNummer}</a></td>
-						<td class="pane" ><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.passed}</a></td>
-						<td class="pane" ><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.inconclusive}</a></td>
-						<td class="pane"><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.error}</a></td>
-						<td class="pane"><a href="/${it.project.getUrl()}/${configuration.buildNummer}/TPT_Report">${configuration.failed}</a></td>
+						<td class="pane"><a href="${rootURL}/${it.project.getUrl()}${configuration.buildNummer}/TPT_Report">${configuration.buildNummer}</a></td>
+						<td class="pane"><a href="${rootURL}/${it.project.getUrl()}${configuration.buildNummer}/TPT_Report">${configuration.passed}</a></td>
+						<td class="pane"><a href="${rootURL}/${it.project.getUrl()}${configuration.buildNummer}/TPT_Report">${configuration.inconclusive}</a></td>
+						<td class="pane"><a href="${rootURL}/${it.project.getUrl()}${configuration.buildNummer}/TPT_Report">${configuration.error}</a></td>
+						<td class="pane"><a href="${rootURL}/${it.project.getUrl()}${configuration.buildNummer}/TPT_Report">${configuration.failed}</a></td>
 					</tr>
 				</j:forEach>
 			</table>

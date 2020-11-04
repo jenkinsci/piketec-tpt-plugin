@@ -36,6 +36,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.xml.sax.SAXException;
 
 import com.piketec.jenkins.plugins.tpt.Publish;
@@ -63,6 +64,11 @@ import hudson.tasks.Publisher;
  * @author FInfantino, PikeTec GmbH
  */
 public class TPTReportPublisher extends Notifier {
+
+  @DataBoundConstructor
+  public TPTReportPublisher() {
+    // NOP
+  }
 
   /**
    * Creates the directories on the build directory, loops over all JenkinsConfigurations and

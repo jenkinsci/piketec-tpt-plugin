@@ -20,6 +20,7 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:t="/lib/hudson" xmlns:test="/lib/hudson/test" >
+<!--
    <style>
    iframe{
    align: right !important;
@@ -30,10 +31,11 @@
     align : left !important;
    }
    </style>
-
+-->
 <!-- Override Parent Div the floating by error display -->
-
+<!--
   <j:if test="${it.getLastSuccessfulBuild() != null}">
     <iframe  id="knowledgeFrame" width="1650" height="410" frameborder="0" src="/${it.getUrl()}/TPTtrendResults/index.html" ></iframe>
   </j:if>
+-->
 </j:jelly>

@@ -22,6 +22,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -313,6 +314,8 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    *         previous builds.
    */
   public ArrayList<ResultData> getHistoryData() {
+    actualBuild = this.project.getLastSuccessfulBuild();
+    refreshTrendGraph();
     return this.historyData;
   }
 
