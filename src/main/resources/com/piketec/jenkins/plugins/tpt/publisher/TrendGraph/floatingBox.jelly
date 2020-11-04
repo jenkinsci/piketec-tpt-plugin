@@ -20,6 +20,7 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:t="/lib/hudson" xmlns:test="/lib/hudson/test" >
+<!--
    <style>
    iframe{
    align: right !important;
@@ -30,18 +31,11 @@
     align : left !important;
    }
    </style>
-
+-->
 <!-- Override Parent Div the floating by error display -->
-
-<j:if test="${it.getLastSuccessfulBuild() != null}">
-  <j:invokeStatic className="com.piketec.jenkins.plugins.tpt.publisher.TPTGlobalConfiguration" method="isTrustSlavesAndUsers" var="trustSlaves"/>
-  <j:if test="${!trustSlaves}">
-  <div id="error" >
-   <h2 style="color:#CCCC00 ">Cannot display the TPT trend graph. Please "Trust Slaves and User to modify Jenkins workspace" under <a href="${it.rootUrl}/configure">Jenkins Configuration</a></h2>
-  </div>
+<!--
+  <j:if test="${it.getLastSuccessfulBuild() != null}">
+    <iframe  id="knowledgeFrame" width="1650" height="410" frameborder="0" src="/${it.getUrl()}/TPTtrendResults/index.html" ></iframe>
   </j:if>
-  <j:if test="${trustSlaves}">
-  <iframe  id="knowledgeFrame" width="1650" height="410" frameborder="0" src="/${it.getUrl()}/TPTtrendResults/index.html" ></iframe>
-  </j:if>
- </j:if>
+-->
 </j:jelly>

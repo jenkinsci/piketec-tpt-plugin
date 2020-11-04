@@ -142,7 +142,7 @@ public class TptPlugin extends Builder {
     this.tptBindingName = tptBindingName;
     this.tptPort = tptPort;
     this.tptStartUpWaitTime = tptStartUpWaitTime;
-    this.executionConfiguration = new ArrayList<JenkinsConfiguration>();
+    this.executionConfiguration = new ArrayList<>();
     if (executionConfiguration != null) {
       this.executionConfiguration.addAll(executionConfiguration);
     }
@@ -310,7 +310,7 @@ public class TptPlugin extends Builder {
    * @return if all Ids are unique as they should be
    */
   private boolean areIdsUnique(AbstractBuild< ? , ? > build) {
-    Set<String> ids = new HashSet<String>();
+    Set<String> ids = new HashSet<>();
     List buildSteps = ((Project)build.getParent()).getBuilders();
     for (Object object : buildSteps) {
       if (object instanceof TptPlugin) {
@@ -361,9 +361,14 @@ public class TptPlugin extends Builder {
     // split and expand list of ptahs to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
     for (int i = 0; i < expandedStringExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(build.getWorkspace(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
     }
     // expand arguments and report
     String expandedArguments = environment.expand(this.arguments);
@@ -402,9 +407,14 @@ public class TptPlugin extends Builder {
     // split and expand list of paths to TPT installations
     String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
     for (int i = 0; i < expandedStringExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(build.getWorkspace(), environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
     }
     String jUnitXmlPath = environment.expand(jUnitreport);
     // expand and parse TPT RMI port

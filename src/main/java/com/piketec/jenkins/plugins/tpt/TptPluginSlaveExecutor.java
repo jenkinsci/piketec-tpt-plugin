@@ -132,12 +132,14 @@ class TptPluginSlaveExecutor {
     TptApiAccess tptApiAccess =
         new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
 
-    FilePath slaveReportPath =
-        new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(jenkinsConfig));
-    FilePath slaveDataPath =
-        new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(jenkinsConfig));
-    FilePath tptFilePath = new FilePath(build.getWorkspace(), jenkinsConfig.getTptFile());
     FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
+    FilePath slaveReportPath = new FilePath(workspace, Utils.getGeneratedReportDir(jenkinsConfig));
+    FilePath slaveDataPath = new FilePath(workspace, Utils.getGeneratedTestDataDir(jenkinsConfig));
+    FilePath tptFilePath = new FilePath(workspace, jenkinsConfig.getTptFile());
 
     // Register cleanup task that is called in the end to close remote TPT Project
     CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort,

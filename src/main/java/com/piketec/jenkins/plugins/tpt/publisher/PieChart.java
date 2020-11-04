@@ -106,7 +106,7 @@ class PieChart {
   public PieChart(List<Segment> segments, int fractionalDigits, boolean showTotalInLegend)
       throws MalformedURLException, IOException {
     this(segments, null, fractionalDigits, showTotalInLegend, false, null);
-    Jenkins jenkinsInstance = Jenkins.getInstance();
+    Jenkins jenkinsInstance = Jenkins.get();
     if (jenkinsInstance == null) {
       throw new IOException("No Jenkins instance found.");
     }

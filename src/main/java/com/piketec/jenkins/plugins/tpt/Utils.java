@@ -127,7 +127,7 @@ public class Utils {
    *           If no Jenkins isntance could be found
    */
   public static File getTptPluginRootDir() throws IOException {
-    Jenkins jenkinsInstance = Jenkins.getInstance();
+    Jenkins jenkinsInstance = Jenkins.get();
     if (jenkinsInstance == null) {
       throw new IOException("No Jenkins instance found.");
     }

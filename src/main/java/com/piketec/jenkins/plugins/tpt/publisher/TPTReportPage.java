@@ -25,6 +25,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -32,6 +33,9 @@ import javax.imageio.ImageIO;
 import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
+
+import com.google.common.io.Files;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Result;
@@ -253,14 +257,6 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
   }
 
   /**
-   * @return Has the user activated the "trust slaves and users" check box in the global Jenkins
-   *         configurations
-   */
-  public boolean isTrustSlavesAndUsers() {
-    return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
-  }
-
-  /**
    * Used to calculate the actual build number of the 'failed since' build, failed since is always
    * &gt;=1
    * 
@@ -277,6 +273,20 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     return ((Run< ? , ? >)previousBuilds.get(previousBuilds.size() - 1)).getNumber();
   }
 
+  @JavaScriptMethod
+  public String getPieChart() {
+    File pieChartFile = getPieChartFile();
+    try {
+      if (!pieChartFile.exists()) {
+        createGraph();
+      }
+      return "data:image/png;base64,"
+          + Base64.getMimeEncoder().encodeToString(Files.toByteArray(pieChartFile));
+    } catch (IOException e) {
+      return "";
+    }
+  }
+
   /**
    * Host images, HTML report and failed report
    * 
@@ -290,9 +300,6 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
    * @return an new Action that is going to be host
    */
   public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
-    if (name.equals("SecurityError")) {
-      return new SecurityErrorAction();
-    }
     if (name.equals("Images")) {
       return new InvisibleActionHostingImages(build);
     }
@@ -331,8 +338,7 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     list.add(error);
     list.add(failed);
     PieChart pieChart = new PieChart(list, 0, true);
-    File output = new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT"
-        + File.separator + "Images" + File.separator + "pieChart.png");
+    File output = getPieChartFile();
     BufferedImage image = pieChart.render(150);
     if (!output.exists() && !output.mkdirs()) {
       throw new IOException("Could not create directory " + output.getAbsolutePath());
@@ -341,6 +347,11 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
       throw new IOException("Could not create pie chart");
     }
 
+  }
+
+  private File getPieChartFile() {
+    return new File(build.getRootDir().getAbsolutePath(),
+        "Piketec-TPT" + File.separator + "Images" + File.separator + "pieChart.png");
   }
 
 }

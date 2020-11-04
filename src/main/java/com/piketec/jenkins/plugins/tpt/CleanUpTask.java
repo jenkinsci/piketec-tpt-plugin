@@ -32,6 +32,7 @@ import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.Computer;
+import hudson.remoting.VirtualChannel;
 
 /**
  * Task to execute after executing a builder. Usually done in a finally block
@@ -79,7 +80,13 @@ public class CleanUpTask {
     Computer computer = cleanUpCallable.getFilePath().toComputer();
     String agentString = computer == null ? "" : " on Agent " + computer.getName();
     try {
-      success = launcher.getChannel().call(cleanUpCallable);
+      VirtualChannel channel = launcher.getChannel();
+      if (channel == null) {
+        logger.error("Cannot cleanup " + cleanUpCallable.getFilePath().getRemote() + agentString
+            + ": Agent does not support vitual channels.");
+        return false;
+      }
+      success = channel.call(cleanUpCallable);
     } catch (RemoteException e) {
       logger.error("RemoteException while cleaning " + cleanUpCallable.getFilePath().getRemote()
           + agentString + ": " + e.getMessage());

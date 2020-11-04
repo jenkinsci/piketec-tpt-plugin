@@ -107,6 +107,10 @@ class TptPluginSingleJobExecutor {
   boolean execute() throws InterruptedException {
     boolean success = true;
     FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      logger.error("No workspace available");
+      return false;
+    }
     // use first found (existing) TPT installation
     FilePath exeFile = null;
     for (FilePath f : exePaths) {
@@ -131,10 +135,9 @@ class TptPluginSingleJobExecutor {
         // Absolute paths are recognized as such, relative paths are resolved depending on the
         // workspace directory,
         // or the unique sub folder created in the workspace for the current job.
-        FilePath testDataPath =
-            new FilePath(build.getWorkspace(), Utils.getGeneratedTestDataDir(ec));
-        FilePath reportPath = new FilePath(build.getWorkspace(), Utils.getGeneratedReportDir(ec));
-        FilePath tptFilePath = new FilePath(build.getWorkspace(), ec.getTptFile());
+        FilePath testDataPath = new FilePath(workspace, Utils.getGeneratedTestDataDir(ec));
+        FilePath reportPath = new FilePath(workspace, Utils.getGeneratedReportDir(ec));
+        FilePath tptFilePath = new FilePath(workspace, ec.getTptFile());
         String configurationName = ec.getConfiguration();
         String tesSet = ec.getTestSet();
         logger.info("*** Running TPT-File \"" + tptFilePath + //

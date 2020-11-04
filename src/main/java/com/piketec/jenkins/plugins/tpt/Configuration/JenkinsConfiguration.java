@@ -143,7 +143,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    */
   @Override
   public Descriptor<JenkinsConfiguration> getDescriptor() {
-    Jenkins instance = Jenkins.getInstance();
+    Jenkins instance = Jenkins.getInstanceOrNull();
     if (instance == null) {
       return null;
     }

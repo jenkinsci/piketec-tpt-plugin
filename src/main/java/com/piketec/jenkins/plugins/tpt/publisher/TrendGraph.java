@@ -22,6 +22,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,14 +87,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     this.project = project;
     initBuildAndTestCaseResultCounts();
     setHistoryIterativ();
-  }
-
-  /**
-   * @return true if the security has been set. (By security is meant the "trust slaves and user to
-   *         modify the jenkins workspace option).
-   */
-  public boolean isTrustSlavesAndUsers() {
-    return TPTGlobalConfiguration.DescriptorImpl.trustSlavesAndUsers;
   }
 
   /**
@@ -321,6 +314,8 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    *         previous builds.
    */
   public ArrayList<ResultData> getHistoryData() {
+    actualBuild = this.project.getLastSuccessfulBuild();
+    refreshTrendGraph();
     return this.historyData;
   }
 
@@ -354,7 +349,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     if (actualBuild == null) {
       return;
     }
-    TPTGlobalConfiguration.setSecurity();
     generateJson();
     File buildDir = actualBuild.getRootDir();
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
@@ -394,11 +388,12 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     }
     // replace the place holder "toReplace" by actual json script
     String jsonScript = getResultArray(historyData);
-    String newIndexHTMLWithJson = FileUtils.readFileToString(oldIndexHTML);
+    String newIndexHTMLWithJson =
+        FileUtils.readFileToString(oldIndexHTML, Charset.forName("UTF-8"));
     newIndexHTMLWithJson = newIndexHTMLWithJson.replace("toReplace", jsonScript);
     File newIndexHTML = new File(
         buildDir.getAbsolutePath() + File.separator + "TrendGraph" + File.separator + "index.html");
-    FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson);
+    FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson, Charset.forName("UTF-8"));
 
   }
 
