@@ -1,1 +1,1 @@
-mvn findbugs:findbugs findbugs:gui -Dfindbugs.excludeFilterFile=src/findbugs/excludesFilter.xml
+mvn spotbugs:spotbugs spotbugs:gui -Dfindbugs.excludeFilterFile=src/findbugs/excludesFilter.xml

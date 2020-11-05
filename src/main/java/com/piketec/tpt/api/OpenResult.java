@@ -23,6 +23,8 @@ package com.piketec.tpt.api;
 import java.io.Serializable;
 import java.util.List;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * This object represents the result of an attempt to open a TPT project. It contains the project as
  * well as any log messages occurred during the opening of the project.
@@ -41,6 +43,8 @@ public class OpenResult implements Serializable {
   /**
    * A handle to the open TPT project.
    */
+  @SuppressFBWarnings(value = "SE_BAD_FIELD",
+    justification = "Its a remote object that will be serialized by RMI")
   private final Project project;
 
   /**
