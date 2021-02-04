@@ -70,17 +70,17 @@ public final class Publish {
     XmlStreamWriter xmlPub = null;
 
     try {
-      String classname = FilenameUtils.getBaseName(jenkinsConfig.getTptFile());
+      String tptFileName = FilenameUtils.getBaseName(jenkinsConfig.getTptFile());
       FilePath jUnitXMLFile =
           new FilePath(jUnitOutputDir, jenkinsConfig.getId().replace(" ", "_") + ".xml");
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(jUnitXMLFile);
-      xmlPub.writeTestsuite(classname);
+      xmlPub.writeTestsuite(tptFileName);
       List<Testcase> testdata = getTestcases(testDataDir, logger);
       logger.info("Found " + testdata.size() + " test results.");
       for (Testcase tc : testdata) {
         if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
-          xmlPub.writeTestcase(classname, tc.getQualifiedName(), tc.getExecDuration());
+          xmlPub.writeTestcase(tptFileName, tc);
         } else {
           StringBuilder log = new StringBuilder();
           for (LogEntry entry : tc.getLogEntries(logLevel)) {
@@ -89,8 +89,7 @@ public final class Publish {
             }
             log.append('[').append(entry.level.name()).append("] ").append(entry.message);
           }
-          xmlPub.writeTestcaseError(classname, tc.getQualifiedName(), tc.getExecDuration(),
-              log.toString());
+          xmlPub.writeTestcaseError(tptFileName, tc, log.toString());
         }
       }
       return testdata.size();

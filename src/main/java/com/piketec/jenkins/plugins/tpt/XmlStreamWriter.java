@@ -80,8 +80,8 @@ class XmlStreamWriter {
   /**
    * Used by Publish.publishJUnitResults , it writes a test case in the XML
    * 
-   * @param classname
-   *          the JUnit class name
+   * @param tptFileName
+   *          the name of the TPT file the test originates from
    * @param testname
    *          the name of the test
    * @param timeMillis
@@ -89,12 +89,11 @@ class XmlStreamWriter {
    * @throws XMLStreamException
    *           If the XML cannot be created
    */
-  public void writeTestcase(String classname, String testname, String timeMillis)
-      throws XMLStreamException {
+  public void writeTestcase(String tptFileName, Testcase tc) throws XMLStreamException {
     writer.writeStartElement("testcase");
-    writer.writeAttribute("classname", classname);
-    writer.writeAttribute("name", testname);
-    writer.writeAttribute("time", millis2secs(timeMillis));
+    writer.writeAttribute("classname", getClassName(tptFileName, tc));
+    writer.writeAttribute("name", tc.getQualifiedName());
+    writer.writeAttribute("time", millis2secs(tc.getExecDuration()));
     writer.writeEndElement();
     writer.flush();
   }
@@ -102,8 +101,8 @@ class XmlStreamWriter {
   /**
    * Used by Publish.publishJUnitResults , it writes an error in the XML
    * 
-   * @param classname
-   *          the JUnit class name
+   * @param tptFileName
+   *          the name of the TPT file the test originates from
    * @param testname
    *          the name of the test
    * @param timeMillis
@@ -113,18 +112,40 @@ class XmlStreamWriter {
    * @throws XMLStreamException
    *           If the XML cannot be created
    */
-  public void writeTestcaseError(String classname, String testname, String timeMillis, String error)
+  public void writeTestcaseError(String tptFileName, Testcase tc, String error)
       throws XMLStreamException {
     writer.writeStartElement("testcase");
-    writer.writeAttribute("classname", classname);
-    writer.writeAttribute("name", testname);
-    writer.writeAttribute("time", millis2secs(timeMillis));
+    writer.writeAttribute("classname", getClassName(tptFileName, tc));
+    writer.writeAttribute("name", tc.getQualifiedName());
+    writer.writeAttribute("time", millis2secs(tc.getExecDuration()));
     writer.writeStartElement("error");
     writer.writeAttribute("message", error);
     writer.writeEndElement();
     writer.flush();
     writer.writeEndElement();
     writer.flush();
+  }
+
+  /**
+   * Get the full name of a test cases. The pattern is
+   * $executionconfigname$.$platformname$.$testcasename$_$testcase-id$. If execution configuration
+   * name or platform name are unavailable for some reaseon they are skipped.
+   * 
+   * @param tc
+   *          The test case to get the full for
+   * @return The full name
+   */
+  private String getClassName(String filename, Testcase tc) {
+    StringBuilder testname = new StringBuilder(filename);
+    String executionConfigName = tc.getExecutionConfigName();
+    if (executionConfigName != null && !executionConfigName.isEmpty()) {
+      testname.append('.').append(tc.getExecutionConfigName());
+    }
+    String platformName = tc.getPlatformName();
+    if (platformName != null && !platformName.isEmpty()) {
+      testname.append('.').append(tc.getPlatformName());
+    }
+    return testname.toString();
   }
 
   /**

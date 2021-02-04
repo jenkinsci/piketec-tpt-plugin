@@ -95,6 +95,8 @@ public class TestcaseParser extends DefaultHandler {
     if (elementName.equalsIgnoreCase("TestcaseInformation")) {
       ti = new Testcase();
       ti.setName(attributes.getValue("ScenarioName"));
+      ti.setExecutionConfigName(attributes.getValue("ExecutionConfigName"));
+      ti.setPlatformName(attributes.getValue("PlatformName"));
       try {
         ti.setID(Integer.parseInt(attributes.getValue("ScenarioId")));
       } catch (NumberFormatException e) {

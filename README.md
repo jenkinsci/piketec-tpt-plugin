@@ -8,6 +8,9 @@ Testing)](https://piketec.com/tpt/) via Jenkins. A XML file
 can be generated in JUnit format for the reporting of test results. You
 can also display the TPT test report in Jenkins.  
 
+# Change log
+[CHANGELOG.md on GitHub](.https://github.com/jenkinsci/piketec-tpt-plugin/blob/master/CHANGELOG.md)
+
 # Usage
 
 We will give you a short overview here. If you need a more detailed

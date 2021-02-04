@@ -33,6 +33,10 @@ import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
  */
 public class Testcase {
 
+  private String executionConfigName;
+
+  private String platformName;
+
   private String name;
 
   private int id;
@@ -49,12 +53,46 @@ public class Testcase {
     log = new TptLog();
     execDuration = "0";
     result = "";
+    executionConfigName = "";
+    platformName = "";
     name = "";
     id = 0;
   }
 
   /**
-   * @return name ,get the name of the testcase
+   * @return The name of the execution config the test was executed with
+   */
+  public String getExecutionConfigName() {
+    return executionConfigName;
+  }
+
+  /**
+   * @param executionConfigName
+   *          set the name of the execution config the test was executed with
+   */
+  public void setExecutionConfigName(String executionConfigName) {
+    this.executionConfigName = executionConfigName;
+  }
+
+  /**
+   * @return The name of the platform the test was executed with. When a platform was used multiple
+   *         times in an execution config the index is appended.
+   */
+  public String getPlatformName() {
+    return platformName;
+  }
+
+  /**
+   * @param platformName
+   *          Set the name of the platform the test was executed with. When a platform was used
+   *          multiple times in an execution config the index is appended.
+   */
+  public void setPlatformName(String platformName) {
+    this.platformName = platformName;
+  }
+
+  /**
+   * @return name get the name of the testcase
    * 
    */
   String getName() {
@@ -63,7 +101,7 @@ public class Testcase {
 
   /**
    * @param name
-   *          ,set the name of the testcase while parsing
+   *          set the name of the testcase while parsing
    * 
    */
   void setName(String name) {
@@ -71,7 +109,7 @@ public class Testcase {
   }
 
   /**
-   * @return id ,get the id of the testcase
+   * @return id get the id of the testcase
    * 
    */
   int getID() {
@@ -80,7 +118,7 @@ public class Testcase {
 
   /**
    * @param id
-   *          ,set the id of the testcase while parsing
+   *          set the id of the testcase while parsing
    * 
    */
   void setID(int id) {
@@ -89,7 +127,7 @@ public class Testcase {
 
   /**
    * @param date
-   *          ,set the date of the testcase while parsing
+   *          set the date of the testcase while parsing
    * 
    */
   void setExecDate(Date execDate) {
@@ -97,7 +135,7 @@ public class Testcase {
   }
 
   /**
-   * @return date ,get the date of execution from the testcase
+   * @return date get the date of execution from the testcase
    */
   Date getExecDate() {
     return execDate;
