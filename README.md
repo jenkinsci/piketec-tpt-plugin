@@ -9,7 +9,7 @@ can be generated in JUnit format for the reporting of test results. You
 can also display the TPT test report in Jenkins.  
 
 # Change log
-[CHANGELOG.md on GitHub](.https://github.com/jenkinsci/piketec-tpt-plugin/blob/master/CHANGELOG.md)
+[CHANGELOG.md on GitHub](https://github.com/jenkinsci/piketec-tpt-plugin/blob/master/CHANGELOG.md)
 
 # Usage
 
