@@ -3,6 +3,9 @@ Release History
 ## Version 9.2
 
 -   Added pipeline support
+-   Fixed the behavior in of the setting "Number of slave jobs" for values less than 1 in
+    master slave mode. It will now start a job for every test case as mentionend in the
+    help.
 
 ## Version 9.1
 

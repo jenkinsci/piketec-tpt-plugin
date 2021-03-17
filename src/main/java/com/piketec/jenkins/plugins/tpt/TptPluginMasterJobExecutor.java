@@ -244,11 +244,11 @@ class TptPluginMasterJobExecutor {
     // create test sets for slave jobs
     int slaveJobSize;
     int remainer;
-    if (slaveJobCount > 1) {
+    if (slaveJobCount >= 1) {
       slaveJobSize = testCases.size() / slaveJobCount;
       remainer = testCases.size() % slaveJobCount;
     } else {
-      slaveJobSize = testCases.size();
+      slaveJobSize = 1;
       remainer = 0;
     }
     ArrayList<List<String>> subTestSets = getSubTestSets(testCases, slaveJobSize, remainer);
