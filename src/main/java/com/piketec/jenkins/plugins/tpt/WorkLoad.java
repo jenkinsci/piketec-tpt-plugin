@@ -30,7 +30,7 @@ import java.util.Queue;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 /**
  * Through this class is how the data from master to slave is passed. A way to tell the slave what
@@ -44,7 +44,7 @@ public class WorkLoad {
 
   private List<String> testCases;
 
-  private AbstractBuild< ? , ? > masterId;
+  private Run< ? , ? > masterId;
 
   private FilePath masterWorkspace;
 
@@ -69,7 +69,7 @@ public class WorkLoad {
    *          The report directory on the agent the master job is running on
    */
   public WorkLoad(JenkinsConfiguration unresolvedConfig, List<String> subTestSet,
-                  FilePath masterWorkspace, AbstractBuild< ? , ? > masterId, FilePath masterDataDir,
+                  FilePath masterWorkspace, Run< ? , ? > masterId, FilePath masterDataDir,
                   FilePath masterReportDir) {
     this.jenkinsConfig = unresolvedConfig;
     this.testCases = subTestSet;
@@ -103,7 +103,7 @@ public class WorkLoad {
   /**
    * @return the current build, used to get an unique Id
    */
-  public AbstractBuild< ? , ? > getMasterId() {
+  public Run< ? , ? > getMasterId() {
     return masterId;
   }
 
@@ -166,7 +166,7 @@ public class WorkLoad {
    * @param masterBuild
    *          the build of the master job
    */
-  public static synchronized void clean(String jobName, AbstractBuild< ? , ? > masterBuild) {
+  public static synchronized void clean(String jobName, Run< ? , ? > masterBuild) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
     if (queue == null) {
       return;

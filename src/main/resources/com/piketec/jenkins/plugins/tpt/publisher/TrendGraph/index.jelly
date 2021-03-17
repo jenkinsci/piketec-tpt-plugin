@@ -100,16 +100,13 @@
         }
 			</style>
 			<h1>Trend of Builds</h1>
-			<!-- iframe sandbox="allow-scripts allow-popups allow-forms" id="knowledgeFrame" width="1650" height="400"
-				frameborder="0"
-				src="/${it.project.getUrl()}/TPTtrendResults/index.html"></iframe -->
 			<h2>Last successfully Builds</h2>
 			<table class="pane sortable bigtable stripped" id="tests">
 				<tr>
 					<th  class="pane-header"  id="whiteT" >Build Nummer</th>
 					<th  class="pane-header"  id="passed">Passed</th>
 					<th  class="pane-header"  id="inconclused">Inconclusive</th>
-					<th   class="pane-header"  id="failed">Error</th>
+					<th  class="pane-header"  id="failed">Error</th>
 					<th  class="pane-header"  id="executionE">Failed</th>
 				</tr>
 				<j:forEach items="${it.historyData}" var="configuration">

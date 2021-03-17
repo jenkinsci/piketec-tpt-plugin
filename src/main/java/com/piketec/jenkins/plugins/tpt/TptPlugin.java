@@ -27,25 +27,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
+
 import org.apache.commons.lang.RandomStringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Project;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
@@ -55,33 +64,47 @@ import hudson.util.ListBoxModel;
  * a proper configured TptPluginSlave Build step. Master-slave execution was was introduced in the
  * year 2016.
  */
-public class TptPlugin extends Builder {
+public class TptPlugin extends Builder implements SimpleBuildStep {
 
+  public static final String RUN_BUILD = "--run build";
+
+  @CheckForNull
   private transient String exe; // deprecated, replaced by exePaths
 
-  private String exePaths;
+  @CheckForNull
+  private String exePaths = null;
 
-  private final String arguments;
+  @CheckForNull
+  private String arguments = null;
 
-  private boolean isTptMaster;
+  private boolean isTptMaster = DescriptorImpl.getDefaultIsTptMaster();
 
-  private String slaveJob;
+  @CheckForNull
+  private String slaveJob = null;
 
-  private String slaveJobCount;
+  @CheckForNull
+  private String slaveJobCount = null;
 
-  private String slaveJobTries;
+  @CheckForNull
+  private String slaveJobTries = null;
 
-  private String tptBindingName;
+  @CheckForNull
+  private String tptBindingName = null;
 
-  private String tptPort;
+  @CheckForNull
+  private String tptPort = null;
 
-  private String tptStartUpWaitTime;
+  @CheckForNull
+  private String tptStartUpWaitTime = null;
 
-  private Boolean enableJunit;
+  // null = old version where the behaviour could not be turned off -> enable in read resolve
+  private Boolean enableJunit = null;
 
+  @CheckForNull
   private String jUnitreport; // JUnit Report!
 
-  private LogLevel jUnitLogLevel;
+  @CheckForNull
+  private LogLevel jUnitLogLevel = null;
 
   private final ArrayList<JenkinsConfiguration> executionConfiguration;
 
@@ -93,62 +116,21 @@ public class TptPlugin extends Builder {
    * All the parameter are processed and then they are passed to TptPluginSingleJobExecutor or to
    * TptPluginMasterJobExecutor
    * 
-   * @param exe
-   *          deprecated
    * @param exePaths
    *          paths to tpt executables separated by a comma or a semicolon
-   * @param arguments
-   *          the commandline arguments given in the descriptor
-   * @param isTptMaster
-   *          to know if there will be distributed builds or a singleJob
-   * @param slaveJob
-   *          the name of the slave job, used for putting the workload to the right slave
-   * @param slaveJobCount
-   *          the number of slaveJobs that will be executed
-   * @param slaveJobTries
-   *          used for the retryablejob
-   * @param tptBindingName
-   *          the binding name used to connect to the TptApi (for the registry)
-   * @param tptPort
-   *          the port for binding to the TptApi
    * @param executionConfiguration
    *          all the jenkins configurations given in the descriptor, used to get the
    *          Files,Execution Configuration, test Set, testDataDir, reportDir,etc
-   * @param tptStartUpWaitTime
-   *          the time it should wait before start tpt
-   * @param enableJunit
-   *          to know if is necessary to generate the jUnit report
-   * @param jUnitreport
-   *          path to where the jUnit report will generated
-   * @param jUnitLogLevel
-   *          The sverity of log messages that will be written ti the JUnit xml file
    */
   @DataBoundConstructor
-  public TptPlugin(String exe, String exePaths, String arguments, boolean isTptMaster,
-                   String slaveJob, String slaveJobCount, String slaveJobTries,
-                   String tptBindingName, String tptPort,
-                   ArrayList<JenkinsConfiguration> executionConfiguration,
-                   String tptStartUpWaitTime, Boolean enableJunit, String jUnitreport,
-                   LogLevel jUnitLogLevel) {
-    this.exePaths = exe;
+  public TptPlugin(String exePaths, ArrayList<JenkinsConfiguration> executionConfiguration) {
     if (exePaths != null) {
-      this.exePaths = exePaths;
+      this.exePaths = Util.fixEmpty(exePaths);
     }
-    this.arguments = arguments;
-    this.isTptMaster = isTptMaster;
-    this.slaveJob = slaveJob;
-    this.slaveJobCount = slaveJobCount;
-    this.slaveJobTries = slaveJobTries;
-    this.tptBindingName = tptBindingName;
-    this.tptPort = tptPort;
-    this.tptStartUpWaitTime = tptStartUpWaitTime;
     this.executionConfiguration = new ArrayList<>();
     if (executionConfiguration != null) {
       this.executionConfiguration.addAll(executionConfiguration);
     }
-    this.jUnitreport = jUnitreport;
-    this.jUnitLogLevel = jUnitLogLevel;
-    this.enableJunit = enableJunit;
   }
 
   /**
@@ -176,6 +158,10 @@ public class TptPlugin extends Builder {
     if (enableJunit == null) {
       enableJunit = Boolean.TRUE;
     }
+    if (arguments != null && arguments.contains(TptPlugin.RUN_BUILD)) {
+      arguments = arguments.replaceAll("\\s*" + TptPlugin.RUN_BUILD + "\\s*", " ");
+      arguments = arguments.trim();
+    }
     return this;
   }
 
@@ -183,14 +169,39 @@ public class TptPlugin extends Builder {
    * @return The list of paths to possible TPT-installations.
    */
   public String getExePaths() {
-    return exePaths;
+    return Util.fixNull(exePaths);
   }
 
   /**
-   * @return Should testcase execution be deligated to a slave job
+   * Deprecated, use exePaths instead
+   * 
+   * @param exe
+   *          The path to the tpt.exe
+   * 
+   */
+  @Deprecated
+  public void setExe(String exe) {
+    if (exe != null) {
+      this.exe = exe;
+    }
+  }
+
+  /**
+   * @return Should testcase execution be delegated to a sub job
    */
   public boolean getIsTptMaster() {
     return isTptMaster;
+  }
+
+  /**
+   * Should testcase execution be delegated to a sub job or is this run as a single job.
+   * 
+   * @param isTptMaster
+   *          <code>true</code> if the execution should be
+   */
+  @DataBoundSetter
+  public void setIsTptMaster(boolean isTptMaster) {
+    this.isTptMaster = isTptMaster;
   }
 
   /**
@@ -204,7 +215,16 @@ public class TptPlugin extends Builder {
    * @return The name of slave job if the plugin runs in master mode
    */
   public String getSlaveJob() {
-    return slaveJob;
+    return Util.fixNull(slaveJob);
+  }
+
+  /**
+   * @param slaveJob
+   *          The name of slave job if the plugin runs in master mode
+   */
+  @DataBoundSetter
+  public void setSlaveJob(String slaveJob) {
+    this.slaveJob = Util.fixEmpty(slaveJob);
   }
 
   /**
@@ -212,7 +232,18 @@ public class TptPlugin extends Builder {
    *         test case will be started in its own job.
    */
   public String getSlaveJobCount() {
-    return slaveJobCount;
+    return slaveJobCount == null ? DescriptorImpl.DEFAULT_SLAVE_JOB_COUNT : slaveJobCount;
+  }
+
+  /**
+   * @param slaveJobCount
+   *          The number of slave job the plugin will run in master mode. A value below 1 means
+   *          every test case will be started in its own job.
+   */
+  @DataBoundSetter
+  public void setSlaveJobCount(String slaveJobCount) {
+    this.slaveJobCount =
+        DescriptorImpl.DEFAULT_SLAVE_JOB_COUNT.equals(slaveJobCount) ? null : slaveJobCount;
   }
 
   /**
@@ -220,21 +251,51 @@ public class TptPlugin extends Builder {
    *         try. This is the maximal number of tries.
    */
   public String getSlaveJobTries() {
-    return slaveJobTries;
+    return slaveJobTries == null ? DescriptorImpl.DEFAULT_SLAVE_JOB_TRIES : slaveJobTries;
+  }
+
+  /**
+   * @param slaveJobTries
+   *          If the execution of a slave job fails it is possible to reschedule the job for another
+   *          try. This is the maximal number of tries.
+   */
+  @DataBoundSetter
+  public void setSlaveJobTries(String slaveJobTries) {
+    this.slaveJobTries =
+        DescriptorImpl.DEFAULT_SLAVE_JOB_TRIES.equals(slaveJobTries) ? null : slaveJobTries;
   }
 
   /**
    * @return the RMI binding name for TPT
    */
   public String getTptBindingName() {
-    return tptBindingName;
+    return tptBindingName == null ? DescriptorImpl.getDefaultTptBindingName() : tptBindingName;
+  }
+
+  /**
+   * @param tptBindingName
+   *          The RMI binding name for TPT
+   */
+  @DataBoundSetter
+  public void setTptBindingName(String tptBindingName) {
+    this.tptBindingName =
+        DescriptorImpl.getDefaultTptBindingName().equals(tptBindingName) ? null : tptBindingName;
   }
 
   /**
    * @return The port of the RMI registry
    */
   public String getTptPort() {
-    return tptPort;
+    return tptPort == null ? DescriptorImpl.getDefaultTptPort() : tptPort;
+  }
+
+  /**
+   * @param tptPort
+   *          The port of the RMI registry
+   */
+  @DataBoundSetter
+  public void setTptPort(String tptPort) {
+    this.tptPort = DescriptorImpl.getDefaultTptPort().equals(tptPort) ? null : tptPort;
   }
 
   /**
@@ -244,14 +305,31 @@ public class TptPlugin extends Builder {
    * @return 0 or more options for tpt.
    */
   public String getArguments() {
-    return arguments;
+    return Util.fixNull(arguments);
+  }
+
+  @DataBoundSetter
+  public void setArguments(String arguments) {
+    this.arguments = Util.fixEmpty(arguments);
   }
 
   /**
    * @return The time waited before trying to get the API handle after starting TPT
    */
   public String getTptStartUpWaitTime() {
-    return tptStartUpWaitTime;
+    return tptStartUpWaitTime == null ? DescriptorImpl.getDefaultTptStartUpWaitTime()
+        : tptStartUpWaitTime;
+  }
+
+  /**
+   * @param tptStartUpWaitTime
+   *          the time waited before trying to get the API handle after starting TPT
+   */
+  @DataBoundSetter
+  public void setTptStartUpWaitTime(String tptStartUpWaitTime) {
+    this.tptStartUpWaitTime =
+        DescriptorImpl.getDefaultTptStartUpWaitTime().equals(tptStartUpWaitTime) ? null
+            : tptStartUpWaitTime;
   }
 
   /**
@@ -269,12 +347,30 @@ public class TptPlugin extends Builder {
   }
 
   /**
+   * @param enableJunit
+   *          if the TPT test result should be transformed into a JUnit XML (legacy behaviour)
+   */
+  @DataBoundSetter
+  public void setEnableJunit(boolean enableJunit) {
+    this.enableJunit = enableJunit;
+  }
+
+  /**
    * Report dir (optional).
    * 
    * @return The directory, where to store the results, can be <code>null</code>.
    */
   public String getJUnitreport() {
-    return jUnitreport;
+    return Util.fixEmpty(jUnitreport);
+  }
+
+  /**
+   * @param jUnitreport
+   *          The directory, where to store the results, can be <code>null</code>.
+   */
+  @DataBoundSetter
+  public void setjUnitreport(String jUnitreport) {
+    this.jUnitreport = Util.fixNull(jUnitreport);
   }
 
   /**
@@ -283,7 +379,17 @@ public class TptPlugin extends Builder {
    * @return The severity level of TPT log messages that will be written to failed JUnit tests.
    */
   public LogLevel getJUnitLogLevel() {
-    return jUnitLogLevel;
+    return jUnitLogLevel == null ? DescriptorImpl.getDefaultJUnitLogLevel() : jUnitLogLevel;
+  }
+
+  /**
+   * @param jUnitLogLevel
+   *          The severity level of TPT log messages that will be written to failed JUnit tests.
+   */
+  @DataBoundSetter
+  public void setjUnitLogLevel(LogLevel jUnitLogLevel) {
+    this.jUnitLogLevel =
+        DescriptorImpl.getDefaultJUnitLogLevel().equals(jUnitLogLevel) ? null : jUnitLogLevel;
   }
 
   // --------------------------------------------------------------
@@ -299,14 +405,36 @@ public class TptPlugin extends Builder {
     }
     EnvVars environment = Utils.getEnvironment(build, launcher, logger);
     if (isTptMaster) {
-      return performAsMaster(build, launcher, listener, environment, executionConfiguration);
+      return performAsMaster(build, build.getWorkspace(), launcher, listener, environment,
+          executionConfiguration);
     } else {
-      return performWithoutSlaves(build, launcher, listener, environment, executionConfiguration);
+      return performWithoutSlaves(build, build.getWorkspace(), launcher, listener, environment,
+          executionConfiguration);
+    }
+  }
+
+  @Override
+  public void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+                      TaskListener listener)
+      throws InterruptedException, IOException {
+    logger = new TptLogger(listener.getLogger());
+    EnvVars environment = run.getEnvironment(listener);
+    boolean result = false;
+    if (isTptMaster) {
+      result =
+          performAsMaster(run, workspace, launcher, listener, environment, executionConfiguration);
+    } else {
+      result = performWithoutSlaves(run, workspace, launcher, listener, environment,
+          executionConfiguration);
+    }
+    if (!result) {
+      throw new AbortException();
     }
   }
 
   /**
-   * @param jenkinsConfigurations
+   * @param build
+   *          build of a job containing JenkinsConfigurations
    * @return if all Ids are unique as they should be
    */
   private boolean areIdsUnique(AbstractBuild< ? , ? > build) {
@@ -354,14 +482,13 @@ public class TptPlugin extends Builder {
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public boolean performWithoutSlaves(AbstractBuild< ? , ? > build, Launcher launcher,
-                                      BuildListener listener, EnvVars environment,
+  public boolean performWithoutSlaves(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+                                      TaskListener listener, EnvVars environment,
                                       ArrayList<JenkinsConfiguration> configs)
-      throws InterruptedException {
+      throws InterruptedException, IOException {
     // split and expand list of ptahs to TPT installations
-    String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
+    String[] expandedStringExePaths = environment.expand(getExePaths()).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
-    FilePath workspace = build.getWorkspace();
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
@@ -371,11 +498,12 @@ public class TptPlugin extends Builder {
           new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
     }
     // expand arguments and report
-    String expandedArguments = environment.expand(this.arguments);
-    String jUnitXmlPath = environment.expand(jUnitreport);
+    String expandedArguments = environment.expand(getArguments());
+    String jUnitXmlPath = environment.expand(getJUnitreport());
     // start execution
-    TptPluginSingleJobExecutor executor = new TptPluginSingleJobExecutor(build, launcher, listener,
-        expandedExePaths, expandedArguments, configs, jUnitXmlPath, jUnitLogLevel, enableJunit);
+    TptPluginSingleJobExecutor executor =
+        new TptPluginSingleJobExecutor(run, workspace, launcher, listener, expandedExePaths,
+            expandedArguments, configs, jUnitXmlPath, getJUnitLogLevel(), isEnableJunit());
     return executor.execute();
 
   }
@@ -400,14 +528,13 @@ public class TptPlugin extends Builder {
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public boolean performAsMaster(AbstractBuild< ? , ? > build, Launcher launcher,
-                                 BuildListener listener, EnvVars environment,
+  public boolean performAsMaster(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+                                 TaskListener listener, EnvVars environment,
                                  ArrayList<JenkinsConfiguration> configs)
       throws InterruptedException {
     // split and expand list of paths to TPT installations
-    String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
+    String[] expandedStringExePaths = environment.expand(getExePaths()).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
-    FilePath workspace = build.getWorkspace();
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
@@ -416,10 +543,11 @@ public class TptPlugin extends Builder {
       expandedExePaths[i] =
           new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
     }
-    String jUnitXmlPath = environment.expand(jUnitreport);
+    String jUnitXmlPath = environment.expand(getJUnitreport());
     // expand and parse TPT RMI port
     int expandedTptPort;
-    if (tptPort != null && !tptPort.isEmpty()) {
+    String tptPort = getTptPort();
+    if (!tptPort.isEmpty()) {
       try {
         expandedTptPort = Integer.parseInt(environment.expand(tptPort));
       } catch (NumberFormatException e) {
@@ -432,13 +560,15 @@ public class TptPlugin extends Builder {
     }
     // expand TPT RMI binding name
     String expandedTptBindingName;
-    if (tptBindingName != null && !tptBindingName.isEmpty()) {
+    String tptBindingName = getTptBindingName();
+    if (!tptBindingName.isEmpty()) {
       expandedTptBindingName = environment.expand(tptBindingName);
     } else {
       expandedTptBindingName = DescriptorImpl.getDefaultTptBindingName();
     }
     long expandedTptStartupWaitTime;
-    if (tptStartUpWaitTime != null && !tptStartUpWaitTime.isEmpty()) {
+    String tptStartUpWaitTime = getTptStartUpWaitTime();
+    if (tptStartUpWaitTime.isEmpty()) {
       try {
         expandedTptStartupWaitTime =
             Integer.parseInt(environment.expand(tptStartUpWaitTime)) * 1000;
@@ -452,8 +582,9 @@ public class TptPlugin extends Builder {
       expandedTptStartupWaitTime = Utils.DEFAULT_STARTUP_WAIT_TIME * 1000;
     }
     // expand slaveJobCount
-    int parsedSlaveJobCount = 0;
-    if (slaveJobCount != null && !slaveJobCount.isEmpty()) {
+    int parsedSlaveJobCount = 1;
+    String slaveJobCount = getSlaveJobCount();
+    if (!slaveJobCount.isEmpty()) {
       try {
         parsedSlaveJobCount = Integer.parseInt(environment.expand(slaveJobCount));
       } catch (NumberFormatException e) {
@@ -463,7 +594,8 @@ public class TptPlugin extends Builder {
     }
     // expand slaveJobTries
     int parsedSlaveJobTries = 1;
-    if (slaveJobTries != null && !slaveJobTries.isEmpty()) {
+    String slaveJobTries = getSlaveJobTries();
+    if (!slaveJobTries.isEmpty()) {
       try {
         parsedSlaveJobTries = Integer.parseInt(environment.expand(slaveJobTries));
       } catch (NumberFormatException e) {
@@ -472,12 +604,12 @@ public class TptPlugin extends Builder {
       }
     }
     // expand other variables
-    String expandedSlaveJobName = environment.expand(slaveJob);
+    String expandedSlaveJobName = environment.expand(getSlaveJob());
     // start execution
-    TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, launcher, listener,
-        expandedExePaths, configs, expandedTptPort, expandedTptBindingName, expandedSlaveJobName,
-        expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries, jUnitXmlPath,
-        jUnitLogLevel, enableJunit);
+    TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, workspace, launcher,
+        listener, expandedExePaths, configs, expandedTptPort, expandedTptBindingName,
+        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries,
+        jUnitXmlPath, getJUnitLogLevel(), isEnableJunit());
     try {
       return executor.execute();
     } finally {
@@ -500,14 +632,12 @@ public class TptPlugin extends Builder {
    * @author jkuhnert, PikeTec GmbH
    */
   @Extension
+  @Symbol("tptExecute")
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-    /**
-     * @return "--run build"
-     */
-    public static String getDefaultArguments() {
-      return "--run build";
-    }
+    public static final String DEFAULT_SLAVE_JOB_COUNT = "1";
+
+    public static final String DEFAULT_SLAVE_JOB_TRIES = "1";
 
     /**
      * @return "TptApi"
@@ -552,21 +682,6 @@ public class TptPlugin extends Builder {
     }
 
     /**
-     * Formvalidation for the Arguments field in the descriptor.
-     * 
-     * @param arguments
-     *          The TPT run arguments
-     * @return The validation of the form
-     */
-    public static FormValidation doCheckArguments(@QueryParameter String arguments) {
-      if ((arguments == null) || (arguments.trim().length() == 0)) {
-        return FormValidation.error("At least type \"--run build\".");
-      } else {
-        return FormValidation.ok();
-      }
-    }
-
-    /**
      * Basic validation of the entered paths to tpt.exe. At least one must exist.
      * 
      * @param exePaths
@@ -605,4 +720,5 @@ public class TptPlugin extends Builder {
       return items;
     }
   }
+
 }

@@ -23,26 +23,35 @@ package com.piketec.jenkins.plugins.tpt;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * Plugin executes a single given TPT test case. Intended to be used in the job started by
  * {@link TptPluginMasterJobExecutor}.
  */
-public class TptPluginSlave extends Builder {
+public class TptPluginSlave extends Builder implements SimpleBuildStep {
 
   private String exePaths;
 
@@ -69,86 +78,124 @@ public class TptPluginSlave extends Builder {
    *          the time it should wait before start tpt
    */
   @DataBoundConstructor
-  public TptPluginSlave(String exePaths, String tptBindingName, String tptPort,
-                        String tptStartUpWaitTime) {
+  public TptPluginSlave(String exePaths) {
     this.exePaths = exePaths;
-    this.tptBindingName = tptBindingName;
-    this.tptPort = tptPort;
-    this.tptStartUpWaitTime = tptStartUpWaitTime;
   }
 
   /**
-   * @return the given paths to the tpt executable (tpt.exe)
+   * @return The list of paths to possible TPT-installations.
    */
   public String getExePaths() {
-    return exePaths;
+    return Util.fixNull(exePaths);
   }
 
   /**
-   * @return the given bindingname, used to connect to the api.
+   * @return the RMI binding name for TPT
    */
   public String getTptBindingName() {
-    return tptBindingName;
+    return tptBindingName == null ? DescriptorImpl.getDefaultTptBindingName() : tptBindingName;
   }
 
   /**
-   * @return the tpt port , used to make the connection to the TptApi
+   * @param tptBindingName
+   *          The RMI binding name for TPT
+   */
+  @DataBoundSetter
+  public void setTptBindingName(String tptBindingName) {
+    this.tptBindingName =
+        DescriptorImpl.getDefaultTptBindingName().equals(tptBindingName) ? null : tptBindingName;
+  }
+
+  /**
+   * @return The port of the RMI registry
    */
   public String getTptPort() {
-    return tptPort;
+    return tptPort == null ? DescriptorImpl.getDefaultTptPort() : tptPort;
+  }
+
+  /**
+   * @param tptPort
+   *          The port of the RMI registry
+   */
+  @DataBoundSetter
+  public void setTptPort(String tptPort) {
+    this.tptPort = DescriptorImpl.getDefaultTptPort().equals(tptPort) ? null : tptPort;
   }
 
   /**
    * @return The time waited before trying to get the API handle after starting TPT
    */
   public String getTptStartUpWaitTime() {
-    return tptStartUpWaitTime;
+    return tptStartUpWaitTime == null ? DescriptorImpl.getDefaultTptStartUpWaitTime()
+        : tptStartUpWaitTime;
+  }
+
+  /**
+   * @param tptStartUpWaitTime
+   *          The time to wait for TPT to start
+   */
+  @DataBoundSetter
+  public void setTptStartUpWaitTime(String tptStartUpWaitTime) {
+    this.tptStartUpWaitTime =
+        DescriptorImpl.getDefaultTptStartUpWaitTime().equals(tptStartUpWaitTime) ? null
+            : tptStartUpWaitTime;
   }
 
   // --------------------------------------------------------------
+
+  @Override
+  public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
+      throws InterruptedException, IOException {
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      throw new IOException("No workspace available");
+    }
+    TptLogger logger = new TptLogger(listener.getLogger());
+    perform(build, workspace, launcher, listener, Utils.getEnvironment(build, launcher, logger),
+        logger);
+    return true;
+  }
 
   /**
    * It collects the necesary data (tpt exe path, tpt Port, tpt bindingname and tpt
    * expandedTptStartupWaitTime) from the environment. Then collects the necesary data from the
    * workload (put by the TptPluginMasterJobExecutor). After collecting all the necesary data it
-   * creates a new TptPluginSlaveExecutor and execute it . This method will be called from Jenkins
+   * creates a new TptPluginSlaveExecutor and execute it. This method will be called from Jenkins
    * when a build for a slave is scheduled. @see retryableJob. The logic is that the retryableJob
    * schedules builds for the slaves and those builds will be executed here.
-   * 
-   * @return true if the slave executed successfully its workload.
    */
   @Override
-  public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
+  public void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+                      TaskListener listener)
       throws InterruptedException, IOException {
-
     TptLogger logger = new TptLogger(listener.getLogger());
-    EnvVars environment = Utils.getEnvironment(build, launcher, logger);
-    String[] expandedStringExePaths = environment.expand(exePaths).split("[,;]");
+    perform(run, workspace, launcher, listener, null, logger);
+  }
+
+  public void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+                      TaskListener listener, @CheckForNull EnvVars environment, TptLogger logger)
+      throws InterruptedException, IOException {
+    String[] expandedStringExePaths = expand(environment, exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
-    FilePath workspace = build.getWorkspace();
-    if (workspace == null) {
-      logger.error("No workspace available");
-      return false;
-    }
     for (int i = 0; i < expandedExePaths.length; i++) {
       expandedExePaths[i] =
-          new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
+          new FilePath(workspace, expand(environment, expandedStringExePaths[i].trim()));
     }
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {
       try {
-        expandedTptPort = Integer.parseInt(environment.expand(tptPort));
+        expandedTptPort = Integer.parseInt(expand(environment, tptPort));
       } catch (NumberFormatException e) {
-        logger.error("The given port " + environment.expand(tptPort) + " is not an integer."
+        logger.error("The given port " + expand(environment, tptPort) + " is not an integer."
             + " Using default value.");
-        expandedTptPort = DescriptorImpl.getDefaultTptPort();
+        expandedTptPort = Utils.DEFAULT_TPT_PORT;
       }
     } else {
-      expandedTptPort = DescriptorImpl.getDefaultTptPort();
+      expandedTptPort = Utils.DEFAULT_TPT_PORT;
     }
     String expandedTptBindingName;
     if (tptBindingName != null && !tptBindingName.isEmpty()) {
-      expandedTptBindingName = environment.expand(tptBindingName);
+      expandedTptBindingName = expand(environment, tptBindingName);
     } else {
       expandedTptBindingName = DescriptorImpl.getDefaultTptBindingName();
     }
@@ -156,32 +203,33 @@ public class TptPluginSlave extends Builder {
     if (tptStartUpWaitTime != null && !tptStartUpWaitTime.isEmpty()) {
       try {
         expandedTptStartupWaitTime =
-            Integer.parseInt(environment.expand(tptStartUpWaitTime)) * 1000;
+            Integer.parseInt(expand(environment, tptStartUpWaitTime)) * 1000;
       } catch (NumberFormatException e) {
-        logger.error("The given TPT startup waiting time " + environment.expand(tptStartUpWaitTime)
+        logger.error("The given TPT startup waiting time " + expand(environment, tptStartUpWaitTime)
             + " is not an integer. Using default value.");
-        expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
+        expandedTptStartupWaitTime = Utils.DEFAULT_STARTUP_WAIT_TIME * 1000;
       }
     } else {
-      expandedTptStartupWaitTime = DescriptorImpl.getDefaultTptStartUpWaitTime() * 1000;
+      expandedTptStartupWaitTime = Utils.DEFAULT_STARTUP_WAIT_TIME * 1000;
     }
 
-    String jobName = build.getProject().getName();
+    String jobName = run.getParent().getName();
     WorkLoad workloadToDo = WorkLoad.pollWorkload(jobName);
     if (workloadToDo == null) {
       logger.error("Nothing todo. No work package for \"" + jobName + "\" enqueued.");
-      return false;
+      throw new AbortException();
     }
 
     JenkinsConfiguration unresolvedConfig = workloadToDo.getJenkinsConfig();
     List<String> testCasesFromWorkload = workloadToDo.getTestCases();
-    AbstractBuild masterId = workloadToDo.getMasterId();
+    Run masterId = workloadToDo.getMasterId();
     FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
     FilePath masterDataDir = workloadToDo.getMasterDataDir();
     FilePath masterReportDir = workloadToDo.getMasterReportDir();
 
     // Replace $-Vars:
-    JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(environment);
+    JenkinsConfiguration resolvedConfig =
+        environment == null ? unresolvedConfig : unresolvedConfig.replaceAndNormalize(environment);
 
     logger.info("File Name :               " + resolvedConfig.getTptFile());
     logger.info("Execution Configuration : " + resolvedConfig.getConfiguration());
@@ -196,7 +244,7 @@ public class TptPluginSlave extends Builder {
     }
 
     TptPluginSlaveExecutor executor =
-        new TptPluginSlaveExecutor(launcher, build, listener, expandedExePaths, expandedTptPort,
+        new TptPluginSlaveExecutor(launcher, workspace, listener, expandedExePaths, expandedTptPort,
             expandedTptBindingName, resolvedConfig, testCasesFromWorkload,
             expandedTptStartupWaitTime, masterId, masterWorkspace, masterDataDir, masterReportDir);
 
@@ -204,13 +252,21 @@ public class TptPluginSlave extends Builder {
     if (!result) {
       // reenqueue for new try if job is configured to try multiple times
       WorkLoad.putWorkLoad(jobName, workloadToDo);
+      throw new AbortException();
     }
-    return result;
   }
 
   @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl)super.getDescriptor();
+  }
+
+  private String expand(@CheckForNull EnvVars env, String toExpand) {
+    if (env == null) {
+      return toExpand;
+    } else {
+      return env.expand(toExpand);
+    }
   }
 
   // --------------------------- Descriptor Class -----------------------------------
@@ -221,6 +277,7 @@ public class TptPluginSlave extends Builder {
    * @author jkuhnert, PikeTec GmbH
    */
   @Extension
+  @Symbol("tptAgent")
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
     @Override
@@ -231,7 +288,7 @@ public class TptPluginSlave extends Builder {
 
     @Override
     public String getDisplayName() {
-      return "Execute TPT tests slave";
+      return "Execute TPT tests as a worker for a TPT master job";
     }
 
     /**
@@ -251,15 +308,15 @@ public class TptPluginSlave extends Builder {
     /**
      * @return "1099"
      */
-    public static int getDefaultTptPort() {
-      return Utils.DEFAULT_TPT_PORT;
+    public static String getDefaultTptPort() {
+      return String.valueOf(Utils.DEFAULT_TPT_PORT);
     }
 
     /**
      * @return "60" (1 min)
      */
-    public static int getDefaultTptStartUpWaitTime() {
-      return Utils.DEFAULT_STARTUP_WAIT_TIME;
+    public static String getDefaultTptStartUpWaitTime() {
+      return String.valueOf(Utils.DEFAULT_STARTUP_WAIT_TIME);
     }
 
   }

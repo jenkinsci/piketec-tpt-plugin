@@ -20,64 +20,41 @@
  -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
-	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
->
-<l:header>
-<style type="text/css">
-
-
-
-  </style>
-   
-</l:header>
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" >
 
 	<!-- exentds repeatable part in ValidationSuite jelly -->
 	<f:entry field="enableTest" title="Enable test">
-		<f:checkbox value="${instance.enableTest}" default="${descriptor.defaultEnableTest}" />
+		<f:checkbox default="${descriptor.defaultEnableTest}" />
 	</f:entry>
 	
 	
-	 <f:entry field="id" title="Unique configuration ID"
-    help="/plugin/piketec-tpt/id.html"
-  >
-    <f:textbox value="${instance.id}" />
+	 <f:entry field="id" title="Unique configuration ID" help="/plugin/piketec-tpt/id.html" >
+    <f:textbox />
   </f:entry>
 	
-	<f:entry field="tptFile" title="TPT file"
-		help="/plugin/piketec-tpt/tptFile.html"
-	>
-		<f:textbox value="${instance.tptFile}" />
+	<f:entry field="tptFile" title="TPT file"	help="/plugin/piketec-tpt/tptFile.html" >
+		<f:textbox />
 	</f:entry>
 
-	<f:entry field="configuration" title="Execution configuration"
-		help="/plugin/piketec-tpt/configuration.html"
-	>
-		<f:textbox value="${instance.configuration}" />
+	<f:entry field="configuration" title="Execution configuration" help="/plugin/piketec-tpt/configuration.html" >
+		<f:textbox />
 	</f:entry>
 
 	<f:advanced>
-		<f:entry field="testdataDir" title="Test data directory"
-			help="/plugin/piketec-tpt/testdataDir.html"
-		>
-			<f:textbox value="${instance.testdataDir}" />
+		<f:entry field="testdataDir" title="Test data directory" help="/plugin/piketec-tpt/testdataDir.html" >
+			<f:textbox />
 		</f:entry>
 
-		<f:entry field="reportDir" title="Report directory"
-			help="/plugin/piketec-tpt/reportDir.html"
-		>
-			<f:textbox value="${instance.reportDir}" />
+		<f:entry field="reportDir" title="Report directory" help="/plugin/piketec-tpt/reportDir.html"	>
+			<f:textbox />
 		</f:entry>
 		
-		<f:entry field="testSet" title="Test Set"
-      help="/plugin/piketec-tpt/testSet.html"
-    >
-      <f:textbox value="${instance.testSet}" default="${descriptor.defaultTestSet}" />
+		<f:entry field="testSet" title="Test Set" help="/plugin/piketec-tpt/testSet.html" >
+      <f:textbox />
     </f:entry>
 
-		<f:entry field="timeout" title="Timeout [h]"
-			help="/plugin/piketec-tpt/timeout.html"
-		>
-			<f:number value="${instance.timeout}" default="${descriptor.defaultTimeout}" />
+		<f:entry field="timeout" title="Timeout [h]" help="/plugin/piketec-tpt/timeout.html" >
+			<f:number default="${descriptor.defaultTimeout}" />
 		</f:entry>
 	</f:advanced>
 

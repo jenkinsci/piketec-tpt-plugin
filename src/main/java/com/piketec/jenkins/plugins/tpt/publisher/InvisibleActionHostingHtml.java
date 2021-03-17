@@ -31,9 +31,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Run;
 import hudson.util.HttpResponses;
 
 /**
@@ -43,7 +43,7 @@ import hudson.util.HttpResponses;
  */
 public class InvisibleActionHostingHtml implements Action, StaplerProxy {
 
-  private AbstractBuild< ? , ? > build;
+  private Run< ? , ? > build;
 
   private String id;
 
@@ -57,7 +57,7 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    * @param id
    *          unique id of the jenkins configuration
    */
-  public InvisibleActionHostingHtml(AbstractBuild< ? , ? > build, String id) {
+  public InvisibleActionHostingHtml(Run< ? , ? > build, String id) {
     this.build = build;
     this.id = id;
   }

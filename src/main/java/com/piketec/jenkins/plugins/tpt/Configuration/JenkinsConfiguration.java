@@ -22,7 +22,11 @@ package com.piketec.jenkins.plugins.tpt.Configuration;
 
 import java.io.File;
 
+import javax.annotation.CheckForNull;
+
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import hudson.EnvVars;
@@ -41,21 +45,27 @@ import jenkins.model.Jenkins;
  */
 public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 
-  private final boolean enableTest;
+  private boolean enableTest = DescriptorImpl.getDefaultEnableTest();
 
-  private final String testSet;
+  @CheckForNull
+  private String testSet = null;
 
-  private long timeout;
+  private long timeout = DescriptorImpl.getDefaultTimeout();
 
-  private final String tptFile;
+  @CheckForNull
+  private String tptFile = null;
 
-  private final String configuration;
+  @CheckForNull
+  private String configuration = null;
 
-  private final String testdataDir;
+  @CheckForNull
+  private String testdataDir = null;
 
-  private final String reportDir;
+  @CheckForNull
+  private String reportDir = null;
 
-  private String id;
+  @CheckForNull
+  private String id = null;
 
   /**
    * the execution configuration is used by tpt to determine which file and which arguments is used.
@@ -65,37 +75,19 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    *          path to an executable tpt file
    * @param configuration
    *          arguments and configuration (configuration in double quotes)
-   * @param testdataDir
-   *          Testdata directory, if empty, path from the configuration will used.
-   * @param reportDir
-   *          Report directory, if empty, path from the configuration will used.
-   * @param enableTest
-   *          true if you want to skip this configuration
-   * @param timeout
-   *          how long the execution of this test run is allwoed to take at max
-   * @param testSet
-   *          the name of test set that should be used, <code>null</code> or empty if the test set
-   *          defined in the file should be used.
    * @param id
    *          The unique ID of the configuration to create unique paths
    */
   @DataBoundConstructor
-  public JenkinsConfiguration(String tptFile, String configuration, String testdataDir,
-                              String reportDir, boolean enableTest, long timeout, String testSet,
-                              String id) {
-    this.tptFile = tptFile;
-    this.configuration = configuration;
-    this.testdataDir = testdataDir;
-    this.reportDir = reportDir;
-    this.enableTest = enableTest;
-    this.timeout = timeout;
-    this.testSet = testSet;
-    this.id = id;
+  public JenkinsConfiguration(String tptFile, String configuration, String id) {
+    this.tptFile = Util.fixEmpty(tptFile);
+    this.configuration = Util.fixEmpty(configuration);
+    this.id = Util.fixEmpty(id);
   }
 
   protected Object readResolve() {
     if (timeout <= 0) {
-      timeout = 6;
+      timeout = DescriptorImpl.getDefaultTimeout();
     }
     return this;
   }
@@ -108,6 +100,15 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   /**
+   * @param enableTest
+   *          the enableTest to set
+   */
+  @DataBoundSetter
+  public void setEnableTest(boolean enableTest) {
+    this.enableTest = enableTest;
+  }
+
+  /**
    * @return how long the execution of this test run is allwoed to take at max
    */
   public long getTimeout() {
@@ -115,10 +116,19 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   /**
+   * @param timeout
+   *          the timeout to set
+   */
+  @DataBoundSetter
+  public void setTimeout(long timeout) {
+    this.timeout = timeout;
+  }
+
+  /**
    * @return The TPT file
    */
   public String getTptFile() {
-    return tptFile;
+    return Util.fixNull(tptFile);
   }
 
   /**
@@ -126,14 +136,94 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
    *         defined in the file should be used.
    */
   public String getTestSet() {
-    return testSet;
+    return Util.fixNull(testSet);
+  }
+
+  /**
+   * @param testSet
+   *          the testSet to set
+   */
+  @DataBoundSetter
+  public void setTestSet(String testSet) {
+    this.testSet = Util.fixEmpty(testSet);
   }
 
   /**
    * @return the whole configuration string defined in the jenkins conf
    */
   public String getConfiguration() {
-    return configuration;
+    return Util.fixNull(configuration);
+  }
+
+  /**
+   * @return the directory where the TPT report shall be written to.
+   */
+  public String getReportDir() {
+    return Util.fixEmpty(reportDir);
+  }
+
+  /**
+   * @param reportDir
+   *          the reportDir to set
+   */
+  @DataBoundSetter
+  public void setReportDir(String reportDir) {
+    this.reportDir = Util.fixNull(reportDir);
+  }
+
+  /**
+   * @return The directory where the execution result data shall be written to
+   */
+  public String getTestdataDir() {
+    return Util.fixEmpty(testdataDir);
+  }
+
+  /**
+   * @param testdataDir
+   *          the testdataDir to set
+   */
+  @DataBoundSetter
+  public void setTestdataDir(String testdataDir) {
+    this.testdataDir = Util.fixNull(testdataDir);
+  }
+
+  /**
+   * @return the unique id of this configuration
+   */
+  public String getId() {
+    return Util.fixNull(id);
+  }
+
+  /**
+   * @param id
+   *          set the unique id of this configuration.
+   */
+  public void setId(String id) {
+    this.id = Util.fixEmpty(id);
+  }
+
+  /**
+   * 
+   * This method resolves all variables that are used for the definition of the test set and the
+   * execution configuration, but not for the directories. These are resolved on the respective
+   * agent machine with the respective environment variables.
+   * 
+   * @param environment
+   *          The map of environment variables and their values
+   * @return A {@link JenkinsConfiguration} where all "${}"-Variables are replaced by their value if
+   *         available in <code>environment</code>.
+   */
+  public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
+    JenkinsConfiguration normalizedCfg =
+        new JenkinsConfiguration(Util.replaceMacro(getTptFile(), environment),
+            Util.replaceMacro(getConfiguration(), environment),
+            Util.replaceMacro(getId(), environment));
+    normalizedCfg.setTestdataDir(Util.replaceMacro(getTestdataDir(), environment));
+    normalizedCfg.setReportDir(Util.replaceMacro(getReportDir(), environment));
+    normalizedCfg.setEnableTest(isEnableTest());
+    normalizedCfg.setTimeout(getTimeout());
+    normalizedCfg.setTestSet(Util.replaceMacro(testSet, environment));
+    return normalizedCfg;
   }
 
   // here, jenkins descriptor things
@@ -153,56 +243,10 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
   }
 
   /**
-   * @return the directory where the TPT report shall be written to.
-   */
-  public String getReportDir() {
-    return reportDir;
-  }
-
-  /**
-   * @return The directory where the execution result data shall be written to
-   */
-  public String getTestdataDir() {
-    return testdataDir;
-  }
-
-  /**
-   * @return the unique id of this configuration
-   */
-  public String getId() {
-    return id;
-  }
-
-  /**
-   * @param id
-   *          set the unique id of this configuration.
-   */
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  /**
-   * 
-   * This method resolves all variables that are used for the definition of the test set and the
-   * execution configuration, but not for the directories. These are resolved on the respective
-   * agent machine with the respective environment variables.
-   * 
-   * @param environment
-   *          The map of environment variables and their values
-   * @return A {@link JenkinsConfiguration} where all "${}"-Variables are replaced by their value if
-   *         available in <code>environment</code>.
-   */
-  public JenkinsConfiguration replaceAndNormalize(EnvVars environment) {
-    return new JenkinsConfiguration(Util.replaceMacro(tptFile, environment),
-        Util.replaceMacro(configuration, environment), Util.replaceMacro(testdataDir, environment),
-        Util.replaceMacro(reportDir, environment), enableTest, timeout,
-        Util.replaceMacro(testSet, environment), this.id);
-  }
-
-  /**
    * Inline class for jenkins. so it is an repeatable object in conf.jelly
    */
   @Extension
+  @Symbol("tptConfig")
   public static final class DescriptorImpl extends Descriptor<JenkinsConfiguration> {
 
     /**
@@ -246,23 +290,9 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
       return 6;
     }
 
-    /**
-     * @return 0
-     */
-    public static int getDefaultSlaveJobCount() {
-      return 0;
-    }
-
-    /**
-     * @return an empty String
-     */
-    public static String getDefaultTestSet() {
-      return "";
-    }
-
     @Override
     public String getDisplayName() {
-      return "";
+      return "TPT file configuration";
     }
   }
 

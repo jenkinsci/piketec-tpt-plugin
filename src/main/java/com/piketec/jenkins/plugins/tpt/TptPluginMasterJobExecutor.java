@@ -36,8 +36,9 @@ import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.Job;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 
 class TptPluginMasterJobExecutor {
@@ -46,9 +47,11 @@ class TptPluginMasterJobExecutor {
 
   private Launcher launcher;
 
-  private AbstractBuild< ? , ? > build;
+  private Run< ? , ? > build;
 
-  private BuildListener listener;
+  private FilePath workspace;
+
+  private TaskListener listener;
 
   private FilePath[] exePaths;
 
@@ -101,8 +104,8 @@ class TptPluginMasterJobExecutor {
    * @param enableJunit
    *          to know if is necessary to generate the jUnit XML
    */
-  TptPluginMasterJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
-                             BuildListener listener, FilePath[] exePaths,
+  TptPluginMasterJobExecutor(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+                             TaskListener listener, FilePath[] exePaths,
                              List<JenkinsConfiguration> executionConfigs, int tptPort,
                              String tptBindingName, String slaveJobName, long tptStartupWaitTime,
                              int slaveJobCount, int slaveJobTries, String jUnitXmlPath,
@@ -110,6 +113,7 @@ class TptPluginMasterJobExecutor {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
+    this.workspace = workspace;
     this.listener = listener;
     this.exePaths = exePaths;
     this.executionConfigs = executionConfigs;
@@ -141,7 +145,6 @@ class TptPluginMasterJobExecutor {
         new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
     boolean success = true;
     // We delete the JUnit results before iterating over the jenkinsConfigs
-    FilePath workspace = build.getWorkspace();
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
@@ -187,13 +190,22 @@ class TptPluginMasterJobExecutor {
     }
 
     // Resolve $-vars in paths, test set and execution config names
-    JenkinsConfiguration resolvedConfig =
-        unresolvedConfig.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+    JenkinsConfiguration resolvedConfig = unresolvedConfig;
+    if (build instanceof AbstractBuild) {
+      resolvedConfig = unresolvedConfig.replaceAndNormalize(
+          Utils.getEnvironment((AbstractBuild< ? , ? >)build, launcher, logger));
+    }
+
+    if (!(build instanceof AbstractBuild)) {
+      // We cannot check all IDs beforehand for pipeline jobs so do it here
+      if (!Utils.checkId(resolvedConfig, build, logger)) {
+        return false;
+      }
+    }
 
     // Get necessery paths the user added in the job configuration:
     // These paths are resolved to work on the master.
     Collection<String> testCases = null;
-    FilePath workspace = build.getWorkspace();
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
@@ -261,8 +273,8 @@ class TptPluginMasterJobExecutor {
       logger.info("Create job for \"" + subTestSet + "\"");
 
       // creates the workloads for the slaves, with the smaller chunks of testsets
-      WorkLoad workloadToAdd = new WorkLoad(unresolvedConfig, subTestSet, build.getWorkspace(),
-          build, testDataPath, reportPath);
+      WorkLoad workloadToAdd =
+          new WorkLoad(unresolvedConfig, subTestSet, workspace, build, testDataPath, reportPath);
       // it adds the workloads to an static HashMap.
       WorkLoad.putWorkLoad(slaveJobName, workloadToAdd);
       // Creates a retryable job , there are the builds scheduled. So the logic is : We put a
@@ -313,8 +325,7 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not publish result: " + e.getMessage());
       return false;
     }
-    TPTBuildStepEntries.addEntry(unresolvedConfig, build);
-    return true;
+    return Utils.checkIdAndAddInvisibleActionTPTExecution(resolvedConfig, build, logger);
   }
 
   private ArrayList<List<String>> getSubTestSets(Collection<String> testCases, int slaveJobSize,

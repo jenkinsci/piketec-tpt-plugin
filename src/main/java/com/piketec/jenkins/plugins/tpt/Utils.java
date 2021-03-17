@@ -24,8 +24,13 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
@@ -34,6 +39,7 @@ import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
 import jenkins.model.Jenkins;
 
 /**
@@ -66,6 +72,13 @@ public class Utils {
   static final int DEFAULT_STARTUP_WAIT_TIME = 60;
 
   private static final SimpleDateFormat DDMMYYHHMMSS = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+
+  private static final Pattern illegalWindowsFileNameCharacters =
+      Pattern.compile("[<>:\"/\\\\|?*]|\\R");
+
+  private static final Set<String> reservedWindowsFileNames = new HashSet<>(Arrays.asList("CON",
+      "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+      "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9", ".", ".."));
 
   /**
    * @return the current date. Used for the logs
@@ -307,10 +320,30 @@ public class Utils {
   }
 
   /**
-   * Get the environment variables for a build.s
+   * Checks if name does not contain a lien break, <, >, :, \, ", /, \, |, ?, * nor matches any of
+   * the reserved names CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9,
+   * LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
+   * 
+   * @param name
+   *          The name to check
+   * @return <code>true</code> if the name can be used as a windows file name
+   */
+  public static boolean isValidWidnowsFileName(String name) {
+    if (illegalWindowsFileNameCharacters.matcher(name).find()) {
+      return false;
+    }
+    if (reservedWindowsFileNames.contains(name.trim())) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Get the environment variables for a build. In pipeline all strings should be handled as
+   * litereals and replacing is dones by Groovy so we do not accept Run<?, ?> here.
    * 
    * @param build
-   *          The build
+   *          The build.
    * @param launcher
    *          The launcher
    * @param logger
@@ -330,5 +363,77 @@ public class Utils {
       logger.error(e.getLocalizedMessage());
     }
     return environment;
+  }
+
+  /**
+   * Get all InvisibleActionTPTExecution of a build.
+   * 
+   * @param build
+   *          The build to get the InvisibleActionTPTExecution list from
+   * @return The list of InvisibleActionTPTExecution
+   */
+  public static List<InvisibleActionTPTExecution> getInvisibleActionTPTExecutions(final Run< ? , ? > build) {
+    List<InvisibleActionTPTExecution> jenkinsConfigurationsToPublishForThisWorkspace =
+        build.getActions(InvisibleActionTPTExecution.class);
+    return jenkinsConfigurationsToPublishForThisWorkspace;
+  }
+
+  /**
+   * Check for duplicate ID of <b>already finished</b> JenkinsConfiguration. Adds an
+   * InvisibleActionTPTExecution if ID is valid. Is synchronized to ensure that parallel parts of a
+   * pipeline using the same ID leads to a failure. Method is not heavily used, so staic
+   * synchronized is feasible.
+   * 
+   * @param ec
+   *          JenkinsConfiguration with ID
+   * @param build
+   *          Build that executes the JenkinsConfiguration and may already have executed other
+   *          JenkinsConfiguration wich must have a different ID.
+   * @param logger
+   *          to write an error message to
+   * @return <code>true</code> if the ID is unique and a valid windows file name
+   */
+  public static synchronized boolean checkIdAndAddInvisibleActionTPTExecution(JenkinsConfiguration resolvedConfig,
+                                                                              Run< ? , ? > build,
+                                                                              TptLogger logger) {
+    if (checkId(resolvedConfig, build, logger)) {
+      build.addAction(new InvisibleActionTPTExecution(resolvedConfig));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Check for duplicate ID of <b>already finished</b> JenkinsConfiguration.
+   * 
+   * @param ec
+   *          JenkinsConfiguration with ID
+   * @param build
+   *          Build that executes the JenkinsConfiguration and may already have executed other
+   *          JenkinsConfiguration wich must have a different ID.
+   * @param logger
+   *          to write an error message to
+   * @return <code>true</code> if the ID is unique and a valid windows file name
+   */
+  public static boolean checkId(JenkinsConfiguration ec, Run< ? , ? > build, TptLogger logger) {
+    String id = ec.getId();
+    if (id == null || id.isEmpty()) {
+      logger.error("ID must not be empty");
+      return false;
+    }
+    if (!isValidWidnowsFileName(id)) {
+      logger.error("ID \"" + id + "\" is not a valid windows file name");
+      return false;
+    }
+    List<InvisibleActionTPTExecution> invisibleActionTPTExecutions =
+        getInvisibleActionTPTExecutions(build);
+    for (InvisibleActionTPTExecution invisibleActionTPTExecution : invisibleActionTPTExecutions) {
+      if (id.equals(invisibleActionTPTExecution.getId())) {
+        logger.error("ID \"" + id + "\" already in use.");
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -38,9 +39,11 @@ import org.kohsuke.stapler.bind.JavaScriptMethod;
 import com.google.common.io.Files;
 
 import hudson.model.AbstractBuild;
+import hudson.model.Action;
 import hudson.model.Result;
 import hudson.model.Run;
 import jenkins.model.RunAction2;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * A Page with a table of all executed TPT files and their configuration on top and a table with all
@@ -48,9 +51,9 @@ import jenkins.model.RunAction2;
  * 
  * @author FInfantino, PikeTec GmbH
  */
-public class TPTReportPage implements RunAction2, StaplerProxy {
+public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildAction, StaplerProxy {
 
-  private AbstractBuild< ? , ? > build;
+  private Run< ? , ? > build;
 
   private transient Run run;
 
@@ -84,7 +87,7 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
    * @param tptFiles
    *          The List of TPT files
    */
-  public TPTReportPage(AbstractBuild< ? , ? > build, ArrayList<TPTTestCase> failedTests,
+  public TPTReportPage(Run< ? , ? > build, ArrayList<TPTTestCase> failedTests,
                        ArrayList<TPTFile> tptFiles) {
 
     for (TPTFile f : tptFiles) {
@@ -96,7 +99,6 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
     this.build = build;
     this.setFailedTests(failedTests);
     this.setTptFiles(tptFiles);
-
   }
 
   @Override
@@ -117,7 +119,7 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
   /**
    * @return The Jenkins build
    */
-  public AbstractBuild< ? , ? > getBuild() {
+  public Run< ? , ? > getBuild() {
     return build;
   }
 
@@ -316,6 +318,13 @@ public class TPTReportPage implements RunAction2, StaplerProxy {
       }
     }
     return null;
+  }
+
+  @Override
+  public Collection< ? extends Action> getProjectActions() {
+    List<TrendGraph> projectActions = new ArrayList<>();
+    projectActions.add(new TrendGraph(build.getParent()));
+    return projectActions;
   }
 
   /**

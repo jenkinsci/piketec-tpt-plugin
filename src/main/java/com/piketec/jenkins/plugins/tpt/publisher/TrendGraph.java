@@ -37,14 +37,12 @@ import org.kohsuke.stapler.StaplerResponse;
 import com.piketec.jenkins.plugins.tpt.Utils;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Job;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.util.HttpResponses;
-import jenkins.model.RunAction2;
 
 /**
  * Generates the trend graph on the main page.
@@ -52,17 +50,15 @@ import jenkins.model.RunAction2;
  * @author FInfantino, PikeTec GmbH
  *
  */
-public class TrendGraph implements RunAction2, StaplerProxy {
+public class TrendGraph implements Action, StaplerProxy {
 
   private static final String INDENT = "\t";
 
   private static final String LF = "\n";
 
-  private AbstractProject< ? , ? > project;
+  private transient Run< ? , ? > lastSuccessBuild;
 
-  private AbstractBuild< ? , ? > actualBuild;
-
-  private transient Run< ? , ? > run;
+  private final Job< ? , ? > project;
 
   private ArrayList<Integer> failedBuilds = new ArrayList<>();
 
@@ -74,7 +70,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
 
   private int failed;
 
-  private ArrayList<ResultData> historyData;
+  private ArrayList<ResultData> historyData = new ArrayList<>();
 
   /**
    * Creates a new TrendGraph
@@ -82,8 +78,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * @param project
    *          The Jenkins project this Trendgraph belongs to.
    */
-  public TrendGraph(final AbstractProject< ? , ? > project) {
-    this.historyData = new ArrayList<>();
+  public TrendGraph(final Job< ? , ? > project) {
     this.project = project;
     initBuildAndTestCaseResultCounts();
     setHistoryIterativ();
@@ -97,11 +92,11 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * build.
    */
   private void initBuildAndTestCaseResultCounts() {
-    actualBuild = this.project.getLastSuccessfulBuild();
-    if (actualBuild == null) {
+    lastSuccessBuild = project.getLastSuccessfulBuild();
+    if (lastSuccessBuild == null) {
       return;
     }
-    Action tptAction = actualBuild.getAction(TPTReportPage.class);
+    Action tptAction = lastSuccessBuild.getAction(TPTReportPage.class);
     if (tptAction == null) {
       return;
     }
@@ -125,17 +120,18 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    * Fills the history Data with the data from the last 20 builds.
    */
   private void setHistoryIterativ() {
-    if (actualBuild == null) {
+    if (lastSuccessBuild == null) {
       return;
     }
-    Result result = actualBuild.getResult();
+    Result result = lastSuccessBuild.getResult();
     if (result == null) {
       return;
     }
     @SuppressWarnings("unchecked")
-    List<Run> builds = (List<Run>)actualBuild.getPreviousBuildsOverThreshold(20, Result.UNSTABLE);
+    List<Run> builds =
+        (List<Run>)lastSuccessBuild.getPreviousBuildsOverThreshold(20, Result.UNSTABLE);
     if (result.isBetterOrEqualTo(Result.UNSTABLE)) {
-      builds.add(0, actualBuild);
+      builds.add(0, lastSuccessBuild);
     }
     for (Run run : builds) {
       ResultData toAdd = new ResultData();
@@ -171,45 +167,8 @@ public class TrendGraph implements RunAction2, StaplerProxy {
   /**
    * @return The Jenkins project this Trendgraph belongs to
    */
-  public AbstractProject< ? , ? > getProject() {
+  public Job< ? , ? > getProject() {
     return project;
-  }
-
-  /**
-   * Set the Jenkins project this Trendgraph belongs to
-   * 
-   * @param project
-   *          The Jenkins project this Trendgraph belongs to
-   */
-  public void setProject(AbstractProject< ? , ? > project) {
-    this.project = project;
-  }
-
-  @Override
-  public void onAttached(Run< ? , ? > run) {
-    this.run = run;
-  }
-
-  @Override
-  public void onLoad(Run< ? , ? > run) {
-    this.run = run;
-  }
-
-  /**
-   * @return The concrete run this trend graph belongs to
-   */
-  public Run< ? , ? > getRun() {
-    return run;
-  }
-
-  /**
-   * Set the concrete run this trend graph belongs to
-   * 
-   * @param run
-   *          The concrete run this trend graph belongs to
-   */
-  public void setRun(Run< ? , ? > run) {
-    this.run = run;
   }
 
   /**
@@ -314,7 +273,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
    *         previous builds.
    */
   public ArrayList<ResultData> getHistoryData() {
-    actualBuild = this.project.getLastSuccessfulBuild();
+    lastSuccessBuild = project.getLastSuccessfulBuild();
     refreshTrendGraph();
     return this.historyData;
   }
@@ -344,13 +303,13 @@ public class TrendGraph implements RunAction2, StaplerProxy {
       throws IOException, ServletException, InterruptedException {
     // For every refresh the actual build will be updated. If actual build equals null, nothing to
     // show
-    actualBuild = this.project.getLastSuccessfulBuild();
+    lastSuccessBuild = project.getLastSuccessfulBuild();
     refreshTrendGraph();
-    if (actualBuild == null) {
+    if (lastSuccessBuild == null) {
       return;
     }
     generateJson();
-    File buildDir = actualBuild.getRootDir();
+    File buildDir = lastSuccessBuild.getRootDir();
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
         new FilePath(new File(buildDir.getAbsolutePath() + File.separator + "TrendGraph")),
         "TPT Report", "/plugin/piketec-tpt/tpt.ico", false);
@@ -375,7 +334,7 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     File utilsJs =
         new File(Utils.getTptPluginRootDir(), "TrendGraph" + File.separator + "utils.js");
 
-    File buildDir = actualBuild.getRootDir();
+    File buildDir = lastSuccessBuild.getRootDir();
 
     File trendGraph = new File(buildDir.getAbsolutePath() + File.separator + "TrendGraph");
 
@@ -394,7 +353,6 @@ public class TrendGraph implements RunAction2, StaplerProxy {
     File newIndexHTML = new File(
         buildDir.getAbsolutePath() + File.separator + "TrendGraph" + File.separator + "index.html");
     FileUtils.writeStringToFile(newIndexHTML, newIndexHTMLWithJson, Charset.forName("UTF-8"));
-
   }
 
   /**

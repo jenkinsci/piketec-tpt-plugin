@@ -36,38 +36,53 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.xml.sax.SAXException;
 
+import com.piketec.jenkins.plugins.tpt.InvisibleActionTPTExecution;
 import com.piketec.jenkins.plugins.tpt.Publish;
-import com.piketec.jenkins.plugins.tpt.TPTBuildStepEntries;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
-import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.AbortException;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.Action;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
-import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
+import hudson.tasks.Recorder;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * The post build action to publish the TPT test results in Jenkins
  * 
  * @author FInfantino, PikeTec GmbH
  */
-public class TPTReportPublisher extends Notifier {
+public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
 
   @DataBoundConstructor
   public TPTReportPublisher() {
     // NOP
+  }
+
+  @Override
+  public boolean perform(final AbstractBuild< ? , ? > build, final Launcher launcher,
+                         final BuildListener listener)
+      throws IOException, InterruptedException {
+    FilePath workspace = build.getWorkspace();
+    if (workspace == null) {
+      throw new IOException("No workspace available");
+    }
+    perform(build, workspace, launcher, listener);
+    return true;
   }
 
   /**
@@ -77,19 +92,18 @@ public class TPTReportPublisher extends Notifier {
    * piechart and failed tests)
    */
   @Override
-  public boolean perform(@SuppressWarnings("rawtypes") final AbstractBuild build,
-                         final Launcher launcher, final BuildListener listener)
-      throws IOException, InterruptedException {
+  public void perform(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+                      TaskListener listener)
+      throws InterruptedException, IOException {
 
     TptLogger logger = new TptLogger(listener.getLogger());
     logger.info("Starting Post Build Action \"TPT Report\"");
 
-    List<JenkinsConfiguration> jenkinsConfigurationsToPublishForThisWorkspace =
-        TPTBuildStepEntries.getEntries(build);
+    List<InvisibleActionTPTExecution> jenkinsConfigurationsToPublishForThisWorkspace =
+        Utils.getInvisibleActionTPTExecutions(build);
 
-    if (jenkinsConfigurationsToPublishForThisWorkspace == null) {
-      logger.info("Nothing to publish");
-      return false;
+    if (jenkinsConfigurationsToPublishForThisWorkspace.isEmpty()) {
+      throw new AbortException("Nothing to publish");
     }
 
     ArrayList<FilePath> uniqueTestDataDir = new ArrayList<>();
@@ -97,7 +111,6 @@ public class TPTReportPublisher extends Notifier {
     ArrayList<TPTFile> tptFiles = new ArrayList<>();
     ArrayList<TPTTestCase> failedTests = new ArrayList<>();
     // global file in Build
-    FilePath workspace = build.getWorkspace();
     File piketectptDir = TPTReportUtils.getPikeTecDir(build);
     if (!piketectptDir.exists()) {
       if (!piketectptDir.mkdirs()) {
@@ -106,17 +119,15 @@ public class TPTReportPublisher extends Notifier {
       }
     }
 
-    for (JenkinsConfiguration cfg : jenkinsConfigurationsToPublishForThisWorkspace) {
-      // Replace $-vars used in the config:
-      cfg = cfg.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+    for (InvisibleActionTPTExecution cfg : jenkinsConfigurationsToPublishForThisWorkspace) {
       // make file in build and copy report dir
       File dirExConfig = TPTReportUtils.getReportDir(piketectptDir, cfg.getId());
       if (!dirExConfig.mkdirs()) {
         throw new IOException(
             "Could not create directory \"" + dirExConfig.getAbsolutePath() + "\"");
       }
-      FilePath reportDir = new FilePath(workspace, Utils.getGeneratedReportDir(cfg));
-      FilePath testDataDir = new FilePath(workspace, Utils.getGeneratedTestDataDir(cfg));
+      FilePath reportDir = new FilePath(workspace, cfg.getReportDir());
+      FilePath testDataDir = new FilePath(workspace, cfg.getTestDataDir());
       String tptFileName = FilenameUtils.getBaseName(cfg.getTptFile());
       if (reportDir.exists()) {
         Utils.copyRecursive(reportDir, new FilePath(dirExConfig), logger);
@@ -140,7 +151,7 @@ public class TPTReportPublisher extends Notifier {
       // Check if the Testdata dir and the Report are unique, otherwise throw an exception
       if (uniqueReportDataDir.contains(reportDir) || uniqueTestDataDir.contains(testDataDir)) {
         throw new IOException("The directory \"" + cfg.getReportDir() + "\" or the directoy \""
-            + cfg.getTestdataDir() + "\" is already used, please choose another one");
+            + cfg.getTestDataDir() + "\" is already used, please choose another one");
       }
       uniqueReportDataDir.add(reportDir);
       uniqueTestDataDir.add(testDataDir);
@@ -148,7 +159,7 @@ public class TPTReportPublisher extends Notifier {
 
     // Failed Since. Look up test in previous build. If failed there. extract failed since
     // information and add 1
-    AbstractBuild lastSuccBuild = (AbstractBuild)build.getPreviousNotFailedBuild();
+    Run< ? , ? > lastSuccBuild = build.getPreviousNotFailedBuild();
     // the tpt report of last successful build
     TPTReportPage lastTptFilesAction =
         (lastSuccBuild == null) ? null : lastSuccBuild.getAction(TPTReportPage.class);
@@ -176,7 +187,6 @@ public class TPTReportPublisher extends Notifier {
     if (!failedTests.isEmpty()) {
       build.setResult(Result.UNSTABLE);
     }
-    return true;
   }
 
   private boolean checkForTestCaseInformation(FilePath testDataDir)
@@ -227,11 +237,6 @@ public class TPTReportPublisher extends Notifier {
   }
 
   @Override
-  public Action getProjectAction(AbstractProject< ? , ? > project) {
-    return new TrendGraph(project);
-  }
-
-  @Override
   public DescriptorImpl getDescriptor() {
     return (DescriptorImpl)super.getDescriptor();
   }
@@ -243,6 +248,7 @@ public class TPTReportPublisher extends Notifier {
    *
    */
   @Extension
+  @Symbol("tptReport")
   public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
     /**

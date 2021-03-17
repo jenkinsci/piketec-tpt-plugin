@@ -32,9 +32,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Run;
 import hudson.util.HttpResponses;
 
 /**
@@ -48,7 +48,7 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
 
   private String reportFile;
 
-  private AbstractBuild< ? , ? > build;
+  private Run< ? , ? > build;
 
   private String id;
 
@@ -79,8 +79,8 @@ public class OpenReportForFailedTestAction implements Action, StaplerProxy {
    * @param jenkinsConfigId
    *          The unique ID of the configuration to create unique paths
    */
-  public OpenReportForFailedTestAction(AbstractBuild< ? , ? > build, String fileName,
-                                       String reportFile, String id, String exConfig, String date,
+  public OpenReportForFailedTestAction(Run< ? , ? > build, String fileName, String reportFile,
+                                       String id, String exConfig, String date,
                                        String jenkinsConfigId) {
     this.id = id;
     this.name = fileName;

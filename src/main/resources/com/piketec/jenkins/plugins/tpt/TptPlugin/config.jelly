@@ -23,11 +23,11 @@
   xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
   <!-- TPT Configuration -->
   <f:entry field="exePaths" title="Path to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
-    <f:textbox value="${instance.exePaths}" />
+    <f:textbox />
   </f:entry>
   <f:advanced>
   <f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
-    <f:textbox value="${instance.arguments}" default="${descriptor.defaultArguments}" />
+    <f:textbox />
   </f:entry>
   <f:block>
   <f:optionalBlock name="isTptMaster" title="Distribute work to TPT slave jobs" checked="${instance.isTptMaster}" default="${descriptor.defaultEnableJunit}" inline="true" help="/plugin/piketec-tpt/masterMode.html" field="isTptMaster" >
@@ -36,19 +36,19 @@
       <f:textbox value="${instance.slaveJob}"/>
     </f:entry>
     <f:entry field="slaveJobCount" title="Number of slave jobs" help="/plugin/piketec-tpt/slaveJobCount.html">
-      <f:textbox value="${instance.slaveJobCount}"/>
+      <f:textbox default="${descriptor.DEFAULT_SLAVE_JOB_COUNT}"/>
     </f:entry>
         <f:entry field="slaveJobTries" title="Number of slave jobs execution tries" help="/plugin/piketec-tpt/slaveJobTries.html">
-      <f:textbox value="${instance.slaveJobTries}"/>
+      <f:textbox default="${descriptor.DEFAULT_SLAVE_JOB_TRIES}"/>
     </f:entry>
     <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
-      <f:textbox value="${instance.tptBindingName}" default="${descriptor.defaultTptBindingName}"/>
+      <f:textbox default="${descriptor.defaultTptBindingName}"/>
     </f:entry>
     <f:entry field="tptPort" title="TPT Port" help="/plugin/piketec-tpt/tptPort.html">
-      <f:textbox value="${instance.tptPort}" default="${descriptor.defaultTptPort}"/>
+      <f:textbox default="${descriptor.defaultTptPort}"/>
     </f:entry>
     <f:entry field="tptStartUpWaitTime" title="Wait for TPT start [s]" help="/plugin/piketec-tpt/tptStartUpWaitTime.html">
-      <f:textbox value="${instance.tptStartUpWaitTime}" default="${descriptor.defaultTptStartUpWaitTime}"/>
+      <f:textbox default="${descriptor.defaultTptStartUpWaitTime}"/>
     </f:entry>
   </f:optionalBlock>
   </f:block>
@@ -56,7 +56,7 @@
   <f:block>
   <f:optionalBlock name="enableJunit" title="Use Junit Post Build Action" checked="${instance.enableJunit}" default="${descriptor.defaultEnableJunit}" inline="true" field="enableJunit" >
     <f:entry field="jUnitreport" title="JUnit XML directory" help="/plugin/piketec-tpt/report.html">
-    <f:textbox value="${instance.jUnitreport}"  />
+    <f:textbox />
   </f:entry>
   <f:entry field="jUnitLogLevel" title="JUnit Log Level" help="/plugin/piketec-tpt/loglevel.html">
     <f:select default="${descriptor.defaultJUnitLogLevel}"/>

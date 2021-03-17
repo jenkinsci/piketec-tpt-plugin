@@ -29,9 +29,9 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Run;
 import hudson.util.HttpResponses;
 
 /**
@@ -41,7 +41,7 @@ import hudson.util.HttpResponses;
  */
 public class InvisibleActionHostingImages implements Action, StaplerProxy {
 
-  private AbstractBuild< ? , ? > build;
+  private Run< ? , ? > build;
 
   /**
    * Similar to InvisibleActionHostingHtml but with the images, such as the pie chart. @see
@@ -50,7 +50,7 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
    * @param build
    *          The current jenkins build
    */
-  public InvisibleActionHostingImages(AbstractBuild< ? , ? > build) {
+  public InvisibleActionHostingImages(Run< ? , ? > build) {
     this.build = build;
   }
 
@@ -77,7 +77,7 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
   /**
    * @return The jenkins build this action belongs to
    */
-  public AbstractBuild< ? , ? > getBuild() {
+  public Run< ? , ? > getBuild() {
     return build;
   }
 
@@ -87,7 +87,7 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
    * @param build
    *          The current jenkins build
    */
-  public void setBuild(AbstractBuild< ? , ? > build) {
+  public void setBuild(Run< ? , ? > build) {
     this.build = build;
   }
 

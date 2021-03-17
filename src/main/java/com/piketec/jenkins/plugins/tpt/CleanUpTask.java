@@ -32,6 +32,7 @@ import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.Computer;
+import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
 
 /**
@@ -59,8 +60,7 @@ public class CleanUpTask {
    * @param launcher
    *          the launcher
    */
-  public CleanUpTask(AbstractBuild< ? , ? > masterId, CleanUpCallable cleanUpCallable,
-                     Launcher launcher) {
+  public CleanUpTask(Run< ? , ? > masterId, CleanUpCallable cleanUpCallable, Launcher launcher) {
     this.cleanUpCallable = cleanUpCallable;
     this.launcher = launcher;
     register(this, masterId);
@@ -107,7 +107,7 @@ public class CleanUpTask {
    * @param masterId
    *          to identify to which registry the task is going to be added
    */
-  private static synchronized void register(CleanUpTask task, AbstractBuild< ? , ? > masterId) {
+  private static synchronized void register(CleanUpTask task, Run< ? , ? > masterId) {
     List<CleanUpTask> list = registry.get(masterId);
     if (list == null) {
       list = new ArrayList<>();
@@ -127,7 +127,7 @@ public class CleanUpTask {
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public static synchronized boolean cleanUp(AbstractBuild< ? , ? > masterId, TptLogger logger)
+  public static synchronized boolean cleanUp(Run< ? , ? > masterId, TptLogger logger)
       throws InterruptedException {
     List<CleanUpTask> tasks = registry.remove(masterId);
     if (tasks == null) {

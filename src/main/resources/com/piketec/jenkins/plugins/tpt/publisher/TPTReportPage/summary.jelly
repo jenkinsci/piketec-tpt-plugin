@@ -22,7 +22,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:t="/lib/hudson" xmlns:test="/lib/hudson/test">
     <table style="margin-top: 1em; margin-left: 1em;">
                    <t:summary icon="/plugin/piketec-tpt/tpt.ico">
-                <a href="TPT_Report">TPT Report from last Build</a> (${it.passedCount} Passed, ${it.inconclusiveCount} Inconclusive, ${it.errorCount} Errors , ${it.failedCount} Failed )
+                <a href="TPT_Report">TPT Report</a> (${it.passedCount} Passed, ${it.inconclusiveCount} Inconclusive, ${it.errorCount} Errors , ${it.failedCount} Failed )
             </t:summary>
     </table>
 </j:jelly>

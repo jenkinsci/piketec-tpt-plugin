@@ -2,7 +2,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
 
 import java.io.File;
 
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 public class TPTReportUtils {
 
@@ -25,7 +25,7 @@ public class TPTReportUtils {
    *          The jenkins build
    * @return a directory "Piketec-TPT" on the machine that runs Jenkins
    */
-  public static File getPikeTecDir(AbstractBuild< ? , ? > build) {
+  public static File getPikeTecDir(Run< ? , ? > build) {
     return new File(build.getRootDir().getAbsolutePath() + File.separator + "Piketec-TPT");
   }
 
@@ -36,7 +36,7 @@ public class TPTReportUtils {
    *          The jenkins build
    * @return a directory "Piketec-TPT/Images" on the machine that runs Jenkins
    */
-  public static File getImageDir(AbstractBuild< ? , ? > build) {
+  public static File getImageDir(Run< ? , ? > build) {
     return new File(getPikeTecDir(build), "Images");
   }
 }

@@ -29,11 +29,13 @@ import org.apache.commons.lang.StringUtils;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
+import hudson.AbortException;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Proc;
 import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 
 /**
  * Executes the TPT test cases via command line on a single node.
@@ -44,9 +46,11 @@ class TptPluginSingleJobExecutor {
 
   private Launcher launcher;
 
-  private AbstractBuild< ? , ? > build;
+  private Run< ? , ? > build;
 
-  private BuildListener listener;
+  private FilePath workspace;
+
+  private TaskListener listener;
 
   private FilePath[] exePaths;
 
@@ -80,13 +84,14 @@ class TptPluginSingleJobExecutor {
    * @param enableJunit
    *          to know if is necessary to generate the jUnit XML
    */
-  TptPluginSingleJobExecutor(AbstractBuild< ? , ? > build, Launcher launcher,
-                             BuildListener listener, FilePath[] exePaths, String arguments,
+  TptPluginSingleJobExecutor(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+                             TaskListener listener, FilePath[] exePaths, String arguments,
                              List<JenkinsConfiguration> executionConfigs, String jUnitXmlPath,
                              LogLevel jUnitLogLevel, boolean enableJunit) {
     logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
+    this.workspace = workspace;
     this.listener = listener;
     this.exePaths = exePaths;
     this.arguments = arguments;
@@ -104,9 +109,8 @@ class TptPluginSingleJobExecutor {
    * @return true if the execution from the tpt file was successful.
    * @throws InterruptedException
    */
-  boolean execute() throws InterruptedException {
+  boolean execute() throws InterruptedException, IOException {
     boolean success = true;
-    FilePath workspace = build.getWorkspace();
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
@@ -131,7 +135,10 @@ class TptPluginSingleJobExecutor {
     // execute the sub-configuration
     for (JenkinsConfiguration ec : executionConfigs) {
       if (ec.isEnableTest()) {
-        ec = ec.replaceAndNormalize(Utils.getEnvironment(build, launcher, logger));
+        if (build instanceof AbstractBuild) {
+          ec = ec.replaceAndNormalize(
+              Utils.getEnvironment((AbstractBuild< ? , ? >)build, launcher, logger));
+        }
         // Absolute paths are recognized as such, relative paths are resolved depending on the
         // workspace directory,
         // or the unique sub folder created in the workspace for the current job.
@@ -142,6 +149,9 @@ class TptPluginSingleJobExecutor {
         String tesSet = ec.getTestSet();
         logger.info("*** Running TPT-File \"" + tptFilePath + //
             "\" with configuration \"" + configurationName + "\" now. ***");
+        if (!Utils.checkId(ec, build, logger)) {
+          throw new AbortException("Invalid ID \"" + ec.getId() + "\"");
+        }
 
         try {
           testDataPath.mkdirs();
@@ -157,10 +167,11 @@ class TptPluginSingleJobExecutor {
         try {
           // run the test...
           boolean successOnlyForOneConfig = launchTPT(launcher, listener, cmd, ec.getTimeout());
-          success &= successOnlyForOneConfig;
           if (successOnlyForOneConfig) {
-            TPTBuildStepEntries.addEntry(ec, build);
+            successOnlyForOneConfig =
+                Utils.checkIdAndAddInvisibleActionTPTExecution(ec, build, logger);
           }
+          success &= successOnlyForOneConfig;
           if (enableJunit) {
             // transform TPT results into JUnit results
             logger.info("*** Publishing results now ***");
@@ -207,8 +218,14 @@ class TptPluginSingleJobExecutor {
       cmd.append('"');
     }
     cmd.append(' ');
-    cmd.append(arguments);
-    cmd.append(' ');
+    if (!arguments.isEmpty()) {
+      cmd.append(arguments);
+      cmd.append(' ');
+    }
+    if (!arguments.contains(TptPlugin.RUN_BUILD)) {
+      cmd.append(TptPlugin.RUN_BUILD);
+      cmd.append(' ');
+    }
     String tptFileString = tptFile.getRemote();
     // surround path with ""
     if (!tptFileString.startsWith("\"")) {
@@ -274,7 +291,7 @@ class TptPluginSingleJobExecutor {
    * @throws InterruptedException
    * @throws IOException
    */
-  private boolean launchTPT(Launcher launcher, BuildListener listener, String cmd, long timeout)
+  private boolean launchTPT(Launcher launcher, TaskListener listener, String cmd, long timeout)
       throws InterruptedException, IOException {
     boolean exitCodeWasNull = true;
     logger.info("Launching \"" + cmd + "\"");

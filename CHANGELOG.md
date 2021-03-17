@@ -1,5 +1,9 @@
 Release History
 ===
+## Version 9.2
+
+-   Added pipeline support
+
 ## Version 9.1
 
 -   When converting test results to JUnit format the execution config name and platform config name are now used as package names.

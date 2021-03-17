@@ -88,6 +88,65 @@ Use e.g. the [Throttle Concurrent Builds
 Plugin](https://plugins.jenkins.io/throttle-concurrents/)
 to prevent builds from runnig on the same node.
 
+## Pipeline
+The plugin supports Jenkins pipelines. The easies way to get a valid configuration is to use the [Pipeline Snippet Generator](https://www.jenkins.io/doc/book/pipeline/getting-started/#snippet-generator). The plugin provides the following steps: tptExecute, tptReport, and tptAgent.
+
+<details>
+    <summary>Basic pipeline example</summary>
+
+```groovy
+node('windows') {
+    stage('Execute TPT') {
+        tptExecute
+            enableJunit: true,
+            exePaths: "${PathToTPT}\\tpt.exe",
+            jUnitreport: 'junit',
+            executionConfiguration: [tptConfig(configuration: 'Lights Control FUSION',
+                    id: 'example1',
+                    tptFile: 'C:\\tools\\tpt\\examples\\04 Test Assessments - 01 GUI Assessments.tpt')]
+    }
+    stage('Publish') {
+        junit 'junit/*.xml'
+        tptReport()
+    }
+}
+```
+</details>
+<details>
+    <summary>Example for master mode</summary>
+
+```groovy
+node('windows') {
+    stage('Execute TPT') {
+        tptExecute enableJunit: true,
+            exePaths: "${PathToTPT}\\tpt.exe",
+            executionConfiguration: [tptConfig(configuration: 'Lights Control FUSION',
+                id: 'aaa',
+                tptFile: 'C:\\temp\\examples\\04 Test Assessments - 01 GUI Assessments.tpt')],
+            isTptMaster: true,
+            jUnitreport: 'junit',
+            slaveJob: 'agentJob', // see "Example for agent job"
+            slaveJobCount: '2'
+    }
+    stage('Publish') {
+        junit 'junit/*.xml'
+        tptReport()
+    }
+}
+```
+</details>
+<details>
+    <summary>Example for agent job</summary>
+
+```groovy
+node('windows') {
+    stage('Execute TPT') {
+        tptAgent exePaths: "${PathToTPT}\\tpt.exe", tptBindingName: 'TptApi2', tptPort: '1098'
+    }
+}
+```
+</details>
+
 # FAQ
 
 *TPT hangs/does not start when I use Jenkins. If I start TPT normally it

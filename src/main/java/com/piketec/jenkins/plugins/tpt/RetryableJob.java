@@ -32,7 +32,6 @@ import javax.annotation.Nonnull;
 import hudson.EnvVars;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
-import hudson.model.BuildListener;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Job;
@@ -41,6 +40,7 @@ import hudson.model.ParametersAction;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StringParameterValue;
+import hudson.model.TaskListener;
 import hudson.model.Cause.UpstreamCause;
 import jenkins.model.ParameterizedJobMixIn;
 
@@ -78,12 +78,12 @@ class RetryableJob {
    * @see schedule
    * 
    * @param build
-   *          , to get the environment and for scheduling the build. It will be the same build
+   *          to get the environment and for scheduling the build. It will be the same build
    *          scheduled but with different testcases.
    * @param listener
-   *          , to get the environment and for scheduling the build.
+   *          to get the environment and for scheduling the build.
    */
-  void perform(final AbstractBuild< ? , ? > build, final BuildListener listener) {
+  void perform(final Run< ? , ? > build, final TaskListener listener) {
     runner = new Thread(new Runnable() {
 
       @Override
@@ -92,8 +92,10 @@ class RetryableJob {
         while (tries > 0 && !success) {
           List<Future<Run>> futures = new ArrayList<>();
           try {
-            EnvVars env = build.getEnvironment(listener);
-            env.overrideAll(build.getBuildVariables());
+            if (build instanceof AbstractBuild< ? , ? >) {
+              EnvVars env = build.getEnvironment(listener);
+              env.overrideAll(((AbstractBuild< ? , ? >)build).getBuildVariables());
+            }
             // To be able to enqueue the same build multiple times, they have to be made
             // artificially different. We do that by adding a UUID. Everything else did not work.
             ArrayList<Action> parameterActions = new ArrayList<>();
@@ -181,9 +183,9 @@ class RetryableJob {
    */
   // from prametrized trigger plugin BuildTriggerConfig
   @SuppressWarnings("unchecked")
-  protected Future<Run> schedule(@Nonnull AbstractBuild< ? , ? > build, @Nonnull final Job project,
+  protected Future<Run> schedule(@Nonnull Run< ? , ? > build, @Nonnull final Job project,
                                  int quietPeriod, @Nonnull List<Action> list) {
-    Cause cause = new UpstreamCause((Run)build);
+    Cause cause = new UpstreamCause(build);
     List<Action> queueActions = new ArrayList<>(list);
     queueActions.add(new CauseAction(cause));
 

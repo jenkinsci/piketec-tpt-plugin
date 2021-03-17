@@ -28,8 +28,8 @@ import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 
 /**
  * Executes one test case via TPT API.
@@ -42,9 +42,9 @@ class TptPluginSlaveExecutor {
 
   private Launcher launcher;
 
-  private AbstractBuild< ? , ? > build;
+  private FilePath workspace;
 
-  private BuildListener listener;
+  private TaskListener listener;
 
   private FilePath[] exePaths;
 
@@ -56,7 +56,7 @@ class TptPluginSlaveExecutor {
 
   private long tptStartupWaitTime;
 
-  private AbstractBuild< ? , ? > masterId;
+  private Run< ? , ? > masterId;
 
   private FilePath masterWorkspace;
 
@@ -69,8 +69,6 @@ class TptPluginSlaveExecutor {
   /**
    * @param launcher
    *          passed for executing a process
-   * @param build
-   *          current build, used to get the workspace and for binding to the TptApi
    * @param listener
    *          for the logs
    * @param exePaths
@@ -96,15 +94,14 @@ class TptPluginSlaveExecutor {
    * @param masterWorkspace
    *          the workspace from the master, to know where to copy the results
    */
-  TptPluginSlaveExecutor(Launcher launcher, AbstractBuild< ? , ? > build, BuildListener listener,
+  TptPluginSlaveExecutor(Launcher launcher, FilePath workspace, TaskListener listener,
                          FilePath[] exePaths, int tptPort, String tptBindingName,
                          JenkinsConfiguration jenkinsConfig, List<String> testSet,
-                         long tptStartupWaitTime, AbstractBuild< ? , ? > masterId,
-                         FilePath masterWorkspace, FilePath masterDataPath,
-                         FilePath masterReportPath) {
+                         long tptStartupWaitTime, Run< ? , ? > masterId, FilePath masterWorkspace,
+                         FilePath masterDataPath, FilePath masterReportPath) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
-    this.build = build;
+    this.workspace = workspace;
     this.listener = listener;
     this.exePaths = exePaths;
     this.tptPort = tptPort;
@@ -132,7 +129,6 @@ class TptPluginSlaveExecutor {
     TptApiAccess tptApiAccess =
         new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
 
-    FilePath workspace = build.getWorkspace();
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
