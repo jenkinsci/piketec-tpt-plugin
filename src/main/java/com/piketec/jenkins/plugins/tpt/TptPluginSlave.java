@@ -70,12 +70,6 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
    * 
    * @param exePaths
    *          the paths to the Tpt Executables
-   * @param tptBindingName
-   *          the binding name used to connect to the TptApi (for the registry)
-   * @param tptPort
-   *          the port for binding to the TptApi
-   * @param tptStartUpWaitTime
-   *          the time it should wait before start tpt
    */
   @DataBoundConstructor
   public TptPluginSlave(String exePaths) {

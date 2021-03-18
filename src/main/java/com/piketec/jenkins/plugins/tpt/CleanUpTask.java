@@ -30,7 +30,6 @@ import java.util.Map;
 import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
 
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
 import hudson.model.Computer;
 import hudson.model.Run;
 import hudson.remoting.VirtualChannel;
@@ -51,7 +50,7 @@ public class CleanUpTask {
 
   /**
    * Creates and enqueues an clean up taks that will be executed when calling
-   * {@link #cleanUp(AbstractBuild, TptLogger)}
+   * {@link #cleanUp(Run, TptLogger)}
    * 
    * @param masterId
    *          abstract build as id

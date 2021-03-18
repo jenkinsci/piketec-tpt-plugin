@@ -320,9 +320,9 @@ public class Utils {
   }
 
   /**
-   * Checks if name does not contain a lien break, <, >, :, \, ", /, \, |, ?, * nor matches any of
-   * the reserved names CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9,
-   * LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
+   * Checks if name does not contain a lien break, &lt;, &gt;, :, \, ", /, \, |, ?, * nor matches
+   * any of the reserved names CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8,
+   * COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
    * 
    * @param name
    *          The name to check
@@ -340,7 +340,7 @@ public class Utils {
 
   /**
    * Get the environment variables for a build. In pipeline all strings should be handled as
-   * litereals and replacing is dones by Groovy so we do not accept Run<?, ?> here.
+   * litereals and replacing is dones by Groovy so we do not accept {@link Run} here.
    * 
    * @param build
    *          The build.
@@ -384,7 +384,7 @@ public class Utils {
    * pipeline using the same ID leads to a failure. Method is not heavily used, so staic
    * synchronized is feasible.
    * 
-   * @param ec
+   * @param resolvedConfig
    *          JenkinsConfiguration with ID
    * @param build
    *          Build that executes the JenkinsConfiguration and may already have executed other

@@ -468,7 +468,7 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
    * 
    * All the parameters are used to get the data for creating a new TptPluginSingleJobExecutor
    * 
-   * @param build
+   * @param run
    *          The current Jenkins build
    * @param launcher
    *          The launcher
