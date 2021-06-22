@@ -149,12 +149,6 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
     if (exe != null) {
       this.exePaths = exe;
     }
-    if (slaveJobCount == null) {
-      slaveJobCount = "0";
-    }
-    if (slaveJobTries == null) {
-      slaveJobTries = "1";
-    }
     if (enableJunit == null) {
       enableJunit = Boolean.TRUE;
     }
