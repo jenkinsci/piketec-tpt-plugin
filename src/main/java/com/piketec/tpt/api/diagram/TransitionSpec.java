@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -38,10 +38,8 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getCondition() throws ApiException, RemoteException;
+  public String getCondition() throws RemoteException;
 
   /**
    * Set the formal precondition to be satisfied for the transition to fire. For a syntax reference
@@ -53,10 +51,8 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setCondition(String condition) throws ApiException, RemoteException;
+  public void setCondition(String condition) throws RemoteException;
 
   /**
    * Returns the actions to be executed when a transition fires.
@@ -65,10 +61,8 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getActions() throws ApiException, RemoteException;
+  public String getActions() throws RemoteException;
 
   /**
    * Set the actions to be executed when a transition is executed.For a Syntax reference refer to
@@ -79,8 +73,19 @@ public interface TransitionSpec extends TransitionSpecOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setActions(String actions) throws ApiException, RemoteException;
+  public void setActions(String actions) throws RemoteException;
+
+  /**
+   * Returns <code>null</code> if transition specification can be compiled without errors, the
+   * compile error message otherwise.
+   * 
+   * @return The compile error message or <code>null</code>
+   * @throws ApiException
+   *           If transition specification is not part of a project anymore or compiler is inactive
+   *           for the project.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getCompileError() throws RemoteException, ApiException;
 }

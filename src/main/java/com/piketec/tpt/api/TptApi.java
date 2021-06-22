@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,8 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 
 /**
- * Main entry point for the access to TPT via the Remote API
+ * Main entry point for the access to TPT via the TPT API. This API can be accessed via API Script
+ * editor or via Java RMI.
  */
 public interface TptApi extends TptRemote {
 
@@ -41,10 +42,8 @@ public interface TptApi extends TptRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean closeTpt() throws ApiException, RemoteException;
+  public boolean closeTpt() throws RemoteException;
 
   /**
    * 
@@ -95,20 +94,24 @@ public interface TptApi extends TptRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Collection<Project> getOpenProjects() throws ApiException, RemoteException;
+  public Collection<Project> getOpenProjects() throws RemoteException;
 
   /**
    * @return Returns the version name of the TPT instance represented by this API object.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getTptVersion() throws ApiException, RemoteException;
+  public String getTptVersion() throws RemoteException;
+
+  /**
+   * @return Returns the installation directory of the TPT instance represented by this API object.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public File getTptInstallationDir() throws RemoteException;
 
   /**
    * @return Returns the version number of file format this TPT version will use to store *.tpt-,
@@ -116,10 +119,8 @@ public interface TptApi extends TptRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public int getFileFormatVersion() throws ApiException, RemoteException;
+  public int getFileFormatVersion() throws RemoteException;
 
   /**
    * Starts a run for the given {@link ExecutionConfiguration}. The test run is started
@@ -169,9 +170,80 @@ public interface TptApi extends TptRemote {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           API constraint error
+   *           This method is not supported if the API is running in headless mode
    */
-  public void select(IdentifiableRemote obj) throws ApiException, RemoteException;
+  public void select(IdentifiableRemote obj) throws RemoteException, ApiException;
+
+  /**
+   * Returns the selected TPT {@link Project} or <code>null</code> if no project is selected.
+   * 
+   * @return The selected TPT project or <code>null</code>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Project getSelectedProject() throws RemoteException;
+
+  /**
+   * Returns the selected {@link Testlet} or <code>null</code> if no testlet is selected.
+   * 
+   * @return The selected testlet or <code>null</code>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Testlet getSelectedTestlet() throws RemoteException;
+
+  /**
+   * Returns the selected {@link Scenario scenarios}. If scenarios and/or {@link ScenarioGroup
+   * scenario groups} are selected, groups are irgnored if <code>traverseSelectedGroups</code> is
+   * <code>false</code>. If <code>traverseSelectedGroups</code> is <code>true</code> all scenarios
+   * contained recursivley in the selected groups are returned as well.
+   * 
+   * @param traverseSelectedGroups
+   *          <code>true</code> if scenarios contained in selected groups shall be returned
+   *          <code>false</code> if selected groups shall be ignored.
+   * @return The selected scenarios
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Collection<Scenario> getSelectedScenarios(boolean traverseSelectedGroups)
+      throws RemoteException;
+
+  /**
+   * Retruns the explicitly selected {@link ScenarioGroup scenario groups}. If only {@link Scenario
+   * scenarios} are selected the returned collection will be empty.
+   * 
+   * @return The explicitly selected scenario groups
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Collection<ScenarioGroup> getSelectedScenarioGroups() throws RemoteException;
+
+  /**
+   * Returns the selected {@link Assessment assessments}. If assessments and/or
+   * {@link AssessmentGroup assessment groups} are selected, groups are irgnored if
+   * <code>traverseSelectedGroups</code> is <code>false</code>. If
+   * <code>traverseSelectedGroups</code> is <code>true</code> all assessments contained recursivley
+   * in the selected groups are returned as well.
+   * 
+   * @param traverseSelectedGroups
+   *          <code>true</code> if assessments contained in selected groups shall be returned
+   *          <code>false</code> if selected groups shall be ignored.
+   * @return The selected assessmentss
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Collection<Assessment> getSelectedAssessments(boolean traverseSelectedGroups)
+      throws RemoteException;
+
+  /**
+   * Retruns the explicitly selected {@link AssessmentGroup assessment groups}. If only
+   * {@link Assessment assessments} are selected the returned collection will be empty.
+   * 
+   * @return The explicitly selected scenario groups
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Collection<AssessmentGroup> getSelectedAssessmentGroups() throws RemoteException;
 
   /**
    * Depending on its configuration, TPT requires some time to load all plugins. Since the API is
@@ -187,4 +259,13 @@ public interface TptApi extends TptRemote {
    *           remote communication problem
    */
   public boolean isReady() throws RemoteException;
+
+  /**
+   * Bring the TPT main window to the front.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void toFront() throws RemoteException;
+
 }

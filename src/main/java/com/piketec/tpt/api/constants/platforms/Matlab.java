@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -90,6 +90,8 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String CHECKIO = "CHECKIO";
 
+  public static final String USESUTTYPESTYPESNATIVELY = "useSutTypesTypesNatively";
+
   public static final String CONCATSIGNALNAMES = "concatSignalNames";
 
   public static final String PREFERPORTNAMES = "preferPortNames";
@@ -104,11 +106,15 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String CHECKINTERNALSIGNALS = "checkInternalSignals";
 
+  public static final String FIXINTERNALSIGNALSAUTOMATICALLY = "fixInternalSignalsAutomatically";
+
   public static final String INTERNALSIGNALSBREAKLINKS = "internalSignalsBreakLinks";
 
   public static final String DATASTOREHANDLINGMODE = "dataStoreHandlingMode";
 
   public static final String DATASTORECHANNELTYPE = "dataStoreChannelType";
+
+  public static final String USESLFCNSTUBBING = "useSlFcnStubbing";
 
   public static final String TPT_MATLAB_DTC = "tpt.matlab.dtc";
 
@@ -123,6 +129,8 @@ public interface Matlab extends BasicPlatformConfig {
   public static final String PREPARE_TARGETLINK_SUBSYSTEM = "prepareTargetLinkSubsystem";
 
   public static final String VECTORTREAT = "nativeVectors";
+
+  public static final String SFUNUSEDIRECTFEEDTHROUGH = "sFunUseDirectFeedthrough";
 
   public static final String MEASURE_SCALED_DATA = "measure_scaled_data";
 

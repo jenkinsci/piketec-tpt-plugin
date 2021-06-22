@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,7 +22,6 @@ package com.piketec.tpt.api.diagram;
 
 import java.rmi.RemoteException;
 
-import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.NamedObject;
 import com.piketec.tpt.api.Project;
@@ -45,9 +44,7 @@ public interface DiagramNode extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Testlet getParentTestlet() throws ApiException, RemoteException;
+  public Testlet getParentTestlet() throws RemoteException;
 
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -40,10 +40,8 @@ public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TransitionSpecGroup getGroup() throws ApiException, RemoteException;
+  public TransitionSpecGroup getGroup() throws RemoteException;
 
   /**
    * Returns the {@link Transition} object which directly or indirectly contains this
@@ -53,10 +51,8 @@ public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Transition getTransition() throws ApiException, RemoteException;
+  public Transition getTransition() throws RemoteException;
 
   /**
    * Moves this {@link TransitionSpecOrGroup} to a new position in the transition spec tree.

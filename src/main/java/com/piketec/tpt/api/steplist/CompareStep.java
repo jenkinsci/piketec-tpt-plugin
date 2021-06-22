@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,6 @@
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
 
 /**
  * This {@link Step} provides the possibility to evaluate a comparison during test execution.
@@ -52,10 +50,8 @@ public interface CompareStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setLeftHandSideExpression(String expr) throws RemoteException, ApiException;
+  public void setLeftHandSideExpression(String expr) throws RemoteException;
 
   /**
    * @return the right-hand side term for the comparison.
@@ -73,10 +69,8 @@ public interface CompareStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRightHandSideExpression(String expr) throws RemoteException, ApiException;
+  public void setRightHandSideExpression(String expr) throws RemoteException;
 
   /**
    * Sets the explicit tolerance for this comparison.
@@ -86,10 +80,8 @@ public interface CompareStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTolerance(String expr) throws RemoteException, ApiException;
+  public void setTolerance(String expr) throws RemoteException;
 
   /**
    * @return the explicit tolerance for this comparison.
@@ -132,10 +124,8 @@ public interface CompareStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setOperator(Operator operator) throws RemoteException, ApiException;
+  public void setOperator(Operator operator) throws RemoteException;
 
   /**
    * @return the operator for the comparison.
@@ -153,10 +143,8 @@ public interface CompareStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setCompareType(CompareType cmptype) throws RemoteException, ApiException;
+  public void setCompareType(CompareType cmptype) throws RemoteException;
 
   /**
    * @return when the comparison is evaluated.

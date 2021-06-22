@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,12 +22,10 @@ package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
 
-import com.piketec.tpt.api.ApiException;
-
 /**
  * The Testlet step lets you link to another testlet. This way, you can:
  * <ul>
- * <li>Create a hierarchical automaton inside a test step list.</li>
+ * <li>Create a hierarchical automaton inside a step list.</li>
  * <li>Specify which variants to use in a subautomaton.</li>
  * </ul>
  */
@@ -49,10 +47,8 @@ public interface TestletStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTestlet(String testlet) throws ApiException, RemoteException;
+  public void setTestlet(String testlet) throws RemoteException;
 
   /**
    * @return specified linked variant for the test execution.
@@ -70,10 +66,8 @@ public interface TestletStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setVariant(String variant) throws ApiException, RemoteException;
+  public void setVariant(String variant) throws RemoteException;
 
   /**
    * @return if the test should wait until the testlet is finished.
@@ -91,9 +85,7 @@ public interface TestletStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setWaitUntilTestletTerminates(boolean value) throws ApiException, RemoteException;
+  public void setWaitUntilTestletTerminates(boolean value) throws RemoteException;
 
 }

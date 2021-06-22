@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,6 @@
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
 
 /**
  * This {@link Step} provides the possibility to execute steps in a do-while-loop as long as the
@@ -46,10 +44,8 @@ public interface WaitValueStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDeclaration(String declaration) throws ApiException, RemoteException;
+  public void setDeclaration(String declaration) throws RemoteException;
 
   /**
    * @return the comparative value.
@@ -67,10 +63,8 @@ public interface WaitValueStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDefinition(String value) throws ApiException, RemoteException;
+  public void setDefinition(String value) throws RemoteException;
 
   /**
    * Sets the local tolerance for this comparison.
@@ -80,10 +74,8 @@ public interface WaitValueStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTolerance(String expr) throws RemoteException, ApiException;
+  public void setTolerance(String expr) throws RemoteException;
 
   /**
    * @return the local tolerance for this comparison.
@@ -101,10 +93,8 @@ public interface WaitValueStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setOperator(Operator op) throws RemoteException, ApiException;
+  public void setOperator(Operator op) throws RemoteException;
 
   /**
    * @return the operator for the comparison.
@@ -149,10 +139,8 @@ public interface WaitValueStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setAssess(boolean assess) throws ApiException, RemoteException;
+  public void setAssess(boolean assess) throws RemoteException;
 
   /**
    * @return <code>true</code> if this step is only satisfied if the next step is satisfied, too.
@@ -170,8 +158,6 @@ public interface WaitValueStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setJoinWithNext(boolean value) throws ApiException, RemoteException;
+  public void setJoinWithNext(boolean value) throws RemoteException;
 }

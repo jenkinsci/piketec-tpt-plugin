@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -37,7 +37,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
   /**
    * Type String for URI Test Case Attribute
    * 
-   * @deprecated since TPT13 all attributes are strings
+   * @deprecated since TPT13 all attributes are strings. Will be removed in TPT-18.
    */
   @Deprecated
   public static final String URI_TYPE = "URI";
@@ -49,20 +49,16 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getType() throws ApiException, RemoteException;
+  String getType() throws RemoteException;
 
   /**
    * @return Returns the name of this <code>TestCaseAttribute</code>
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getName() throws ApiException, RemoteException;
+  String getName() throws RemoteException;
 
   /**
    * Set the name for this <code>TestCaseAttribute</code>
@@ -85,10 +81,8 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isCopyable() throws ApiException, RemoteException;
+  boolean isCopyable() throws RemoteException;
 
   /**
    * Set a <code>TestCaseAttribute</code> to be "copyable". The values of a "copyable"
@@ -100,9 +94,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  void setCopyable(boolean on) throws ApiException, RemoteException;
+  void setCopyable(boolean on) throws RemoteException;
 
 }

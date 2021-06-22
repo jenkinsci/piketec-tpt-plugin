@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,7 +22,6 @@ package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Map;
 
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.Pair;
@@ -33,8 +32,8 @@ import com.piketec.tpt.api.Pair;
 public interface ImportSignalStep extends Step {
 
   /**
-   * Sets an assignment({@link Map Map&lt;Declaration, SignalName&gt;}) of imported declarations and
-   * their name in the data file. The method will ensure that always at least one
+   * Sets the assignment of declarations to signals in the data file (List of Pair&lt;Declaration
+   * Name, Signal Name in File&gt;). The method will ensure that always at least one
    * declaration-assignment row exits. When <code>assignment</code> is an empty list one row with
    * empty fields will be added.
    * 
@@ -43,15 +42,13 @@ public interface ImportSignalStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setDeclarationAssignment(List<Pair<String, String>> assignment)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
-   * @return a {@link Map Map&lt;Declaration, SignalName&gt;} with an assignment of imported
-   *         declarations and their name in the data file.
+   * @return a (List of Pair&lt;Declaration Name, Signal Name in File&gt;) with an assignment of
+   *         imported declarations and their name in the data file.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -75,9 +72,30 @@ public interface ImportSignalStep extends Step {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           API constraint error
+   *           if file is null or contains a line break
    */
-  public void setFile(String file) throws ApiException, RemoteException;
+  public void setFile(String file) throws RemoteException, ApiException;
+
+  /**
+   * @return the name of the Excel sheet to be used in case of an Excel import.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getExcelSheet() throws RemoteException;
+
+  /**
+   * Sets the Excel sheet name.
+   * 
+   * @param excelSheet
+   *          the name of the Excel sheet to be used in case of an Excel import
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if excelSheet is null
+   */
+  public void setExcelSheet(String excelSheet) throws RemoteException, ApiException;
 
   /**
    * @return an (optional) time axis name.
@@ -96,9 +114,9 @@ public interface ImportSignalStep extends Step {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           API constraint error
+   *           if name is null or contains a line break
    */
-  public void setTimeAxisName(String name) throws ApiException, RemoteException;
+  public void setTimeAxisName(String name) throws RemoteException, ApiException;
 
   /**
    * @return the time shift.
@@ -117,9 +135,9 @@ public interface ImportSignalStep extends Step {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           API constraint error
+   *           if shift is null or contains a line break
    */
-  public void setTimeShift(String shift) throws ApiException, RemoteException;
+  public void setTimeShift(String shift) throws RemoteException, ApiException;
 
   /**
    * @return <code>true</code> if the linear interpolation mode is enabled, <code>false</code> if
@@ -139,9 +157,7 @@ public interface ImportSignalStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setLinearInterpolation(boolean on) throws RemoteException, ApiException;
+  public void setLinearInterpolation(boolean on) throws RemoteException;
 
 }

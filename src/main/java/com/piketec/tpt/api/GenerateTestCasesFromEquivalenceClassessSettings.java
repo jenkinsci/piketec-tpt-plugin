@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,9 +25,11 @@ import java.io.Serializable;
 /**
  * Class to provide settings for generation of TestCases from EquivalenceClassess.
  *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public class GenerateTestCasesFromEquivalenceClassessSettings implements Serializable {
+
+  private static final long serialVersionUID = 7361670785090109678L;
 
   /**
    * Default value for combination.

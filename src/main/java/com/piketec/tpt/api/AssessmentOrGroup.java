@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,7 +27,7 @@ import java.rmi.RemoteException;
  * ({@link AssessmentGroup}). These objects can build up a tree where both, assessments and
  * assessment groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
 
@@ -39,20 +39,16 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public AssessmentGroup getGroup() throws ApiException, RemoteException;
+  public AssessmentGroup getGroup() throws RemoteException;
 
   /**
    * @return The parent TPT {@link Project} for this <code>AssessmentOrGroup</code>.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Project getProject() throws ApiException, RemoteException;
+  public Project getProject() throws RemoteException;
 
   /**
    * @return the assessment or assessment group ID.
@@ -60,9 +56,39 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           API constraint error
+   *           If the ID of the assessment is not an integer
+   * 
+   * @deprecated Will be removed in TPT-18. Since TPT-16 assessment IDs are strings. Use
+   *             {@link #getIdString()} instead.
    */
-  public int getId() throws ApiException, RemoteException;
+  @Deprecated
+  public int getId() throws RemoteException, ApiException;
+
+  /**
+   * @return the assessment or assessment group ID.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getIdString() throws RemoteException;
+
+  /**
+   * Set the status of the assessment or group.
+   * 
+   * @param author
+   *          The author of the status. <code>Null</code> will be reduced to an empty string.
+   * @param comment
+   *          The comment of the status. <code>Null</code> will be reduced to an empty string.
+   * @param status
+   *          The status type of the status.
+   * @throws ApiException
+   *           If <code>auhor</code> contains line break or the given <code>status</code> is
+   *           invalid.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setStatus(String author, String comment, String status)
+      throws ApiException, RemoteException;
 
   /**
    * Moves this {@link AssessmentOrGroup} to a new position in the assessment tree.
@@ -77,4 +103,23 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   public void move(AssessmentGroup newParent, int index) throws ApiException, RemoteException;
+
+  /**
+   * Copies <code>this</code> into the given <code>targetGroup</code> that can be from a different
+   * {@link Project} that is opened in the same TPT instance. If the <code>targetGroup</code>
+   * already contains an element with the same name a new one will be generated.
+   * 
+   * @param targetGroup
+   *          The group to copy <code>this</code> into. Can be from another <code>Project</code>.
+   * @param targetIndex
+   *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
+   *          copy at the end.
+   * @return The copy of this and all log messages that occured during copying.
+   * @throws ApiException
+   *           If targetGroup is <code>null</code> or copying failed.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public ResultAndLogs<AssessmentOrGroup> copy(AssessmentOwner targetGroup, int targetIndex)
+      throws ApiException, RemoteException;
 }

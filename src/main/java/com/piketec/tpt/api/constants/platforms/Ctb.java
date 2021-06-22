@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,13 +22,11 @@ package com.piketec.tpt.api.constants.platforms;
 
 public interface Ctb extends BasicPlatformConfig {
 
+  public static final String MODEL_HOME = "modelHome";
+
   public static final String HIL_CONNECTOR = "hilConnector";
 
   public static final String IPADR = "ipadr";
-
-  public static final String MEASUREMENTS = "measurements";
-
-  public static final String SIGNAL_BUFFER = "signalBuffer";
 
   public static final String START_CON = "startCon";
 
@@ -39,4 +37,5 @@ public interface Ctb extends BasicPlatformConfig {
   public static final String BATCH_SCRIPT = "batchScript";
 
   public static final String MAPPING = "ctbMapping";
+
 }

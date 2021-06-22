@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -59,6 +59,8 @@ public interface SignalComparison extends BasicAssessment {
 
   public static final String IGNORE_TIME_BOUNDRIES = "ignore-time-boundaries";
 
+  public static final String REF_DATA_TIMESHIFT = "reference-data-timeshift";
+
   public static final String DIFF_TO_HOSE_SUFFIX = "diff-suffix";
 
   public static final String DIFF_TO_REF_SUFFIX = "abs-diff-suffix";
@@ -75,9 +77,17 @@ public interface SignalComparison extends BasicAssessment {
 
   public static final String RELATIVE_TOLERANCE = "relative-tolerance";
 
+  public static final String DISABLED = "disabled";
+
   public static final String LSB_TOLERANCE = "lsb-tolerance";
 
-  public static final String REFERENCE_SEPCIFICATIONS = "reference-specifications";
+  public static final String REFERENCE_SPECIFICATIONS = "reference-specifications";
+
+  /***
+   * @deprecated Use {@link #REFERENCE_SPECIFICATIONS}
+   */
+  @Deprecated
+  public static final String REFERENCE_SEPCIFICATIONS = REFERENCE_SPECIFICATIONS;
 
   public static final String EXECUTION_CONFIG = "execution-config";
 
@@ -88,5 +98,7 @@ public interface SignalComparison extends BasicAssessment {
   public static final String DISPLAY_ABSOLUTE_DIFFERENCE = "display-absolute-difference";
 
   public static final String IGNORE_UNDEFINED_TIME_PHASES = "ignore-undefined-time-phases";
+
+  public static final String COMPARE_ON_CHANGE = "compare-on-change";
 
 }

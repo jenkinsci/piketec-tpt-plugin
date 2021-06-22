@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,21 +23,28 @@ package com.piketec.tpt.api.diagram;
 import java.rmi.RemoteException;
 import java.rmi.server.RemoteObject;
 
-import com.piketec.tpt.api.ApiException;
+import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.RemoteCollection;
 import com.piketec.tpt.api.Scenario;
+import com.piketec.tpt.api.ScenarioGroup;
 import com.piketec.tpt.api.Testlet;
+import com.piketec.tpt.api.steplist.StepListScenario;
 
 /**
- * A {@link DiagramScenario} represents either a test case or a graphically specified Variant for a
- * diagram {@link Testlet}. It specifies
+ * A <code>DiagramScenario</code> is a automaton. It specifies
  * <ul>
  * <li>a path through the automaton given by a set of (active) {@link Transition Transitions}</li>
  * <li>a selected Variant ({@link Scenario}) for each Testlet in the path</li>
  * <li>a selected {@link TransitionSpec} for each of the above {@link Transition Transitions}</li>
  * </ul>
+ *
+ * <p>
+ * In TPT, it represents both the variants as well as the test cases. Create a new
+ * <code>DiagramScenario</code> via {@link Testlet#createDiagVariant(String, ScenarioGroup)}
+ * </p>
  * 
- * @see Testlet#createDiagVariant(String, com.piketec.tpt.api.ScenarioGroup)
+ * @see Testlet#createSLVariant(String, ScenarioGroup)
+ * @see Project#getTopLevelTestlet()
  */
 public interface DiagramScenario extends Scenario {
 
@@ -46,10 +53,8 @@ public interface DiagramScenario extends Scenario {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Transition> getPath() throws ApiException, RemoteException;
+  public RemoteCollection<Transition> getPath() throws RemoteException;
 
   /**
    * Add a {@link Transition} to the list of selected <code>Transitions</code> for this
@@ -59,13 +64,11 @@ public interface DiagramScenario extends Scenario {
    * @param t
    *          The {@link Transition} to add to the path in the scenario.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If the given <code>Transition</code> object is not a {@link RemoteObject} or it does
    *           not originate from the TPT instance represented by this API object.
    */
-  public void addTransitionToPath(Transition t) throws ApiException, RemoteException;
+  public void addTransitionToPath(Transition t) throws RemoteException;
 
   /**
    * Get the Variant that is currently selected for a given state in this {@link Scenario Variant}
@@ -77,13 +80,11 @@ public interface DiagramScenario extends Scenario {
    *         <code>State</code> in the current Scenario. The selected {@link Scenario Variant}
    *         otherwise.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If the given <code>State</code> object is not a {@link RemoteObject} or it does not
    *           originate from the TPT instance represented by this API object.
    */
-  public Scenario getSelectedVariant(Testlet state) throws ApiException, RemoteException;
+  public Scenario getSelectedVariant(Testlet state) throws RemoteException;
 
   /**
    * Set a given {@link Scenario Variant} for a given {@link Testlet} in the current
@@ -96,15 +97,12 @@ public interface DiagramScenario extends Scenario {
    *          A {@link Scenario Variant} to be set or <code>null</code> to reset the variant for
    *          this state.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If the given <code>state</code> or <code>variant</code> objects are not a
    *           {@link RemoteObject} or they do not originate from the TPT instance represented by
    *           this API object.
    */
-  public void setSelectedVariant(Testlet state, Scenario variant)
-      throws ApiException, RemoteException;
+  public void setSelectedVariant(Testlet state, Scenario variant) throws RemoteException;
 
   /**
    * Get the currently selected {@link TransitionSpec transition specification} for the given
@@ -117,11 +115,8 @@ public interface DiagramScenario extends Scenario {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TransitionSpec getSelectedTransitionSpec(Transition transition)
-      throws ApiException, RemoteException;
+  public TransitionSpec getSelectedTransitionSpec(Transition transition) throws RemoteException;
 
   /**
    * Select a {@link TransitionSpec transition specification} for the given {@link Transition} in
@@ -132,14 +127,23 @@ public interface DiagramScenario extends Scenario {
    * @param transitionSpec
    *          The new transition specification or <code>null</code> to select none.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If the given <code>transition</code> or <code>transitionSpec</code> objects are not a
    *           {@link RemoteObject} or they do not originate from the TPT instance represented by
    *           this API object.
    */
   public void setSelectedTransitionSpec(Transition transition, TransitionSpec transitionSpec)
-      throws ApiException, RemoteException;
+      throws RemoteException;
+
+  /**
+   * Transforms this {@link DiagramScenario} into an empty {@link StepListScenario}. All contents
+   * will be deleted, but the meta data like ids and attributes will be retained. Do not use this
+   * {@link DiagramScenario} afterwards.
+   * 
+   * @return This {@link DiagramScenario} as an empty {@link StepListScenario}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public StepListScenario transformToStepList() throws RemoteException;
 
 }

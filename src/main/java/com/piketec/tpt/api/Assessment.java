@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,7 +29,7 @@ import com.piketec.tpt.api.properties.PropertyMap;
  * This class represents an assessment. The particular properties of the different assessment types
  * are mapped to generic properties (see {@link PropertyMap}).
  *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Assessment extends AssessmentOrGroup {
 
@@ -130,7 +130,7 @@ public interface Assessment extends AssessmentOrGroup {
   public static final String SIGNAL_COMPARISON_TYPE = "SignalComparisonAssessletType";
 
   /**
-   * Type String for Test Step List Assessments Assesslet
+   * Type String for Step List Assesslet
    */
   public static final String TEST_STEP_LIST_ASSESSMENTS_TYPE = "StepListAssessments";
 
@@ -154,20 +154,40 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getType() throws ApiException, RemoteException;
+  public String getType() throws RemoteException;
 
   /**
    * @return The value of the description field in the assessment header.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getDescription() throws ApiException, RemoteException;
+  public String getDescription() throws RemoteException;
+
+  /**
+   * @return A comma separated list of the used namespaces for the assessment.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support using
+   */
+  public String getUsing() throws ApiException, RemoteException;
+
+  /**
+   * Set the used namespace(s) for the assessment. For more namespaces provide a comma separated
+   * list.
+   * 
+   * @param using
+   *          The new namespace(s) that shall be used.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support using
+   */
+  public void setUsing(String using) throws ApiException, RemoteException;
 
   /**
    * Set the value for the description field of the assessment header. <code>Null</code> will be
@@ -178,26 +198,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDescription(String description) throws ApiException, RemoteException;
-
-  /**
-   * Returns a list of variants, for which the assessment is enabled. Returns an empty list, if the
-   * assssement is enabled for all variants.
-   *
-   * @return A list of variants and variant groups.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
-   * 
-   * @deprecated Use {@link #getSelectedVariants()} and {@link #getAutoIncludeVariantGroups()}
-   */
-  @Deprecated
-  public RemoteList<ScenarioOrGroup> getEnabledVariants() throws ApiException, RemoteException;
+  public void setDescription(String description) throws RemoteException;
 
   /**
    * Returns a list of variants, for which the assessment is enabled. Returns an empty list, if the
@@ -207,16 +209,32 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   *
+   * @deprecated Use {@link #getSelectedVariantsOrGroups()}. This method will be removed in TPT 18.
    */
-  public RemoteCollection<Scenario> getSelectedVariants() throws ApiException, RemoteException;
+  @Deprecated
+  public RemoteCollection<Scenario> getSelectedVariants() throws RemoteException;
 
   /**
-   * Enable the assessment for a particular variant or variant group. If it the arguement is a
-   * {@link ScenarioGroup} auto include will be enabled for this group and all children will be
-   * enabled recursivly. To disable, use {@link #getSelectedVariants()} or
-   * {@link #getAutoIncludeVariantGroups()} and remove the desired objects.
+   * Returns a list of variants and variant groups, for which the assessment is enabled. Returns an
+   * empty list, if the assssement is enabled for all variants. If a group is contained in the set
+   * all descendent scenarios in this group are contained in the set as well. Removing an element
+   * will remove parent elements as well to retain this constraint. Please note that removing a
+   * group will only disable the group, but leave all its subelements enabled.
+   *
+   * @return A set of {@link ScenarioOrGroup variants}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteCollection<ScenarioOrGroup> getSelectedVariantsOrGroups() throws RemoteException;
+
+  /**
+   * Enables the assessment for a variant or variant group. To disable, use
+   * {@link #getSelectedVariantsOrGroups()} and remove the desired objects.<br>
+   * Please note that using this method to enable a group will also recursively enable all its
+   * subelements. Removing a group however will only disable the group, but leave all its
+   * subelements enabled.
    * 
    * @param sog
    *          The variant / variant group ({@link com.piketec.tpt.api.ScenarioOrGroup
@@ -224,60 +242,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void enableForVariant(ScenarioOrGroup sog) throws ApiException, RemoteException;
-
-  /**
-   * Returns a list of variant groups that will automatically select newly added {@link Scenario
-   * variants} and enables auto include for newly added {@link ScenarioGroup variant groups}. Look
-   * at {@link #enableAutoIncludeForVariantGroup(ScenarioGroup)} for disable variant groups.
-   *
-   * @return A list of {@link ScenarioGroup variant groups}.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
-   */
-  public RemoteCollection<ScenarioGroup> getAutoIncludeVariantGroups()
-      throws ApiException, RemoteException;
-
-  /**
-   * Enable the group to automatically select newly added {@link Scenario variants} and
-   * {@link ScenarioGroup variant groups}. To disable, use {@link #getAutoIncludeVariantGroups()}
-   * and remove the desired objects.
-   * 
-   * @see Assessment#enableForVariant(ScenarioOrGroup)
-   * 
-   * @param scenarioGroup
-   *          for which auto include should be activated
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
-   */
-  public void enableAutoIncludeForVariantGroup(ScenarioGroup scenarioGroup)
-      throws ApiException, RemoteException;
-
-  /**
-   * Returns a list of test cases for which the assessment is enabled.
-   * 
-   * @return A list of test cases or test case groups ({@link com.piketec.tpt.api.ScenarioOrGroup
-   *         ScenarioOrGroup})
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
-   * 
-   * @deprecated Use {@link #getSelectedTestCases()} and {@link #getAutoIncludeTestCaseGroups()}
-   */
-  @Deprecated
-  public RemoteCollection<ScenarioOrGroup> getEnabledTestCases()
-      throws ApiException, RemoteException;
+  public void enableForVariant(ScenarioOrGroup sog) throws RemoteException;
 
   /**
    * Returns a list of test cases for which the assessment is enabled.
@@ -286,31 +252,33 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * 
+   * @deprecated Use {@link #getSelectedTestCasesOrGroups()}. This method will be removed in TPT 18.
    */
-  public RemoteCollection<Scenario> getSelectedTestCases() throws ApiException, RemoteException;
+  @Deprecated
+  public RemoteCollection<Scenario> getSelectedTestCases() throws RemoteException;
 
   /**
-   * Returns a list of {@link ScenarioGroup test case groups} that will automatically select newly
-   * added {@link Scenario test cases} and enables auto include for newly added {@link ScenarioGroup
-   * test case groups}. For disable groups, look at
-   * {@link #enableAutoIncludeForTestCaseGroup(ScenarioGroup)}
-   *
-   * @return A list of {@link ScenarioGroup test case groups}.
+   * Returns a list of test cases and test case groups, for which the assessment is enabled. If a
+   * group is contained in the set all descendent scenarios in this group are contained in the set
+   * as well. Removing an element will remove parent elements as well to retain this constraint.
+   * Please note that removing a group will only disable the group, but leave all its subelements
+   * enabled.
+   * 
+   * @return A set of {@link ScenarioOrGroup test cases}.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * 
    */
-  public RemoteCollection<ScenarioGroup> getAutoIncludeTestCaseGroups()
-      throws ApiException, RemoteException;
+  public RemoteCollection<ScenarioOrGroup> getSelectedTestCasesOrGroups() throws RemoteException;
 
   /**
-   * Enable the assessment for a test case or test case group. To disable, use
-   * {@link #getSelectedTestCases()} or {@link #getAutoIncludeTestCaseGroups()} and remove the
-   * desired objects.
+   * Enables the assessment for a test case or test case group. To disable, use
+   * {@link #getSelectedTestCasesOrGroups()} and remove the desired objects.<br>
+   * Please note that using this method to enable a group will also recursively enable all its
+   * subelements. Removing a group however will only disable the group, but leave all its
+   * subelements enabled.
    * 
    * @param sog
    *          A test case or test case group ({@link com.piketec.tpt.api.ScenarioOrGroup
@@ -318,28 +286,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void enableForTestCase(ScenarioOrGroup sog) throws ApiException, RemoteException;
-
-  /**
-   * Enable the {@link ScenarioGroup test case group} to automatically select newly added
-   * {@link Scenario test cases} and {@link ScenarioGroup test case groups}. To disable, use
-   * {@link #getAutoIncludeTestCaseGroups()} and remove the desired objects.
-   * 
-   * @see Assessment#enableForTestCase(ScenarioOrGroup)
-   * 
-   * @param scenarioGroup
-   *          for which auto include should be activated.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
-   */
-  public void enableAutoIncludeForTestCaseGroup(ScenarioGroup scenarioGroup)
-      throws ApiException, RemoteException;
+  public void enableForTestCase(ScenarioOrGroup sog) throws RemoteException;
 
   /**
    * Returns a list of platform configurations or execution ttems for which the assessment is
@@ -352,11 +300,9 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public RemoteList<PlatformOrExecutionItemEnabler> getEnabledPlatformConfigurationsOrExecutionConfigurationItems()
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Enables the assessment for a particular {@link com.piketec.tpt.api.PlatformConfiguration
@@ -367,11 +313,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void enableForPlatformConfiguration(PlatformConfiguration pc)
-      throws ApiException, RemoteException;
+  public void enableForPlatformConfiguration(PlatformConfiguration pc) throws RemoteException;
 
   /**
    * Enables the assessment for a particular a {@link com.piketec.tpt.api.ExecutionConfigurationItem
@@ -382,11 +325,9 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void enableForExecutionConfigurationItem(ExecutionConfigurationItem execItem)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Returns the properties of the assessment as {@link PropertyMap}.
@@ -402,10 +343,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public PropertyMap getProperties() throws ApiException, RemoteException;
+  public PropertyMap getProperties() throws RemoteException;
 
   /**
    * <p>
@@ -423,10 +362,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
+  public void setProperties(PropertyMap properties) throws RemoteException;
 
   /**
    * Returns all active test cases with respect to the variant context.
@@ -435,10 +372,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Set<Scenario> getActiveTestCases() throws ApiException, RemoteException;
+  public Set<Scenario> getActiveTestCases() throws RemoteException;
 
   /**
    * Get all requirements currently linked to this assesslet. The content of the collection is only
@@ -449,9 +384,67 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Requirement> getLinkedRequirements() throws ApiException, RemoteException;
+  public RemoteCollection<Requirement> getLinkedRequirements() throws RemoteException;
+
+  /**
+   * Returns <code>null</code> if assessment can be compiled without errors, the compile error
+   * message otherwise.
+   * 
+   * @return The compile error message or <code>null</code>.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getCompileError() throws RemoteException;
+
+  /**
+   * Returns the current status of the assessment.
+   * 
+   * @return The current status or <code>null</code> if status is "new".
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Status getCurrentStatus() throws RemoteException;
+
+  /**
+   * Returns a list of all status history entries of the assessment, the newest comes first.
+   * 
+   * @return A list of all {@link Status Statuses}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<Status> getStatusHistory() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this assessment has been modified since the last status history
+   * entry or if it has no revision. Otherwise, returns <code>false</code>.
+   *
+   * @return
+   *         <ul>
+   *         <li><code>true</code> if it is modified or new</li>
+   *         <li><code>false</code> if it is not modified</li>
+   *         </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean checkForNewRevision() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this assessment is marked as "modified"(=outdated) or has no
+   * revision. Otherwise, returns <code>false</code>.
+   *
+   * @return
+   *         <ul>
+   *         <li><code>true</code> if it is outdated or new</li>
+   *         <li><code>false</code> if it is up-to-date</li>
+   *         </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isStatusOutdated() throws RemoteException;
 
 }

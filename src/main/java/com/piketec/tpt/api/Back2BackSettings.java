@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  *
  */
 public interface Back2BackSettings extends IdentifiableRemote {
@@ -43,10 +43,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Back2BackRow addRow(String variable) throws RemoteException, ApiException;
+  public Back2BackRow addRow(String variable) throws RemoteException;
 
   /**
    * Get all added {@link Back2BackRow signal comparison rows}.
@@ -55,20 +53,16 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteList<Back2BackRow> getRows() throws RemoteException, ApiException;
+  public RemoteList<Back2BackRow> getRows() throws RemoteException;
 
   /**
    * @return the suffix added to the reference signals.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getReferenceSuffix() throws RemoteException, ApiException;
+  public String getReferenceSuffix() throws RemoteException;
 
   /**
    * Changes the suffix added to the reference {@link Channel signals}.
@@ -78,20 +72,16 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setReferenceSuffix(String referenceSuffix) throws RemoteException, ApiException;
+  public void setReferenceSuffix(String referenceSuffix) throws RemoteException;
 
   /**
    * @return the suffix added to the difference to hose {@link Channel signal}.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getDifferenceToHoseSuffix() throws RemoteException, ApiException;
+  public String getDifferenceToHoseSuffix() throws RemoteException;
 
   /**
    * Changes the suffix added to the difference to hose {@link Channel signal}.
@@ -101,21 +91,16 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDifferenceToHoseSuffix(String differenceToHoseSuffix)
-      throws RemoteException, ApiException;
+  public void setDifferenceToHoseSuffix(String differenceToHoseSuffix) throws RemoteException;
 
   /**
    * @return the suffix added to the difference to the reference-signal {@link Channel signal}.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getDifferenceToReferenceSuffix() throws RemoteException, ApiException;
+  public String getDifferenceToReferenceSuffix() throws RemoteException;
 
   /**
    * Changes the suffix added to the difference to the reference-signal {@link Channel signal}.
@@ -125,21 +110,17 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setDifferenceToReferenceSuffix(String differenceToReferenceSuffix)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * @return <code>true</code> if the {@link Channel reference signals} are exported to the report.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isExportReferenceSignals() throws RemoteException, ApiException;
+  public boolean isExportReferenceSignals() throws RemoteException;
 
   /**
    * change <code>true</code> if the {@link Channel reference signals} are exported to the report.
@@ -149,11 +130,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setExportReferenceSignals(boolean exportReferenceSignals)
-      throws RemoteException, ApiException;
+  public void setExportReferenceSignals(boolean exportReferenceSignals) throws RemoteException;
 
   /**
    * @return <code>true</code> if the difference to {@link Channel hose signals} are exported to the
@@ -161,10 +139,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isExportDifferenceToHoseSignals() throws RemoteException, ApiException;
+  public boolean isExportDifferenceToHoseSignals() throws RemoteException;
 
   /**
    * Change if the difference to {@link Channel hose signals} are exported to the report.
@@ -174,11 +150,9 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setExportDifferenceToHoseSignals(boolean exportDifferenceToHoseSignals)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * @return <code>true</code> if the difference to the {@link Channel reference signals} are
@@ -186,10 +160,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isExportDifferenceToReferenceSignals() throws RemoteException, ApiException;
+  public boolean isExportDifferenceToReferenceSignals() throws RemoteException;
 
   /**
    * Change if the difference to the {@link Channel reference signals} are exported to the report.
@@ -199,21 +171,17 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setExportDifferenceToReferenceSignals(boolean exportDifferenceToReferenceSignals)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * @return <code>true</code> if patterns are used to highlight signals.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isHighlightSelectiveSamplePoints() throws RemoteException, ApiException;
+  public boolean isHighlightSelectiveSamplePoints() throws RemoteException;
 
   /**
    * Changes if patterns are used to highlight signals.
@@ -223,11 +191,9 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setHighlightSelectiveSamplePoints(boolean usePatternsToHighlightSignals)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * @return <code>true</code> if the differenceSignal calculated by TPT.hose will not be shown but
@@ -236,10 +202,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isDisplayDifferenceToReference() throws RemoteException, ApiException;
+  public boolean isDisplayDifferenceToReference() throws RemoteException;
 
   /**
    * If set to true, the differenceSignal calculated by TPT.hose will not be shown but used to
@@ -251,21 +215,17 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setDisplayDifferenceToReference(boolean displayDifferenceToReference)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * @return <code>true</code> if the time-boundaries are ignored.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isIgnoreTimeBoundaries() throws RemoteException, ApiException;
+  public boolean isIgnoreTimeBoundaries() throws RemoteException;
 
   /**
    * Change if the time-boundaries are ignored.
@@ -275,21 +235,16 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setIgnoreTimeBoundaries(boolean ignoreTimeBoundaries)
-      throws RemoteException, ApiException;
+  public void setIgnoreTimeBoundaries(boolean ignoreTimeBoundaries) throws RemoteException;
 
   /**
    * @return {@link Mapping} that is used for the tolerance.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Mapping getMappingForTolerance() throws RemoteException, ApiException;
+  public Mapping getMappingForTolerance() throws RemoteException;
 
   /**
    * Change {@link Mapping} that is used for the tolerance.
@@ -299,21 +254,16 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setMappingForTolerance(Mapping mappingForTolerance)
-      throws RemoteException, ApiException;
+  public void setMappingForTolerance(Mapping mappingForTolerance) throws RemoteException;
 
   /**
    * @return {@link String} that represents the reference-data-time-shift.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getReferenceDataTimeShift() throws RemoteException, ApiException;
+  public String getReferenceDataTimeShift() throws RemoteException;
 
   /**
    * Change {@link String} that represents the reference-data-time-shift.
@@ -323,21 +273,16 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setReferenceDataTimeShift(String referenceDataTimeShift)
-      throws RemoteException, ApiException;
+  public void setReferenceDataTimeShift(String referenceDataTimeShift) throws RemoteException;
 
   /**
    * @return {@link String} that represents the comparison-trigger-expression.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getComparisonTriggerExpression() throws RemoteException, ApiException;
+  public String getComparisonTriggerExpression() throws RemoteException;
 
   /**
    * Change the {@link String} that represents the comparison-trigger-expression.
@@ -347,11 +292,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setComparisonTriggerExpression(String sampleFilterExpression)
-      throws RemoteException, ApiException;
+  public void setComparisonTriggerExpression(String sampleFilterExpression) throws RemoteException;
 
   /**
    * Set the reference directory of the parent {@link ExecutionConfiguration} as reference. A call
@@ -372,10 +314,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  void setReferenceToFile(String path) throws RemoteException, ApiException;
+  void setReferenceToFile(String path) throws RemoteException;
 
   /**
    * Set an other execution configuration item as reference.
@@ -413,10 +353,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Object getReference() throws RemoteException, ApiException;
+  public Object getReference() throws RemoteException;
 
   /**
    * Changes if auto-update is enabled for {@link Type type}.
@@ -435,10 +373,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setAutoUpdate(VariableType type, boolean on) throws RemoteException, ApiException;
+  public void setAutoUpdate(VariableType type, boolean on) throws RemoteException;
 
   /**
    * @param type
@@ -448,10 +384,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isAutoUpdate(VariableType type) throws RemoteException, ApiException;
+  public boolean isAutoUpdate(VariableType type) throws RemoteException;
 
   /**
    * @return <code>true</code> if differences in a sample are ignored. Default value is
@@ -459,10 +393,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isIgnoreUndefinedPhases() throws RemoteException, ApiException;
+  public boolean isIgnoreUndefinedPhases() throws RemoteException;
 
   /**
    * Changes if differences in a sample are ignored. Default value is <code>true</code>.
@@ -472,20 +404,15 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setIgnoreUndefinedPhases(boolean ignoreUndefinedPhases)
-      throws RemoteException, ApiException;
+  public void setIgnoreUndefinedPhases(boolean ignoreUndefinedPhases) throws RemoteException;
 
   /**
    * @return {@link ExecutionConfigurationItem} related to this {@link Back2BackSettings}.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public ExecutionConfigurationItem getExecConfigItem() throws RemoteException, ApiException;
+  public ExecutionConfigurationItem getExecConfigItem() throws RemoteException;
 
 }

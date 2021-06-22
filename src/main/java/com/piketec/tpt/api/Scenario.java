@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,14 @@ import java.io.File;
 import java.rmi.RemoteException;
 
 /**
- * Either a test case or a Diagram/StepList variant of a TestLet.
+ * Either a test case or a Diagram/StepList variant of a TestLet. *
+ * <p>
+ * In TPT, it represents both the variants as well as the test cases. Create new
+ * <code>Scenarios</code> via {@link Testlet#createDiagVariant(String, ScenarioGroup)} or
+ * {@link Testlet#createSLVariant(String, ScenarioGroup)}.
+ * </p>
+ * 
+ * @see Project#getTopLevelTestlet()
  */
 public interface Scenario extends ScenarioOrGroup {
 
@@ -37,10 +44,8 @@ public interface Scenario extends ScenarioOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteCollection<Requirement> getLinkedRequirements() throws ApiException, RemoteException;
+  RemoteCollection<Requirement> getLinkedRequirements() throws RemoteException;
 
   /**
    * Returns the test data directory of scenario for a given execution configuration item. Since
@@ -60,4 +65,69 @@ public interface Scenario extends ScenarioOrGroup {
   public File getTestDataDirectory(ExecutionConfigurationItem execConfigItem)
       throws RemoteException, ApiException;
 
+  /**
+   * Returns <code>null</code> if scenario can be compiled without errors, the compile error message
+   * otherwise.
+   * 
+   * @return The compile error message or <code>null</code>
+   * @throws ApiException
+   *           If scenario is not part of a project anymore or compiler is inactive for the project.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getCompileError() throws RemoteException, ApiException;
+
+  /**
+   * Returns the current status of the scenario.
+   * 
+   * @return The current status or <code>null</code> if status is "new".
+   * @throws ApiException
+   *           If this {@link Scenario} is not a test case.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Status getCurrentStatus() throws ApiException, RemoteException;
+
+  /**
+   * Returns a list of all status history entries of the scenario, the newest comes first.
+   * 
+   * @return A list of all {@link Status Statuses}.
+   * @throws ApiException
+   *           If this {@link Scenario} is not a test case.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<Status> getStatusHistory() throws ApiException, RemoteException;
+
+  /**
+   * Returns <code>true</code> if this scenario has been modified since the last status history
+   * entry or if it has no revision. Otherwise, returns <code>false</code>.
+   *
+   * @return
+   *         <ul>
+   *         <li><code>true</code> if it is modified or new</li>
+   *         <li><code>false</code> if it is up-to-date</li>
+   *         </ul>
+   * @throws ApiException
+   *           If this {@link Scenario} is not a test case.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean checkForNewRevision() throws ApiException, RemoteException;
+
+  /**
+   * Returns <code>true</code> if this scenario is marked as "modified"(=outdated) or has no
+   * revision. Otherwise, returns <code>false</code>.
+   *
+   * @return
+   *         <ul>
+   *         <li><code>true</code> if it is outdated or new</li>
+   *         <li><code>false</code> if it is up-to-date</li>
+   *         </ul>
+   * @throws ApiException
+   *           If this {@link Scenario} is not a test case.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isStatusOutdated() throws ApiException, RemoteException;
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,14 @@
 package com.piketec.tpt.api;
 
 /**
- * The object represents a list of {@link Scenario} and <code>ScenrioGroup</code> objects. Together
+ * The object represents a list of {@link Scenario} and <code>ScenarioGroup</code> objects. Together
  * with the sub-groups it represents a tree.
+ * <p>
+ * In TPT, it represents both the variant groups as well as the test case groups. Create new
+ * <code>ScenarioGroups</code> via {@link Testlet#createVariantGroup(String, ScenarioGroup)}.
+ * </p>
+ * 
+ * @see Project#getTopLevelTestlet()
  */
 public interface ScenarioGroup extends ScenarioOrGroup, RemoteList<ScenarioOrGroup> {
 

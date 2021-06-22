@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,6 @@ package com.piketec.tpt.api.diagram;
 import java.awt.Point;
 import java.rmi.RemoteException;
 
-import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.NamedObject;
 import com.piketec.tpt.api.RemoteList;
@@ -38,20 +37,16 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public DiagramNode getFrom() throws ApiException, RemoteException;
+  public DiagramNode getFrom() throws RemoteException;
 
   /**
    * @return The end diagram node of the <code>Transition</code>
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public DiagramNode getTo() throws ApiException, RemoteException;
+  public DiagramNode getTo() throws RemoteException;
 
   /**
    * Set starting diagram node for this <code>Transition</code>
@@ -59,12 +54,10 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * @param n
    *          The new starting point
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If <code>n</code> does not belong to the TPT instance represented by the API object.
    */
-  public void setFrom(DiagramNode n) throws ApiException, RemoteException;
+  public void setFrom(DiagramNode n) throws RemoteException;
 
   /**
    * Set end diagram node for this <code>Transition</code>
@@ -72,12 +65,10 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * @param n
    *          The new end point
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If <code>n</code> does not belong to the TPT instance represented by the API object.
    */
-  public void setTo(DiagramNode n) throws ApiException, RemoteException;
+  public void setTo(DiagramNode n) throws RemoteException;
 
   /**
    * Returns a list of auxiliary points for this transition that are used to define a curvy shape
@@ -87,10 +78,8 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteList<Point> getAuxPositions() throws ApiException, RemoteException;
+  public RemoteList<Point> getAuxPositions() throws RemoteException;
 
   /**
    * Add a new list of auxiliary point for this transition.
@@ -102,10 +91,8 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void addAuxPoint(Point p, int index) throws ApiException, RemoteException;
+  public void addAuxPoint(Point p, int index) throws RemoteException;
 
   /**
    * Returns the list of {@link TransitionSpec transition specifications} or
@@ -119,11 +106,9 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public RemoteList<TransitionSpecOrGroup> getTopLevelTransitionSpecOrGroup()
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Create a new {@link TransitionSpec}. The new specification is either added to a given group,
@@ -137,14 +122,12 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    *          this transition.
    * @return The newly created {@link TransitionSpec}.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If <code>groupOrNull</code> does not belong to the TPT instance represented by the
    *           API object.
    */
   public TransitionSpec createTransitionSpec(String name, TransitionSpecGroup groupOrNull)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Create a new {@link TransitionSpecGroup}. The new group is either added to a given group, or,
@@ -158,13 +141,11 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    *          this transition.
    * @return The newly created {@link TransitionSpecGroup}.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           If <code>groupOrNull</code> does not belong to the TPT instance represented by the
    *           API object.
    */
   public TransitionSpecGroup createTransitionSpecGroup(String name, TransitionSpecGroup groupOrNull)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
 }

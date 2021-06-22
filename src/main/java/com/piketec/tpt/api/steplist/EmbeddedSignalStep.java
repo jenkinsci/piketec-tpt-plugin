@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,6 @@ package com.piketec.tpt.api.steplist;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.Pair;
 import com.piketec.tpt.api.Type;
 
@@ -48,10 +47,8 @@ public interface EmbeddedSignalStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDeclaration(String name) throws RemoteException, ApiException;
+  public void setDeclaration(String name) throws RemoteException;
 
   /**
    * @return a map with all sample points. Look at
@@ -74,11 +71,9 @@ public interface EmbeddedSignalStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setSamplePoints(List<Pair<Long, String>> signalPoints, Type type)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * @return <code>true</code> if the linear interpolation mode is enabled, <code>false</code> if
@@ -98,9 +93,7 @@ public interface EmbeddedSignalStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setLinearInterpolation(boolean on) throws RemoteException, ApiException;
+  public void setLinearInterpolation(boolean on) throws RemoteException;
 
 }

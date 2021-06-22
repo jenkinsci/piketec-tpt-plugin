@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -51,10 +51,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean hasDefinedContent() throws ApiException, RemoteException;
+  public boolean hasDefinedContent() throws RemoteException;
 
   /**
    * Creates a new local definition for this state that has not been referenced so far.
@@ -64,10 +62,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void createNewContent() throws ApiException, RemoteException;
+  public void createNewContent() throws RemoteException;
 
   /**
    * Creates a new step list variant ({@link StepListScenario}) or a new test case (if the current
@@ -144,11 +140,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteList<ScenarioOrGroup> getTopLevelScenarioOrGroup()
-      throws ApiException, RemoteException;
+  public RemoteList<ScenarioOrGroup> getTopLevelScenarioOrGroup() throws RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all {@link Transition Transitions} in
@@ -156,10 +149,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Transition> getTransitions() throws ApiException, RemoteException;
+  public RemoteCollection<Transition> getTransitions() throws RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all {@link Line Lines} in this
@@ -167,10 +158,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Line> getLines() throws ApiException, RemoteException;
+  public RemoteCollection<Line> getLines() throws RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all {@link TextArea text areas} in
@@ -178,10 +167,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<TextArea> getTextAreas() throws ApiException, RemoteException;
+  public RemoteCollection<TextArea> getTextAreas() throws RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all {@link Testlet Testlets} in this
@@ -189,10 +176,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Testlet> getStates() throws ApiException, RemoteException;
+  public RemoteCollection<Testlet> getStates() throws RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all {@link Junction Junctions} in this
@@ -200,10 +185,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Junction> getJunctions() throws ApiException, RemoteException;
+  public RemoteCollection<Junction> getJunctions() throws RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all final junctions ({@link Final}) in
@@ -211,10 +194,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<Final> getFinals() throws ApiException, RemoteException;
+  public RemoteCollection<Final> getFinals() throws RemoteException;
 
   /**
    * Get the top level group that contains all {@link ScenarioOrGroup ScenarioOrGroups} that are
@@ -226,10 +207,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  ScenarioGroup getToplevelScenarioGroup() throws RemoteException, ApiException;
+  ScenarioGroup getToplevelScenarioGroup() throws RemoteException;
 
   /**
    * Creates a new {@link Transition} from a node <code>from</code> to a node <code>to</code>. A
@@ -267,10 +246,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Line createLine(int y) throws ApiException, RemoteException;
+  public Line createLine(int y) throws RemoteException;
 
   /**
    * Create a new {@link TextArea} at the position <code>pos</code> with the content
@@ -285,10 +262,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TextArea createTextArea(String text, Point pos) throws ApiException, RemoteException;
+  public TextArea createTextArea(String text, Point pos) throws RemoteException;
 
   /**
    * Create a new diagram state ({@link Testlet}) at the given position
@@ -302,10 +277,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Testlet createTestlet(String name, Point pos) throws ApiException, RemoteException;
+  public Testlet createTestlet(String name, Point pos) throws RemoteException;
 
   /**
    * Create a new state ({@link Testlet}) which is not visible in the diagram and is intended for
@@ -318,10 +291,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Testlet createTestlet(String name) throws ApiException, RemoteException;
+  public Testlet createTestlet(String name) throws RemoteException;
 
   /**
    * Create a new {@link Junction} at the given position <code>pos</code>
@@ -332,10 +303,8 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Junction createJunction(Point pos) throws ApiException, RemoteException;
+  public Junction createJunction(Point pos) throws RemoteException;
 
   /**
    * Creat a new {@link Final} junction at the given position <code>pos</code>
@@ -346,8 +315,21 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Final createFinal(Point pos) throws ApiException, RemoteException;
+  public Final createFinal(Point pos) throws RemoteException;
+
+  /**
+   * Copies <code>this</code> into the given <code>target</code> that can be from a different
+   * {@link Project} that is opened in the same TPT instance. If the <code>target</code> already
+   * contains an element with the same name a new one will be generated.
+   * 
+   * @param target
+   *          The testlet to copy <code>this</code> into. Can be from another <code>Project</code>.
+   * @return The copy of this and all log messages that occured during copying.
+   * @throws ApiException
+   *           If target is <code>null</code> or copying failed.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  ResultAndLogs<Testlet> copy(Testlet target) throws RemoteException, ApiException;
 }

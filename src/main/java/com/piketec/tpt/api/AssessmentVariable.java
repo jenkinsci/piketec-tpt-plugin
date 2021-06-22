@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * An assessment variable is used to evaluate tests.
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface AssessmentVariable extends Declaration {
 
@@ -37,10 +37,8 @@ public interface AssessmentVariable extends Declaration {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isRecord() throws ApiException, RemoteException;
+  boolean isRecord() throws RemoteException;
 
   /**
    * Set if the assessment variable should be recorded during test execution.
@@ -51,9 +49,7 @@ public interface AssessmentVariable extends Declaration {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  void setRecord(boolean on) throws ApiException, RemoteException;
+  void setRecord(boolean on) throws RemoteException;
 
 }

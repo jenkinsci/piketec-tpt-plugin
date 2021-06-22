@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,11 +22,13 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.IterableRemoteList;
+
 /**
- * A sorted set of (Remote) elements. Changes to this list will be done directly in TPT.
+ * An ordered collection of (Remote) elements. Changes to this list will be done directly in TPT.
  * 
  * @param <E>
- *          type parameter for list element data type
+ *          the type of elements in this list
  */
 public interface RemoteList<E> extends RemoteCollection<E> {
 
@@ -41,10 +43,8 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public E get(int index) throws ApiException, IndexOutOfBoundsException, RemoteException;
+  public E get(int index) throws IndexOutOfBoundsException, RemoteException;
 
   /**
    * Removes the element at position <code>index</code> from the list.
@@ -56,10 +56,8 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void delete(int index) throws ApiException, IndexOutOfBoundsException, RemoteException;
+  public void delete(int index) throws IndexOutOfBoundsException, RemoteException;
 
   /**
    * Moves an element from the position <code>from</code> to <code>to</code>. All elements in this
@@ -77,9 +75,10 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    *           <code>to &gt;= getItems().size()</code> or <code>from &gt;= getItems().size()</code>
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public E move(int from, int to) throws ApiException, IndexOutOfBoundsException, RemoteException;
+  public E move(int from, int to) throws IndexOutOfBoundsException, RemoteException;
+
+  @Override
+  public IterableRemoteList<E> asIterable() throws RemoteException;
 
 }

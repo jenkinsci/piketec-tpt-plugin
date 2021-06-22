@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,11 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+/**
+ * General configuration of the report created after a test run.
+ * 
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ */
 public interface AdvancedReportSettings extends IdentifiableRemote {
 
   /**
@@ -44,8 +49,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
     ALWAYS;
 
     /**
-     * @deprecated this attribute exists for backwards compatibility reasons only. It has the same
-     *             semantics as {@link #PASSED_OR_FAILED_OR_EXECERROR_ONLY}. Please use
+     * @deprecated Will be removed in TPT 18. this attribute exists for backwards compatibility
+     *             reasons only. It has the same semantics as
+     *             {@link #PASSED_OR_FAILED_OR_EXECERROR_ONLY}. Please use
      *             {@link #PASSED_OR_FAILED_OR_EXECERROR_ONLY} instead.
      */
     @Deprecated
@@ -54,6 +60,10 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
 
   }
 
+  /**
+   * @deprecated Will be removed in TPT 18.
+   */
+  @Deprecated
   public static final ShowAssessmentVariables SHOW_ASSESSMENT_VARIABLES_DEFAULT =
       ShowAssessmentVariables.PASSED_OR_FAILED_OR_EXECERROR_ONLY;
 
@@ -65,10 +75,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void addAdditionalRequirementAttr(String attr) throws RemoteException, ApiException;
+  public void addAdditionalRequirementAttr(String attr) throws RemoteException;
 
   /**
    * Gets all additional attributes for the requirements result tables.
@@ -77,10 +85,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteList<String> getAdditionalRequirementAttrs() throws RemoteException, ApiException;
+  public RemoteList<String> getAdditionalRequirementAttrs() throws RemoteException;
 
   /**
    * Adds an attribute of the testcase to the testcase summary table.
@@ -90,10 +96,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void addTestcasetAttr(String attr) throws RemoteException, ApiException;
+  public void addTestcasetAttr(String attr) throws RemoteException;
 
   /**
    * Gets all attributes that are shown for each testcase in the testcase summary table.
@@ -102,10 +106,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteList<String> getTestcaseAttrs() throws RemoteException, ApiException;
+  public RemoteList<String> getTestcaseAttrs() throws RemoteException;
 
   /**
    * Get attribute assessmentVariableFilter. In case of a huge amount of assessment variables it
@@ -119,10 +121,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getAssessmentVariableFilter() throws RemoteException, ApiException;
+  public String getAssessmentVariableFilter() throws RemoteException;
 
   /**
    * Get attribute OverviewImagePath. This image will be shown at the beginning of the report.
@@ -131,10 +131,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getOverviewImagePath() throws RemoteException, ApiException;
+  public String getOverviewImagePath() throws RemoteException;
 
   /**
    * Get attribute OverviewText. This text is shown at the beginning of the report.
@@ -143,10 +141,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getOverviewText() throws RemoteException, ApiException;
+  public String getOverviewText() throws RemoteException;
 
   /**
    * Get target path for the compressed report file.
@@ -155,10 +151,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getCompressionPath() throws RemoteException, ApiException;
+  public String getCompressionPath() throws RemoteException;
 
   /**
    * Get attribute showAssessmentVariables. An assessment variable is a variable used for evaluating
@@ -169,11 +163,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public com.piketec.tpt.api.AdvancedReportSettings.ShowAssessmentVariables getShowAssessmentVariables()
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * Get attribute buildOverviewAutomatically. Set to true to finalize the test run and generate the
@@ -183,10 +175,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isOverviewBuildAutomatically() throws RemoteException, ApiException;
+  public boolean isOverviewBuildAutomatically() throws RemoteException;
 
   /**
    * Check only {@link Requirement Requirements} linked to the executed test case or variant: The
@@ -198,10 +188,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isOnlyLinkedRequirements() throws RemoteException, ApiException;
+  public boolean isOnlyLinkedRequirements() throws RemoteException;
 
   /**
    * Determines if a requirements overview section is generated.
@@ -210,10 +198,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isCreateRequirementsOverviewSection() throws RemoteException, ApiException;
+  public boolean isCreateRequirementsOverviewSection() throws RemoteException;
 
   /**
    * Determines if the report directory is deleted after writing the compressed report file. If and
@@ -223,10 +209,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isDeleteReportDirAfterCompression() throws RemoteException, ApiException;
+  public boolean isDeleteReportDirAfterCompression() throws RemoteException;
 
   /**
    * If this flag is set and a requirement was not checked in any assesslet
@@ -236,11 +220,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public boolean isDeriveRequirementResultsFromTCIfNotCheckedInAnyAssesslets()
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * Determines if a requirements assesslet results table section is written in the requirements
@@ -251,10 +233,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isGenerateRequirementsAssessletResultsTable() throws RemoteException, ApiException;
+  public boolean isGenerateRequirementsAssessletResultsTable() throws RemoteException;
 
   /**
    * Determines if a variable summary section is generated.
@@ -263,10 +243,18 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isGenerateVariableSummary() throws RemoteException, ApiException;
+  public boolean isGenerateVariableSummary() throws RemoteException;
+
+  /**
+   * Determines if "Status Summary" report page is generated.
+   * 
+   * @return get attribute generateStatusSummary
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGenerateStatusSummary() throws RemoteException;
 
   /**
    * Determines if Signal-Viewer-Links are included.
@@ -275,10 +263,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isIncludeSignalViewerApplet() throws RemoteException, ApiException;
+  public boolean isIncludeSignalViewerApplet() throws RemoteException;
 
   /**
    * Determines if a compressed file is generated. If set to true but no file is set, an
@@ -288,10 +274,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isCompressReport() throws RemoteException, ApiException;
+  public boolean isCompressReport() throws RemoteException;
 
   /**
    * @return Determines if custom filter settings ({@link #getCustomPackExcludeFilter()} and
@@ -300,40 +284,32 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           isCompressReport()==false
    */
-  public boolean isPackCustomFilter() throws RemoteException, ApiException;
+  public boolean isPackCustomFilter() throws RemoteException;
 
   /**
    * @return Determines if test report files will be archived in the report archive.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           isCompressReport()==false || isPackCustomFilter==true
    */
-  public boolean isPackTestReportData() throws RemoteException, ApiException;
+  public boolean isPackTestReportData() throws RemoteException;
 
   /**
    * @return Determines if test summary files will be archived in the report archive.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           isCompressReport()==false || isPackCustomFilter==true
    */
-  public boolean isPackTestSummaryData() throws RemoteException, ApiException;
+  public boolean isPackTestSummaryData() throws RemoteException;
 
   /**
    * @return Determines if test record files will be archived in the report archive.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           isCompressReport()==false || isPackCustomFilter==true
    */
-  public boolean isPackTestRecordData() throws RemoteException, ApiException;
+  public boolean isPackTestRecordData() throws RemoteException;
 
   /**
    * @return Returns the custom include filter string. Please see UI documentation for detailed
@@ -341,10 +317,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           isCompressReport()==false || isPackCustomFilter==false
    */
-  public String getCustomPackIncludeFilter() throws RemoteException, ApiException;
+  public String getCustomPackIncludeFilter() throws RemoteException;
 
   /**
    * @return Returns the custom exclude filter string. Please see UI documentation for detailed
@@ -352,10 +326,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           isCompressReport()==false || isPackCustomFilter==false
    */
-  public String getCustomPackExcludeFilter() throws RemoteException, ApiException;
+  public String getCustomPackExcludeFilter() throws RemoteException;
 
   /**
    * Determines if a comment column is generated for the Test Case Summary table in the Platform
@@ -365,10 +337,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isShowPlatformOverviewComment() throws RemoteException, ApiException;
+  public boolean isShowPlatformOverviewComment() throws RemoteException;
 
   /**
    * Determines if a directory column is generated for the Test Case Summary table in the Platform
@@ -378,10 +348,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isShowPlatformOverviewDirectory() throws RemoteException, ApiException;
+  public boolean isShowPlatformOverviewDirectory() throws RemoteException;
 
   /**
    * When importing requirements, there might be requirements tagged as heading (for more detail see
@@ -393,10 +361,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isShowRequirementHeadings() throws RemoteException, ApiException;
+  public boolean isShowRequirementHeadings() throws RemoteException;
 
   /**
    * When importing requirements, there might be requirements tagged as information (for more detail
@@ -408,10 +374,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isShowRequirementInformation() throws RemoteException, ApiException;
+  public boolean isShowRequirementInformation() throws RemoteException;
 
   /**
    * Determines if comments in the requirements results table are displayed.
@@ -420,10 +384,18 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isShowRequirementComments() throws RemoteException, ApiException;
+  public boolean isShowRequirementComments() throws RemoteException;
+
+  /**
+   * Determines if document versions in the requirements results table are displayed.
+   * 
+   * @return get attribute showDocumentVersions
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isShowDocumentVersions() throws RemoteException;
 
   /**
    * Get attribute checkAndShowTestCaseStatusInformation. If this is set to true, an overview table
@@ -434,10 +406,20 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isCheckAndShowTestCaseStatusInformation() throws RemoteException, ApiException;
+  public boolean isCheckAndShowTestCaseStatusInformation() throws RemoteException;
+
+  /**
+   * Get attribute checkAndShowAssessmentStatusInformation. If this is set to true, an overview
+   * table is added to the report, showing all assessments with their status (e.g. stable, in
+   * progress, new, ...)
+   * 
+   * @return get attribute checkAndShowAssessmentStatusInformation
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isCheckAndShowAssessmentStatusInformation() throws RemoteException;
 
   /**
    * Change attribute assessmentVariableFilter. In case of a huge amount of assessment variables it
@@ -451,11 +433,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setAssessmentVariableFilter(String assessmentVariableFilter)
-      throws RemoteException, ApiException;
+  public void setAssessmentVariableFilter(String assessmentVariableFilter) throws RemoteException;
 
   /**
    * Change attribute buildOverviewAutomatically. Set to <code>true</code> to finalize the test run
@@ -466,11 +445,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setOverviewBuildAutomatically(boolean buildReportAutomatically)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * Set if only linked {@link Requirement Requirements} are printed into the report.
@@ -530,10 +507,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setOverviewImagePath(String overviewImagePath) throws RemoteException, ApiException;
+  public void setOverviewImagePath(String overviewImagePath) throws RemoteException;
 
   /**
    * Change attribute overviewText. This text is shown at the beginning of the report.
@@ -543,10 +518,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setOverviewText(String overviewText) throws RemoteException, ApiException;
+  public void setOverviewText(String overviewText) throws RemoteException;
 
   /**
    * Changes if a requirements assesslet results table section is generated, which shows which
@@ -570,11 +543,19 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setGenerateVariableSummary(boolean generateVariableSummary)
-      throws RemoteException, ApiException;
+  public void setGenerateVariableSummary(boolean generateVariableSummary) throws RemoteException;
+
+  /**
+   * Changes if "Status Summary" report page is generated.
+   * 
+   * @param generateStatusSummary
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setGenerateStatusSummary(boolean generateStatusSummary) throws RemoteException;
 
   /**
    * Changes if Signal-Viewer-Links are included.
@@ -596,10 +577,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setCompressReport(boolean packReport) throws RemoteException, ApiException;
+  public void setCompressReport(boolean packReport) throws RemoteException;
 
   /**
    * Changes if custom include and exclude filters are applied for compressed report.
@@ -609,10 +588,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error (e.g. {@link #isCompressReport()} ==false)
    */
-  public void setPackCustomFilter(boolean customFilter) throws RemoteException, ApiException;
+  public void setPackCustomFilter(boolean customFilter) throws RemoteException;
 
   /**
    * Changes if the compressed report includes test report files.
@@ -622,11 +599,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error (e.g. {@link #isCompressReport()} &amp;&amp;
-   *           !{@link #isPackCustomFilter()} ==false)
    */
-  public void setPackTestReportData(boolean packReportData) throws RemoteException, ApiException;
+  public void setPackTestReportData(boolean packReportData) throws RemoteException;
 
   /**
    * Changes if the compressed report includes summary (e.g. xml) files.
@@ -636,11 +610,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error (e.g. {@link #isCompressReport()} &amp;&amp;
-   *           !{@link #isPackCustomFilter()} ==false)
    */
-  public void setPackTestSummaryData(boolean packSummaryData) throws RemoteException, ApiException;
+  public void setPackTestSummaryData(boolean packSummaryData) throws RemoteException;
 
   /**
    * Changes if the compressed report includes test record (e.g. tptbin) files.
@@ -650,11 +621,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error (e.g. {@link #isCompressReport()} &amp;&amp;
-   *           !{@link #isPackCustomFilter()} ==false)
    */
-  public void setPackTestRecordData(boolean packRecordData) throws RemoteException, ApiException;
+  public void setPackTestRecordData(boolean packRecordData) throws RemoteException;
 
   /**
    * Sets a custom include filter string. Please see UI documentation for detailed information.
@@ -664,11 +632,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error (e.g. {@link #isCompressReport()} &amp;&amp;
-   *           {@link #isPackCustomFilter()} ==false)
    */
-  public void setCustomPackIncludeFilter(String includeFilter) throws RemoteException, ApiException;
+  public void setCustomPackIncludeFilter(String includeFilter) throws RemoteException;
 
   /**
    * Sets a custom exclude filter string. Please see UI documentation for detailed information.
@@ -678,11 +643,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error (e.g. {@link #isCompressReport()} &amp;&amp;
-   *           {@link #isPackCustomFilter()} ==false)
    */
-  public void setCustomPackExcludeFilter(String excludeFilter) throws RemoteException, ApiException;
+  public void setCustomPackExcludeFilter(String excludeFilter) throws RemoteException;
 
   /**
    * Changes if a comment column is generated for the Test Case Summary table in the Platform
@@ -693,11 +655,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setShowPlatformOverviewComment(boolean platformOverviewComment)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * Changes if a directory column is generated for the Test Case Summary table in the Platform
@@ -721,10 +681,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setCompressionPath(String compressionPath) throws RemoteException, ApiException;
+  public void setCompressionPath(String compressionPath) throws RemoteException;
 
   /**
    * Change attribute showAssessmentVariables. An assessment variable is a variable used for
@@ -737,11 +695,9 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   public void setShowAssessmentVariables(ShowAssessmentVariables showAssessmentVariables)
-      throws RemoteException, ApiException;
+      throws RemoteException;
 
   /**
    * When importing requirements, there might be requirements tagged as heading (for more detail see
@@ -754,10 +710,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setShowRequirementHeadings(boolean showHeadings) throws RemoteException, ApiException;
+  public void setShowRequirementHeadings(boolean showHeadings) throws RemoteException;
 
   /**
    * When importing requirements, there might be requirements tagged as information (for more detail
@@ -770,11 +724,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setShowRequirementInformation(boolean showInformation)
-      throws RemoteException, ApiException;
+  public void setShowRequirementInformation(boolean showInformation) throws RemoteException;
 
   /**
    * Changes if comments are shown in the requirements results table.
@@ -784,11 +735,19 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setShowRequirementComments(boolean showRequirementComments)
-      throws RemoteException, ApiException;
+  public void setShowRequirementComments(boolean showRequirementComments) throws RemoteException;
+
+  /**
+   * Changes if document versions are shown in the requirements results table.
+   * 
+   * @param showDocumentVersions
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setShowDocumentVersions(boolean showDocumentVersions) throws RemoteException;
 
   /**
    * If this is set to true, an overview table is added to the report, showing all test cases with
@@ -801,6 +760,19 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    *           remote communication problem
    */
   public void setCheckAndShowTestCaseStatusInformation(boolean checkAndShowTestCaseStatusInformation)
+      throws RemoteException;
+
+  /**
+   * If this is set to true, an overview table is added to the report, showing all assessments with
+   * their status (e.g. stable, in progress, new, ...)
+   * 
+   * @param checkAndShowAssessmentStatusInformation
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setCheckAndShowAssessmentStatusInformation(boolean checkAndShowAssessmentStatusInformation)
       throws RemoteException;
 
 }

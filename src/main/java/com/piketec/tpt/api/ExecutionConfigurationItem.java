@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import java.util.Map;
  * Configuration of the test execution for a particular platform, test set and parameter set. Part
  * of a {@link ExecutionConfiguration}
  *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 
@@ -47,21 +47,16 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Back2BackSettings getBack2BackSettings(boolean createIfUnavailable)
-      throws ApiException, RemoteException;
+  public Back2BackSettings getBack2BackSettings(boolean createIfUnavailable) throws RemoteException;
 
   /**
    * Removes the back to back settings of this item (set reference to "No Reference Platform").
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void removeBack2BackSettings() throws ApiException, RemoteException;
+  public void removeBack2BackSettings() throws RemoteException;
 
   /**
    * @return The {@link ExecutionConfiguration} this instance belongs to.
@@ -96,30 +91,24 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setActive(boolean active) throws ApiException, RemoteException;
+  public void setActive(boolean active) throws RemoteException;
 
   /**
    * @return Returns whether this <code>ExecutionConfigItem</code> is enabled for execution or not.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isActive() throws ApiException, RemoteException;
+  public boolean isActive() throws RemoteException;
 
   /**
    * @return Returns the selected test set or <code>null</code> if it set to "Selected test cases".
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TestSet getTestSet() throws ApiException, RemoteException;
+  public TestSet getTestSet() throws RemoteException;
 
   /**
    * @return Returns the currently selected {@link PlatformConfiguration} or <code>null</code> if
@@ -127,24 +116,20 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public PlatformConfiguration getPlatformConfiguration() throws ApiException, RemoteException;
+  public PlatformConfiguration getPlatformConfiguration() throws RemoteException;
 
   /**
    * @return Returns the parameter file or <code>null</code> if none has been selected so far.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getParameterFilePath()}
-   *             instead.
+   *             instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public File getParameterFile() throws ApiException, RemoteException;
+  public File getParameterFile() throws RemoteException;
 
   /**
    * @return The parameter file as <code>String</code> or <code>null</code> if none has yet been
@@ -152,10 +137,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getParameterFilePath() throws ApiException, RemoteException;
+  public String getParameterFilePath() throws RemoteException;
 
   /**
    * Returns the variables defined for <b>this</b> <code>ExecutionConfigurationItem</code>.
@@ -168,10 +151,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Map<String, String> getVariables() throws ApiException, RemoteException;
+  public Map<String, String> getVariables() throws RemoteException;
 
   /**
    * Set a {@link TestSet} for this <code>ExecutionConfigurationItem</code>.
@@ -181,10 +162,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTestSet(TestSet ts) throws ApiException, RemoteException;
+  public void setTestSet(TestSet ts) throws RemoteException;
 
   /**
    * Set a particular {@link PlatformConfiguration} for this ExecutionConfigurationItem.
@@ -194,11 +173,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setPlatformConfiguration(PlatformConfiguration pc)
-      throws ApiException, RemoteException;
+  public void setPlatformConfiguration(PlatformConfiguration pc) throws RemoteException;
 
   /**
    * Set the parameter file as <code>File</code> or deletes the entry if <code>f==null</code>
@@ -208,14 +184,12 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use
-   *             {@link #setParameterFilePath(String)} instead.
+   *             {@link #setParameterFilePath(String)} instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public void setParameterFile(File f) throws ApiException, RemoteException;
+  public void setParameterFile(File f) throws RemoteException;
 
   /**
    * Set the parameter file as <code>String</code> or delete the entry if <code>path==null</code>
@@ -225,10 +199,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setParameterFilePath(String path) throws ApiException, RemoteException;
+  public void setParameterFilePath(String path) throws RemoteException;
 
   /**
    * Enable or disable whether assessments should be executed for this
@@ -247,10 +219,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRunAssessments(boolean run) throws ApiException, RemoteException;
+  public void setRunAssessments(boolean run) throws RemoteException;
 
   /**
    * @return Returns <code>true</code> if assessments should be executed for this
@@ -258,10 +228,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isRunAssessments() throws ApiException, RemoteException;
+  public boolean isRunAssessments() throws RemoteException;
 
   /**
    * Set the variables <code>name</code> to the given <code>value</code> or delete it, if

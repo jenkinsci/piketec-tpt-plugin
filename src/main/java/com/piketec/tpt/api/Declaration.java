@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * A <code>Declaration</code> is either a signal or a parameter or a constant.
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Declaration extends NamedObject, IdentifiableRemote {
 
@@ -34,10 +34,8 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getGroup() throws ApiException, RemoteException;
+  String getGroup() throws RemoteException;
 
   /**
    * Set the group the declaration should belong to.
@@ -48,10 +46,8 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  void setGroup(String group) throws ApiException, RemoteException;
+  void setGroup(String group) throws RemoteException;
 
   /**
    * Returns the name of the unit of the declaration. For complex types units of subvariables are
@@ -62,10 +58,8 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getUnit() throws ApiException, RemoteException;
+  String getUnit() throws RemoteException;
 
   /**
    * Returns the {@link Unit} set to this declaration. The method is only allowed on non-structured
@@ -76,7 +70,7 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           If this declaration has a strcutured type.
+   *           If this declaration has a structured type.
    */
   Unit getUnitObject() throws ApiException, RemoteException;
 
@@ -100,13 +94,13 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
   void setUnit(String unit) throws ApiException, RemoteException;
 
   /**
-   * Set the unit of this declaration. The method is only allowed on unstructered declarations. Use
+   * Set the unit of this declaration. The method is only allowed on unstructured declarations. Use
    * {@link #setUnit(String)} for structured declarations.
    * 
    * @param unit
    *          to be set or <code>null</code> to remove unit.
    * @throws ApiException
-   *           If this declaration has a strcutured type.
+   *           If this declaration has a structured type.
    * @throws RemoteException
    *           remote communication problem
    */
@@ -118,12 +112,10 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @return The default value string.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           remote communication problem
    */
-  String getDefaultValue() throws ApiException, RemoteException;
+  String getDefaultValue() throws RemoteException;
 
   /**
    * Set the default value of the declaration. The format is the same as seen in tptaif or the
@@ -144,12 +136,10 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @return The type of the declaration.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           remote communication problem
    */
-  Type getType() throws ApiException, RemoteException;
+  Type getType() throws RemoteException;
 
   /**
    * Set the type of the declaration. Anonymous types are copied so the following code will return
@@ -179,12 +169,10 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    * 
    * @return The description of the declaration.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           remote communication problem
    */
-  String getDescription() throws ApiException, RemoteException;
+  String getDescription() throws RemoteException;
 
   /**
    * Set the description of the declaration.
@@ -193,11 +181,9 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    *          The new description of the declaration. <code>Null</code> will be reduced to an empty
    *          string.
    * 
-   * @throws ApiException
-   *           API constraint error
    * @throws RemoteException
    *           remote communication problem
    */
-  void setDescription(String description) throws ApiException, RemoteException;
+  void setDescription(String description) throws RemoteException;
 
 }

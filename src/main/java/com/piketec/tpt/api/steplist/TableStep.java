@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,6 @@
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
 
 /**
  * The {@link TableStep} is a step which provides the possibility to manage and execute similar wait
@@ -59,10 +57,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TableStepColumnType getColumnType(int columnIndex) throws RemoteException, ApiException;
+  public TableStepColumnType getColumnType(int columnIndex) throws RemoteException;
 
   /**
    * Sets the {@link TableStepColumnType} of the column at position columnPos.
@@ -74,11 +70,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setColumnType(int columnIndex, TableStepColumnType type)
-      throws RemoteException, ApiException;
+  public void setColumnType(int columnIndex, TableStepColumnType type) throws RemoteException;
 
   /**
    * @param columnIndex
@@ -87,10 +80,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getDeclarationName(int columnIndex) throws RemoteException, ApiException;
+  public String getDeclarationName(int columnIndex) throws RemoteException;
 
   /**
    * Sets the declaration of the columnPosth column by their name.
@@ -102,10 +93,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDeclarationName(int columnIndex, String name) throws RemoteException, ApiException;
+  public void setDeclarationName(int columnIndex, String name) throws RemoteException;
 
   /**
    * @param rowIndex
@@ -114,10 +103,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getWaitExpr(int rowIndex) throws RemoteException, ApiException;
+  public String getWaitExpr(int rowIndex) throws RemoteException;
 
   /**
    * Set the time to wait after the row is executed.
@@ -129,10 +116,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setWaitExpr(int rowIndex, String expr) throws RemoteException, ApiException;
+  public void setWaitExpr(int rowIndex, String expr) throws RemoteException;
 
   /**
    * @param rowIndex
@@ -143,10 +128,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getValueAt(int rowIndex, int columnIndex) throws RemoteException, ApiException;
+  public String getValueAt(int rowIndex, int columnIndex) throws RemoteException;
 
   /**
    * Sets the value of a cell in the table.
@@ -160,11 +143,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setValueAt(int rowIndex, int columnIndex, String value)
-      throws RemoteException, ApiException;
+  public void setValueAt(int rowIndex, int columnIndex, String value) throws RemoteException;
 
   /**
    * Adds a new column at index. Index values starts to count with zero.
@@ -174,10 +154,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void addColumn(int index) throws RemoteException, ApiException;
+  public void addColumn(int index) throws RemoteException;
 
   /**
    * Removes the column at index. Index values starts to count with zero.
@@ -187,10 +165,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void removeColumn(int index) throws RemoteException, ApiException;
+  public void removeColumn(int index) throws RemoteException;
 
   /**
    * Adds a new row at index. Index values starts to count with zero.
@@ -200,10 +176,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void addRow(int index) throws RemoteException, ApiException;
+  public void addRow(int index) throws RemoteException;
 
   /**
    * Removes the row at index. Index values starts to count with zero.
@@ -213,10 +187,8 @@ public interface TableStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void removeRow(int index) throws RemoteException, ApiException;
+  public void removeRow(int index) throws RemoteException;
 
   /**
    * @return The number of columns, time column not included.

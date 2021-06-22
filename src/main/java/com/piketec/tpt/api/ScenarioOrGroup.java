@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -38,10 +38,8 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getDescription() throws ApiException, RemoteException;
+  public String getDescription() throws RemoteException;
 
   /**
    * Set the testual description for this <code>ScenarioOrGroup</code> to be displayed in the
@@ -52,10 +50,8 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDescription(String description) throws ApiException, RemoteException;
+  public void setDescription(String description) throws RemoteException;
 
   /**
    * Get the parent scenario group or <code>null</code> if this object reside on the top level
@@ -65,23 +61,18 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public ScenarioGroup getGroup() throws ApiException, RemoteException;
+  public ScenarioGroup getGroup() throws RemoteException;
 
   /**
    * @return Returns the {@link Testlet} this <code>ScenarioOrGroup</code> belongs to. In case this
    *         object is a test case (see {@link #isTestcaseOrGroup()}) the "main" testlet is
    *         returned.
    * 
-   * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Testlet getTestlet() throws ApiException, RemoteException;
+  public Testlet getTestlet() throws RemoteException;
 
   /**
    * Returns <code>true</code> if this ScenarioOrGroup represents a test case or test case group. A
@@ -103,14 +94,15 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
   /**
    * Set a given initial <code>value</code> for a given <code>declarationName</code> for this
    * <code>ScenarioOrGroup</code>. This corresponds to the initial values tab for test cases and
-   * variants. Child nodes inherit the setting from theire parent groups.
+   * variants. Child nodes inherit the setting from their parent groups.
    * 
    * 
    * @param declarationName
-   *          The name of the {@link Declaration}.
+   *          The name of the {@link Declaration}. Struct members and array accesses with constant
+   *          index are also supported.
    * @param value
-   *          The new value for the {@link Declaration} or <code>null</code> to remove a value
-   *          specific to this <code>ScenarioOrGroup</code>.
+   *          The new value for the <code>declarationName</code> or <code>null</code> to remove a
+   *          value specific to this <code>ScenarioOrGroup</code>.
    * @throws ApiException
    *           <ul>
    *           <li>if the name of the declaration does not exists or</li>
@@ -129,7 +121,8 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * <code>ScenarioOrGroup</code>.
    * 
    * @param declarationName
-   *          Name of the {@link Declaration}
+   *          Name of the {@link Declaration}. Struct members and array accesses with constant index
+   *          are also supported.
    * @return <code>null</code> or the currently set value.
    * @throws ApiException
    *           <ul>
@@ -186,14 +179,46 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
       throws ApiException, RemoteException;
 
   /**
+   * Set the status of the scenario or group.
+   * 
+   * @param author
+   *          The author of the status. <code>Null</code> will be reduced to an empty string.
+   * @param comment
+   *          The comment of the status. <code>Null</code> will be reduced to an empty string.
+   * @param status
+   *          The status type of the status.
+   * @throws ApiException
+   *           If this is not a test case or test case group, <code>author</code> contains line
+   *           breaks, or given <code>status</code> is invalid.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see Project#createStatusType(String)
+   */
+  public void setStatus(String author, String comment, String status)
+      throws ApiException, RemoteException;
+
+  /**
    * @return the scenario or scenario group ID.
    * 
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           API constraint error
+   *           If the ID of the assessment is not an integer
+   * 
+   * @deprecated Will be removed in TPT-18. Since TPT-16 scenario IDs are strings. Use
+   *             {@link #getIdString()} instead.
    */
-  public int getId() throws ApiException, RemoteException;
+  @Deprecated
+  public int getId() throws RemoteException;
+
+  /**
+   * @return the scenario or scenario group ID.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getIdString() throws RemoteException;
 
   /**
    * Moves this {@link ScenarioOrGroup} to a new position in the scenario tree.
@@ -208,4 +233,23 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   public void move(ScenarioGroup newParent, int index) throws ApiException, RemoteException;
+
+  /**
+   * Copies <code>this</code> into the given <code>targetGroup</code> that can be from a different
+   * {@link Project} that is opened in the same TPT instance. If the <code>targetGroup</code>
+   * already contains an element with the same name a new one will be generated.
+   * 
+   * @param targetGroup
+   *          The group to copy <code>this</code> into. Can be from another <code>Project</code>.
+   * @param targetIndex
+   *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
+   *          copy at the end.
+   * @return The copy of this and all log messages that occured during copying.
+   * @throws ApiException
+   *           If targetGroup is <code>null</code> or copying failed.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public ResultAndLogs<ScenarioOrGroup> copy(ScenarioGroup targetGroup, int targetIndex)
+      throws ApiException, RemoteException;
 }

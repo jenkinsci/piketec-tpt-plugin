@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,21 +23,11 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * A type is the data type of a {@link Declaration}.
+ * A type is the data type of a {@link Declaration}. Create and get types by using
+ * {@link Project#createType(String, String)}, {@link Project#getTypes()}. For predefined types use
+ * for example {@link Project#getTypeDouble()}.
  * 
- * 
- * <p>
- * Anonymous types are copied so equals will return false:
- * </p>
- * 
- * <pre>
- * Type anonymousType = project.createType(null, "float[]");
- * Channel channel = project.createChannel("myChannel");
- * channel.setType(anonymousType);
- * return channel.getType().equals(anonymousType); // false
- * </pre>
- *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Type extends IdentifiableRemote {
 
@@ -48,23 +38,8 @@ public interface Type extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getName() throws ApiException, RemoteException;
-
-  /**
-   * Set the name of the type.
-   * 
-   * @param name
-   *          The new name of the type.
-   * @throws ApiException
-   *           If the name is not legal identifier, a type with the given name already exists or the
-   *           type is anonymous or predefined.
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  void setName(String name) throws ApiException, RemoteException;
+  String getName() throws RemoteException;
 
   /**
    * Get the type definition as a string as seen in tptaif or in the type editor.
@@ -73,34 +48,52 @@ public interface Type extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * 
+   * @see Project#createType(String, String) for examples of the type syntax
    */
-  String getTypeString() throws ApiException, RemoteException;
+  String getTypeString() throws RemoteException;
 
   /**
-   * Get if the type is predefined.
+   * Determines if the type is "predefined".
+   * <ul>
+   * <li>Any primitive type without a declared name and without enum consts is predefined.
+   * <li>String types without a declared name are predefined.
+   * <li>All other types are not predefined.
+   * </ul>
+   * Note, that every predefined type is also anonymous.
    * 
    * @return <code>true</code> if the type is predefined, <code>false</code> otherwise.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * @see #isAnonymous()
    */
-  boolean isPredefined() throws ApiException, RemoteException;
+  boolean isPredefined() throws RemoteException;
 
   /**
    * 
-   * Get if the type is anonymous.
+   * Determine if the type is anonymous, i.e., if the type is <b>not</b> a custom type with an
+   * explicitly declared name. This is the inverse function of {@link #isDeclared()}.
    * 
    * @return <code>true</code> if the type is anonymous, <code>false</code> otherwise.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * @see #isDeclared()
    */
-  boolean isAnonymous() throws ApiException, RemoteException;
+  boolean isAnonymous() throws RemoteException;
+
+  /**
+   * Determine if the type is declared, i.e., if the type is a custom type explicitly declared in
+   * the type editor of TPT. This is the inverse function of {@link #isAnonymous()}.
+   * 
+   * @return <code>true</code> if the type is declared with a custom name, <code>false</code>
+   *         otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @see #isAnonymous()
+   */
+  boolean isDeclared() throws RemoteException;
 
 }

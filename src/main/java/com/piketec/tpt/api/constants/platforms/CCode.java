@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,13 +20,21 @@
  */
 package com.piketec.tpt.api.constants.platforms;
 
+import com.piketec.tpt.api.cplatform.CCodePlatformConfiguration;
+
 /**
  * For further information, please refer to the User Guide, C Code Platform.
+ * 
+ * @deprecated Will be removed in TPT-18. Use dedicated API {@link CCodePlatformConfiguration}
+ *             instead.
  */
+@Deprecated
 public interface CCode extends BasicPlatformConfig, EclipseCdtDebuggingConfig {
 
   // ---- KEYS FOR PROPERTIES ----
   public final String CALL_TPT_VM_API_BIND_SIGNAL_FINALIZE = "callTptVmapiBindSignalFinalize";
+
+  public final String CALL_TPT_VM_API_INIT_TEST_OUTPUTS = "callTptVmapiInitTestOutputs";
 
   public final String TPT_GENERATED_DIR = "tptGeneratedDir";
 
@@ -51,6 +59,8 @@ public interface CCode extends BasicPlatformConfig, EclipseCdtDebuggingConfig {
 
   public final String SRCFILES_PATH = "srcfiles.path";
 
+  public final String SRCFILES_ADDITIONAL_HEADERFILES = "srcfiles.additionalHeaders";
+
   public final String LIBFILES = "libfiles";
 
   public final String INCLUDES = "includes";
@@ -65,6 +75,12 @@ public interface CCode extends BasicPlatformConfig, EclipseCdtDebuggingConfig {
 
   public final String EXTRACOMPILEROPTS = "extracompileropts";
 
+  public final String EXTRALINKEROPTS = "extralinkeropts";
+
+  public final String CUSTOMCOMPILEROPTS = "customLinkerOptions";
+
+  public final String CUSTOMLINKEROPTS = "customLinkerOptions";
+
   public final String COMPILER = "compiler";
 
   public final String SINGLETHREADED = "singlethreaded";
@@ -72,6 +88,10 @@ public interface CCode extends BasicPlatformConfig, EclipseCdtDebuggingConfig {
   public final String WORKINGDIR = "workingdir";
 
   public final String INITINTERFACEVARIABLES = "initinterfacevariables";
+
+  public final String ROUNDSCALINGRESULTS = "roundscalingresults";
+
+  public final String USE_EFFECTIVE_INTERFACE = "useEffectiveInterface";
 
   public final String ENABLERW = "enablerw";
 

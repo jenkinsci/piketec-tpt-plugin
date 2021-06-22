@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -49,7 +49,7 @@ public interface TestCaseExecutionStatus extends TptRemote {
     Pending, ResultUnknown, ResultSuccess, ResultFailed, ResultError, Running,
     /**
      * @deprecated Only listed to remain compatible to old TPT versions. Completely replaced by
-     *             ResultUnkown.
+     *             ResultUnkown. Will be removed in TPT-18.
      */
     @Deprecated
     ResultNoAsssessments
@@ -60,20 +60,16 @@ public interface TestCaseExecutionStatus extends TptRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TestCaseStatus getStatus() throws ApiException, RemoteException;
+  public TestCaseStatus getStatus() throws RemoteException;
 
   /**
    * @return Returns a list of log entries as <code>String</code>
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public List<String> getStatusLog() throws ApiException, RemoteException;
+  public List<String> getStatusLog() throws RemoteException;
 
   /**
    * Manuall set (reclassify) the execution status to either {@link TestCaseStatus#ResultSuccess} or
@@ -95,11 +91,8 @@ public interface TestCaseExecutionStatus extends TptRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void reclassify(boolean success, String userName, String comment)
-      throws ApiException, RemoteException;
+  public void reclassify(boolean success, String userName, String comment) throws RemoteException;
 
   /**
    * @return The {@link ExecutionConfigurationItem} in which the assigned test case was, is or
@@ -107,19 +100,14 @@ public interface TestCaseExecutionStatus extends TptRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public ExecutionConfigurationItem getExecutionConfigurationItem()
-      throws ApiException, RemoteException;
+  public ExecutionConfigurationItem getExecutionConfigurationItem() throws RemoteException;
 
   /**
    * @return The assigned test case.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public Scenario getTestcase() throws ApiException, RemoteException;
+  public Scenario getTestcase() throws RemoteException;
 }

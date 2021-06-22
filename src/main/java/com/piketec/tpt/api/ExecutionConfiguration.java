@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -36,7 +36,7 @@ import java.util.Map;
  * For a detailed description of the attributes please refer to the User Guide.
  * 
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfiguration
     extends ExecutionConfigurationOrGroup, RemoteList<ExecutionConfigurationItem> {
@@ -44,7 +44,7 @@ public interface ExecutionConfiguration
   /**
    * Enumeration representing the possible output formats of the report.
    * 
-   * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   public enum ReportFormat {
     Html, HtmlAllInOne, Pdf, AllInOnePdf
@@ -53,7 +53,7 @@ public interface ExecutionConfiguration
   /**
    * Enumeration representing the possible reference modes.
    * 
-   * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   public enum ReferenceMode {
     EXECUTION_DIR, PLATFORM_DIR
@@ -62,10 +62,11 @@ public interface ExecutionConfiguration
   /**
    * Enumeration representing the different directory structure configurations.
    * 
-   * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   public enum DataDirStructure {
-    HIERARCHICAL_WITH_INDEX, HIERARCHICAL_WITH_ID, FLAT_WITH_INDEX, FLAT_WITH_ID, FLAT_ONLY_ID
+    HIERARCHICAL_WITH_INDEX, HIERARCHICAL_WITH_ID, FLAT_WITH_INDEX, FLAT_WITH_ID, FLAT_ONLY_ID,
+    FLAT_WITH_INDEX_AND_ID
   }
 
   /**
@@ -77,79 +78,64 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public ExecutionConfigurationItem createExecutionConfigurationItem()
-      throws ApiException, RemoteException;
+  public ExecutionConfigurationItem createExecutionConfigurationItem() throws RemoteException;
 
   /**
    * @return The data directory.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getDataDirPath()}
-   *             instead.
+   *             instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public File getDataDir() throws ApiException, RemoteException;
+  public File getDataDir() throws RemoteException;
 
   /**
    * @return Returns the test data directory as {@link String}
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getDataDirPath() throws ApiException, RemoteException;
+  public String getDataDirPath() throws RemoteException;
 
   /**
    * @return Returns the advanced report settings.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public AdvancedReportSettings getAdvancedReportSettings() throws RemoteException, ApiException;
+  public AdvancedReportSettings getAdvancedReportSettings() throws RemoteException;
 
   /**
    * @return The report directory.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getReportDirPath()}
-   *             instead.
+   *             instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public File getReportDir() throws ApiException, RemoteException;
+  public File getReportDir() throws RemoteException;
 
   /**
    * @return Returns the report directory.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getReportDirPath() throws ApiException, RemoteException;
+  public String getReportDirPath() throws RemoteException;
 
   /**
    * @return Returns the reference directory.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getReferenceDirPath() throws ApiException, RemoteException;
+  public String getReferenceDirPath() throws RemoteException;
 
   /**
    * Set the data directory.
@@ -159,14 +145,12 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #setDataDirPath(String)}
-   *             instead.
+   *             instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public void setDataDir(File f) throws ApiException, RemoteException;
+  public void setDataDir(File f) throws RemoteException;
 
   /**
    * Set the data directory.
@@ -176,10 +160,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDataDirPath(String path) throws ApiException, RemoteException;
+  public void setDataDirPath(String path) throws RemoteException;
 
   /**
    * Set the report directory.
@@ -193,14 +175,12 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use
-   *             {@link #setReportDirPath(String)} instead.
+   *             {@link #setReportDirPath(String)} instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public void setReportDir(File f) throws ApiException, RemoteException;
+  public void setReportDir(File f) throws RemoteException;
 
   /**
    * Set the reference directory.
@@ -210,10 +190,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setReferenceDirPath(String path) throws ApiException, RemoteException;
+  public void setReferenceDirPath(String path) throws RemoteException;
 
   /**
    * Set the report directory.
@@ -227,10 +205,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setReportDirPath(String path) throws ApiException, RemoteException;
+  public void setReportDirPath(String path) throws RemoteException;
 
   /**
    * @return Returns <code>true</code> if test should be executed. Represents the "Execute" check
@@ -238,10 +214,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isRunExec() throws ApiException, RemoteException;
+  public boolean isRunExec() throws RemoteException;
 
   /**
    * @return Returns <code>true</code> if the assessments should be executed. Represents the
@@ -249,10 +223,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isRunAssess() throws ApiException, RemoteException;
+  public boolean isRunAssess() throws RemoteException;
 
   /**
    * 
@@ -261,10 +233,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isRunReport() throws ApiException, RemoteException;
+  public boolean isRunReport() throws RemoteException;
 
   /**
    * @return Returns <code>true</code> if the dashboard should be enabled during test execution.
@@ -272,10 +242,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isRunDashboard() throws ApiException, RemoteException;
+  public boolean isRunDashboard() throws RemoteException;
 
   /**
    * @param enabled
@@ -283,10 +251,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRunExec(boolean enabled) throws ApiException, RemoteException;
+  public void setRunExec(boolean enabled) throws RemoteException;
 
   /**
    * @param enabled
@@ -294,10 +260,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRunAssess(boolean enabled) throws ApiException, RemoteException;
+  public void setRunAssess(boolean enabled) throws RemoteException;
 
   /**
    * 
@@ -309,10 +273,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRunReport(boolean enabled) throws ApiException, RemoteException;
+  public void setRunReport(boolean enabled) throws RemoteException;
 
   /**
    * @param enabled
@@ -320,10 +282,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRunDashboard(boolean enabled) throws ApiException, RemoteException;
+  public void setRunDashboard(boolean enabled) throws RemoteException;
 
   /**
    * Returns the additional attributes for a Execution Configuration as specified by the user. This
@@ -333,12 +293,10 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * @deprecated Please use {@link #getAttributesList()} instead
    */
   @Deprecated
-  public Map<String, String> getAttributes() throws ApiException, RemoteException;
+  public Map<String, String> getAttributes() throws RemoteException;
 
   /**
    * Set a user-defined attribute given by <code>key</code> to the value given by the
@@ -355,7 +313,7 @@ public interface ExecutionConfiguration
    *           if <code>key==null</code>
    * @throws RemoteException
    *           remote communication problem
-   * @deprecated Please use {@link #setAttributesList(List)} instead
+   * @deprecated Please use {@link #setAttributesList(List)} instead. Will be removed in TPT-18.
    */
   @Deprecated
   public void setAttributes(String key, String value) throws ApiException, RemoteException;
@@ -368,10 +326,8 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public List<Pair<String, String>> getAttributesList() throws ApiException, RemoteException;
+  public List<Pair<String, String>> getAttributesList() throws RemoteException;
 
   /**
    * Set a list of user-defined attributes given by <code>pair.first</code> to the value given by
@@ -461,20 +417,99 @@ public interface ExecutionConfiguration
   public void setDataDirStructure(DataDirStructure dds) throws ApiException, RemoteException;
 
   /**
+   * 
+   * @return true, if the global assessment is enabled and false if not.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGlobalAssessmentEnabled() throws RemoteException;
+
+  /**
+   * 
+   * @param enabled
+   *          or disable the execution of the global assessment.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setGlobalAssessmentEnabled(boolean enabled) throws RemoteException;
+
+  /**
+   * 
+   * @return the script from the global assessment.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getGlobalAssessmentScript() throws RemoteException;
+
+  /**
+   * 
+   * @param script
+   *          that shall be executed during the global assessment.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setGlobalAssessmentScript(String script) throws RemoteException;
+
+  /**
+   * @return the list of global assessment rows
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<GlobalAssessmentRow> getGlobalAssessmentRows() throws RemoteException;
+
+  /**
+   * Creates a new {@link GlobalAssessmentRow} and adds it to the tail of the GlobalAssessmentRows
+   * list. This list is represented by the table in the GUI.
+   * 
+   * 
+   * @return A fresh GlobalAssessmentRow
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public GlobalAssessmentRow createGlobalAssessmentRow() throws RemoteException;
+
+  /**
+   * Set the number of cores used during execution. Contrary to the TPT UI you can set more cores
+   * than actually available on the current machine. At test execution at most actually available
+   * cores will be used.
+   * 
+   * @param cores
+   *          the maximum number of cores to use.
+   * @throws ApiException
+   *           if cores ist less than 1
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setCores(int cores) throws ApiException, RemoteException;
+
+  /**
+   * Get the maximal number of cores used during test exectuion. That number may be greater than
+   * actually available cores on the current machine.
+   * 
+   * @return the maximal number of cores used during test execution.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public int getCores() throws RemoteException;
+
+  /**
    * @return Returns <code>null</code> if "Pack report" is not enabled. Otherwise, the target file
    *         for the ZIP is returned.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getReportPackPath()}
-   *             instead.
+   *             instead. Will be removed in TPT-18.
    */
-
   @Deprecated
-  public File getReportPackFile() throws ApiException, RemoteException;
+  public File getReportPackFile() throws RemoteException;
 
   /**
    * Set the ZIP file where the packed report should be stored. Using <code>zipFile==null</code>
@@ -485,14 +520,12 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated No support for $-variables and relative paths - use
-   *             {@link #setReportPackPath(String)} instead.
+   *             {@link #setReportPackPath(String)} instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public void setReportPackFile(File zipFile) throws ApiException, RemoteException;
+  public void setReportPackFile(File zipFile) throws RemoteException;
 
   /**
    * @return Returns <code>null</code> if "Pack report" is not enabled. Otherwise, the target file
@@ -500,13 +533,12 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
-   * @deprecated Use {@link AdvancedReportSettings#getCompressionPath()} instead.
+   * @deprecated Use {@link AdvancedReportSettings#getCompressionPath()} instead. Will be removed in
+   *             TPT-18.
    */
   @Deprecated
-  public String getReportPackPath() throws ApiException, RemoteException;
+  public String getReportPackPath() throws RemoteException;
 
   /**
    * Set the ZIP file where the packed report should be stored. Using <code>zipFile==null</code>
@@ -517,13 +549,12 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
-   * @deprecated Use {@link AdvancedReportSettings#setCompressionPath(String)} instead.
+   * @deprecated Use {@link AdvancedReportSettings#setCompressionPath(String)} instead. Will be
+   *             removed in TPT-18.
    */
   @Deprecated
-  public void setReportPackPath(String zipFile) throws ApiException, RemoteException;
+  public void setReportPackPath(String zipFile) throws RemoteException;
 
   /**
    * @return Returns <code>true</code> if the report directory should be deleted after it has been
@@ -531,13 +562,12 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated Use {@link AdvancedReportSettings#isDeleteReportDirAfterCompression()} instead.
+   *             Will be removed in TPT-18.
    */
   @Deprecated
-  public boolean isDeleteReportDirAfterPack() throws ApiException, RemoteException;
+  public boolean isDeleteReportDirAfterPack() throws RemoteException;
 
   /**
    * @param enable
@@ -546,13 +576,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @deprecated Use {@link AdvancedReportSettings#setDeleteReportDirAfterCompression(boolean)}
-   *             instead.
+   *             instead. Will be removed in TPT-18.
    */
   @Deprecated
-  public void setDeleteReportDirAfterPack(boolean enable) throws ApiException, RemoteException;
+  public void setDeleteReportDirAfterPack(boolean enable) throws RemoteException;
 
 }

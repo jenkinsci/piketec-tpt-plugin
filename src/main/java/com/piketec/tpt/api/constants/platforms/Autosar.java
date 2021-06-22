@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,6 +28,14 @@ public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig 
   public static final String PROJECT_DIR = "projectdir";
 
   public static final String OUT_DIR = "outdir";
+
+  public static final String USE_REPOSITORY_FILES = "useRepositoryFiles";
+
+  public static final String REPOSITORY_ARXML_FILES = "repositoryArxmlFiles";
+
+  public static final String REPOSITORY_SUT_FILES = "repositorySUTFiles";
+
+  public static final String REPOSITORY_INCLUDES = "repositoryIncludes";
 
   public static final String AR_XMLS = "arxmls";
 
@@ -57,6 +65,8 @@ public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig 
 
   public static final String C_COMPILER_NAME = "cCompilerName";
 
+  public static final String STUB_HEADER_FILE = "stubHeaderFile";
+
   public static final String X64BIT = "64bit";
 
   public static final String EXTRACOMPILEROPTS = "extracompileropts";
@@ -72,5 +82,9 @@ public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig 
   public static final String WRITE_COUNTER_SIGNALS = "writeCounterSignals";
 
   public static final String REMOVE_DEFAULT_PORT_PREFIXES = "removeDefaultPortPrefixes";
+
+  public static final String USE_NAME_SPACES = "useNameSpaces";
+
+  public static final String CUSTOM_INTERFACE_FILE = "customInterfaceFile";
 
 }

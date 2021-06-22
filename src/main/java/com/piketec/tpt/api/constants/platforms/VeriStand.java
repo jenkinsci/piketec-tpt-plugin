@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -38,4 +38,24 @@ public interface VeriStand extends BasicPlatformConfig {
   public static final String PARAMETERNAME = "parameterName";
 
   public static final String SDFFILENAME = "sdfFileName";
+
+  public static final String STARTVERISTAND = "startveristand";
+
+  public static final String PROJECTFILENAME = "projectfilename";
+
+  public static final String ASAMXILVERSION = "asamxilversion";
+
+  public static final String MANIFEST_NAME = "manifestname";
+
+  public static final String VENDORIDENTIFIER = "vendoridentifier";
+
+  public static final String PRODUCTNAME = "productname";
+
+  public static final String PRODUCTVERSION = "productversion";
+
+  public static final String FORCEDOWNLOAD = "forcedownload";
+
+  public static final String SHOWWORKSPACE = "showworkspace";
+
+  public static final String LOGFILEPATH = "logfilepath";
 }

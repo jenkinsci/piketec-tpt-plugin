@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,6 +24,7 @@ import java.rmi.RemoteException;
 
 import com.piketec.tpt.api.properties.Property;
 import com.piketec.tpt.api.properties.PropertyMap;
+import com.piketec.tpt.api.tasmo.TasmoTestDataGenerationController;
 
 /**
  * This object represents a configuration for a specific platform adapter.
@@ -31,7 +32,7 @@ import com.piketec.tpt.api.properties.PropertyMap;
  * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
  * </p>
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
 
@@ -169,10 +170,8 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public long getTimeOut() throws ApiException, RemoteException;
+  public long getTimeOut() throws RemoteException;
 
   /**
    * Set the platform timeout.
@@ -182,20 +181,16 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTimeOut(long timeOut) throws ApiException, RemoteException;
+  public void setTimeOut(long timeOut) throws RemoteException;
 
   /**
    * @return Returns the step size of the platform in microseconds.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public long getStepSize() throws ApiException, RemoteException;
+  public long getStepSize() throws RemoteException;
 
   /**
    * Set the step size for the platform.
@@ -205,10 +200,8 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setStepSize(long stepSize) throws ApiException, RemoteException;
+  public void setStepSize(long stepSize) throws RemoteException;
 
   /**
    * @return Returns the size of the ring buffer (history) that is used to enable access to signal
@@ -216,10 +209,27 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public int getHistorySize() throws ApiException, RemoteException;
+  public int getHistorySize() throws RemoteException;
+
+  /**
+   * Set the {@link Mapping} for this platform configuration.
+   * 
+   * @param mapping
+   *          The new {@link Mapping}. May be null.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setMapping(Mapping mapping) throws RemoteException;
+
+  /**
+   * @return Returns the {@link Mapping} for this platform configuration or <code>null</code> if no
+   *         mapping is configured.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Mapping getMapping() throws RemoteException;
 
   /**
    * Set the size of the ring buffer (history) that is used to enable access to signal values of
@@ -230,10 +240,8 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setHistorySize(int historySize) throws ApiException, RemoteException;
+  public void setHistorySize(int historySize) throws RemoteException;
 
   /**
    * Returns the properties of the platform adapter as {@link PropertyMap}.
@@ -248,10 +256,8 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public PropertyMap getProperties() throws ApiException, RemoteException;
+  public PropertyMap getProperties() throws RemoteException;
 
   /**
    * Set the configuration for the platform adapter via {@link PropertyMap}.
@@ -266,10 +272,8 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
+  public void setProperties(PropertyMap properties) throws RemoteException;
 
   /**
    * Run a function of this particular platform adapter (e.g., import-interface, ...). The available
@@ -295,6 +299,41 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    *           function.
    */
   public void invoke(String functionName, PropertyMap parameterOrNull)
+      throws ApiException, RemoteException;
+
+  /**
+   * Initialize the TASMO test case generation with this Platform.
+   * 
+   * @param mapping
+   *          The mapping containing the TASMO input specification to be used.
+   * @return The interface that provides access to TASMO test data generation.
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If TASMO is not licensed, the plugin needed for this platform is not loaded or this
+   *           platform is not supported by TASMO.
+   */
+  public TasmoTestDataGenerationController initTasmoTestDataGeneration(Mapping mapping)
+      throws RemoteException;
+
+  /**
+   * Copies <code>this</code> into the given <code>target</code> that can be a different
+   * {@link Project} that is opened in the same TPT instance. If the <code>target</code> already
+   * contains an element with the same name a new one will be generated.
+   * 
+   * @param target
+   *          The project to copy <code>this</code> into. Can be another <code>Project</code> than
+   *          the one <code>this</code> belongs to.
+   * @param targetIndex
+   *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
+   *          copy at the end.
+   * @return The copy of this and all log messages that occured during copying.
+   * @throws ApiException
+   *           If target is <code>null</code> or copying failed.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public ResultAndLogs<PlatformConfiguration> copy(Project target, int targetIndex)
       throws ApiException, RemoteException;
 
 }

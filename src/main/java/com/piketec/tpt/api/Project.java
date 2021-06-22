@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,22 +26,26 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import com.piketec.tpt.api.Requirement.RequirementType;
+import com.piketec.tpt.api.importinterface.ImportInterfaceSettings;
 
 /**
  * This object represents a TPT project. It has been either newly created with
  * {@link TptApi#newProject(File)} or opened via {@link TptApi#openProject(File)}.
  * 
  *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
-public interface Project extends IdentifiableRemote {
+public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, TestSetOwner {
 
   /**
    * Modes how to match existing declarations and imported declarations.
    * 
-   * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
    *
    */
   public static enum SynchronizationMethod {
@@ -126,10 +130,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  File getFile() throws ApiException, RemoteException;
+  File getFile() throws RemoteException;
 
   /**
    * @return Returns the list of all {@link ExecutionConfiguration ExecutionConfigurations} and
@@ -138,34 +140,63 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   RemoteList<ExecutionConfigurationOrGroup> getTopLevelExecutionConfigurations()
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * @return Returns the set of all {@link ExecutionConfiguration ExecutionConfigurations} defined
    *         in this project i.e. a flat list of the execution configuration tree containing
-   *         {@link ExecutionConfiguration ExecutionConfigurations} only.
+   *         {@link ExecutionConfiguration ExecutionConfigurations} only. The returned
+   *         RemoteCollection is a virtual collection. Changes to the returned RemoteCollection will
+   *         change the TPT model but changes in the TPT model will not be reflected here.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * 
+   * @see #getTopLevelExecutionConfigurations()
    */
-  RemoteCollection<ExecutionConfiguration> getExecutionConfigurations()
-      throws ApiException, RemoteException;
+  RemoteCollection<ExecutionConfiguration> getExecutionConfigurations() throws RemoteException;
 
   /**
-   * @return Returns the set of all {@link TestSet TestSets} defined in this project.
+   * Delivers the first execution configuration or group with the given name or <code>null</code> if
+   * no such execution configuration or group exists.
+   * 
+   * @param name
+   *          The name of the <code>ExecutionConfigurationOrGroup</code>.
+   * @return The {@link ExecutionConfigurationOrGroup} or <code>null</code>.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteCollection<TestSet> getTestSets() throws ApiException, RemoteException;
+  ExecutionConfigurationOrGroup getExecutionConfigurationOrGroupByName(String name)
+      throws RemoteException;
+
+  /**
+   * Delivers all execution configurations and/or groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link ExecutionConfigurationOrGroup ExecutionConfigurationOrGroups},
+   *         matching the given name pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<ExecutionConfigurationOrGroup> getExecutionConfigurationOrGroupByNamePattern(Pattern namepattern)
+      throws RemoteException;
+
+  /**
+   * @return Returns the set of all {@link TestSet TestSets} defined in this project. Changes to the
+   *         returned RemoteCollection will change the TPT model but changes in the TPT model will
+   *         not be reflected here.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #getTopLevelTestSets()
+   */
+  RemoteCollection<TestSet> getTestSets() throws RemoteException;
 
   /**
    * @return Returns the list of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups}
@@ -173,10 +204,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteList<TestSetOrGroup> getTopLevelTestSets() throws ApiException, RemoteException;
+  RemoteList<TestSetOrGroup> getTopLevelTestSets() throws RemoteException;
 
   /**
    * @return Returns the list of all {@link PlatformConfiguration PlatformConfigurations} defined
@@ -184,11 +213,35 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteList<PlatformConfiguration> getPlatformConfigurations()
-      throws ApiException, RemoteException;
+  RemoteList<PlatformConfiguration> getPlatformConfigurations() throws RemoteException;
+
+  /**
+   * Delivers the first platform configuration with the given name or <code>null</code> if no such
+   * platform configuration exists.
+   * 
+   * @param name
+   *          The name of the <code>PlatformConfiguration</code>.
+   * @return The {@link PlatformConfiguration} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  PlatformConfiguration getPlatformConfigurationByName(String name) throws RemoteException;
+
+  /**
+   * Delivers all Platform configurations, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link PlatformConfiguration PlatformConfigurations}, matching the
+   *         given name pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<PlatformConfiguration> getPlatformConfigurationByNamePattern(Pattern namepattern)
+      throws RemoteException;
 
   /**
    * Returns the list all top level <code>Assessments</code> and <code>AssessmentGroups</code> of
@@ -200,10 +253,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteList<AssessmentOrGroup> getTopLevelAssessments() throws ApiException, RemoteException;
+  RemoteList<AssessmentOrGroup> getTopLevelAssessments() throws RemoteException;
 
   /**
    * Adds a new requirement to this project.
@@ -233,10 +284,87 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteList<Requirement> getRequirements() throws ApiException, RemoteException;
+  RemoteList<Requirement> getRequirements() throws RemoteException;
+
+  /**
+   * Add a new requirement set to this project.
+   * 
+   * @param name
+   *          The name of the requirement set
+   * @param condition
+   *          the condtion of the requirement set. The value <code>null</code> will be corrected to
+   *          an empty string.
+   * @return The newly created requirement set.
+   * @throws ApiException
+   *           If <code>name</code> is <code>null</code>.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RequirementSet createRequirementSet(String name, String condition)
+      throws ApiException, RemoteException;
+
+  /**
+   * Get the list of all requirement sets of this project.
+   * 
+   * @return The list of requirement sets.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteList<RequirementSet> getRequirementSets() throws RemoteException;
+
+  /**
+   * Delivers the scenario or scenario group with the given id or <code>null</code> if no such
+   * scenario or scenario group exists.
+   * 
+   * @param id
+   *          The ID of the <code>ScenarioOrGroup</code>.
+   * @return The {@link ScenarioOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  ScenarioOrGroup getScenarioOrGroupByID(String id) throws RemoteException;
+
+  /**
+   * Delivers the scenario or scenario group with the given uuid or <code>null</code> if no such
+   * scenario or scenario group exists.
+   * 
+   * @param uuid
+   *          The <code>UUID</code> of the <code>ScenarioOrGroup</code>.
+   * @return The {@link ScenarioOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  ScenarioOrGroup getScenarioOrGroupByUUID(UUID uuid) throws RemoteException;
+
+  /**
+   * Delivers the first scenario or scenario group with the given name or <code>null</code> if no
+   * such scenario or scenario group exists.
+   * 
+   * @param name
+   *          The name of the <code>ScenarioOrGroup</code>.
+   * @return The {@link ScenarioOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  ScenarioOrGroup getScenarioOrGroupByName(String name) throws RemoteException;
+
+  /**
+   * Delivers all scenarios and/or scenario groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link ScenarioOrGroup ScenarioOrGroups}, matching the given name
+   *         pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<ScenarioOrGroup> getScenarioOrGroupByNamePattern(Pattern namepattern)
+      throws RemoteException;
 
   /**
    * Create a new {@link TestSet} with the given name.
@@ -247,10 +375,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  TestSet createTestSet(String name) throws ApiException, RemoteException;
+  TestSet createTestSet(String name) throws RemoteException;
 
   /**
    * Creates a new {@link TestSet} with the given name below the given {@link TestSetGroup}. If
@@ -265,10 +391,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  TestSet createTestSet(String name, TestSetGroup groupOrNull) throws ApiException, RemoteException;
+  TestSet createTestSet(String name, TestSetGroup groupOrNull) throws RemoteException;
 
   /**
    * Creates a new {@link TestSetGroup} with the given name below the given {@link TestSetGroup}. If
@@ -284,11 +408,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  TestSetGroup createTestSetGroup(String name, TestSetGroup groupOrNull)
-      throws ApiException, RemoteException;
+  TestSetGroup createTestSetGroup(String name, TestSetGroup groupOrNull) throws RemoteException;
 
   /**
    * Create a new type. The structure of the type is given by the <code>typeString</code> argument.
@@ -303,6 +424,7 @@ public interface Project extends IdentifiableRemote {
    * <li>Map : "map[primitive_type1,primitive_type2,primitive_type3]"</li>
    * <li>Matrix : "primitive_type[][]"</li>
    * <li>Struct : "struct[e1:primitive_type1, e2:primitive_type2, e3:primitive_type3, ...]"</li>
+   * <li>Enums : "int8 [ a = 1, b = 2 ]"</li>
    * </ul>
    * 
    * @param nameOrNull
@@ -328,10 +450,25 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteCollection<Type> getTypes() throws ApiException, RemoteException;
+  RemoteCollection<Type> getTypes() throws RemoteException;
+
+  /**
+   * A declared type can be renamed using this method. This replaces the old type (declared under
+   * name <code>oldName</code> before) with a new type (declared under name <code>newName</code>)
+   * with the same structure (just renamed). This method has no effect if there is no type declared
+   * with name <code>oldName</code>.
+   * 
+   * @param oldName
+   *          name of the declared type to be renamed
+   * @param newName
+   *          new name for the renamed type. No other type must ne declared using this name.
+   * @throws ApiException
+   *           if another type named <code>newName</code> exists.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void renameType(String oldName, String newName) throws ApiException, RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -341,10 +478,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeBoolean() throws ApiException, RemoteException;
+  Type getTypeBoolean() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -354,10 +489,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeUInt8() throws ApiException, RemoteException;
+  Type getTypeUInt8() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -367,10 +500,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeInt8() throws ApiException, RemoteException;
+  Type getTypeInt8() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -380,10 +511,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeUInt16() throws ApiException, RemoteException;
+  Type getTypeUInt16() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -393,10 +522,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeInt16() throws ApiException, RemoteException;
+  Type getTypeInt16() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -406,10 +533,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeUInt32() throws ApiException, RemoteException;
+  Type getTypeUInt32() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -419,10 +544,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeInt32() throws ApiException, RemoteException;
+  Type getTypeInt32() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -432,10 +555,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeInt64() throws ApiException, RemoteException;
+  Type getTypeInt64() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -445,10 +566,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeFloat() throws ApiException, RemoteException;
+  Type getTypeFloat() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -458,10 +577,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeDouble() throws ApiException, RemoteException;
+  Type getTypeDouble() throws RemoteException;
 
   /**
    * The predefined Types are not returned by {@link #getTypes()}. This method returns the
@@ -471,21 +588,20 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Type getTypeString() throws ApiException, RemoteException;
+  Type getTypeString() throws RemoteException;
 
   /**
-   * @return The collection of all declarations (assessment variables, channels, constants,
-   *         parameters, measurements)
+   * Returns an indexed list of all {@link Declaration Declarations} defined in this project. The
+   * name of the {@link Declaration} serves as index.
+   * 
+   * @return The list of all declarations (assessment variables, channels, constants, parameters,
+   *         measurements).
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteCollection<Declaration> getDeclarations() throws ApiException, RemoteException;
+  RemoteIndexedList<String, Declaration> getDeclarations() throws RemoteException;
 
   /**
    * Creates a new channel with the given name.
@@ -569,11 +685,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  ExecutionConfiguration createExecutionConfiguration(String name)
-      throws ApiException, RemoteException;
+  ExecutionConfiguration createExecutionConfiguration(String name) throws RemoteException;
 
   /**
    * Creates a new {@link ExecutionConfiguration} with the given name below the given
@@ -589,12 +702,10 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   ExecutionConfiguration createExecutionConfiguration(String name,
                                                       ExecutionConfigurationGroup groupOrNull)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Creates a new {@link ExecutionConfigurationGroup} with the given name below the given
@@ -610,12 +721,10 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   ExecutionConfigurationGroup createExecutionConfigurationGroup(String name,
                                                                 ExecutionConfigurationGroup groupOrNull)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Create a new {@link PlatformConfiguration} with the given name and the given type.
@@ -639,6 +748,59 @@ public interface Project extends IdentifiableRemote {
       throws ApiException, RemoteException;
 
   /**
+   * Delivers the assessment or assessment group with the given id or <code>null</code> if no such
+   * assessment or assessment group exists.
+   * 
+   * @param id
+   *          The ID of the <code>AssessmentOrGroup</code>.
+   * @return The {@link AssessmentOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  AssessmentOrGroup getAssessmentOrGroupByID(String id) throws RemoteException;
+
+  /**
+   * Delivers the assessment or assessment group with the given uuid or <code>null</code> if no such
+   * assessment or assessment group exists.
+   * 
+   * @param uuid
+   *          The <code>UUID</code> of the <code>AssessmentOrGroup</code>.
+   * @return The {@link AssessmentOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  AssessmentOrGroup getAssessmentOrGroupByUUID(UUID uuid) throws RemoteException;
+
+  /**
+   * Delivers the first assessment or assessment group with the given name or <code>null</code> if
+   * no such assessment or assessment group exists.
+   * 
+   * @param name
+   *          The name of the <code>AssessmentOrGroup</code>.
+   * @return The {@link AssessmentOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  AssessmentOrGroup getAssessmentOrGroupByName(String name) throws RemoteException;
+
+  /**
+   * Delivers all assessments and/or assessment groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link AssessmentOrGroup AssessmentOrGroups}, matching the given name
+   *         pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<AssessmentOrGroup> getAssessmentOrGroupByNamePattern(Pattern namepattern)
+      throws RemoteException;
+
+  /**
    * 
    * Create a {@link AssessmentGroup} with the given name and within the given parent
    * <code>AssessmentGroup</code>.
@@ -656,11 +818,9 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   AssessmentGroup createAssessmentGroup(String name, AssessmentGroup groupOrNull)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * 
@@ -699,10 +859,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Testlet getTopLevelTestlet() throws ApiException, RemoteException;
+  Testlet getTopLevelTestlet() throws RemoteException;
 
   /**
    * Returns the list of declared {@link TestCaseAttribute TestCaseAttributes} for this project.
@@ -711,10 +869,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteCollection<TestCaseAttribute> getTestCaseAttributes() throws ApiException, RemoteException;
+  RemoteCollection<TestCaseAttribute> getTestCaseAttributes() throws RemoteException;
 
   /**
    * Create a new {@link TestCaseAttribute}
@@ -760,10 +916,33 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteList<Mapping> getMappings() throws RemoteException, ApiException;
+  RemoteList<Mapping> getMappings() throws RemoteException;
+
+  /**
+   * Delivers the first mapping with the given name or <code>null</code> if no such mapping exists.
+   * 
+   * @param name
+   *          The name of the <code>Mapping</code>.
+   * @return The {@link Mapping} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Mapping getMappingByName(String name) throws RemoteException;
+
+  /**
+   * Delivers all mappings, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * 
+   * @return Collection of all {@link Mapping Mappings}, matching the given name pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<Mapping> getMappingByNamePattern(Pattern namepattern) throws RemoteException;
 
   /**
    * Create a new {@link Mapping} with the <code>given</code> name. If the <code>name</code> already
@@ -776,10 +955,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Mapping createMapping(String name) throws RemoteException, ApiException;
+  Mapping createMapping(String name) throws RemoteException;
 
   /**
    * Imports existing test data as step lists to TPT. This corresponds to "Tools | Generate Test
@@ -882,36 +1059,45 @@ public interface Project extends IdentifiableRemote {
       throws ApiException, RemoteException;
 
   /**
-   * @return is this ProjectFile created with the current TPT-version? Will return
-   *         <code>false</code> for a new unsaved project.
+   * Imports the interface by selecting the suitable importer by the given
+   * {@link ImportInterfaceSettings} sub class of <code>settings</code>, using the configuration
+   * contained in this instance.
    * 
+   * @param settings
+   *          A sub class of {@link ImportInterfaceSettings} for a specific import type containing
+   *          the needed information to execute the import without user interactions.
+   * @return The log containing warning und error messages, that occured during import and did not
+   *         result in an {@link ApiException}
+   * @throws ApiException
+   *           If an error occurs during import or the file format is not supported.
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean createdWithCurrentVersion() throws ApiException, RemoteException;
+  Log importIO(ImportInterfaceSettings settings) throws ApiException, RemoteException;
 
   /**
-   * @return Version number of loaded tpt-project-file. For a new project this will return -1.
+   * @return is this ProjectFile created with the current TPT-version?
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  int getCreatedWithFileFormatVersion() throws ApiException, RemoteException;
+  boolean createdWithCurrentVersion() throws RemoteException;
 
   /**
-   * @return TPT version name of the loaded tpt-project-file. For a new project this will return
-   *         <code>null</code>.
+   * @return Fileformat version number of the tpt-project-file.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getCreatedWithTptVersionName() throws ApiException, RemoteException;
+  int getCreatedWithFileFormatVersion() throws RemoteException;
+
+  /**
+   * @return TPT version name of the tpt-project-file.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getCreatedWithTptVersionName() throws RemoteException;
 
   /**
    * @param f
@@ -920,10 +1106,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  List<String> importEquivalenceClasses(File f) throws ApiException, RemoteException;
+  List<String> importEquivalenceClasses(File f) throws RemoteException;
 
   /**
    * @param f
@@ -932,10 +1116,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  List<String> exportEquivalenceClasses(File f) throws ApiException, RemoteException;
+  List<String> exportEquivalenceClasses(File f) throws RemoteException;
 
   /**
    * This method provides the functionality to generate {@link Scenario test cases} from equivalence
@@ -951,13 +1133,11 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   List<String> generateTestCasesFromEquivalenceClasses(ScenarioOrGroup scenarioOrGroup,
                                                        GenerateTestCasesFromEquivalenceClassessSettings settings,
                                                        Map<Declaration, Collection<String>> equivalenceClassMap)
-      throws ApiException, RemoteException;
+      throws RemoteException;
 
   /**
    * Get the default report section.
@@ -966,10 +1146,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Assessment getDefaultReportSection() throws ApiException, RemoteException;
+  Assessment getDefaultReportSection() throws RemoteException;
 
   /**
    * Set the default report section. If the given argument is <code>null</code> the top level report
@@ -990,10 +1168,8 @@ public interface Project extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteList<Unit> getUnits() throws ApiException, RemoteException;
+  RemoteList<Unit> getUnits() throws RemoteException;
 
   /**
    * Creates a new {@link Unit} for this project.
@@ -1011,5 +1187,48 @@ public interface Project extends IdentifiableRemote {
    *           with the same name or symbol already exists
    */
   Unit createUnit(String name, String symbol) throws ApiException, RemoteException;
+
+  /**
+   * @return A list of all status types defined for this project.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteList<String> getStatusTypes() throws RemoteException;
+
+  /**
+   * Creates a new status type for this project.
+   * 
+   * @param status
+   *          The status type to be created.
+   * @throws ApiException
+   *           If status is empty, <code>null</code>, contains line breaks, or a status with the
+   *           given name already exists.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void createStatusType(String status) throws ApiException, RemoteException;
+
+  /**
+   * Get all tags already used for tagging statuses.
+   * 
+   * @return The list of tags.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Set<String> getStatusTags() throws RemoteException;
+
+  /**
+   * Adds the same tag to all current revisions of test cases and assesslets.
+   * 
+   * @param tag
+   *          The tag to be added.
+   * @throws ApiException
+   *           If tag is empty, <code>null</code>, contains line breaks, or a tag with the given
+   *           name already exists.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void tagCurrentRevisions(String tag) throws ApiException, RemoteException;
 
 }

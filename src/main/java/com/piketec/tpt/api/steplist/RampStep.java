@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,6 @@
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
 
 /**
  * A step which provides the possibility to ramp the value of a channel.
@@ -45,10 +43,8 @@ public interface RampStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDeclaration(String declaration) throws ApiException, RemoteException;
+  public void setDeclaration(String declaration) throws RemoteException;
 
   /**
    * @return the target value.
@@ -66,10 +62,8 @@ public interface RampStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTarget(String value) throws ApiException, RemoteException;
+  public void setTarget(String value) throws RemoteException;
 
   /**
    * @return the gradient per second.
@@ -87,8 +81,6 @@ public interface RampStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setGradient(String grad) throws ApiException, RemoteException;
+  public void setGradient(String grad) throws RemoteException;
 }

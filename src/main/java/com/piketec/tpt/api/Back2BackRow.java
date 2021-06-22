@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  *
  */
 public interface Back2BackRow extends IdentifiableRemote {
@@ -35,23 +35,19 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @see Back2BackSettings#setAutoUpdate(com.piketec.tpt.api.Back2BackSettings.VariableType,
    *      boolean)
    */
-  public boolean createdByAutoMode() throws RemoteException, ApiException;
+  public boolean createdByAutoMode() throws RemoteException;
 
   /**
    * @return the corresponding variable to this {@link Back2BackRow}.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getVariable() throws RemoteException, ApiException;
+  public String getVariable() throws RemoteException;
 
   /**
    * Change the corresponding variable to this {@link Back2BackRow}.
@@ -61,20 +57,16 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setVariable(String channel) throws RemoteException, ApiException;
+  public void setVariable(String channel) throws RemoteException;
 
   /**
    * @return the corresponding reference-signal-name or <code>null</code>.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getReferenceSignalNameOrNull() throws RemoteException, ApiException;
+  public String getReferenceSignalNameOrNull() throws RemoteException;
 
   /**
    * Change the corresponding reference-signal-name or set it to <code>null</code> to remove it.
@@ -84,21 +76,16 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setReferenceSignalNameOrNull(String referenceSignalNameOrNull)
-      throws RemoteException, ApiException;
+  public void setReferenceSignalNameOrNull(String referenceSignalNameOrNull) throws RemoteException;
 
   /**
    * @return the {@link String} representing the time tolerance.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getTimeTolerance() throws RemoteException, ApiException;
+  public String getTimeTolerance() throws RemoteException;
 
   /**
    * Change the {@link String} representing the time tolerance.
@@ -108,20 +95,16 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setTimeTolerance(String timeTolerance) throws RemoteException, ApiException;
+  public void setTimeTolerance(String timeTolerance) throws RemoteException;
 
   /**
    * @return the {@link String} representing the absolute tolerance.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getAbsoluteTolerance() throws RemoteException, ApiException;
+  public String getAbsoluteTolerance() throws RemoteException;
 
   /**
    * Change the {@link String} representing the absolute tolerance.
@@ -131,20 +114,16 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setAbsoluteTolerance(String absoluteTolerance) throws RemoteException, ApiException;
+  public void setAbsoluteTolerance(String absoluteTolerance) throws RemoteException;
 
   /**
    * @return the {@link String} representing the relative tolerance.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getRelativeTolerance() throws RemoteException, ApiException;
+  public String getRelativeTolerance() throws RemoteException;
 
   /**
    * Change the {@link String} representing the relative tolerance.
@@ -154,20 +133,16 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setRelativeTolerance(String relativeTolerance) throws RemoteException, ApiException;
+  public void setRelativeTolerance(String relativeTolerance) throws RemoteException;
 
   /**
    * @return the {@link String} representing the lsb-tolerance.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getLsbTolerance() throws RemoteException, ApiException;
+  public String getLsbTolerance() throws RemoteException;
 
   /**
    * Change the {@link String} representing the lsb-tolerance.
@@ -177,20 +152,16 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setLsbTolerance(String lsbTolerance) throws RemoteException, ApiException;
+  public void setLsbTolerance(String lsbTolerance) throws RemoteException;
 
   /**
    * @return <code>true</code> if this {@link Back2BackRow} is disabled.
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isDisabled() throws RemoteException, ApiException;
+  public boolean isDisabled() throws RemoteException;
 
   /**
    * Change if this {@link Back2BackRow} is disabled.
@@ -200,10 +171,8 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDisabled(boolean disabled) throws RemoteException, ApiException;
+  public void setDisabled(boolean disabled) throws RemoteException;
 
   /**
    * @return <code>true</code> if float precision for comparison instead of double precision is
@@ -211,10 +180,8 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public boolean isFloatPrecision() throws RemoteException, ApiException;
+  public boolean isFloatPrecision() throws RemoteException;
 
   /**
    * Set to <code>true</code> if float precision for the comparison shall be enforced instead of
@@ -225,9 +192,7 @@ public interface Back2BackRow extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setFloatPrecision(boolean floatPrecision) throws RemoteException, ApiException;
+  public void setFloatPrecision(boolean floatPrecision) throws RemoteException;
 
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,20 +23,42 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * A <code>TestSet</code> represents a set of test cases ({@link Scenario Scenarios})
+ * A <code>TestSet</code> represents a set of {@link Scenario test cases}. Test cases have to be
+ * selected explicitly but they can be restricted further dynamically by a {@link #getCondition()
+ * test set conditon} or by restricting}them to test cases linked to requirments of a
+ * {@link #getRequirementSet() selected requirement set}.
  */
 public interface TestSet extends TestSetOrGroup {
 
   /**
    * @return The {@link RemoteCollection set} of all {@link Scenario test cases} that are assigned
-   *         to this <code>TestSet</code>.
+   *         to this <code>TestSet</code> and are not suppresed by its test set condition (using
+   *         default values to evaluate the condition).
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * 
+   * @deprecated Use {@link #getSelectedTestCasesOrGroups()}. This method will be removed in TPT 18.
    */
-  public RemoteCollection<Scenario> getTestCases() throws ApiException, RemoteException;
+  @Deprecated
+  public RemoteCollection<Scenario> getTestCases() throws RemoteException;
+
+  /**
+   * Get the selected test cases and test case groups without taking the test set condition into
+   * account. If a group is contained in the set all descendent scenarios in this group are
+   * contained in the set as well.
+   * 
+   * Please note that you cannot remove items from this collection if test set {@link #isLocked()}
+   * 
+   * @return The raw selected test cases and test case groups.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #isLocked()
+   * @see #getCondition()
+   * @see #isRestrictedToLinkedTestCases()
+   */
+  public RemoteCollection<ScenarioOrGroup> getSelectedTestCasesOrGroups() throws RemoteException;
 
   /**
    * Add a new test case to the test set.
@@ -48,47 +70,155 @@ public interface TestSet extends TestSetOrGroup {
    * @see ScenarioOrGroup#isTestcaseOrGroup()
    * @see Project#getTopLevelTestlet()
    * @see Testlet#getTopLevelScenarioOrGroup()
+   * @see #isLocked()
    * 
    * @param tc
    *          The test case to be added to the <code>TestSet</code>
    * @throws ApiException
-   *           If the given <code>Scenario</code> is not a test case.
+   *           <ul>
+   *           <li>If the test set is locked
+   *           <li>If the given <code>Scenario</code> is not a test case or not from the current TPT
+   *           instance.
+   *           </ul>
    * @throws RemoteException
-   *           If the given <code>Scenario</code> is not an object from the current TPT instance.
+   *           remote communication problem
    */
   public void addTestCase(Scenario tc) throws ApiException, RemoteException;
 
   /**
-   * Returns a list of {@link ScenarioGroup test case groups} that will automatically select newly
-   * added {@link Scenario test cases} and enables auto include for newly added {@link ScenarioGroup
-   * test case groups}. For disable groups, look at
-   * {@link #enableAutoIncludeForTestCaseGroup(ScenarioGroup)}
-   *
-   * @return A list of {@link ScenarioGroup test case groups}.
+   * A test set can be locked to avoid accidental changes of the set of selected
+   * {@link ScenarioOrGroup test cases or test case groups}. No test cases can be added to or
+   * removed from a locked test set.
    * 
+   * @return <code>false</code> if the scenario selection can be changed <code>true</code> otherwise
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteCollection<ScenarioGroup> getAutoIncludeTestCaseGroups()
-      throws ApiException, RemoteException;
+  public boolean isLocked() throws RemoteException;
 
   /**
-   * Enable the {@link ScenarioGroup test case group} to automatically select newly added
-   * {@link Scenario test cases} and {@link ScenarioGroup test case groups}. To disable, use
-   * {@link #getAutoIncludeTestCaseGroups()} and remove the desired objects.
+   * A test set can be locked to avoid accidental changes of the set of selected
+   * {@link ScenarioOrGroup test cases or test case groups}. No test cases can be added to or
+   * removed from a locked test set.
    * 
-   * @see Assessment#enableForTestCase(ScenarioOrGroup)
-   * 
-   * @param scenarioGroup
-   *          for which auto include should be activated.
-   * 
+   * @param locked
+   *          <code>false</code> to make the scenario selection editable <code>true</code> otherwise
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void enableAutoIncludeForTestCaseGroup(ScenarioGroup scenarioGroup)
-      throws ApiException, RemoteException;
+  public void setLocked(boolean locked) throws RemoteException;
+
+  /**
+   * Get the test set condition. If the condition is {@link #isConditionEnabled() enabled} only test
+   * cases that fulfill the condition are considered as part of the test set.
+   * {@link #getSelectedTestCasesOrGroups() Selected} test cases that do not fulfill the condition
+   * will be suppressed.
+   * 
+   * @return the test set condition
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #isConditionEnabled()
+   */
+  public String getCondition() throws RemoteException;
+
+  /**
+   * Get the test set condition. If the condition is {@link #isConditionEnabled() enabled} only test
+   * cases that fulfill the condition are considered as part of the test set.
+   * {@link #getSelectedTestCasesOrGroups() Selected} test cases that do not fulfill the condition
+   * will be suppressed.
+   * 
+   * @param condition
+   *          The condition to set. <code>null</code> will be corrected to an empty string.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #setConditionEnabled(boolean)
+   */
+  public void setCondition(String condition) throws RemoteException;
+
+  /**
+   * Returns whether the {@link #getCondition() test set condition} is enabled. The condition will
+   * only be evaluated and will only suppress selected test cases iff it is enabled.
+   * 
+   * @return <code>true</code> if the test case condition will suppress selected test cases
+   *         <code>false</code> otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #getCondition
+   */
+  public boolean isConditionEnabled() throws RemoteException;
+
+  /**
+   * Set if the {@link #getCondition() test set condition} is enabled. The condition will only be
+   * evaluated and will only suppress selected test cases iff it is enabled.
+   * 
+   * @param enabled
+   *          <code>true</code> if the test case condition shall suppress selected test cases
+   *          <code>false</code> otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #setCondition(String)
+   */
+  public void setConditionEnabled(boolean enabled) throws RemoteException;
+
+  /**
+   * Get the requirement set. The requirement set can be used to restrict the selected test cases to
+   * test cases that are linked to a requirement of the given requirement set.
+   * 
+   * @return The selected requirement set or <code>null</code> for the implicit requirement set
+   *         containing all requirements.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #isRestrictedToLinkedTestCases()
+   */
+  public RequirementSet getRequirementSet() throws RemoteException;
+
+  /**
+   * Set the requirement set. The requirement set can be used to restrict the selected test cases to
+   * test cases that are linked to a requirement of the given requirement set.
+   * 
+   * @param requirementSet
+   *          The requirement set to set or <code>null</code> for the implicit requirement set
+   *          containing all requirements.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #setRestrictedToLinkedTestCases(boolean)
+   */
+  public void setRequirementSet(RequirementSet requirementSet) throws RemoteException;
+
+  /**
+   * Returns <code>true</code> iff only test cases linked to a requirement that is part of the
+   * selected requirement set are considered as part of the test set.
+   * {@link #getSelectedTestCasesOrGroups() Selected} test cases that are not linked to such a
+   * requirement are suppressed.
+   * 
+   * @return <code>true</code> if test cases are suppressed based on the selected requirement set
+   *         <code>false</code> otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #getRequirementSet()
+   */
+  public boolean isRestrictedToLinkedTestCases() throws RemoteException;
+
+  /**
+   * Set iff only test cases linked to a requirement that is part of the selected requirement set
+   * are considered as part of the test set. {@link #getSelectedTestCasesOrGroups() Selected} test
+   * cases that are not linked to such a requirement will be suppressed.
+   * 
+   * @param restrict
+   *          <code>true</code> if test cases shall be suppressed based on the selected requirement
+   *          set <code>false</code> otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see #setRequirementSet(RequirementSet)
+   */
+  public void setRestrictedToLinkedTestCases(boolean restrict) throws RemoteException;
+
 }

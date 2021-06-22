@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,7 +22,6 @@ package com.piketec.tpt.api.diagram;
 
 import java.rmi.RemoteException;
 
-import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 
 /**
@@ -38,10 +37,8 @@ public interface Line extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public int getPosition() throws ApiException, RemoteException;
+  public int getPosition() throws RemoteException;
 
   /**
    * Set the vertical position of a line in the drawing area.
@@ -51,9 +48,7 @@ public interface Line extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setPosition(int y) throws ApiException, RemoteException;
+  public void setPosition(int y) throws RemoteException;
 
 }

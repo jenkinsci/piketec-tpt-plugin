@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,6 +27,8 @@ import java.util.ArrayList;
  * 
  */
 public class PropertyList extends ArrayList<Property> implements Property {
+
+  private static final long serialVersionUID = 2079986645319486649L;
 
   @Override
   public String toString() {

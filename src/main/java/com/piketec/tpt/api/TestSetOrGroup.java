@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,7 +26,7 @@ import java.rmi.RemoteException;
  * An object representing either a {@link TestSet} or a group of test sets ({@link TestSetGroup}).
  * These objects can build up a tree where both, test sets and test set groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface TestSetOrGroup extends IdentifiableRemote, NamedObject {
 
@@ -38,10 +38,8 @@ public interface TestSetOrGroup extends IdentifiableRemote, NamedObject {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public TestSetGroup getGroup() throws ApiException, RemoteException;
+  public TestSetGroup getGroup() throws RemoteException;
 
   /**
    * Moves this {@link TestSetOrGroup} to a new position in the test set tree.
@@ -56,4 +54,23 @@ public interface TestSetOrGroup extends IdentifiableRemote, NamedObject {
    *           remote communication problem
    */
   public void move(TestSetGroup newParent, int index) throws ApiException, RemoteException;
+
+  /**
+   * Copies <code>this</code> into the given <code>targetGroup</code> that can be from a different
+   * {@link Project} that is opened in the same TPT instance. If the <code>targetGroup</code>
+   * already contains an element with the same name a new one will be generated.
+   * 
+   * @param targetGroup
+   *          The group to copy <code>this</code> into. Can be from another <code>Project</code>.
+   * @param targetIndex
+   *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
+   *          copy at the end.
+   * @return The copy of this and all log messages that occured during copying.
+   * @throws ApiException
+   *           If targetGroup is <code>null</code> or copying failed.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public ResultAndLogs<TestSetOrGroup> copy(TestSetOwner targetGroup, int targetIndex)
+      throws ApiException, RemoteException;
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,10 +32,8 @@ public interface Unit extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getName() throws ApiException, RemoteException;
+  String getName() throws RemoteException;
 
   /**
    * Set the name of this unit.
@@ -58,10 +56,8 @@ public interface Unit extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  String getSymbol() throws ApiException, RemoteException;
+  String getSymbol() throws RemoteException;
 
   /**
    * Set the symbol of this unit.
@@ -84,10 +80,8 @@ public interface Unit extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  double getOffset() throws ApiException, RemoteException;
+  double getOffset() throws RemoteException;
 
   /**
    * Set the offset of this unit.
@@ -103,29 +97,27 @@ public interface Unit extends IdentifiableRemote {
   void setOffset(double offset) throws ApiException, RemoteException;
 
   /**
-   * Returns the nominator of this units factor.
+   * Returns the numerator of this units factor.
    * 
-   * @return nominator
+   * @return numerator
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  int getNominator() throws ApiException, RemoteException;
+  int getNumerator() throws RemoteException;
 
   /**
-   * Set the nominator of this units factor
+   * Set the numerator of this units factor.
    * 
-   * @param nominator
-   *          to be set
+   * @param numerator
+   *          to be set.
    * 
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
    *           if unit is not editable
    */
-  void setNominator(int nominator) throws ApiException, RemoteException;
+  void setNumerator(int numerator) throws ApiException, RemoteException;
 
   /**
    * Returns the denominator of this units factor.
@@ -134,16 +126,27 @@ public interface Unit extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
+   * 
+   * @deprecated Use {@link #getDenominator()} instead. Will be removed in TPT-18.
    */
-  int getDenomintaor() throws ApiException, RemoteException;
+  @Deprecated
+  int getDenomintaor() throws RemoteException;
 
   /**
-   * Set the denominator of this units factor
+   * Returns the denominator of this units factor.
+   * 
+   * @return denominator
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  int getDenominator() throws RemoteException;
+
+  /**
+   * Set the denominator of this units factor.
    * 
    * @param denominator
-   *          to be set
+   *          to be set.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -155,14 +158,12 @@ public interface Unit extends IdentifiableRemote {
   /**
    * Returns the power of ten of this units factor.
    * 
-   * @return decimal exponent for nominator
+   * @return decimal exponent for numerator
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  int getDecimalExponent() throws ApiException, RemoteException;
+  int getDecimalExponent() throws RemoteException;
 
   /**
    * Set the exponent to the base of ten of this units factor
@@ -180,14 +181,12 @@ public interface Unit extends IdentifiableRemote {
   /**
    * Returns the power of two of this units factor.
    * 
-   * @return binary exponent for nominator
+   * @return binary exponent for numerator
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  int getBinaryExponent() throws ApiException, RemoteException;
+  int getBinaryExponent() throws RemoteException;
 
   /**
    * Set the exponent to the base of two of this units factor
@@ -205,14 +204,12 @@ public interface Unit extends IdentifiableRemote {
   /**
    * Returns the power of &#x03C0; of this units factor.
    *
-   * @return PI exponent for nominator
+   * @return PI exponent for numerator
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  int getPiExponent() throws ApiException, RemoteException;
+  int getPiExponent() throws RemoteException;
 
   /**
    * Set the exponent to the base of &#x03C0; of this units factor
@@ -228,7 +225,7 @@ public interface Unit extends IdentifiableRemote {
   void setPiExponent(int exponent) throws ApiException, RemoteException;
 
   /**
-   * Returns the units dependencies. To remove a dependecy to an other unit set its exponent to 0.
+   * Returns the units dependencies. To remove a dependency to an other unit set its exponent to 0.
    * 
    * @see #setDependency(Unit, short)
    * 
@@ -236,14 +233,12 @@ public interface Unit extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  Map<Unit, Short> getDependencies() throws ApiException, RemoteException;
+  Map<Unit, Short> getDependencies() throws RemoteException;
 
   /**
    * Set the dependency of this unit to the given <code>unit</code> by defining an exponent. To
-   * remove a dependecy set the exponent to <code>0</code>.
+   * remove a dependency set the exponent to <code>0</code>.
    * 
    * @param unit
    *          The unit this unit shall get a dependency to.
@@ -253,33 +248,51 @@ public interface Unit extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           if unit is not editable
+   *           if this unit is not editable, if the other unit is not a base unit.
    */
   void setDependency(Unit unit, short exponent) throws ApiException, RemoteException;
 
   /**
-   * Returns <code>true</code> if this unit is editable, <code>false</code> otehrwise.
+   * Returns <code>true</code> if this unit is editable, <code>false</code> otherwise.
    * 
-   * @return <code>true</code> iff this unit is editable
+   * @return <code>true</code> if this unit is editable
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isEditable() throws ApiException, RemoteException;
+  boolean isEditable() throws RemoteException;
 
   /**
    * Returns <code>true</code> if this unit has no dependencies to other units, <code>false</code>
    * otherwise.
    *
-   * @return <code>true</code> iff this unit has no dependencies to other units
+   * @return <code>true</code> if this unit has no dependencies to other units
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isBaseUnit() throws ApiException, RemoteException;
+  boolean isBaseUnit() throws RemoteException;
+
+  /**
+   * Sets the wholefactor of the Unit.
+   * 
+   * @param numerator
+   *          to be set.
+   * @param denominator
+   *          to be set.
+   * @param decimalExponent
+   *          to be set.
+   * @param binaryExponent
+   *          to be set.
+   * @param piExponent
+   *          to be set.
+   * @throws ApiException
+   *           if unit is not editable
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setFactor(int numerator, int denominator, int decimalExponent, int binaryExponent,
+                 int piExponent)
+      throws ApiException, RemoteException;
 
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,6 @@
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
 
 /**
  * This {@link Step} provides the possibility to open a message box during the test execution.
@@ -65,10 +63,8 @@ public interface MessageBoxStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setMessage(String message) throws ApiException, RemoteException;
+  public void setMessage(String message) throws RemoteException;
 
   /**
    * @return the result channel.
@@ -86,10 +82,8 @@ public interface MessageBoxStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setChannel(String channel) throws ApiException, RemoteException;
+  public void setChannel(String channel) throws RemoteException;
 
   /**
    * @return the termination condition for this message box.
@@ -107,10 +101,8 @@ public interface MessageBoxStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setCondition(String condition) throws ApiException, RemoteException;
+  public void setCondition(String condition) throws RemoteException;
 
   /**
    * @return the {@link MessageBoxType type} of this message box.
@@ -128,9 +120,7 @@ public interface MessageBoxStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setMessageBoxType(MessageBoxType type) throws ApiException, RemoteException;
+  public void setMessageBoxType(MessageBoxType type) throws RemoteException;
 
 }

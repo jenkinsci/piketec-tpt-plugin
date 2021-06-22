@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -45,4 +45,11 @@ public interface Exe extends BasicPlatformConfig {
 
   public static final String CALL_TPT_VM_API_BIND_SIGNAL_FINALIZE =
       "callTptVmapiBindSignalFinalize";
+
+  public static final String CALL_TPT_VM_API_INIT_TEST_OUTPUTS = "callTptVmapiInitTestOutputs";
+
+  public final String ROUNDSCALINGRESULTS = "roundscalingresults";
+
+  public static final String USE_EFFECTIVE_INTERFACE = "useEffectiveInterface";
+
 }

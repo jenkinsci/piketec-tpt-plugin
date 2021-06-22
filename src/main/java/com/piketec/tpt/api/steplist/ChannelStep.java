@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,8 +21,6 @@
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.ApiException;
 
 /**
  * This {@link Step} is a step which provides the possibility to change the value of a channel
@@ -46,10 +44,8 @@ public interface ChannelStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setChannel(String channel) throws ApiException, RemoteException;
+  public void setChannel(String channel) throws RemoteException;
 
   /**
    * @return the definition of this step.
@@ -67,10 +63,8 @@ public interface ChannelStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDefinition(String definition) throws ApiException, RemoteException;
+  public void setDefinition(String definition) throws RemoteException;
 
   /**
    * @return <code>true</code> if this step should run "always".
@@ -88,8 +82,6 @@ public interface ChannelStep extends Step {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setAlways(boolean value) throws ApiException, RemoteException;
+  public void setAlways(boolean value) throws RemoteException;
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,15 +23,23 @@ package com.piketec.tpt.api.steplist;
 import java.rmi.RemoteException;
 
 import com.piketec.tpt.api.ApiException;
+import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.RemoteList;
 import com.piketec.tpt.api.Scenario;
+import com.piketec.tpt.api.ScenarioGroup;
 import com.piketec.tpt.api.Testlet;
+import com.piketec.tpt.api.diagram.DiagramScenario;
 
 /**
- * A <code>StepListScenario</code> contains a list of {@link Step steps} and can be a variant of a
- * {@link Testlet} or as a standalone test case.
+ * A <code>StepListScenario</code> contains a list of {@link Step steps}.
+ *
+ * <p>
+ * In TPT, it represents both the variants as well as the test cases. Create a new
+ * <code>StepListScenario</code> via {@link Testlet#createDiagVariant(String, ScenarioGroup)}
+ * </p>
  * 
- * @see Testlet#createSLVariant(String, com.piketec.tpt.api.ScenarioGroup)
+ * @see Testlet#createDiagVariant(String, ScenarioGroup)
+ * @see Project#getTopLevelTestlet()
  */
 public interface StepListScenario extends Scenario {
 
@@ -40,10 +48,8 @@ public interface StepListScenario extends Scenario {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public RemoteList<Step> getSteps() throws ApiException, RemoteException;
+  public RemoteList<Step> getSteps() throws RemoteException;
 
   /**
    * Creates a step of a given type at the given position.
@@ -84,10 +90,8 @@ public interface StepListScenario extends Scenario {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isDoAssessment() throws ApiException, RemoteException;
+  boolean isDoAssessment() throws RemoteException;
 
   /**
    * Sets the report always variable from a step list scenario. When it is set to true, all the
@@ -111,9 +115,72 @@ public interface StepListScenario extends Scenario {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isReportAlways() throws ApiException, RemoteException;
+  boolean isReportAlways() throws RemoteException;
 
+  /**
+   * @return A comma separated list of the used namespaces for the step list scenario.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getUsing() throws RemoteException;
+
+  /**
+   * Set the used namespace(s) for the step list scenario. For more namespaces provide a comma
+   * separated list.
+   * 
+   * @param using
+   *          The new namespace(s) that shall be used.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setUsing(String using) throws RemoteException;
+
+  /**
+   * Transforms this {@link StepListScenario} into a {@link DiagramScenario} without any transitions
+   * added to the path. All contents will be deleted, but the meta data like ids and attributes will
+   * be retained. Do not use this {@link StepListScenario} afterwards.
+   * 
+   * @return This {@link StepListScenario} as an empty {@link DiagramScenario}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public DiagramScenario transformToDiagramScenario() throws RemoteException;
+
+  /**
+   * Generates a specification containing the step list and the initial values. This specification
+   * can be remimported via {@link #importTestSpecification(String)}. <br>
+   * Please note that some complex steps cannot be imported and will be imported as documentation
+   * steps (e.g. embedded signal step) or will be unrolled (e.g. table step).
+   * 
+   * 
+   * @return generated test specification for this step list.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String exportTestSpecification() throws RemoteException;
+
+  /**
+   * Imports a formatted step list specification into this {@link StepListScenario}. This method
+   * imports initial values and appends all steps to the existing definitions.<br>
+   * Please note that some complex steps cannot be imported and will be imported as documentation
+   * steps (e.g. embedded signal step) or will be unrolled (e.g. table step).
+   * 
+   * @param specification
+   *          The sepcification as formatted plain text, e.g. <br>
+   *          <br>
+   *          <code>
+   *          Initialize myVar to 17<br>
+   *          Set myVar to myVar+1 // myComment<br>
+   *          Ramp myParam to 1 with 2/s</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @see #exportTestSpecification()
+   */
+  public void importTestSpecification(String specification)
+      throws RemoteException;
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,14 +25,14 @@ import java.rmi.RemoteException;
 /**
  * A parameter can change during a test execution but normally holds the same value most time.
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Parameter extends Declaration {
 
   /**
-   * Defines how parameter values will be exchanged between TPT and the SuT.
+   * Defines how parameter values will be exchanged between TPT and the SUT.
    * 
-   * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   enum ExchangeMode {
     /**
@@ -60,12 +60,10 @@ public interface Parameter extends Declaration {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    * 
    * @see ExchangeMode
    */
-  ExchangeMode getMode() throws ApiException, RemoteException;
+  ExchangeMode getMode() throws RemoteException;
 
   /**
    * Sets the exchange mode of the parameter.

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -33,8 +33,6 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
   public static final String A2L_FLAVOR = "A2L";
 
   public static final String ADTF_FLAVOR = "Adtf";
-
-  public static final String CATS_FLAVOR = "CATS";
 
   public static final String CTB_FLAVOR = "CTB Mapping";
 
@@ -73,10 +71,8 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  RemoteCollection<String> getFlavors() throws ApiException, RemoteException;
+  RemoteCollection<String> getFlavors() throws RemoteException;
 
   /**
    * Add a new flavor to the mapping represented by this object.
@@ -106,12 +102,39 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * @return The String representation of the value from the given mapping flavor column.
    * 
    * @throws ApiException
-   *           If the declaration or the column is null, if the declaration does not locally exists
+   *           If the declaration or the column is null, if the declaration does not exist locally
    *           or if the mapping does not have any flavor with the given column.
    * @throws RemoteException
    *           remote communication problem
    */
   String getMappingFlavorColumnValue(Declaration decl, String column, boolean allowDefaultValue)
+      throws ApiException, RemoteException;
+
+  /**
+   * Get the value of the given mapping flavor column.
+   * 
+   * @param decl
+   *          The {@link Declaration} from which you want to get the flavor.
+   * @param subElement
+   *          The subelement in case of a structured {@link Declaration}. Can be left empty or
+   *          <code>null</code> to set the value for the root element. The sub elements must be
+   *          seperated by '.'. Do NOT add the name of the declaration as first element.
+   * @param column
+   *          The name of the column of the flavor. Valid column names are all mapping specific
+   *          column names from the declaration editor, such as <code>Min</code>, <code>Max</code>,
+   *          <code>Hidden</code>, <code>External_Name</code> etc.
+   * @param allowDefaultValue
+   *          A flag which allows to get the default value from the flavor in case it is null.
+   * @return The String representation of the value from the given mapping flavor column.
+   * 
+   * @throws ApiException
+   *           If the declaration or the column is null, if the declaration does not exist locally
+   *           or if the mapping does not have any flavor with the given column.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getMappingFlavorColumnValue(Declaration decl, String subElement, String column,
+                                     boolean allowDefaultValue)
       throws ApiException, RemoteException;
 
   /**
@@ -129,13 +152,41 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    *          be null when the file is saved and loaded again.
    * 
    * @throws ApiException
-   *           If the declaration or the column is null, if the declaration does not locally exists,
+   *           If the declaration or the column is null, if the declaration does not exist locally,
    *           if the mapping does not have any flavor with the given column or if the value can not
    *           be parsed to the column type.
    * @throws RemoteException
    *           remote communication problem
    */
   void setMappingFlavorColumnValue(Declaration decl, String column, String value)
+      throws ApiException, RemoteException;
+
+  /**
+   * Set the value of the given mapping flavor column.
+   * 
+   * @param decl
+   *          The {@link Declaration} from which you want to set the flavor.
+   * @param subElement
+   *          The subelement in case of a structured {@link Declaration}. Can be left empty or
+   *          <code>null</code> to set the value for the root element. The sub elements must be
+   *          seperated by '.'. Do NOT add the name of the declaration as first element.
+   * @param column
+   *          The name of the column of the flavor. Valid column names are all mapping specific
+   *          column names from the declaration editor, such as <code>Min</code>, <code>Max</code>,
+   *          <code>Hidden</code>, <code>External_Name</code> etc.
+   * @param value
+   *          The value to be set. Setting the value to the default value
+   *          ({@link #getMappingFlavorColumnDefaultValue(Declaration, String)}) will let the value
+   *          be null when the file is saved and loaded again.
+   * 
+   * @throws ApiException
+   *           If the declaration or the column is null, if the declaration does not exist locally,
+   *           if the mapping does not have any flavor with the given column or if the value can not
+   *           be parsed to the column type.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setMappingFlavorColumnValue(Declaration decl, String subElement, String column, String value)
       throws ApiException, RemoteException;
 
   /**
@@ -148,12 +199,34 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    *          The name of the column of the flavor.
    * @return The String representation of the default value from the flavor
    * @throws ApiException
-   *           If the declaration or the column is null, if the declaration does not locally exists
+   *           If the declaration or the column is null, if the declaration does not exist locally
    *           or if the mapping does not have any flavor with the given column.
    * @throws RemoteException
-   *           remote communication problem
+   *           remote co@Override mmunication problem
    */
   String getMappingFlavorColumnDefaultValue(Declaration decl, String column)
+      throws ApiException, RemoteException;
+
+  /**
+   * 
+   * Get the default value of the given mapping flavor column for the given declaration.
+   * 
+   * @param decl
+   *          The {@link Declaration} from which you want to get the flavor.
+   * @param subElement
+   *          The subelement in case of a structured {@link Declaration}. Can be left empty or
+   *          <code>null</code> to set the value for the root element. The sub elements must be
+   *          seperated by '.'. Do NOT add the name of the declaration as first element.
+   * @param column
+   *          The name of the column of the flavor.
+   * @return The String representation of the default value from the flavor
+   * @throws ApiException
+   *           If the declaration or the column is null, if the declaration does not exist locally
+   *           or if the mapping does not have any flavor with the given column.
+   * @throws RemoteException
+   *           remote co@Override mmunication problem
+   */
+  String getMappingFlavorColumnDefaultValue(Declaration decl, String subElement, String column)
       throws ApiException, RemoteException;
 
 }

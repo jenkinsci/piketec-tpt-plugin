@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * A Constant is a value that stays the same during execution time.
  * 
- * @author Copyright (c) 2014-2020 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Constant extends Declaration {
 
@@ -36,10 +36,8 @@ public interface Constant extends Declaration {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  boolean isSystemConstant() throws ApiException, RemoteException;
+  boolean isSystemConstant() throws RemoteException;
 
   /**
    * Set if the constant is a system constant.
@@ -50,9 +48,7 @@ public interface Constant extends Declaration {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  void setSystemConstant(boolean on) throws ApiException, RemoteException;
+  void setSystemConstant(boolean on) throws RemoteException;
 
 }

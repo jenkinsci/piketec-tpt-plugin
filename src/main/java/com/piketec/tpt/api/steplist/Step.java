@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,7 +22,6 @@ package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
 
-import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.properties.PropertyMap;
 
@@ -161,10 +160,8 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public String getType() throws ApiException, RemoteException;
+  public String getType() throws RemoteException;
 
   /**
    * Returns a {@link PropertyMap} String -&gt; Property that represents all properties of the given
@@ -175,11 +172,9 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   @Deprecated
-  public PropertyMap getProperties() throws ApiException, RemoteException;
+  public PropertyMap getProperties() throws RemoteException;
 
   /**
    * Configures the step with the given <code>PropertyMap</code>.
@@ -189,11 +184,9 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
   @Deprecated
-  public void setProperties(PropertyMap properties) throws ApiException, RemoteException;
+  public void setProperties(PropertyMap properties) throws RemoteException;
 
   /**
    * TPT offers the possibility to assign some objects comments which are added to the report. This
@@ -204,10 +197,8 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setDocumentation(String documentation) throws ApiException, RemoteException;
+  public void setDocumentation(String documentation) throws RemoteException;
 
   /**
    * @return a {@link String} which will be added as a comment to the report.
@@ -222,10 +213,8 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public StepListScenario getStepList() throws RemoteException, ApiException;
+  public StepListScenario getStepList() throws RemoteException;
 
   /**
    * Sets if this step is enabled.
@@ -235,10 +224,8 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           API constraint error
    */
-  public void setActive(boolean value) throws ApiException, RemoteException;
+  public void setActive(boolean value) throws RemoteException;
 
   /**
    * Determines if this step is enabled.

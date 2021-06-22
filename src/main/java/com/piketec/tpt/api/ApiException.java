@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2020 PikeTec GmbH
+ * Copyright (c) 2014-2021 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,11 +22,35 @@ package com.piketec.tpt.api;
 
 /**
  * This exception indicates a misuse of the TPT API.
+ * 
+ * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
-public class ApiException extends Exception {
+public class ApiException extends RuntimeException {
 
+  private static final long serialVersionUID = -8020652982219750761L;
+
+  /**
+   * Creates a new <code>ApiException</code> with the given message.
+   * 
+   * @param message
+   *          The message of the exception
+   * 
+   * @see Throwable#Throwable(String)
+   */
   public ApiException(String message) {
     super(message);
+  }
+
+  /**
+   * Creates a new <code>ApiException</code> with the given cause.
+   * 
+   * @param cause
+   *          the cause
+   * 
+   * @see Throwable#Throwable(Throwable)
+   */
+  public ApiException(Throwable cause) {
+    super(cause);
   }
 
 }
