@@ -28,7 +28,7 @@
 	</f:entry>
 	
 	
-	 <f:entry field="id" title="Unique configuration ID" help="/plugin/piketec-tpt/id.html" >
+	<f:entry field="id" title="Unique configuration ID" help="/plugin/piketec-tpt/id.html" >
     <f:textbox />
   </f:entry>
 	
@@ -57,10 +57,4 @@
 			<f:number default="${descriptor.defaultTimeout}" />
 		</f:entry>
 	</f:advanced>
-
-	<f:entry title="">
-		<div align="right">
-			<f:repeatableDeleteButton />
-		</div>
-	</f:entry>
 </j:jelly>

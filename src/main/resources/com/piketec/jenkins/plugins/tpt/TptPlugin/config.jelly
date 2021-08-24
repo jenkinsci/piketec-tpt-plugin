@@ -38,7 +38,7 @@
     <f:entry field="slaveJobCount" title="Number of slave jobs" help="/plugin/piketec-tpt/slaveJobCount.html">
       <f:textbox default="${descriptor.DEFAULT_SLAVE_JOB_COUNT}"/>
     </f:entry>
-        <f:entry field="slaveJobTries" title="Number of slave jobs execution tries" help="/plugin/piketec-tpt/slaveJobTries.html">
+    <f:entry field="slaveJobTries" title="Number of slave jobs execution tries" help="/plugin/piketec-tpt/slaveJobTries.html">
       <f:textbox default="${descriptor.DEFAULT_SLAVE_JOB_TRIES}"/>
     </f:entry>
     <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
@@ -67,9 +67,15 @@
 
   <!-- Validation Suite Configuration -->
   <f:section title="TPT files and configuration">
-    <f:entry help="/plugin/piketec-tpt/executionConfiguration.html">
+    <f:entry>
       <f:repeatableProperty field="executionConfiguration"
-        minimum="1" header="Validation-Set" noAddButton="false"  />
+        minimum="1" header="Validation-Set" noAddButton="false">
+        <f:block>
+          <div align="right">
+            <f:repeatableDeleteButton />
+          </div>
+        </f:block>
+      </f:repeatableProperty>
     </f:entry>
   </f:section>
 </j:jelly>
