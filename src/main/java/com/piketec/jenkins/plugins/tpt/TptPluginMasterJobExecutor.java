@@ -235,7 +235,7 @@ class TptPluginMasterJobExecutor {
     testCases = tptApiAccess.getTestCases(tptFilePath, resolvedConfig.getConfiguration(),
         resolvedConfig.getTestSet());
     if (testCases == null) {
-      logger.error("Getting test cases via the TPT API did not work!");
+      logger.error("Unable to get test cases via TPT API.");
       return false;
     }
 

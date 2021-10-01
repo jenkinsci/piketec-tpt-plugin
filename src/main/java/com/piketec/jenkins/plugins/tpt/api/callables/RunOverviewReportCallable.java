@@ -11,7 +11,7 @@ import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
 import com.piketec.tpt.api.ExecutionStatus;
-import com.piketec.tpt.api.OpenResult;
+import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.RemoteCollection;
 import com.piketec.tpt.api.TestSet;
 import com.piketec.tpt.api.TptApi;
@@ -38,11 +38,11 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
 
   private FilePath testDataPath;
 
-  public RunOverviewReportCallable(TaskListener listener, String hostName, int tptPort,
-                                   String tptBindingName, FilePath[] exePaths, long startUpWaitTime,
-                                   FilePath tptFilePath, String executionConfigName, String testSet,
-                                   FilePath reportPath, FilePath testdataPath) {
-    super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
+  public RunOverviewReportCallable(TaskListener listener, int tptPort, String tptBindingName,
+                                   FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath,
+                                   String executionConfigName, String testSet, FilePath reportPath,
+                                   FilePath testdataPath) {
+    super(listener, tptPort, tptBindingName, exePaths, startUpWaitTime);
     this.tptFilePath = tptFilePath;
     this.executionConfigName = executionConfigName;
     this.testSet = testSet;
@@ -58,11 +58,14 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
       logger.error("Could not establish connection to the TPT API.");
       return false;
     }
-    OpenResult openProject = getOpenProject(logger, api, tptFilePath);
+    Project project = getOpenProject(logger, api, tptFilePath);
+    if (project == null) {
+      return false;
+    }
     try {
       // Get the execution cofig that should be executed
       ExecutionConfiguration executionConfig =
-          getExecutionConfigByName(openProject.getProject(), executionConfigName);
+          getExecutionConfigByName(project, executionConfigName);
       if (executionConfig == null) {
         logger.error("Could not find execution configuration " + executionConfigName);
         return false;
@@ -79,7 +82,7 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
       // but the one that is defined in Jenkins.
       ArrayList<TestSet> oldTestSets = new ArrayList<>();
       if (StringUtils.isNotEmpty(testSet)) {
-        RemoteCollection<TestSet> allTestSets = openProject.getProject().getTestSets();
+        RemoteCollection<TestSet> allTestSets = project.getTestSets();
         TestSet newTestSet = null;
         for (TestSet t : allTestSets.getItems()) {
           if (t.getName().equals(testSet)) {

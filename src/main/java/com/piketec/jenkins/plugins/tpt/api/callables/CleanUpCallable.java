@@ -19,7 +19,7 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
 
   public CleanUpCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
                          FilePath[] exePaths, long tptStartUpTime, FilePath tptFilePath) {
-    super(listener, hostName, tptPort, tptBindingName, exePaths, tptStartUpTime);
+    super(listener, tptPort, tptBindingName, exePaths, tptStartUpTime);
     this.tptFilePath = tptFilePath;
   }
 

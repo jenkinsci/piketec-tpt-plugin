@@ -75,9 +75,8 @@ public class TptApiAccess {
   public Collection<String> getTestCases(FilePath tptFilePath, String executionConfigName,
                                          String testSet)
       throws InterruptedException {
-    GetTestCasesCallable callable =
-        new GetTestCasesCallable(launcher.getListener(), "localhost", tptPort, tptBindingName,
-            exePaths, startUpWaitTime, tptFilePath, executionConfigName, testSet);
+    GetTestCasesCallable callable = new GetTestCasesCallable(launcher.getListener(), tptPort,
+        tptBindingName, exePaths, startUpWaitTime, tptFilePath, executionConfigName, testSet);
     Collection<String> testCases = null;
     try {
       VirtualChannel channel = launcher.getChannel();
@@ -113,9 +112,9 @@ public class TptApiAccess {
   public Boolean runOverviewReport(FilePath tptFilePath, String executionConfigName, String testSet,
                                    FilePath reportPath, FilePath testDataPath)
       throws InterruptedException {
-    RunOverviewReportCallable callable = new RunOverviewReportCallable(launcher.getListener(),
-        "localhost", tptPort, tptBindingName, exePaths, startUpWaitTime, tptFilePath,
-        executionConfigName, testSet, reportPath, testDataPath);
+    RunOverviewReportCallable callable =
+        new RunOverviewReportCallable(launcher.getListener(), tptPort, tptBindingName, exePaths,
+            startUpWaitTime, tptFilePath, executionConfigName, testSet, reportPath, testDataPath);
     Boolean worked = false;
     try {
       VirtualChannel channel = launcher.getChannel();
@@ -155,8 +154,8 @@ public class TptApiAccess {
                                    FilePath slaveDataPath, List<String> testSetList)
       throws InterruptedException {
     ExecuteTestsSlaveCallable callable = new ExecuteTestsSlaveCallable(launcher.getListener(),
-        "localhost", tptPort, tptBindingName, exePaths, startUpWaitTime, tptFilePath,
-        slaveReportPath, slaveDataPath, executionConfigName, testSetList, testSetName);
+        tptPort, tptBindingName, exePaths, startUpWaitTime, tptFilePath, slaveReportPath,
+        slaveDataPath, executionConfigName, testSetList, testSetName);
     Boolean worked = false;
     try {
       VirtualChannel channel = launcher.getChannel();

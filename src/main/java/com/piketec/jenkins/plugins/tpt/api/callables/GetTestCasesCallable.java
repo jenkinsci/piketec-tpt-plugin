@@ -10,7 +10,7 @@ import org.jenkinsci.remoting.RoleChecker;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
-import com.piketec.tpt.api.OpenResult;
+import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.Scenario;
 import com.piketec.tpt.api.TestSet;
 import com.piketec.tpt.api.TptApi;
@@ -32,10 +32,10 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
 
   private String testSet;
 
-  public GetTestCasesCallable(TaskListener listener, String hostName, int tptPort,
-                              String tptBindingName, FilePath[] exePaths, long startUpWaitTime,
-                              FilePath tptFilePath, String executionConfigName, String testSet) {
-    super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
+  public GetTestCasesCallable(TaskListener listener, int tptPort, String tptBindingName,
+                              FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath,
+                              String executionConfigName, String testSet) {
+    super(listener, tptPort, tptBindingName, exePaths, startUpWaitTime);
     this.tptFilePath = tptFilePath;
     this.executionConfigName = executionConfigName;
     this.testSet = testSet;
@@ -56,11 +56,14 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
     Collection<String> testCases = null;
 
     // Open the TPT Project via the TPT-API
-    OpenResult openProject = getOpenProject(logger, api, tptFilePath);
+    Project project = getOpenProject(logger, api, tptFilePath);
+    if (project == null) {
+      return null;
+    }
     try {
       // Get the execution cofig that should be executed
       ExecutionConfiguration executionConfig =
-          getExecutionConfigByName(openProject.getProject(), executionConfigName);
+          getExecutionConfigByName(project, executionConfigName);
       if (executionConfig == null) {
         logger.error("Could not find execution configuration " + executionConfigName);
         return null;
@@ -69,7 +72,7 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
       // Get all testcases that should be executed
       if (StringUtils.isNotEmpty(testSet)) {
         boolean testSetFound = false;
-        for (TestSet definedTestset : openProject.getProject().getTestSets().getItems()) {
+        for (TestSet definedTestset : project.getTestSets().getItems()) {
           if (definedTestset.getName().equals(testSet)) {
             testSetFound = true;
             testCases = new ArrayList<>();

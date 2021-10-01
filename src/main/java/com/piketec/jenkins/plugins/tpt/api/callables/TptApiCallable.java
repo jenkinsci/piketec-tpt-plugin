@@ -1,7 +1,10 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -10,7 +13,10 @@ import java.rmi.registry.Registry;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+
+import org.apache.commons.lang.SystemUtils;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
@@ -51,14 +57,19 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
 
   private long startUpWaitTime;
 
-  public TptApiCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
+  public TptApiCallable(TaskListener listener, int tptPort, String tptBindingName,
                         FilePath[] exePaths, long startUpWaitTime) {
     this.listener = listener;
-    this.hostName = hostName;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
     this.exePaths = exePaths.clone();
     this.startUpWaitTime = startUpWaitTime;
+    if (System.getenv("HOSTNAME") != null) {
+      // Environmentvariable that may be used in Docker
+      this.hostName = System.getenv("HOSTNAME");
+    } else {
+      this.hostName = "localhost";
+    }
   }
 
   /**
@@ -145,26 +156,44 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
         return false;
       }
     } catch (IOException e1) {
-      logger.error("Could not dertmine existence of TPT: " + exeFile.getRemote());
+      logger.error("Could not determine existence of TPT: " + exeFile.getRemote());
       return false;
     }
-    ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", exeFile.getRemote(), "--apiPort",
-        Integer.toString(tptPort), "--apiBindingName", tptBindingName);
+    ProcessBuilder builder = null;
+    if (!SystemUtils.IS_OS_LINUX) {
+      builder = new ProcessBuilder(exeFile.getRemote(), "--apiPort", Integer.toString(tptPort),
+          "--apiBindingName", tptBindingName);
+    } else {
+      builder = new ProcessBuilder(exeFile.getRemote(), "--apiPort", Integer.toString(tptPort),
+          "--apiBindingName", tptBindingName, "--run", "apiserver", "--headless");
+
+    }
+    logger.info("Waiting " + startupWaitTime / 1000 + "s for TPT to start.");
+    TPTProcessOutputReaderThread outputThread = null;
+    TPTProcessOutputReaderThread errorThread = null;
     try {
-      logger.info("Waiting " + startupWaitTime / 1000 + "s for TPT to start.");
-      builder.start();
+      Process p = builder.start();
+      outputThread = new TPTProcessOutputReaderThread(p.getInputStream(), false, logger);
+      errorThread = new TPTProcessOutputReaderThread(p.getErrorStream(), true, logger);
     } catch (IOException e) {
       logger.error("Could not start TPT.");
       return false;
     }
-    Thread.sleep(startupWaitTime);
+    try {
+      Thread.sleep(startupWaitTime);
+    } finally {
+      outputThread.stopOutputForwarding();
+      errorThread.stopOutputForwarding();
+      logger.info("Logging output of TPT process stopped.");
+    }
     return true;
   }
 
   /**
    * Open the given TPT Project via the TPT API
    */
-  OpenResult getOpenProject(TptLogger logger, TptApi api, FilePath tptFilePath) {
+  @CheckForNull
+  Project getOpenProject(TptLogger logger, TptApi api, FilePath tptFilePath) {
     // Open the TPT Project via the TPT-API
     OpenResult openProject = null;
     try {
@@ -173,7 +202,7 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
         logger.error("Could not open project:\n" + Utils.toString(openProject.getLogs(), "\n"));
         return null;
       }
-      return openProject;
+      return openProject.getProject();
     } catch (RemoteException e) {
       logger.error("RemoteException: " + e.getMessage());
       return null;
@@ -250,6 +279,58 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
       }
     }
     return result;
+  }
+
+  /**
+   * Reads the error and output stream to avoid hanging due to stream congestion. Will forward
+   * output to {@link TptLogger} until unset.
+   */
+  private static class TPTProcessOutputReaderThread extends Thread {
+
+    private final InputStream inputStream;
+
+    private final boolean isErrorStream;
+
+    @Nullable
+    private TptLogger logger;
+
+    TPTProcessOutputReaderThread(InputStream inputStream, boolean isErrorStream, TptLogger logger) {
+      this.inputStream = inputStream;
+      this.isErrorStream = isErrorStream;
+      this.logger = logger;
+      this.setDaemon(true);
+      this.start();
+    }
+
+    @Override
+    public void run() {
+      try (BufferedReader sc = new BufferedReader(new InputStreamReader(inputStream, "utf-8"))) {
+        String line;
+        while ((line = sc.readLine()) != null) {
+          synchronized (this) {
+            if (logger != null) {
+              if (isErrorStream) {
+                logger.error(line);
+              } else {
+                logger.info(line);
+              }
+            }
+          }
+        }
+        sc.close();
+      } catch (IOException e) {
+        synchronized (this) {
+          if (logger != null) {
+            logger.error("Error reading TPT process output: " + e.getMessage());
+          }
+        }
+      }
+    }
+
+    public synchronized void stopOutputForwarding() {
+      logger = null;
+    }
+
   }
 
 }

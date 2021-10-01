@@ -15,7 +15,7 @@ import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
 import com.piketec.tpt.api.ExecutionStatus;
-import com.piketec.tpt.api.OpenResult;
+import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.Scenario;
 import com.piketec.tpt.api.ScenarioGroup;
 import com.piketec.tpt.api.ScenarioOrGroup;
@@ -73,12 +73,12 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
    * @param testSetName
    *          The test set to execute
    */
-  public ExecuteTestsSlaveCallable(TaskListener listener, String hostName, int tptPort,
-                                   String tptBindingName, FilePath[] exePaths, long startUpWaitTime,
-                                   FilePath tptFilePath, FilePath slaveReportPath,
-                                   FilePath slaveDataPath, String executionConfigName,
-                                   List<String> testSet, String testSetName) {
-    super(listener, hostName, tptPort, tptBindingName, exePaths, startUpWaitTime);
+  public ExecuteTestsSlaveCallable(TaskListener listener, int tptPort, String tptBindingName,
+                                   FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath,
+                                   FilePath slaveReportPath, FilePath slaveDataPath,
+                                   String executionConfigName, List<String> testSet,
+                                   String testSetName) {
+    super(listener, tptPort, tptBindingName, exePaths, startUpWaitTime);
     this.tptFilePath = tptFilePath;
     this.slaveReportPath = slaveReportPath;
     this.slaveDataPath = slaveDataPath;
@@ -95,11 +95,14 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       logger.error("Could not establish connection to the TPT API.");
       return false;
     }
-    OpenResult openProject = getOpenProject(logger, api, tptFilePath);
+    Project project = getOpenProject(logger, api, tptFilePath);
+    if (project == null) {
+      return false;
+    }
     try {
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
-          openProject.getProject().getExecutionConfigurations().getItems();
+          project.getExecutionConfigurations().getItems();
       ExecutionConfiguration config = null;
       for (ExecutionConfiguration elem : execConfigs) {
         if (elem.getName().equals(execCfg)) {
@@ -116,8 +119,8 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       String oldTestDataDir = config.getDataDirPath();
 
       Collection<Scenario> foundScenearios = new HashSet<>();
-      find(openProject.getProject().getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(),
-          testSetList, foundScenearios);
+      find(project.getTopLevelTestlet().getTopLevelScenarioOrGroup().getItems(), testSetList,
+          foundScenearios);
       if (foundScenearios.size() != testSetList.size()) {
         logger
             .error("Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
@@ -148,7 +151,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
               i++;
               logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
                   + remoteScenarioSetToString(intersectionSet) + "\"");
-              TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+              TestSet testSet = project.createTestSet(tmpTestSetName);
               newTestSets.add(testSet);
               for (Scenario scen : intersectionSet) {
                 testSet.addTestCase(scen);
@@ -162,7 +165,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
         logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
             + remoteScenarioSetToString(foundScenearios) + "\" from File " + tptFilePath.getName());
 
-        TestSet testSet = openProject.getProject().createTestSet(tmpTestSetName);
+        TestSet testSet = project.createTestSet(tmpTestSetName);
         newTestSets.add(testSet);
         for (Scenario scen : foundScenearios) {
           testSet.addTestCase(scen);
@@ -201,7 +204,7 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
         config.setReportDirPath(oldReportDir);
         for (TestSet testSet : newTestSets) {
           logger.info("delete temporary test set \"" + testSet.getName() + "\"");
-          openProject.getProject().getTestSets().delete(testSet);
+          project.getTestSets().delete(testSet);
         }
         logger.info("Reactivate temporary deactivated execution config items.");
         for (ExecutionConfigurationItem item : deactivated) {

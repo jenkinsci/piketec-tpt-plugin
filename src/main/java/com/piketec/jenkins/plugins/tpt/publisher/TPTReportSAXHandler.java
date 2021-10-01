@@ -172,10 +172,18 @@ class TPTReportSAXHandler extends DefaultHandler {
       logger.error("Could not extract the platform name!");
       return "";
     }
-    // This is handled with String-methods, because these are Windows Paths and if we'd use
-    // path.relativize
-    // while Jenkins is running on a Linux machine, it wouldn't work.
-    return relativePath.substring(0, relativePath.indexOf("\\"));
+    // This is handled with String-methods, because these are Windows Paths or Linux Path and if
+    // we'd use path.relativize while Jenkins is running on a machine with another OS than the paths
+    // are created on, it wouldn't work.
+    int pathSepIdx = relativePath.indexOf("\\");
+    if (pathSepIdx < 0) {
+      pathSepIdx = relativePath.indexOf('/');
+    }
+    if (pathSepIdx >= 0) {
+      return relativePath.substring(0, pathSepIdx);
+    } else {
+      return relativePath;
+    }
   }
 
   /**
@@ -195,11 +203,11 @@ class TPTReportSAXHandler extends DefaultHandler {
           + reportDir);
       return "";
     }
-    // This is handled with String-methods, because these are Windows Paths and if we'd use
-    // path.relativize
-    // while Jenkins is running on a Linux machine, it wouldn't work.
+    // This is handled with String-methods, because these are Windows Paths or Linux Path and if
+    // we'd use path.relativize while Jenkins is running on a machine with another OS than the paths
+    // are created on, it wouldn't work.
     String substring = reportFile.substring(reportDir.length());
-    if (substring.startsWith("\\")) {
+    if (substring.startsWith("\\") || substring.startsWith("/")) {
       substring = substring.substring(1);
     }
     return substring;
