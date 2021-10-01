@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.tools.ant.types.Commandline;
+
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 
@@ -435,5 +437,16 @@ public class Utils {
       }
     }
     return true;
+  }
+
+  /**
+   * Translates a command line String to seperate arguments using
+   * {@link Commandline#translateCommandline(String)}.
+   * 
+   * @return a fixed-size list backed by the command line array
+   */
+  public static List<String> parseCommandLine(String toProcess) {
+    String[] translatedCommandline = Commandline.translateCommandline(toProcess);
+    return Arrays.asList(translatedCommandline);
   }
 }

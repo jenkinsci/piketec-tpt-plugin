@@ -25,6 +25,11 @@
 	<f:entry field="exePaths" title="Paths to tpt.exe" help="/plugin/piketec-tpt/exePaths.html">
 		<f:textbox value="${instance.exePaths}" />
 	</f:entry>
+	<f:advanced>
+    <f:entry field="arguments" title="Arguments" help="/plugin/piketec-tpt/arguments.html">
+      <f:textbox />
+    </f:entry>
+  </f:advanced>
   <f:entry field="tptPort" title="TPT Port" help="/plugin/piketec-tpt/tptPort.html">
     <f:textbox value="${instance.tptPort}" default="${descriptor.defaultTptPort}"/>
   </f:entry>

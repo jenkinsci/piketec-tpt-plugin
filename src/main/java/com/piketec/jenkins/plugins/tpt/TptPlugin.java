@@ -537,6 +537,7 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
       expandedExePaths[i] =
           new FilePath(workspace, environment.expand(expandedStringExePaths[i].trim()));
     }
+    String expandedArguments = environment.expand(getArguments());
     String jUnitXmlPath = environment.expand(getJUnitreport());
     // expand and parse TPT RMI port
     int expandedTptPort;
@@ -600,10 +601,11 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
     // expand other variables
     String expandedSlaveJobName = environment.expand(getSlaveJob());
     // start execution
-    TptPluginMasterJobExecutor executor = new TptPluginMasterJobExecutor(build, workspace, launcher,
-        listener, expandedExePaths, configs, expandedTptPort, expandedTptBindingName,
-        expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount, parsedSlaveJobTries,
-        jUnitXmlPath, getJUnitLogLevel(), isEnableJunit());
+    TptPluginMasterJobExecutor executor =
+        new TptPluginMasterJobExecutor(build, workspace, launcher, listener, expandedExePaths,
+            expandedArguments, configs, expandedTptPort, expandedTptBindingName,
+            expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount,
+            parsedSlaveJobTries, jUnitXmlPath, getJUnitLogLevel(), isEnableJunit());
     try {
       return executor.execute();
     } finally {

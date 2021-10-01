@@ -48,6 +48,8 @@ class TptPluginSlaveExecutor {
 
   private FilePath[] exePaths;
 
+  private String arguments;
+
   private int tptPort;
 
   private String tptBindingName;
@@ -95,7 +97,7 @@ class TptPluginSlaveExecutor {
    *          the workspace from the master, to know where to copy the results
    */
   TptPluginSlaveExecutor(Launcher launcher, FilePath workspace, TaskListener listener,
-                         FilePath[] exePaths, int tptPort, String tptBindingName,
+                         FilePath[] exePaths, String arguments, int tptPort, String tptBindingName,
                          JenkinsConfiguration jenkinsConfig, List<String> testSet,
                          long tptStartupWaitTime, Run< ? , ? > masterId, FilePath masterWorkspace,
                          FilePath masterDataPath, FilePath masterReportPath) {
@@ -104,6 +106,7 @@ class TptPluginSlaveExecutor {
     this.workspace = workspace;
     this.listener = listener;
     this.exePaths = exePaths;
+    this.arguments = arguments;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
     this.jenkinsConfig = jenkinsConfig;
@@ -126,8 +129,8 @@ class TptPluginSlaveExecutor {
    *           If thread was interrupted
    */
   public boolean execute() throws InterruptedException {
-    TptApiAccess tptApiAccess =
-        new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
+    TptApiAccess tptApiAccess = new TptApiAccess(launcher, logger, exePaths,
+        Utils.parseCommandLine(arguments), tptPort, tptBindingName, tptStartupWaitTime);
 
     if (workspace == null) {
       logger.error("No workspace available");

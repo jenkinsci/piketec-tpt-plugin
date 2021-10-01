@@ -3,6 +3,7 @@ package com.piketec.jenkins.plugins.tpt.api.callables;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
@@ -33,9 +34,9 @@ public class GetTestCasesCallable extends TptApiCallable<Collection<String>> {
   private String testSet;
 
   public GetTestCasesCallable(TaskListener listener, int tptPort, String tptBindingName,
-                              FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath,
-                              String executionConfigName, String testSet) {
-    super(listener, tptPort, tptBindingName, exePaths, startUpWaitTime);
+                              FilePath[] exePaths, List<String> arguments, long startUpWaitTime,
+                              FilePath tptFilePath, String executionConfigName, String testSet) {
+    super(listener, tptPort, tptBindingName, exePaths, arguments, startUpWaitTime);
     this.tptFilePath = tptFilePath;
     this.executionConfigName = executionConfigName;
     this.testSet = testSet;

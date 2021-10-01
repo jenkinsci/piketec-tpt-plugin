@@ -55,6 +55,9 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
 
   private String exePaths;
 
+  @CheckForNull
+  private String arguments = null;
+
   private String tptBindingName;
 
   private String tptPort;
@@ -81,6 +84,21 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
    */
   public String getExePaths() {
     return Util.fixNull(exePaths);
+  }
+
+  /**
+   * Common command line opts. Delimiter between the options is one or more spaces. Inside
+   * doublequotes spaces have no special meaning.
+   * 
+   * @return 0 or more options for tpt.
+   */
+  public String getArguments() {
+    return Util.fixNull(arguments);
+  }
+
+  @DataBoundSetter
+  public void setArguments(String arguments) {
+    this.arguments = Util.fixEmpty(arguments);
   }
 
   /**
@@ -175,6 +193,8 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
       expandedExePaths[i] =
           new FilePath(workspace, expand(environment, expandedStringExePaths[i].trim()));
     }
+    String expandedArguments =
+        environment == null ? getArguments() : environment.expand(getArguments());
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {
       try {
@@ -237,10 +257,10 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
       logger.info("Path to tpt.exe :         " + f.getRemote());
     }
 
-    TptPluginSlaveExecutor executor =
-        new TptPluginSlaveExecutor(launcher, workspace, listener, expandedExePaths, expandedTptPort,
-            expandedTptBindingName, resolvedConfig, testCasesFromWorkload,
-            expandedTptStartupWaitTime, masterId, masterWorkspace, masterDataDir, masterReportDir);
+    TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, workspace, listener,
+        expandedExePaths, expandedArguments, expandedTptPort, expandedTptBindingName,
+        resolvedConfig, testCasesFromWorkload, expandedTptStartupWaitTime, masterId,
+        masterWorkspace, masterDataDir, masterReportDir);
 
     boolean result = executor.execute();
     if (!result) {

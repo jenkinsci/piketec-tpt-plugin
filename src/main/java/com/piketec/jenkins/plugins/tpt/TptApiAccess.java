@@ -24,6 +24,8 @@ public class TptApiAccess {
 
   private FilePath[] exePaths;
 
+  private List<String> arguments;
+
   private int tptPort;
 
   private String tptBindingName;
@@ -48,11 +50,13 @@ public class TptApiAccess {
    * @param tptStartupWaitTime
    *          time that Jenkins waits for TPT to start up if it is not running already
    */
-  public TptApiAccess(Launcher launcher, TptLogger logger, FilePath[] exePaths, int tptPort,
-                      String tptBindingName, long tptStartupWaitTime) {
+  public TptApiAccess(Launcher launcher, TptLogger logger, FilePath[] exePaths,
+                      List<String> arguments, int tptPort, String tptBindingName,
+                      long tptStartupWaitTime) {
     this.launcher = launcher;
     this.logger = logger;
     this.exePaths = exePaths.clone();
+    this.arguments = arguments;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
     this.startUpWaitTime = tptStartupWaitTime;
@@ -75,8 +79,9 @@ public class TptApiAccess {
   public Collection<String> getTestCases(FilePath tptFilePath, String executionConfigName,
                                          String testSet)
       throws InterruptedException {
-    GetTestCasesCallable callable = new GetTestCasesCallable(launcher.getListener(), tptPort,
-        tptBindingName, exePaths, startUpWaitTime, tptFilePath, executionConfigName, testSet);
+    GetTestCasesCallable callable =
+        new GetTestCasesCallable(launcher.getListener(), tptPort, tptBindingName, exePaths,
+            arguments, startUpWaitTime, tptFilePath, executionConfigName, testSet);
     Collection<String> testCases = null;
     try {
       VirtualChannel channel = launcher.getChannel();
@@ -112,9 +117,9 @@ public class TptApiAccess {
   public Boolean runOverviewReport(FilePath tptFilePath, String executionConfigName, String testSet,
                                    FilePath reportPath, FilePath testDataPath)
       throws InterruptedException {
-    RunOverviewReportCallable callable =
-        new RunOverviewReportCallable(launcher.getListener(), tptPort, tptBindingName, exePaths,
-            startUpWaitTime, tptFilePath, executionConfigName, testSet, reportPath, testDataPath);
+    RunOverviewReportCallable callable = new RunOverviewReportCallable(launcher.getListener(),
+        tptPort, tptBindingName, exePaths, arguments, startUpWaitTime, tptFilePath,
+        executionConfigName, testSet, reportPath, testDataPath);
     Boolean worked = false;
     try {
       VirtualChannel channel = launcher.getChannel();
@@ -154,7 +159,7 @@ public class TptApiAccess {
                                    FilePath slaveDataPath, List<String> testSetList)
       throws InterruptedException {
     ExecuteTestsSlaveCallable callable = new ExecuteTestsSlaveCallable(launcher.getListener(),
-        tptPort, tptBindingName, exePaths, startUpWaitTime, tptFilePath, slaveReportPath,
+        tptPort, tptBindingName, exePaths, arguments, startUpWaitTime, tptFilePath, slaveReportPath,
         slaveDataPath, executionConfigName, testSetList, testSetName);
     Boolean worked = false;
     try {

@@ -1,5 +1,7 @@
 package com.piketec.jenkins.plugins.tpt.api.callables;
 
+import java.util.Collections;
+
 import org.jenkinsci.remoting.RoleChecker;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
@@ -19,7 +21,7 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
 
   public CleanUpCallable(TaskListener listener, String hostName, int tptPort, String tptBindingName,
                          FilePath[] exePaths, long tptStartUpTime, FilePath tptFilePath) {
-    super(listener, tptPort, tptBindingName, exePaths, tptStartUpTime);
+    super(listener, tptPort, tptBindingName, exePaths, Collections.emptyList(), tptStartUpTime);
     this.tptFilePath = tptFilePath;
   }
 

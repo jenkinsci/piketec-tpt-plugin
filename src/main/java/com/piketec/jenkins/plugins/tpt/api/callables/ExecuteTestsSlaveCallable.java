@@ -74,11 +74,12 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
    *          The test set to execute
    */
   public ExecuteTestsSlaveCallable(TaskListener listener, int tptPort, String tptBindingName,
-                                   FilePath[] exePaths, long startUpWaitTime, FilePath tptFilePath,
+                                   FilePath[] exePaths, List<String> arguments,
+                                   long startUpWaitTime, FilePath tptFilePath,
                                    FilePath slaveReportPath, FilePath slaveDataPath,
                                    String executionConfigName, List<String> testSet,
                                    String testSetName) {
-    super(listener, tptPort, tptBindingName, exePaths, startUpWaitTime);
+    super(listener, tptPort, tptBindingName, exePaths, arguments, startUpWaitTime);
     this.tptFilePath = tptFilePath;
     this.slaveReportPath = slaveReportPath;
     this.slaveDataPath = slaveDataPath;

@@ -55,6 +55,8 @@ class TptPluginMasterJobExecutor {
 
   private FilePath[] exePaths;
 
+  private String arguments;
+
   private List<JenkinsConfiguration> executionConfigs;
 
   private int tptPort;
@@ -105,7 +107,7 @@ class TptPluginMasterJobExecutor {
    *          to know if is necessary to generate the jUnit XML
    */
   TptPluginMasterJobExecutor(Run< ? , ? > build, FilePath workspace, Launcher launcher,
-                             TaskListener listener, FilePath[] exePaths,
+                             TaskListener listener, FilePath[] exePaths, String arguments,
                              List<JenkinsConfiguration> executionConfigs, int tptPort,
                              String tptBindingName, String slaveJobName, long tptStartupWaitTime,
                              int slaveJobCount, int slaveJobTries, String jUnitXmlPath,
@@ -116,6 +118,7 @@ class TptPluginMasterJobExecutor {
     this.workspace = workspace;
     this.listener = listener;
     this.exePaths = exePaths;
+    this.arguments = arguments;
     this.executionConfigs = executionConfigs;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
@@ -141,8 +144,8 @@ class TptPluginMasterJobExecutor {
    * @throws InterruptedException
    */
   boolean execute() throws InterruptedException {
-    TptApiAccess tptApiAccess =
-        new TptApiAccess(launcher, logger, exePaths, tptPort, tptBindingName, tptStartupWaitTime);
+    TptApiAccess tptApiAccess = new TptApiAccess(launcher, logger, exePaths,
+        Utils.parseCommandLine(arguments), tptPort, tptBindingName, tptStartupWaitTime);
     boolean success = true;
     // We delete the JUnit results before iterating over the jenkinsConfigs
     if (workspace == null) {

@@ -10,8 +10,10 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -55,14 +57,17 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
 
   private FilePath[] exePaths;
 
+  private List<String> arguments;
+
   private long startUpWaitTime;
 
   public TptApiCallable(TaskListener listener, int tptPort, String tptBindingName,
-                        FilePath[] exePaths, long startUpWaitTime) {
+                        FilePath[] exePaths, List<String> arguments, long startUpWaitTime) {
     this.listener = listener;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
     this.exePaths = exePaths.clone();
+    this.arguments = arguments;
     this.startUpWaitTime = startUpWaitTime;
     if (System.getenv("HOSTNAME") != null) {
       // Environmentvariable that may be used in Docker
@@ -160,12 +165,26 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
       return false;
     }
     ProcessBuilder builder = null;
+    List<String> cmd = new ArrayList<>();
     if (!SystemUtils.IS_OS_LINUX) {
-      builder = new ProcessBuilder(exeFile.getRemote(), "--apiPort", Integer.toString(tptPort),
-          "--apiBindingName", tptBindingName);
+      cmd.add(exeFile.getRemote());
+      cmd.add("--apiPort");
+      cmd.add(Integer.toString(tptPort));
+      cmd.add("--apiBindingName");
+      cmd.add(tptBindingName);
+      cmd.addAll(arguments);
+      builder = new ProcessBuilder(cmd);
     } else {
-      builder = new ProcessBuilder(exeFile.getRemote(), "--apiPort", Integer.toString(tptPort),
-          "--apiBindingName", tptBindingName, "--run", "apiserver", "--headless");
+      cmd.add(exeFile.getRemote());
+      cmd.add("--apiPort");
+      cmd.add(Integer.toString(tptPort));
+      cmd.add("--apiBindingName");
+      cmd.add(tptBindingName);
+      cmd.add("--run");
+      cmd.add("apiserver");
+      cmd.add("--headless");
+      cmd.addAll(arguments);
+      builder = new ProcessBuilder(cmd);
 
     }
     logger.info("Waiting " + startupWaitTime / 1000 + "s for TPT to start.");
