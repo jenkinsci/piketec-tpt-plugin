@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -35,6 +35,163 @@ public class PropertyList extends ArrayList<Property> implements Property {
     StringBuffer buffer = new StringBuffer();
     toString(buffer, "");
     return buffer.toString();
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyBool(value))</code>
+   * 
+   * @param value
+   *          The boolean value that shall be added.
+   */
+  public void add(boolean value) {
+    this.add(new PropertyBool(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyDecimal(value))</code>
+   * 
+   * @param value
+   *          The double value that shall be added.
+   */
+  public void add(double value) {
+    this.add(new PropertyDecimal(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyInt(value))</code>
+   * 
+   * @param value
+   *          The integer property value that shall be added.
+   */
+  public void add(int value) {
+    this.add(new PropertyInt(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyLong(value))</code>
+   * 
+   * @param value
+   *          The long integer property value that shall be added.
+   */
+  public void add(long value) {
+    this.add(new PropertyLong(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyString(value))</code>
+   * 
+   * @param value
+   *          The {@link String} property value that shall be added.
+   */
+  public void add(String value) {
+    this.add(new PropertyString(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyList())</code>
+   * 
+   * @return the new {@link PropertyList}
+   */
+  public PropertyList addList() {
+    PropertyList list = new PropertyList();
+    this.add(list);
+    return list;
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyMap())</code>
+   * 
+   * @return the new {@link PropertyMap}
+   */
+  public PropertyMap addMap() {
+    PropertyMap map = new PropertyMap();
+    this.add(map);
+    return map;
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyBool(value))</code>
+   * 
+   * @param index
+   *          the position in the list where the element should be added.
+   * 
+   * @param value
+   *          The boolean value that shall be added.
+   */
+  public void set(int index, boolean value) {
+    this.set(index, new PropertyBool(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyDecimal(value))</code>
+   * 
+   * @param index
+   *          the position in the list where the element should be added.
+   * 
+   * @param value
+   *          The double value that shall be added.
+   */
+  public void set(int index, double value) {
+    this.set(index, new PropertyDecimal(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyInt(value))</code>
+   * 
+   * @param index
+   *          the position in the list where the element should be added.
+   * 
+   * @param value
+   *          The integer property value that shall be added.
+   */
+  public void set(int index, int value) {
+    this.set(index, new PropertyInt(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyLong(value))</code>
+   * 
+   * @param index
+   *          the position in the list where the element should be added.
+   * 
+   * @param value
+   *          The long integer property value that shall be added.
+   */
+  public void set(int index, long value) {
+    this.set(index, new PropertyLong(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyString(value))</code>
+   * 
+   * @param index
+   *          the position in the list where the element should be added.
+   * 
+   * @param value
+   *          The {@link String} property value that shall be added.
+   */
+  public void set(int index, String value) {
+    this.set(index, new PropertyString(value));
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyList())</code>
+   * 
+   * @param index
+   *          the position in the list where the new list should be added
+   */
+  public void setList(int index) {
+    this.set(index, new PropertyList());
+  }
+
+  /**
+   * Shorthand for <code>add(new PropertyMap())</code>
+   * 
+   * @param index
+   *          the position in the list where the map should be added
+   */
+  public void setMap(int index) {
+    this.set(index, new PropertyMap());
   }
 
   @Override

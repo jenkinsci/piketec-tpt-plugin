@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,40 +28,94 @@ import java.rmi.RemoteException;
  */
 public interface Mapping extends IdentifiableRemote, NamedObject {
 
+  /**
+   * Initial values flavor
+   */
   public static final String INIT_VALUES_FLAVOR = "Init Values";
 
+  /**
+   * A2L flavor
+   */
   public static final String A2L_FLAVOR = "A2L";
 
+  /**
+   * Adtf flavor
+   */
   public static final String ADTF_FLAVOR = "Adtf";
 
+  /**
+   * CTB Mapping flavor
+   */
   public static final String CTB_FLAVOR = "CTB Mapping";
 
+  /**
+   * LabCar flavor
+   */
   public static final String LABCAR_FLAVOR = "LabCar";
 
+  /**
+   * Logging flavor
+   */
   public static final String LOGGING_FLAVOR = "Logging";
 
+  /**
+   * Measurement flavor
+   */
   public static final String MEASUREMENT_FLAVOR = "Measurement";
 
+  /**
+   * Min/Max flavor
+   */
   public static final String MINMAX_FLAVOR = "Min/Max";
 
+  /**
+   * Output Operation flavor
+   */
   public static final String OUTPUT_OPERATION_FLAVOR = "Output Operation";
 
+  /**
+   * Rename flavor
+   */
   public static final String RENAME_FLAVOR = "Rename";
 
+  /**
+   * Simulink Measurement flavor
+   */
   public static final String SIMULINK_MEASUREMENT_FLAVOR = "Simulink Measurement";
 
+  /**
+   * Simulink Object flavor
+   */
   public static final String SIMULINK_OBJECT_FLAVOR = "Simulink Object";
 
+  /**
+   * TargetLink Data Dictionary flavor
+   */
   public static final String TARGETLINK_DATA_DICTIONARY_FLAVOR = "TargetLink Data Dictionary";
 
+  /**
+   * TargetLink Measurement flavor
+   */
   public static final String TARGETLINK_MEASUREMENT_FLAVOR = "TargetLink Measurement";
 
+  /**
+   * Tolerance flavor
+   */
   public static final String TOLERANCE_FLAVOR = "Tolerance";
 
+  /**
+   * Scaling flavor
+   */
   public static final String SCALING_FLAVOR = "Scaling";
 
+  /**
+   * TASMO Input Specification flavor
+   */
   public static final String TASMO_INPUT_SPECIFICATION_FLAVOR = "TASMO Input Specification";
 
+  /**
+   * SOME/IP flavor
+   */
   public static final String SOMEIP_FLAVOR = "SOME/IP Configuration";
 
   /**
@@ -111,14 +165,14 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
       throws ApiException, RemoteException;
 
   /**
-   * Get the value of the given mapping flavor column.
+   * Get the value of the given mapping flavor column of structured elements and its members.
    * 
    * @param decl
    *          The {@link Declaration} from which you want to get the flavor.
    * @param subElement
    *          The subelement in case of a structured {@link Declaration}. Can be left empty or
-   *          <code>null</code> to set the value for the root element. The sub elements must be
-   *          seperated by '.'. Do NOT add the name of the declaration as first element.
+   *          <code>null</code> to get the value for the root element. The sub elements must be
+   *          separated by '.'. Do NOT add the name of the declaration as first element.
    * @param column
    *          The name of the column of the flavor. Valid column names are all mapping specific
    *          column names from the declaration editor, such as <code>Min</code>, <code>Max</code>,
@@ -169,7 +223,7 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * @param subElement
    *          The subelement in case of a structured {@link Declaration}. Can be left empty or
    *          <code>null</code> to set the value for the root element. The sub elements must be
-   *          seperated by '.'. Do NOT add the name of the declaration as first element.
+   *          separated by '.'. Do NOT add the name of the declaration as first element.
    * @param column
    *          The name of the column of the flavor. Valid column names are all mapping specific
    *          column names from the declaration editor, such as <code>Min</code>, <code>Max</code>,
@@ -202,7 +256,7 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    *           If the declaration or the column is null, if the declaration does not exist locally
    *           or if the mapping does not have any flavor with the given column.
    * @throws RemoteException
-   *           remote co@Override mmunication problem
+   *           remote communication problem
    */
   String getMappingFlavorColumnDefaultValue(Declaration decl, String column)
       throws ApiException, RemoteException;
@@ -216,7 +270,7 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    * @param subElement
    *          The subelement in case of a structured {@link Declaration}. Can be left empty or
    *          <code>null</code> to set the value for the root element. The sub elements must be
-   *          seperated by '.'. Do NOT add the name of the declaration as first element.
+   *          separated by '.'. Do NOT add the name of the declaration as first element.
    * @param column
    *          The name of the column of the flavor.
    * @return The String representation of the default value from the flavor
@@ -224,7 +278,7 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    *           If the declaration or the column is null, if the declaration does not exist locally
    *           or if the mapping does not have any flavor with the given column.
    * @throws RemoteException
-   *           remote co@Override mmunication problem
+   *           remote communication problem
    */
   String getMappingFlavorColumnDefaultValue(Declaration decl, String subElement, String column)
       throws ApiException, RemoteException;

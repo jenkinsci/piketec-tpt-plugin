@@ -7,7 +7,7 @@ import com.piketec.tpt.api.util.IterableRemoteIndexedList;
 /**
  * A list of Objects that supports fast access to elements based on an index.
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  * 
  * @param <KEY>
  *          the type of keys of this indexed list

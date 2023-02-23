@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,6 +21,7 @@
 package com.piketec.tpt.api;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A simple pair.
@@ -38,23 +39,49 @@ public class Pair<A, B> implements Serializable {
 
   private B second;
 
+  /**
+   * Create a pair of <code>first</code> and <code>second</code>
+   * 
+   * @param first
+   *          The first pair member
+   * @param second
+   *          The second pair member
+   */
   public Pair(A first, B second) {
     this.first = first;
     this.second = second;
   }
 
+  /**
+   * @return The first pair member
+   */
   public A getFirst() {
     return first;
   }
 
+  /**
+   * Set the first pair member
+   * 
+   * @param first
+   *          The new first pair member
+   */
   public void setFirst(A first) {
     this.first = first;
   }
 
+  /**
+   * @return The second pair member
+   */
   public B getSecond() {
     return second;
   }
 
+  /**
+   * Set the second pair member
+   * 
+   * @param second
+   *          The new second pair member
+   */
   public void setSecond(B second) {
     this.second = second;
   }
@@ -62,5 +89,25 @@ public class Pair<A, B> implements Serializable {
   @Override
   public String toString() {
     return "(" + first + "," + second + ")";
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(first, second);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    Pair other = (Pair)obj;
+    return Objects.equals(first, other.first) && Objects.equals(second, other.second);
   }
 }

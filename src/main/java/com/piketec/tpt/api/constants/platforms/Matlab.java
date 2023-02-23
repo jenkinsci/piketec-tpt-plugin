@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,14 +27,22 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String EXECIOFILEOVERWRITE = "execIOFileOverwrite";
 
+  public static final String EXECTESTFRAMEREGEN = "execTestFrameRegen";
+
   public static final String EXECKEEPMATLABOPEN = "execKeepMatlabOpen";
 
   public static final String FASTRESTART = "fastRestart";
+
+  public static final String SLSIMULATIONMODE = "slSimulationMode";
 
   public static final String ENFORCEFIRSTTESTCASESINGLETHREADED =
       "enforceFirstTestCaseSingleThreaded";
 
   public static final String EXECMODELLOADSCRIPT = "execModelLoadScript";
+
+  public static final String CODECOVERAGECUSTOMSCRIPT = "codeCoverageCustomScript";
+
+  public static final String EXECFINALIZESCRIPT = "execFinalizeScript";
 
   public static final String EXECRESTARTMATLABEVERY = "execRestartMatlabEvery";
 
@@ -52,11 +60,13 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String MATLABSTARTUPSCRIPT = "matlabStartupScript";
 
-  public static final String MATLLABVERSIONNAME = "matlabVersionName";
+  public static final String MATLABVERSIONNAME = "matlabVersionName";
 
   public static final String ORIGINALBLOCKPATH = "originalBlockPath";
 
   public static final String ORIGINALMODELFILE = "originalModelFile";
+
+  public static final String ORIGINALMODELVERSION = "originalModelVersion";
 
   public static final String ORIGINALMODELLOADSCRIPT = "originalModelLoadScript";
 
@@ -72,15 +82,11 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String PARAMETERLOADMODE = "parameterLoadMode";
 
-  public static final String PARAMETERLOADXMLSCRIPT = "parameterLoadXMLScript";
-
   public static final String PARAMETERWRITEFCN = "parameterWriteFcn";
 
   public static final String PARAMETERWRITEMODE = "parameterWriteMode";
 
   public static final String UPDATETARGETLINKCODEPARAMS = "updateTargetLinkCodeParams";
-
-  public static final String PARAMETERWRITEXMLSCRIPT = "parameterWriteXMLScript";
 
   public static final String TPT_MATLAB_USE_GENERATED_TESTFRAME_FILENAME =
       "tpt.matlab.testframefilename.usegenerated";
@@ -99,6 +105,8 @@ public interface Matlab extends BasicPlatformConfig {
   public static final String IMPORTALLPARAMS = "IMPORTALLPARAMS";
 
   public static final String DUALSCALEDPARAMSUSEVALUE = "dualScaledParamsUseValue";
+
+  public static final String IMPORTALLENUMS = "importAllEnums";
 
   public static final String STARTVECTORINDEXWT0 = "STARTVECTORINDEXWT0";
 
@@ -140,7 +148,7 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String CODECOVERAGE_ENABLED = "code_coverage_enabled";
 
-  public static final String CODECOVERAGE_UNDO_SETTINGS = "code_coverage_undo_settings";
+  public static final String COVERAGE_EXCLUDED_BLOCKS = "coverage_excluded_blocks";
 
   public static final String CODECOVERAGE_ONLY_REPORTING = "code_coverage_only_reporting";
 

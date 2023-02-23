@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,14 +22,16 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.UUIDObject;
+
 /**
  * An object representing either an {@link ExecutionConfiguration} or a group of execution
  * configurations ({@link ExecutionConfigurationGroup}). These objects can build up a tree where
  * both, execution configurations and execution configuration groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
-public interface ExecutionConfigurationOrGroup extends NamedObject, IdentifiableRemote {
+public interface ExecutionConfigurationOrGroup extends NamedObject, IdentifiableRemote, UUIDObject {
 
   /**
    * Get the parent execution configuration group or <code>null</code> if this object resides on the
@@ -41,6 +43,17 @@ public interface ExecutionConfigurationOrGroup extends NamedObject, Identifiable
    *           remote communication problem
    */
   public ExecutionConfigurationGroup getGroup() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this is a {@link ExecutionConfigurationGroup}, <code>false</code>
+   * otherwise.
+   * 
+   * @return <code>true</code> if this is a {@link ExecutionConfigurationGroup}, <code>false</code>
+   *         otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGroup() throws RemoteException;
 
   /**
    * Moves this {@link ExecutionConfigurationOrGroup} to a new position in the execution
@@ -63,8 +76,9 @@ public interface ExecutionConfigurationOrGroup extends NamedObject, Identifiable
    * {@link Project} that is opened in the same TPT instance. If the <code>targetGroup</code>
    * already contains an element with the same name a new one will be generated.
    * 
-   * @param targetGroup
-   *          The group to copy <code>this</code> into. Can be from another <code>Project</code>.
+   * @param targetGroupOrProject
+   *          The group or project to copy <code>this</code> into. The target can be from another
+   *          <code>Project</code>.
    * @param targetIndex
    *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
    *          copy at the end.
@@ -74,7 +88,7 @@ public interface ExecutionConfigurationOrGroup extends NamedObject, Identifiable
    * @throws RemoteException
    *           remote communication problem
    */
-  public ResultAndLogs<ExecutionConfigurationOrGroup> copy(ExecutionConfigurationOwner targetGroup,
+  public ResultAndLogs<ExecutionConfigurationOrGroup> copy(ExecutionConfigurationOwner targetGroupOrProject,
                                                            int targetIndex)
       throws ApiException, RemoteException;
 }

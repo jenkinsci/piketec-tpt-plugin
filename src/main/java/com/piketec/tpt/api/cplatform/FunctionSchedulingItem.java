@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import com.piketec.tpt.api.IdentifiableRemote;
  * A function that can be used for scheduling in the C\C++ platform in TPT
  * 
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface FunctionSchedulingItem extends IdentifiableRemote {
 
@@ -120,5 +120,26 @@ public interface FunctionSchedulingItem extends IdentifiableRemote {
    *           remote communication problem
    */
   public boolean isImportedFromCCodeSource() throws RemoteException;
+
+  /**
+   * Get the delay before the scheduling starts
+   * 
+   * @return the current delay
+   *
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getDelay() throws RemoteException;
+
+  /**
+   * Set the delay before the scheduling starts
+   * 
+   * @param delay
+   *          The new delay
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setDelay(String delay) throws RemoteException;
 
 }

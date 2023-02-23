@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -82,7 +82,7 @@ public interface Transition extends NamedObject, IdentifiableRemote {
   public RemoteList<Point> getAuxPositions() throws RemoteException;
 
   /**
-   * Add a new list of auxiliary point for this transition.
+   * Adds a new entry in the list of auxiliary points for this transition.
    *
    * @param p
    *          The new auxiliary point
@@ -93,6 +93,21 @@ public interface Transition extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   public void addAuxPoint(Point p, int index) throws RemoteException;
+
+  /**
+   * Adds a new entry in the list of auxiliary points for this transition.
+   *
+   * @param x
+   *          The x coordinate of the new auxiliary point
+   * @param y
+   *          The y coordinate of the new auxiliary point
+   * @param index
+   *          The position of the new auxiliary point in the list.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void addAuxPoint(int x, int y, int index) throws RemoteException;
 
   /**
    * Returns the list of {@link TransitionSpec transition specifications} or

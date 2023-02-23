@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,7 +32,7 @@ import com.piketec.tpt.api.tasmo.TasmoTestDataGenerationController;
  * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
  * </p>
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
 
@@ -40,6 +40,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * Type String for ADTF Platform
    */
   public static final String ADTF_PLATFORM_TYPE = "adtf";
+
+  /**
+   * Type String for Arduino Platform
+   */
+  public static final String ARDUINO_FUSION_PLATFORM_TYPE = "arduino";
 
   /**
    * Type String for ASCET Platform
@@ -52,21 +57,24 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String ASCET_AT_FUSION_PLATFORM_TYPE = "ascet2";
 
   /**
+   * Type String for Assessment Platform
+   */
+  public static final String ASSESSMENT_PLATFORM_TYPE = "assessment";
+
+  /**
    * Type String for AUTOSAR Platform
    */
   public static final String AUTOSAR_PLATFORM_TYPE = "autosar";
 
   /**
-   * Type String for Assessment Platform
+   * Type String for AUTOSAR FUSION Platform
    */
-  public static final String ASSESSMENT_PLATFORM_TYPE = "assessment";
-
-  public static final String BOSCH_FUSION_PLATFORM_TYPE = "bosch-fusion";
+  public static final String AUTOSAR_FUSION_PLATFORM_TYPE = "autosarfusion";
 
   /**
-   * Type String for CANoe Platform
+   * Type String for BOSCH FUSION Platform
    */
-  public static final String CANOE_PLATFORM_TYPE = "canoe";
+  public static final String BOSCH_FUSION_PLATFORM_TYPE = "bosch-fusion";
 
   /**
    * Type String for C Platform
@@ -74,14 +82,24 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String C_PLATFORM_TYPE = "ccode";
 
   /**
+   * Type String for CANape Platform
+   */
+  public static final String CANAPE_FUSION_PLATFORM_TYPE = "canape";
+
+  /**
+   * Type String for CANoe Platform
+   */
+  public static final String CANOE_PLATFORM_TYPE = "canoe";
+
+  /**
    * Type String for CANoe@FUSION Platform
    */
   public static final String CANOE_AT_FUSION_PLATFORM_TYPE = "canoe@fusion";
 
   /**
-   * Type String for CTB Platform
+   * Type String for CarMaker Platform
    */
-  public static final String CTB_PLATFORM_TYPE = "daimler-ctb";
+  public static final String CARMAKER_FMU_FUSION_PLATFORM_TYPE = "carmakerfmu";
 
   /**
    * Type String for Concurrent HiL Platform
@@ -89,9 +107,44 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String CONCURRENT_HIL_PLATFORM_TYPE = "concurrent-hil";
 
   /**
+   * Type String for CTB Platform
+   */
+  public static final String CTB_PLATFORM_TYPE = "daimler-ctb";
+
+  /**
+   * Type String for DiagRA D Platform
+   */
+  public static final String DIAGRAD_FUSION_PLATFORM_TYPE = "diagrad";
+
+  /**
+   * Type String for dSPACE HiL@FUSION Platform
+   */
+  public static final String DSPACE_HIL_AT_FUSION_PLATFORM_TYPE = "dspaceXil";
+
+  /**
+   * Type String for dSPACE HiL Platform
+   */
+  public static final String DSPACE_HIL_PLATFORM_TYPE = "dspace-hil";
+
+  /**
+   * Type String for dSPACE PiL Platform
+   */
+  public static final String DSPACE_PIL_PLATFORM_TYPE = "dspace-pil";
+
+  /**
    * Type String for EXE Platform
    */
   public static final String EXE_PLATFORM_TYPE = "exe";
+
+  /**
+   * Type String for FEP Platform
+   */
+  public static final String FEP_PLATFORM_TYPE = "fep";
+
+  /**
+   * Type String for FMI Platform
+   */
+  public static final String FMI_FUSION_PLATFORM_TYPE = "fmi";
 
   /**
    * Type String for FUSION Platform
@@ -99,9 +152,24 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String FUSION_PLATFORM_TYPE = "fusion";
 
   /**
+   * Type String for INCA Platform
+   */
+  public static final String GDB_FUSION_PLATFORM_TYPE = "gdb";
+
+  /**
+   * Type String for INCA Platform
+   */
+  public static final String INCA_FUSION_PLATFORM_TYPE = "inca";
+
+  /**
    * Type String for LABCAR Platform
    */
   public static final String LABCAR_PLATFORM_TYPE = "labcar";
+
+  /**
+   * Type String for Lauterbach Platform
+   */
+  public static final String LAUTERBACH_FUSION_PLATFORM_TYPE = "lauterbach";
 
   /**
    * Type String for MATLAB/Simulink Platform
@@ -109,9 +177,29 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String MATLAB_SIMULINK_PLATFORM_TYPE = "matlab";
 
   /**
+   * Type String for Peak CAN Platform
+   */
+  public static final String PEAK_CAN_FUSION_PLATFORM_TYPE = "peakcan";
+
+  /**
+   * Type String for PLS UDE Platform
+   */
+  public static final String PLS_UDE_FUSION_PLATFORM_TYPE = "plsude";
+
+  /**
    * Type String for RADARCAN Platform
    */
   public static final String RADARCAN_PLATFORM_TYPE = "radarcan";
+
+  /**
+   * Type String for RealtimeMaker Platform
+   */
+  public static final String REALTIMEMAKER_PLATFORM_TYPE = "realtimemaker";
+
+  /**
+   * Type String for RT-LAB Platform
+   */
+  public static final String RTLAB_FUSION_PLATFORM_TYPE = "rtlab";
 
   /**
    * Type String for Silver Platform
@@ -124,19 +212,19 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String SIMULINK_REAL_TIME_PLATFORM_TYPE = "matlab-rt";
 
   /**
+   * Type String for SLRT@FUSION Platform
+   */
+  public static final String SLRT_AT_FUSION_PLATFORM_TYPE = "slrtxil@fusion";
+
+  /**
    * Type String for Stand-alone Platform
    */
   public static final String STAND_ALONE_PLATFORM_TYPE = "stand-alone";
 
   /**
-   * Type String for VW / Audi Platform
+   * Type String for Vector CAN Platform
    */
-  public static final String VW_AUDI_PLATFORM_TYPE = "vw-audi";
-
-  /**
-   * Type String for VeriStand Platform
-   */
-  public static final String VERISTAND_PLATFORM_TYPE = "veristand";
+  public static final String VECTOR_CAN_FUSION_PLATFORM_TYPE = "vectorcan";
 
   /**
    * Type String for VeriStand@FUSION Platform
@@ -144,14 +232,19 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String VERISTAND_AT_FUSION_PLATFORM_TYPE = "veristand@fusion";
 
   /**
-   * Type String for dSPACE HiL Platform
+   * Type String for VeriStand Platform
    */
-  public static final String DSPACE_HIL_PLATFORM_TYPE = "dspace-hil";
+  public static final String VERISTAND_PLATFORM_TYPE = "veristand";
 
   /**
-   * Type String for dSPACE HiL@FUSION Platform
+   * Type String for VTD Platform
    */
-  public static final String DSPACE_HIL_AT_FUSION_PLATFORM_TYPE = "dspaceXil";
+  public static final String VTD_FUSION_PLATFORM_TYPE = "vtd";
+
+  /**
+   * Type String for VW / Audi Platform
+   */
+  public static final String VW_AUDI_PLATFORM_TYPE = "vw-audi";
 
   /**
    * Type String for ASAM XIL@FUSION Platform
@@ -159,11 +252,13 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String XIL_AT_FUSION_PLATFORM_TYPE = "asamXil";
 
   /**
-   * Type String for dSPACE HiL@FUSION Platform
+   * @return The type name of the platform
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see Project#createPlatformConfiguration(String, String)
    */
-  public static final String FEP = "fep";
-
-  public String getType() throws ApiException, RemoteException;
+  public String getType() throws RemoteException;
 
   /**
    * @return Returns the platform timeout in microseconds.
@@ -314,7 +409,7 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    *           platform is not supported by TASMO.
    */
   public TasmoTestDataGenerationController initTasmoTestDataGeneration(Mapping mapping)
-      throws RemoteException;
+      throws ApiException, RemoteException;
 
   /**
    * Copies <code>this</code> into the given <code>target</code> that can be a different

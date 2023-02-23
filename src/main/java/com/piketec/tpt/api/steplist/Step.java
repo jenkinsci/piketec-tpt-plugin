@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,6 +24,7 @@ import java.rmi.RemoteException;
 
 import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.properties.PropertyMap;
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
 /**
  * A step is one entry in a {@link StepListScenario}.
@@ -172,6 +173,8 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}
    */
   @Deprecated
   public PropertyMap getProperties() throws RemoteException;
@@ -184,6 +187,8 @@ public interface Step extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}
    */
   @Deprecated
   public void setProperties(PropertyMap properties) throws RemoteException;

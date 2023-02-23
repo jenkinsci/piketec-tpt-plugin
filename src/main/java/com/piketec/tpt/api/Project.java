@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,23 +29,45 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.piketec.tpt.api.Requirement.RequirementType;
 import com.piketec.tpt.api.importinterface.ImportInterfaceSettings;
+import com.piketec.tpt.api.requirements.RequirementsExportSettings;
+import com.piketec.tpt.api.requirements.RequirementsImportSettings;
+import com.piketec.tpt.api.requirements.TestCasesExportSettings;
+import com.piketec.tpt.api.requirements.TestCasesImportSettings;
+import com.piketec.tpt.api.requirements.codebeamer.CodeBeamerRequirementsImportSettings;
+import com.piketec.tpt.api.requirements.codebeamer.CodeBeamerTestCasesExportSettings;
+import com.piketec.tpt.api.requirements.codebeamer.CodeBeamerTestCasesImportSettings;
+import com.piketec.tpt.api.requirements.csv.CsvFileRequirementsExportSettings;
+import com.piketec.tpt.api.requirements.csv.CsvFileRequirementsImportSettings;
+import com.piketec.tpt.api.requirements.csv.CsvFileTestCasesExportSettings;
+import com.piketec.tpt.api.requirements.csv.CsvFileTestCasesImportSettings;
+import com.piketec.tpt.api.requirements.excel.ExcelFileRequirementsExportSettings;
+import com.piketec.tpt.api.requirements.excel.ExcelFileRequirementsImportSettings;
+import com.piketec.tpt.api.requirements.excel.ExcelFileTestCasesExportSettings;
+import com.piketec.tpt.api.requirements.excel.ExcelFileTestCasesImportSettings;
+import com.piketec.tpt.api.requirements.polarion.PolarionRequirementsImportSettings;
+import com.piketec.tpt.api.requirements.polarion.PolarionTestCasesExportSettings;
+import com.piketec.tpt.api.requirements.polarion.PolarionTestCasesImportSettings;
+import com.piketec.tpt.api.requirements.reqif.ReqIfRequirementsImportSettings;
+import com.piketec.tpt.api.requirements.reqif.ReqIfTestCasesExportSettings;
+import com.piketec.tpt.api.steplist.formalrequirements.FormalRequirementDefine;
 
 /**
  * This object represents a TPT project. It has been either newly created with
  * {@link TptApi#newProject(File)} or opened via {@link TptApi#openProject(File)}.
  * 
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, TestSetOwner {
 
   /**
    * Modes how to match existing declarations and imported declarations.
    * 
-   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
    *
    */
   public static enum SynchronizationMethod {
@@ -57,6 +79,27 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
      * Match declarations by their external name of a given rename mapping.
      */
     EXTERNAL_NAME;
+  }
+
+  /**
+   * Modes that determine which types of requirement links are included in calculations.
+   * 
+   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   *
+   */
+  public static enum RequirementsLinking {
+    /**
+     * Only links to test cases are considered for calculations.
+     */
+    TEST_CASES_ONLY,
+    /**
+     * Only links to assesslets are considered for calculations.
+     */
+    ASSESSLETS_ONLY,
+    /**
+     * All kinds of links, i.e. test cases, variants and assesslets are considered for calculations.
+     */
+    ALL_KINDS;
   }
 
   /**
@@ -123,6 +166,30 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
 
   /**
    * 
+   * Saves the project in the file at the given path. The file can be changed by this method. This
+   * function basically represents the "Save as..." menu item.
+   * <p>
+   * The file extension defines the save format for the file (*.tpt, *.tptz, *.tptprj)
+   * </p>
+   * 
+   * @param file
+   *          the path to the file to save the project to
+   * 
+   * @see Project#saveProject()
+   * @see TptApi#newProject(File)
+   * @see TptApi#openProject(File)
+   *
+   * @return A list of messages that have occurred during the save operation.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the project is not open or it the project cannot be written to the given file,
+   */
+  List<String> saveAsProjectByPath(String file) throws ApiException, RemoteException;
+
+  /**
+   * 
    * Returns the {@link File} that is associated with this TPT project. If no file has been
    * specified so far, it returns <code>null</code>.
    * 
@@ -132,6 +199,18 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   File getFile() throws RemoteException;
+
+  /**
+   * 
+   * Returns the path to the file that is associated with this TPT project. If no file has been
+   * specified so far, it returns <code>null</code>.
+   * 
+   * @return A path to a TPT file or <code>null</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getFilePath() throws RemoteException;
 
   /**
    * @return Returns the list of all {@link ExecutionConfiguration ExecutionConfigurations} and
@@ -187,6 +266,22 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
       throws RemoteException;
 
   /**
+   * Delivers all execution configurations and/or groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link ExecutionConfigurationOrGroup ExecutionConfigurationOrGroups},
+   *         matching the given name pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<ExecutionConfigurationOrGroup> getExecutionConfigurationOrGroupByNamePattern(String namepattern)
+      throws PatternSyntaxException, RemoteException;
+
+  /**
    * @return Returns the set of all {@link TestSet TestSets} defined in this project. Changes to the
    *         returned RemoteCollection will change the TPT model but changes in the TPT model will
    *         not be reflected here.
@@ -197,6 +292,51 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @see #getTopLevelTestSets()
    */
   RemoteCollection<TestSet> getTestSets() throws RemoteException;
+
+  /**
+   * Delivers the first test set or test set group with the given name or <code>null</code> if no
+   * such test set or test set group exists.
+   * 
+   * @param name
+   *          The name of the <code>TestSet</code>.
+   * @return The {@link TestSet TestSets}/{@link TestSetGroup TestSetGroups} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  TestSetOrGroup getTestSetOrGroupByName(String name) throws RemoteException;
+
+  /**
+   * Delivers all test sets and test set groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * 
+   * @return Collection of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups},
+   *         matching the given name pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<TestSetOrGroup> getTestSetOrGroupByNamePattern(Pattern namepattern)
+      throws RemoteException;
+
+  /**
+   * Delivers all test sets and test set groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * 
+   * @return Collection of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups},
+   *         matching the given name pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<TestSetOrGroup> getTestSetOrGroupByNamePattern(String namepattern)
+      throws RemoteException, PatternSyntaxException;
 
   /**
    * @return Returns the list of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups}
@@ -244,6 +384,22 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
       throws RemoteException;
 
   /**
+   * Delivers all Platform configurations, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link PlatformConfiguration PlatformConfigurations}, matching the
+   *         given name pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<PlatformConfiguration> getPlatformConfigurationByNamePattern(String namepattern)
+      throws PatternSyntaxException, RemoteException;
+
+  /**
    * Returns the list all top level <code>Assessments</code> and <code>AssessmentGroups</code> of
    * this project. These are basically those elements that are placed on the highest hierarchy level
    * in the Assessment view.
@@ -257,12 +413,31 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   RemoteList<AssessmentOrGroup> getTopLevelAssessments() throws RemoteException;
 
   /**
+   * Sets the {@link RequirementsLinking} for this project.
+   * 
+   * @param requirementsLinking
+   *          the requirements linking to be used
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setRequirementsLinking(RequirementsLinking requirementsLinking) throws RemoteException;
+
+  /**
+   * Returns the {@link RequirementsLinking} used for this project.
+   * 
+   * @return the requirements linking used for this project
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RequirementsLinking getRequirementsLinking() throws RemoteException;
+
+  /**
    * Adds a new requirement to this project.
    * 
    * @param id
    *          The unique ID of the requirement
-   * @param module
-   *          The module name or <code>null</code>.
+   * @param document
+   *          The requirements document or <code>null</code>.
    * @param text
    *          The describing requirement text.
    * @param type
@@ -274,7 +449,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  Requirement createRequirement(String id, String module, String text, RequirementType type)
+  Requirement createRequirement(String id, String document, String text, RequirementType type)
       throws ApiException, RemoteException;
 
   /**
@@ -285,7 +460,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  RemoteList<Requirement> getRequirements() throws RemoteException;
+  RemoteIndexedList<String, Requirement> getRequirements() throws RemoteException;
 
   /**
    * Add a new requirement set to this project.
@@ -312,6 +487,76 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   RemoteList<RequirementSet> getRequirementSets() throws RemoteException;
+
+  /**
+   * Returns all {@link FormalRequirementDefine defines} of all {@link Requirement} of the current
+   * TPT project.
+   *
+   * @return all {@link FormalRequirementDefine defines} of all {@link Requirement} of the current
+   *         TPT project.
+   *
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteIndexedList<String, FormalRequirementDefine> getFormalRequirementDefines()
+      throws RemoteException;
+
+  /**
+   * Adds a {@link FormalRequirementDefine define} to the current TPT project.
+   * 
+   * @param name
+   *          The name of the define
+   * @param value
+   *          The value of the define
+   * @return {@link FormalRequirementDefine define} which was created and added to the current TPT
+   *         project
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the name already exists or is illegal
+   */
+  FormalRequirementDefine addFormalRequirementDefine(String name, String value)
+      throws RemoteException, ApiException;
+
+  /**
+   * Removes the requirement attribute with the given name. The attribute will be removed in all
+   * requirements of the project.
+   * 
+   * @param attributeName
+   *          The name of the attribute to remove.
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the name of the attribute is empty or {@code null}
+   */
+  void removeRequirementAttribute(String attributeName) throws RemoteException;
+
+  /**
+   * Sets the name spaces which will be used for the Defines of this TPT project. If several name
+   * spaces are used the names have to be comma separated.
+   * 
+   * @param nameSpaces
+   *          the name space, comma separated
+   * 
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if nameSpace is {@code null}
+   */
+  void setUsedNameSpaces(String nameSpaces) throws RemoteException, ApiException;
+
+  /**
+   * Gets the name spaces which will be used for the Defines of this TPT project.
+   * 
+   * @return the name spaces as String
+   * 
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getUsedNameSpaces() throws RemoteException;
 
   /**
    * Delivers the scenario or scenario group with the given id or <code>null</code> if no such
@@ -365,6 +610,22 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    */
   Collection<ScenarioOrGroup> getScenarioOrGroupByNamePattern(Pattern namepattern)
       throws RemoteException;
+
+  /**
+   * Delivers all scenarios and/or scenario groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link ScenarioOrGroup ScenarioOrGroups}, matching the given name
+   *         pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<ScenarioOrGroup> getScenarioOrGroupByNamePattern(String namepattern)
+      throws PatternSyntaxException, RemoteException;
 
   /**
    * Create a new {@link TestSet} with the given name.
@@ -801,6 +1062,22 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
       throws RemoteException;
 
   /**
+   * Delivers all assessments and/or assessment groups, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link AssessmentOrGroup AssessmentOrGroups}, matching the given name
+   *         pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<AssessmentOrGroup> getAssessmentOrGroupByNamePattern(String namepattern)
+      throws PatternSyntaxException, RemoteException;
+
+  /**
    * 
    * Create a {@link AssessmentGroup} with the given name and within the given parent
    * <code>AssessmentGroup</code>.
@@ -881,7 +1158,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          The name for the new attribute.
    * @param type
    *          The type of the attribute as String
-   * @return An newly created {@link TestCaseAttribute}
+   * @return A newly created {@link TestCaseAttribute}
    * 
    * @throws ApiException
    *           If there already exists a {@link TestCaseAttribute} with the given name or
@@ -889,8 +1166,33 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           is unknown.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated will be removed in TPT-21. Use
+   *             {@link #createTestCaseAttribute(String, com.piketec.tpt.api.TestCaseAttribute.TestCaseAttributeType)
+   *             createTestCaseAttribute(String, TestCaseAttributeType)} instead.
    */
+  @Deprecated
   TestCaseAttribute createTestCaseAttribute(String name, String type)
+      throws ApiException, RemoteException;
+
+  /**
+   * Create a new {@link TestCaseAttribute}
+   * 
+   * @see TestCaseAttribute#getAttributeType()
+   * 
+   * @param name
+   *          The name for the new attribute.
+   * @param type
+   *          The type of the attribute as TestCaseAttributeType.
+   * @return A newly created {@link TestCaseAttribute}
+   * 
+   * @throws ApiException
+   *           If there already exists a {@link TestCaseAttribute} with the given name or
+   *           <code>name==null</code> or <code>type==null</code>.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  TestCaseAttribute createTestCaseAttribute(String name,
+                                            TestCaseAttribute.TestCaseAttributeType type)
       throws ApiException, RemoteException;
 
   /**
@@ -945,6 +1247,22 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   Collection<Mapping> getMappingByNamePattern(Pattern namepattern) throws RemoteException;
 
   /**
+   * Delivers all mappings, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * 
+   * @return Collection of all {@link Mapping Mappings}, matching the given name pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Collection<Mapping> getMappingByNamePattern(String namepattern)
+      throws PatternSyntaxException, RemoteException;
+
+  /**
    * Create a new {@link Mapping} with the <code>given</code> name. If the <code>name</code> already
    * exists, a suffix (_00&lt;n&gt;) is added to the name of the new mapping.
    * 
@@ -968,8 +1286,11 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param dir
    *          The directory where the test data resides.
    * @param filePatternOrNull
-   *          A regular expression to constrain the set of files that are imported to TPT. If the
-   *          expression is <code>null</code> or empty, all available files will be imported.
+   *          A regular expression to constrain the set of files that are imported to TPT.<br>
+   *          For example, use <code>".*\.mdf"</code> to consider only MDF files (i.e., all files
+   *          whose file name ends with '.mdf').<br>
+   *          If the expression is <code>null</code> or empty, all available files with supported
+   *          file format will be imported.
    * @param includeSubdirs
    *          Enable/disable the traversal of sub-directories of <code>dir</code> for further data
    *          to import.
@@ -1039,6 +1360,91 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
       throws ApiException, RemoteException;
 
   /**
+   * Imports existing test data as step lists to TPT. This corresponds to "Tools | Generate Test
+   * Cases from Test Data". This function could either try to update an already existing set of
+   * imported test data or create a new set. *
+   * 
+   * @param scenarioGroup
+   *          A variant group where the imported test data should be inserted.
+   * @param dir
+   *          The path to the directory where the test data resides.
+   * @param filePatternOrNull
+   *          A regular expression to constrain the set of files that are imported to TPT.<br>
+   *          For example, use <code>".*\.mdf"</code> to consider only MDF files (i.e., all files
+   *          whose file name ends with '.mdf').<br>
+   *          If the expression is <code>null</code> or empty, all available files with supported
+   *          file format will be imported.
+   * @param includeSubdirs
+   *          Enable/disable the traversal of sub-directories of <code>dir</code> for further data
+   *          to import.
+   * @param channelPatternOrNull
+   *          Provide a regular expression to define a mapping between channels in TPT and signal
+   *          names in the file. The placeholder ${CHANNEL} can be used to refer to a arbitrary
+   *          channel name in TPT: the expression <code>"prefix_${CHANNEL}_postfix"</code> would
+   *          match a TPT channel <code>"mysignal"</code> to the signal
+   *          <code>"prefix_mysignal_postfix"</code> in the file.
+   * @param linkSignals
+   *          Enable or disable the linking of test data files. If set to <code>false</code>, test
+   *          date will be imported as Embedded Signal Step, instead.
+   * @param renameMappingNameOrNull
+   *          The name of a existing mapping with a rename flavor, that should be used to map the
+   *          channels in TPT to the signal in the file.
+   * @param createAssesslets
+   *          Enable/Disable the automatic creation of Signal Comparison Assesslets for the input
+   *          channels in the test data.
+   * @param timeTolOrNull
+   *          Specify the time tolerance for the Signal Comparison Assesslets. <code>null</code>
+   *          means none.
+   * @param valueTolOrNull
+   *          Specify the value tolerance for the Signal Comparison Assesslets. <code>null</code>
+   *          means none.
+   * @param createLocalReferenceChannels
+   *          Create local signals for the reference channels of the Signal comparison from the
+   *          channels of the file to have the reference data available for embedded signals, too.
+   * @param addTerminationCondition
+   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          replayed.
+   * @param assignParameters
+   *          Enable the assignment of parameter values to test cases, if those are present in the
+   *          test data file and a respective mapping flavor is present.
+   * @param updateExistingGeneratedScenarios
+   *          If this argument is set to <code>true</code>, TPT tries to find an older import to
+   *          update with the new data. If it finds an older import, TPT updates already existing
+   *          test cases, adds missing test cases, and removes such test cases, that do not have
+   *          corresponding test data anymore.
+   *          <p>
+   *          A older updateable import exists, if the testlet for the provided
+   *          <code>scenarioGroup</code> contains exactly one child group that matches the name
+   *          scheme <code>"Import DD.MM.YY HH:MM:SS - RootDirName"</code> and there exists a test
+   *          case group of the same name.
+   *          </p>
+   * @return Returns a <code>String</code> containing the error and warning messages occurred during
+   *         the import.
+   * @throws ApiException
+   *           <ul>
+   *           <li>If <code>dir</code> cannot be read.</li>
+   *           <li>If no mapping with the name <code>renameMappingNameOrNull</code> can be found or
+   *           the Mapping does not have a Rename Flavor.
+   *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
+   *           a Signal Comparison Assesslet could be created.</li>
+   *           <li>If an error occurs during the import.</li>
+   *           </ul>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String generateTestCasesFromTestDataByPath(ScenarioGroup scenarioGroup, String dir,
+                                             String filePatternOrNull, boolean includeSubdirs,
+                                             String channelPatternOrNull, boolean linkSignals,
+                                             String renameMappingNameOrNull,
+                                             boolean createAssesslets, String timeTolOrNull,
+                                             String valueTolOrNull,
+                                             boolean createLocalReferenceChannels,
+                                             boolean addTerminationCondition,
+                                             boolean assignParameters,
+                                             boolean updateExistingGeneratedScenarios)
+      throws ApiException, RemoteException;
+
+  /**
    * Imports the interface from the given file. Supported are tpt, tptprj, tptz, tptaif, xml and
    * xlsx files.
    * 
@@ -1056,6 +1462,26 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   List<String> importIO(File f, Mapping mappingOrNull, SynchronizationMethod syncMethod)
+      throws ApiException, RemoteException;
+
+  /**
+   * Imports the interface from the given file. Supported are tpt, tptprj, tptz, tptaif, xml and
+   * xlsx files.
+   * 
+   * @param f
+   *          The path to the interface file containing the declarations to import.
+   * @param mappingOrNull
+   *          The mapping where mapping information shall be imported or <code>null</code> if a new
+   *          mapping should be created if needed.
+   * @param syncMethod
+   *          Specifies how the existing and imported declarations are matched.
+   * @return A list of warnings that occurred during import.
+   * @throws ApiException
+   *           If an error occurs during import or the file format is not supported.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> importIOByPath(String f, Mapping mappingOrNull, SynchronizationMethod syncMethod)
       throws ApiException, RemoteException;
 
   /**
@@ -1111,6 +1537,18 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
 
   /**
    * @param f
+   *          the path to the file to be imported.
+   * @return {@link List} with warnings occurred during import.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the path is null
+   */
+  List<String> importEquivalenceClassesByPath(String f) throws RemoteException, ApiException;
+
+  /**
+   * @param f
    *          target-{@link File} for export.
    * @return {@link List} with warnings occurred during import.
    * 
@@ -1118,6 +1556,18 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   List<String> exportEquivalenceClasses(File f) throws RemoteException;
+
+  /**
+   * @param f
+   *          path to the target File for export.
+   * @return {@link List} with warnings occurred during import.
+   * @throws ApiException
+   *           if the path is null
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> exportEquivalenceClassesByPath(String f) throws ApiException, RemoteException;
 
   /**
    * This method provides the functionality to generate {@link Scenario test cases} from equivalence
@@ -1230,5 +1680,135 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   void tagCurrentRevisions(String tag) throws ApiException, RemoteException;
+
+  /**
+   * Exports the last test results to an extern destination.
+   * 
+   * @param key
+   *          the key of the exporter to use
+   * @throws ApiException
+   *           if any problems occur during the export
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void exportTestResults(TestResultsExporterKey key) throws ApiException, RemoteException;
+
+  /**
+   * Exports the test cases to a CSV, Excel, or ReqIF file to import the changes to a test
+   * management tool. It is also possible to export test cases directly to codeBeamer or Polarion.
+   * 
+   * @param exportSettings
+   *          The settings for the individual export.<br>
+   *          For the test cases export to a CSV file use
+   *          {@link CsvFileTestCasesExportSettings}.<br>
+   *          For the test cases export to an Excel file use
+   *          {@link ExcelFileTestCasesExportSettings}.<br>
+   *          For the test cases export to Polarion use {@link PolarionTestCasesExportSettings}.<br>
+   *          For the test cases export to codeBeamer use
+   *          {@link CodeBeamerTestCasesExportSettings}.<br>
+   *          For the test cases export to refIF use {@link ReqIfTestCasesExportSettings}.
+   * @throws ApiException
+   *           if any problems occur during the export
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void exportTestCases(TestCasesExportSettings exportSettings) throws ApiException, RemoteException;
+
+  /**
+   * Imports the test cases from a CSV or an Excel file. It is also possible to import test cases
+   * directly from codeBeamer or Polarion.
+   * 
+   * @param importSettings
+   *          The settings for the individual import.<br>
+   *          For the test cases import from a CSV file use
+   *          {@link CsvFileTestCasesImportSettings}.<br>
+   *          For the test cases import from an Excel file use
+   *          {@link ExcelFileTestCasesImportSettings}.<br>
+   *          For the test cases import from Polarion use
+   *          {@link PolarionTestCasesImportSettings}.<br>
+   *          For the test cases import from codeBeamer use
+   *          {@link CodeBeamerTestCasesImportSettings}.
+   * @throws ApiException
+   *           if any problems occur during the import
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void importTestCases(TestCasesImportSettings importSettings) throws ApiException, RemoteException;
+
+  /**
+   * Exports the requirements to a CSV or an Excel file to import the changes to a test management
+   * tool.
+   * 
+   * @param exportSettings
+   *          The settings for the individual export.<br>
+   *          For the requirements export to a CSV file use
+   *          {@link CsvFileRequirementsExportSettings}.<br>
+   *          For the requirements export to an Excel file use
+   *          {@link ExcelFileRequirementsExportSettings}.
+   * @throws ApiException
+   *           if any problems occur during the export
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void exportRequirements(RequirementsExportSettings exportSettings)
+      throws ApiException, RemoteException;
+
+  /**
+   * Imports the requirements from a CSV, Excel, or ReqIF file. It is also possible to import
+   * requirements directly from codeBeamer or Polarion.
+   * 
+   * @param importSettings
+   *          The settings for the individual import.<br>
+   *          For the requirements import from a CSV file use
+   *          {@link CsvFileRequirementsImportSettings}.<br>
+   *          For the requirements import from an Excel file use
+   *          {@link ExcelFileRequirementsImportSettings}.<br>
+   *          For the requirements import from Polarion use
+   *          {@link PolarionRequirementsImportSettings}.<br>
+   *          For the requirements import from codeBeamer use
+   *          {@link CodeBeamerRequirementsImportSettings}.<br>
+   *          For the requirements import from refIF use {@link ReqIfRequirementsImportSettings}.
+   * @throws ApiException
+   *           if any problems occur during the import
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void importRequirements(RequirementsImportSettings importSettings)
+      throws ApiException, RemoteException;
+
+  /**
+   * Delivers the last used requirements import settings for the given document name or
+   * <code>null</code> if no settings exist.
+   * 
+   * @param documentName
+   *          The name of the document. An empty string represents the default document.
+   * @return The settings for the individual import.<br>
+   *         For the requirements import from a CSV file {@link CsvFileRequirementsImportSettings}
+   *         is returned.<br>
+   *         For the requirements import from an Excel file
+   *         {@link ExcelFileRequirementsImportSettings} is returned.<br>
+   *         For the requirements import from Polarion {@link PolarionRequirementsImportSettings} is
+   *         returned.<br>
+   *         For the requirements import from codeBeamer
+   *         {@link CodeBeamerRequirementsImportSettings} is returned.<br>
+   *         For the requirements import from refIF {@link ReqIfRequirementsImportSettings} is
+   *         returned.
+   * @throws ApiException
+   *           if any problems occur during the import
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RequirementsImportSettings getLastImportRequirementsSettings(String documentName)
+      throws ApiException, RemoteException;
+
+  /**
+   * Delivers the names of all requirements documents contained in the project in alphabetical
+   * order.
+   * 
+   * @return A list of all names of requirements documents in this project
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> getRequirementsDocuments() throws RemoteException;
 
 }

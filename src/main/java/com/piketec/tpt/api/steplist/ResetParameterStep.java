@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,12 +23,12 @@ package com.piketec.tpt.api.steplist;
 import java.rmi.RemoteException;
 
 /**
- * A step which provides the possibility to reset a parameter during the test execution.
+ * A step which provides the possibility to reset a channel or parameter during the test execution.
  */
 public interface ResetParameterStep extends Step {
 
   /**
-   * @return the parameter to be reseted.
+   * @return the channel or parameter to be reseted.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -36,14 +36,14 @@ public interface ResetParameterStep extends Step {
   public String getParameter() throws RemoteException;
 
   /**
-   * Sets the parameter to be reseted.
+   * Sets the channel or parameter to be reseted.
    * 
-   * @param parameter
-   *          parameter to reset
+   * @param channelOrParameter
+   *          channel or parameter to reset
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  public void setParameter(String parameter) throws RemoteException;
+  public void setParameter(String channelOrParameter) throws RemoteException;
 
 }

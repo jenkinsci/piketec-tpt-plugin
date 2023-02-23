@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,7 +32,7 @@ import com.piketec.tpt.api.TptRemote;
 /**
  * This interface provides access to TASMO test data generation.
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface TasmoTestDataGenerationController extends TptRemote {
 
@@ -91,7 +91,7 @@ public interface TasmoTestDataGenerationController extends TptRemote {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           if the TASMO test data generation is allready running.
+   *           if the TASMO test data generation is already running.
    */
   public void start() throws RemoteException;
 
@@ -132,7 +132,8 @@ public interface TasmoTestDataGenerationController extends TptRemote {
    * Export the input specification overview as csv.
    * 
    * @param file
-   *          The file to export the results to.
+   *          The file to export the results to. The csv extension is added to the file if not
+   *          present.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -142,10 +143,26 @@ public interface TasmoTestDataGenerationController extends TptRemote {
   public void exportInputSpecificationReport(File file) throws RemoteException;
 
   /**
+   * Export the input specification overview as csv.
+   * 
+   * @param file
+   *          The path to the file where to export the results to. The csv extension is added to the
+   *          path if not present.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the TASMO test data generation has not yet stopped.
+   */
+  public void exportInputSpecificationReportByPath(String file)
+      throws RemoteException, ApiException;
+
+  /**
    * Export the coverage results overview as csv.
    * 
    * @param file
-   *          The file to export the results to.
+   *          The file to export the results to. The csv extension is added to the file if not
+   *          present.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -153,6 +170,20 @@ public interface TasmoTestDataGenerationController extends TptRemote {
    *           if the TASMO test data generation has not yet stopped.
    */
   public void exportCoverageResultsReport(File file) throws RemoteException;
+
+  /**
+   * Export the coverage results overview as csv.
+   * 
+   * @param file
+   *          The path to the file where to export the results to. The csv extension is added to the
+   *          file if not present.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the TASMO test data generation has not yet stopped.
+   */
+  public void exportCoverageResultsReportByPath(String file) throws RemoteException, ApiException;
 
   /**
    * Close and dispose this object. This will close the TASMO UI as well. After this is called all

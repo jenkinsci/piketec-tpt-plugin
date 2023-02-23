@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,12 +24,13 @@ import java.rmi.RemoteException;
 import java.util.Set;
 
 import com.piketec.tpt.api.properties.PropertyMap;
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
 /**
  * This class represents an assessment. The particular properties of the different assessment types
  * are mapped to generic properties (see {@link PropertyMap}).
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface Assessment extends AssessmentOrGroup {
 
@@ -47,6 +48,11 @@ public interface Assessment extends AssessmentOrGroup {
    * Type String for Equivalence Classes Assesslet
    */
   public static final String EQUIVALENCE_CLASSES_TYPE = "EquivalenceClassesAssessletType";
+
+  /**
+   * Type String for Equivalence Classes Assesslet
+   */
+  public static final String FORMAL_REQUIREMENTS_TYPE = "FormalRequirmentsAssessletType";
 
   /**
    * Type String for Import Measurements Assesslet
@@ -73,11 +79,6 @@ public interface Assessment extends AssessmentOrGroup {
    * Type String for Report Image Assesslet
    */
   public static final String REPORT_IMAGE_TYPE = "ImageReportAssessletType";
-
-  /**
-   * Type String for Report Linked Requirements Assesslet
-   */
-  public static final String REPORT_LINKED_REQUIREMENTS_TYPE = "rmassesslet";
 
   /**
    * Type String for Report Meta Information Assesslet
@@ -150,6 +151,32 @@ public interface Assessment extends AssessmentOrGroup {
   public static final String VARIABLE_DEFINITIONS_TYPE = "VarDefsType";
 
   /**
+   * Type String for Global Script Assesslet
+   */
+  public static final String GLOBAL_SCRIPT_TYPE = "GlobalType";
+
+  /**
+   * Type String for Global Variable Assesslet
+   */
+  public static final String GLOBAL_VARIABLE_TYPE = "GlobalVariableType";
+
+  /**
+   * Type String for Global Equivalence Classes Assesslet
+   */
+  public static final String GLOBAL_EQUIVALENCE_CLASSES_TYPE = "GlobalEquivalenceClassesType";
+
+  /**
+   * @deprecated Will be removed in TPT-20.
+   */
+  @Deprecated
+  public static final String REPORT_LINKED_REQUIREMENTS_TYPE = "rmassesslet";
+
+  /**
+   * Type String for Requirements Coverage Assesslet
+   */
+  public static final String REQUIREMENTS_COVERAGE_TYPE = REPORT_LINKED_REQUIREMENTS_TYPE;
+
+  /**
    * @return The name of the assessment type.
    * 
    * @throws RemoteException
@@ -210,7 +237,8 @@ public interface Assessment extends AssessmentOrGroup {
    * @throws RemoteException
    *           remote communication problem
    *
-   * @deprecated Use {@link #getSelectedVariantsOrGroups()}. This method will be removed in TPT 18.
+   * @deprecated Use {@link #getSelectedVariantsOrGroups()}. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}
    */
   @Deprecated
   public RemoteCollection<Scenario> getSelectedVariants() throws RemoteException;
@@ -226,6 +254,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link ScenarioOrGroup variants}
    */
   public RemoteCollection<ScenarioOrGroup> getSelectedVariantsOrGroups() throws RemoteException;
 
@@ -242,6 +272,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link ScenarioOrGroup variants}
    */
   public void enableForVariant(ScenarioOrGroup sog) throws RemoteException;
 
@@ -253,7 +285,8 @@ public interface Assessment extends AssessmentOrGroup {
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Use {@link #getSelectedTestCasesOrGroups()}. This method will be removed in TPT 18.
+   * @deprecated Use {@link #getSelectedTestCasesOrGroups()}. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}
    */
   @Deprecated
   public RemoteCollection<Scenario> getSelectedTestCases() throws RemoteException;
@@ -269,6 +302,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link ScenarioOrGroup test cases}
    * 
    */
   public RemoteCollection<ScenarioOrGroup> getSelectedTestCasesOrGroups() throws RemoteException;
@@ -286,16 +321,18 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link ScenarioOrGroup test cases}
    */
   public void enableForTestCase(ScenarioOrGroup sog) throws RemoteException;
 
   /**
-   * Returns a list of platform configurations or execution ttems for which the assessment is
-   * enabled. Returns an empty list, if the <code>Assessment</code> is enabled for all platforms and
-   * all execution items.
+   * Returns a list of platform configurations, execution configurations and execution configuration
+   * items for which the assessment is enabled. Returns an empty list, if the
+   * <code>Assessment</code> is enabled for all platforms and all execution configuration items.
    *
-   * @return A list of Platform Configurations or Execution Items
-   *         ({@link com.piketec.tpt.api.PlatformOrExecutionItemEnabler
+   * @return A list of platform configurations, execution configurations and execution configuration
+   *         items ({@link com.piketec.tpt.api.PlatformOrExecutionItemEnabler
    *         PlatformOrExecutionItemEnabler})
    * 
    * @throws RemoteException
@@ -309,10 +346,13 @@ public interface Assessment extends AssessmentOrGroup {
    * PlatformConfiguration}.
    *
    * @param pc
-   *          The Platform Configuration, for which the assessment should be enabled.
+   *          The {@link PlatformConfiguration}, for which the assessment should be enabled.
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link PlatformConfiguration
+   *           PlatformConfigurations}
    */
   public void enableForPlatformConfiguration(PlatformConfiguration pc) throws RemoteException;
 
@@ -321,13 +361,31 @@ public interface Assessment extends AssessmentOrGroup {
    * ExecutionConfigurationItem}.
    *
    * @param execItem
-   *          The <code>ExecutionConfigurationItem</code>, the assessment should be enabled for.
+   *          The {@link ExecutionConfigurationItem}, the assessment should be enabled for.
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link ExecutionConfigurationItem
+   *           ExecutionConfigurationItems}
    */
   public void enableForExecutionConfigurationItem(ExecutionConfigurationItem execItem)
       throws RemoteException;
+
+  /**
+   * Enables the assessment for a particular a {@link com.piketec.tpt.api.ExecutionConfiguration
+   * ExecutionConfiguration}.
+   *
+   * @param ec
+   *          The <code>ExecutionConfiguration</code>, the assessment should be enabled for.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if assessment does not support enabling for {@link ExecutionConfiguration
+   *           ExecutionConfigurations}
+   */
+  public void enableForExecutionConfiguration(ExecutionConfiguration ec) throws RemoteException;
 
   /**
    * Returns the properties of the assessment as {@link PropertyMap}.
@@ -372,6 +430,8 @@ public interface Assessment extends AssessmentOrGroup {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           if assessment cannot be activated for {@link Scenario test cases}
    */
   public Set<Scenario> getActiveTestCases() throws RemoteException;
 
@@ -446,5 +506,32 @@ public interface Assessment extends AssessmentOrGroup {
    *           remote communication problem
    */
   public boolean isStatusOutdated() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this assessment is global
+   *
+   * @return
+   *         <ul>
+   *         <li><code>true</code> if it is a global assessment</li>
+   *         <li><code>false</code> if it is not a global assessment</li>
+   *         </ul>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGlobal() throws RemoteException;
+
+  /**
+   * Set the report section for the assessment.
+   * 
+   * @param reportSecAssessment
+   *          <code>Assesslet</code> to be set as the report section or <code>null</code> if the
+   *          <code>&lt;Top-Level&gt;</code> should be set.
+   * @throws ApiException
+   *           if reportSecAssessment is not a report section assesslet
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setReportSection(Assessment reportSecAssessment) throws ApiException, RemoteException;
 
 }

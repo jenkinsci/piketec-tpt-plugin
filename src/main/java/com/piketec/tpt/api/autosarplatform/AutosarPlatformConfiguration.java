@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,11 +28,14 @@ import com.piketec.tpt.api.PlatformConfiguration;
 import com.piketec.tpt.api.Project.SynchronizationMethod;
 import com.piketec.tpt.api.RemoteCollection;
 import com.piketec.tpt.api.RemoteList;
+import com.piketec.tpt.api.codecoverage.CTCCoverageSettings;
+import com.piketec.tpt.api.codecoverage.CoverageSettings;
+import com.piketec.tpt.api.codecoverage.GCovCoverageSettings;
 
 /**
  * The TPT API representation of the AUTOSAR platform in TPT
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface AutosarPlatformConfiguration extends PlatformConfiguration {
 
@@ -121,13 +124,13 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
 
   /**
    * Add an arxm file. This paths must be relative to the configured project root folder for this
-   * platform (see #{@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
+   * platform (see {@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
    * 
    * @param path
    *          The new path to Add
    * 
    * @throws ApiException
-   *           In case the added path is invalid or allready contained.
+   *           In case the added path is invalid or already contained.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -137,7 +140,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   /**
    * Get the paths of the currently selected arxml files. All paths are relative to the configured
    * project root folder for this platform (see
-   * #{@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
+   * {@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
    * 
    * @return A remote collection with the selected configured arxml files
    * 
@@ -195,7 +198,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    *          The new path to Add
    * 
    * @throws ApiException
-   *           In case the added path is invalid or allready contained.
+   *           In case the added path is invalid or already contained.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -258,6 +261,47 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public String getStubHeaderFiles() throws RemoteException;
 
   /**
+   * @param importParameterCurveMapTypes
+   *          <code>true</code> to import application data type with category CURVE or MAP for
+   *          parameters as curve/map type to TPT, <code>false</code> to import them with the
+   *          underlying implementation data type instead.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setImportParameterCurveMapTypes(boolean importParameterCurveMapTypes)
+      throws RemoteException;
+
+  /**
+   * @return <code>true</code> if importing application data type with category CURVE or MAP for
+   *         parameters as curve/map type to TPT, <code>false</code> otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isImportParameterCurveMapTypes() throws RemoteException;
+
+  /**
+   * @param assumeAllPortElementsExplicitAccess
+   *          <code>true</code> to enable the "assume explicit access for all port elements" option,
+   *          <code>false</code> to disable it
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setAssumeAllPortElementsExplicitAccess(boolean assumeAllPortElementsExplicitAccess)
+      throws RemoteException;
+
+  /**
+   * @return <code>true</code> if the "assume explicit access for all port elements" option enabled,
+   *         <code>false</code> otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isAssumeAllPortElementsExplicitAccess() throws RemoteException;
+
+  /**
    * @return <code>true</code> if using repositry files is enabled, <code>false</code> otherwise.
    * 
    * @throws RemoteException
@@ -277,6 +321,21 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setUseRepository(boolean useRepository) throws RemoteException;
 
   /**
+   * @return Is the the "use effective interface" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isUseEffectiveInterface() throws RemoteException;
+
+  /**
+   * @param useEffectiveInterface
+   *          En- or disable the "use effective interface" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setUseEffectiveInterface(boolean useEffectiveInterface) throws RemoteException;
+
+  /**
    * Add an arxm file from the repository. This paths must be relative to the repository root
    * folder.
    * 
@@ -284,7 +343,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    *          The new path to Add
    * 
    * @throws ApiException
-   *           In case the added path is invalid or allready contained.
+   *           In case the added path is invalid or already contained.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -310,7 +369,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    *          The new path to Add
    * 
    * @throws ApiException
-   *           In case the added path is invalid or allready contained.
+   *           In case the added path is invalid or already contained.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -388,6 +447,52 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setCustomInterfaceFilePath(String path) throws RemoteException;
 
   /**
+   * Enable or disable using a system to use its data mapping for sender-receiver elements. If
+   * enabled the system to be used can be set via {@link #setSystemForSignalMapping(String)}.
+   * 
+   * @param useSystemMapping
+   *          <code>true</code> to enable using a system data mapping, <code>false</code> to disable
+   *          it
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setUseSystemMapping(boolean useSystemMapping) throws RemoteException;
+
+  /**
+   * @return <code>true</code> if using a system data mapping is enabled, <code>false</code> if it
+   *         is disabled
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isUseSystemMapping() throws RemoteException;
+
+  /**
+   * Set the name of the system from which the data mapping for sender-receiver elements shall be
+   * used. This must be the short name from the arxml.
+   * 
+   * @param systemName
+   *          the short name of the the AUTOSAR system whose data mapping shall be used for
+   *          sender-receiver elements
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setSystemForSignalMapping(String systemName) throws RemoteException;
+
+  /**
+   * Get the name of the system whose data mapping shall be used for sender-receiver elements.
+   * 
+   * @return the short name of the the AUTOSAR system whose data mapping shall be used for
+   *         sender-receiver elements
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getSystemForSignalMapping() throws RemoteException;
+
+  /**
    * Import the interface based on the current settings (default all)
    * 
    * @param syncMethod
@@ -409,5 +514,64 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public void generateCode(boolean compile) throws RemoteException;
+
+  /**
+   * @return If the coverage data will be cumulated
+   *
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isCumulateCoverage() throws RemoteException;
+
+  /**
+   * Set if the coverage data will be cumulated
+   * 
+   * @param cumulate
+   *          If the coverage data will be cumulated
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setCumulateCoverage(boolean cumulate) throws RemoteException;
+
+  /**
+   * Get the current coverage settings
+   * 
+   * @return The current coverage settings or <code>null</code> if coverage is disabled
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the current coverage type is not supported
+   */
+  public CoverageSettings getCoverageSettings() throws RemoteException, ApiException;
+
+  /**
+   * Enable CTC++ coverage measurement to be used for this platform
+   * 
+   * @return The CTC++ coverage settings that will be used
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public CTCCoverageSettings setCoverageToCTC() throws RemoteException;
+
+  /**
+   * Enable GNU gcov coverage measurement to be used for this platform
+   * 
+   * @return The GNU gcov coverage settings that will be used
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public GCovCoverageSettings setCoverageToGCov() throws RemoteException;
+
+  /**
+   * Disable any sort of code coverage measurement in this platform
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void disableCoverage() throws RemoteException;
 
 }

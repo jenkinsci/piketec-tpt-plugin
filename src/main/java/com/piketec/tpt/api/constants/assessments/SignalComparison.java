@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -83,12 +83,6 @@ public interface SignalComparison extends BasicAssessment {
 
   public static final String REFERENCE_SPECIFICATIONS = "reference-specifications";
 
-  /***
-   * @deprecated Use {@link #REFERENCE_SPECIFICATIONS}
-   */
-  @Deprecated
-  public static final String REFERENCE_SEPCIFICATIONS = REFERENCE_SPECIFICATIONS;
-
   public static final String EXECUTION_CONFIG = "execution-config";
 
   public static final String EXECUTION_ITEM_IDX = "item-index";
@@ -100,5 +94,13 @@ public interface SignalComparison extends BasicAssessment {
   public static final String IGNORE_UNDEFINED_TIME_PHASES = "ignore-undefined-time-phases";
 
   public static final String COMPARE_ON_CHANGE = "compare-on-change";
+
+  /**
+   * Attribute to specify a file name (or relative file path) for loading additional reference
+   * signals which will be evaluated for reference sources {@link ReferenceSource#REFERENCE_DIR} and
+   * {@link ReferenceSource#BACK2BACK}. The root folder of this file will be set automatically to
+   * the corresponding reference folder of the current test case.
+   */
+  public static final String ADDITIONAL_SIGNALS_FILE = "additional-signals-file";
 
 }

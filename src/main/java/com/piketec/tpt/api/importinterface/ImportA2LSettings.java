@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.Project;
  * {@link ImportInterfaceSettings} to import from an A2L file (including dcm, hex and txt file
  * import).
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public class ImportA2LSettings extends ImportInterfaceSettings {
 
@@ -81,6 +81,18 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
   }
 
   /**
+   * Gets the absolute path to the A2L file to import.
+   * 
+   * @return the a2lFile path
+   */
+  public String getA2lFilePath() {
+    if (a2lFile == null) {
+      return null;
+    }
+    return a2lFile.getAbsolutePath();
+  }
+
+  /**
    * Sets the A2L file to import.
    * 
    * @param a2lFile
@@ -88,6 +100,20 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
    */
   public void setA2lFile(File a2lFile) {
     this.a2lFile = a2lFile;
+  }
+
+  /**
+   * Sets the A2L file to import.
+   * 
+   * @param a2lFile
+   *          the path to the file to set
+   */
+  public void setA2lFileByPath(String a2lFile) {
+    if (a2lFile == null) {
+      this.a2lFile = null;
+    } else {
+      this.a2lFile = new File(a2lFile);
+    }
   }
 
   /**
@@ -102,6 +128,20 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
   }
 
   /**
+   * Gets the absolute path to the text file containing interface information to reduce the imported
+   * declarations or <code>null</code>. If an interface file is given, only channels, parameters,
+   * and constants listed there will be imported.
+   * 
+   * @return the path to the interface file or <code>null</code>
+   */
+  public String getInterfaceFilePathOrNull() {
+    if (interfaceFileOrNull == null) {
+      return null;
+    }
+    return interfaceFileOrNull.getAbsolutePath();
+  }
+
+  /**
    * Sets the text file containing interface information to reduce the imported declarations or
    * <code>null</code>. If an interface file is given, only channels, parameters, and constants
    * listed there will be imported.
@@ -111,6 +151,23 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
    */
   public void setInterfaceFileOrNull(File interfaceFileOrNull) {
     this.interfaceFileOrNull = interfaceFileOrNull;
+  }
+
+  /**
+   * Sets the text file containing interface information to reduce the imported declarations or
+   * <code>null</code>. If an interface file is given, only channels, parameters, and constants
+   * listed there will be imported.
+   * 
+   * @param interfaceFileOrNull
+   *          the path to the interface file or <code>null</code> to set
+   */
+  public void setInterfaceFilePathOrNull(String interfaceFileOrNull) {
+    if (interfaceFileOrNull == null) {
+      this.interfaceFileOrNull = null;
+    } else {
+      this.interfaceFileOrNull = new File(interfaceFileOrNull);
+    }
+
   }
 
   /**
@@ -187,6 +244,19 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
   }
 
   /**
+   * Gets the absolute path to the Intel HEX file to import. You can either import a hex file or a
+   * dcm file. If both are set only the hex file will be taken into account.
+   * 
+   * @return the path to the hex file to import
+   */
+  public String getHexFilePathOrNull() {
+    if (hexFileOrNull == null) {
+      return null;
+    }
+    return hexFileOrNull.getAbsolutePath();
+  }
+
+  /**
    * Sets the Intel HEX file to import. You can either import a hex file or a dcm file. If both are
    * set only the hex file will be taken into account.
    * 
@@ -195,6 +265,22 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
    */
   public void setHexFileOrNull(File hexFileOrNull) {
     this.hexFileOrNull = hexFileOrNull;
+  }
+
+  /**
+   * Sets the Intel HEX file to import. You can either import a hex file or a dcm file. If both are
+   * set only the hex file will be taken into account.
+   * 
+   * @param hexFileOrNull
+   *          the path to the Intel HEX file to import or <code>null</code>.
+   */
+  public void setHexFileOrNullByPath(String hexFileOrNull) {
+    if (hexFileOrNull == null) {
+      this.hexFileOrNull = null;
+    } else {
+      this.hexFileOrNull = new File(hexFileOrNull);
+    }
+
   }
 
   /**
@@ -229,6 +315,19 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
   }
 
   /**
+   * Gets the absolute path to the DCM file to import. You can either import a hex file or a dcm
+   * file. If both are set only the hex file will be taken into account.
+   * 
+   * @return the path to the DCM file or <code>null</code>
+   */
+  public String getDcmFilePathOrNull() {
+    if (dcmFileOrNull == null) {
+      return null;
+    }
+    return dcmFileOrNull.getAbsolutePath();
+  }
+
+  /**
    * Sets the DCM file to import. You can either import a hex file or a dcm file. If both are set
    * only the hex file will be taken into account.
    * 
@@ -237,6 +336,21 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
    */
   public void setDcmFileOrNull(File dcmFileOrNull) {
     this.dcmFileOrNull = dcmFileOrNull;
+  }
+
+  /**
+   * Sets the DCM file to import. You can either import a hex file or a dcm file. If both are set
+   * only the hex file will be taken into account.
+   * 
+   * @param dcmFileOrNull
+   *          the path to the DCM file or <code>null</code> to set
+   */
+  public void setDcmFileOrNullByPath(String dcmFileOrNull) {
+    if (dcmFileOrNull == null) {
+      this.dcmFileOrNull = null;
+    } else {
+      this.dcmFileOrNull = new File(dcmFileOrNull);
+    }
   }
 
   /**

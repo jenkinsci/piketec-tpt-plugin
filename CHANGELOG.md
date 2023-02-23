@@ -1,5 +1,11 @@
 Release History
 ===
+## Version 9.3
+
+- Plugin now needs at least Jenkin 2.361.1
+- Compatibility to TPT 19
+- Taking test set condition into account when using master slave mode. This can only be done for TPT versions equal or newer than TPT 16, else a warning is printed.
+
 ## Version 9.2
 
 -   Added pipeline support

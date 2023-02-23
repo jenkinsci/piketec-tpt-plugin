@@ -23,13 +23,10 @@ package com.piketec.jenkins.plugins.tpt;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.CheckForNull;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -44,10 +41,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
-import hudson.model.Project;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -389,71 +383,20 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   // --------------------------------------------------------------
 
   @Override
-  public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
-      throws InterruptedException, IOException {
-    logger = new TptLogger(listener.getLogger());
-
-    if (!areIdsUnique(build)) {
-      logger.error("Ids are not unique!");
-      return false;
-    }
-    EnvVars environment = Utils.getEnvironment(build, launcher, logger);
-    if (isTptMaster) {
-      return performAsMaster(build, build.getWorkspace(), launcher, listener, environment,
-          executionConfiguration);
-    } else {
-      return performWithoutSlaves(build, build.getWorkspace(), launcher, listener, environment,
-          executionConfiguration);
-    }
-  }
-
-  @Override
-  public void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+  public void perform(Run< ? , ? > run, FilePath workspace, EnvVars env, Launcher launcher,
                       TaskListener listener)
       throws InterruptedException, IOException {
     logger = new TptLogger(listener.getLogger());
-    EnvVars environment = run.getEnvironment(listener);
     boolean result = false;
     if (isTptMaster) {
-      result =
-          performAsMaster(run, workspace, launcher, listener, environment, executionConfiguration);
+      result = performAsMaster(run, workspace, launcher, listener, env, executionConfiguration);
     } else {
-      result = performWithoutSlaves(run, workspace, launcher, listener, environment,
-          executionConfiguration);
+      result =
+          performWithoutSlaves(run, workspace, launcher, listener, env, executionConfiguration);
     }
     if (!result) {
       throw new AbortException();
     }
-  }
-
-  /**
-   * @param build
-   *          build of a job containing JenkinsConfigurations
-   * @return if all Ids are unique as they should be
-   */
-  private boolean areIdsUnique(AbstractBuild< ? , ? > build) {
-    Set<String> ids = new HashSet<>();
-    List buildSteps = ((Project)build.getParent()).getBuilders();
-    for (Object object : buildSteps) {
-      if (object instanceof TptPlugin) {
-        List<JenkinsConfiguration> jenkinsConfigurations =
-            ((TptPlugin)object).getExecutionConfiguration();
-        for (JenkinsConfiguration config : jenkinsConfigurations) {
-          String id = config.getId();
-          if (id == null || id.isEmpty()) {
-            id = RandomStringUtils.randomAlphanumeric(6);
-            config.setId(id);
-            logger.info("Missing Id is generated: " + id);
-          }
-          if (ids.contains(id)) {
-            logger.error("Id \"" + id + "\" exists twice.");
-            return false;
-          }
-          ids.add(id);
-        }
-      }
-    }
-    return true;
   }
 
   /**

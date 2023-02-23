@@ -46,12 +46,11 @@ import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
 
 import hudson.AbortException;
+import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -73,18 +72,6 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
     // NOP
   }
 
-  @Override
-  public boolean perform(final AbstractBuild< ? , ? > build, final Launcher launcher,
-                         final BuildListener listener)
-      throws IOException, InterruptedException {
-    FilePath workspace = build.getWorkspace();
-    if (workspace == null) {
-      throw new IOException("No workspace available");
-    }
-    perform(build, workspace, launcher, listener);
-    return true;
-  }
-
   /**
    * Creates the directories on the build directory, loops over all JenkinsConfigurations and
    * extract from each one the data from the "test_summary.xml". Then it sets the failed tests and
@@ -92,7 +79,7 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
    * piechart and failed tests)
    */
   @Override
-  public void perform(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+  public void perform(Run< ? , ? > build, FilePath workspace, EnvVars env, Launcher launcher,
                       TaskListener listener)
       throws InterruptedException, IOException {
 
@@ -145,7 +132,7 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
         tptFiles.add(newTPTFile);
       } else {
         logger.error("There is no test_summary.xml for the file \"" + tptFileName
-            + "\".It won't be published ");
+            + "\". It won't be published ");
         continue;
       }
       // Check if the Testdata dir and the Report are unique, otherwise throw an exception
@@ -260,7 +247,7 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
     }
 
     @Override
-    public boolean isApplicable(@SuppressWarnings("rawtypes") Class< ? extends AbstractProject> jobType) {
+    public boolean isApplicable(Class< ? extends AbstractProject> jobType) {
       // Indicates that this builder can be used with all kinds of project
       // types.
       return true;

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -77,6 +77,26 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    *           remote communication problem
    */
   public E move(int from, int to) throws IndexOutOfBoundsException, RemoteException;
+
+  /**
+   * Returns the index of the first occurrence of the specified element in this list, or -1 if this
+   * list does not contain the element.More formally, returns the lowest index i such that
+   * Objects.equals(o, get(i)), or -1 if there is no such index.
+   * 
+   * @param element
+   *          element to search for
+   * @return the index of the first occurrence of the specified element in this list, or -1 if this
+   *         list does not contain the element
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ClassCastException
+   *           if the type of the specified element is incompatible with this list(optional)
+   * @throws NullPointerException
+   *           if the specified element is null and this list does not permit null
+   *           elements(optional)
+   */
+  public int indexOf(E element) throws RemoteException, ClassCastException, NullPointerException;
 
   @Override
   public IterableRemoteList<E> asIterable() throws RemoteException;

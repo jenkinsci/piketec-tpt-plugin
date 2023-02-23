@@ -16,7 +16,7 @@ import com.piketec.tpt.api.RemoteIndexedList;
  * implements the {@link Iterable} interface. Since the methods of the latter do not throw
  * <code>RemoteException</code> this Object <i>cannot</i> be exported as a {@link RemoteObject}.
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  * 
  * @param <KEY>
  *          the type of the keys of this indexed list

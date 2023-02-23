@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,15 +22,20 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.constants.assessments.GlobalVariable;
+
 /**
- * A row of the global assessment of an execution configuration. It defines constraints for a
- * variable that must hold for a whole test execution, so for all executed test cases togethter.
+ * A row of the global assessment. It defines constraints for a variable that must hold for a whole
+ * test execution, so for all executed test cases together.
  * 
  * @see ExecutionConfiguration#createGlobalAssessmentRow()
  * @see ExecutionConfiguration#getGlobalAssessmentRows()
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ *
+ * @deprecated Will be removed in TPT-20. Use assesslet {@link GlobalVariable}.
  */
+@Deprecated
 public interface GlobalAssessmentRow extends TptRemote {
 
   /**

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,14 +22,17 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+import com.piketec.tpt.api.util.UUIDObject;
+
 /**
  * An object representing either an {@link Assessment} or a group of assessments
  * ({@link AssessmentGroup}). These objects can build up a tree where both, assessments and
  * assessment groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
-public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
+public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote, UUIDObject {
 
   /**
    * Returns the parent group ({@link AssessmentGroup}) of this assessment or <code>null</code> if
@@ -41,6 +44,15 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   public AssessmentGroup getGroup() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this is a {@link AssessmentGroup}, <code>false</code> otherwise.
+   * 
+   * @return <code>true</code> if this is a {@link AssessmentGroup}, <code>false</code> otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGroup() throws RemoteException;
 
   /**
    * @return The parent TPT {@link Project} for this <code>AssessmentOrGroup</code>.
@@ -58,8 +70,8 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote {
    * @throws ApiException
    *           If the ID of the assessment is not an integer
    * 
-   * @deprecated Will be removed in TPT-18. Since TPT-16 assessment IDs are strings. Use
-   *             {@link #getIdString()} instead.
+   * @deprecated Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}. Since TPT-16
+   *             assessment IDs are strings. Use {@link #getIdString()} instead.
    */
   @Deprecated
   public int getId() throws RemoteException, ApiException;

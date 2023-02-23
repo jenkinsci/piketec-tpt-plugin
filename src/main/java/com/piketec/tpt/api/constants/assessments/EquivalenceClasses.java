@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,6 +25,68 @@ package com.piketec.tpt.api.constants.assessments;
  */
 public interface EquivalenceClasses extends BasicAssessment {
 
+  /**
+   * Property whether this assesslet fails if the signal values are outside of any equivalence class
+   * specified for that signal.
+   * 
+   * @deprecated Please use {@link #FAIL_IF_VALUES_OUTSIDE_ANY} instead. This constant may be
+   *             removed in a future release.
+   */
+  @Deprecated
   public static final String FAIL_ON_MISS = "fail-on-miss";
+
+  /**
+   * Property whether this assesslet fails if the signal values are outside of any equivalence class
+   * specified for that signal.
+   */
+  public static final String FAIL_IF_VALUES_OUTSIDE_ANY = "fail-if-values-outside-any";
+
+  /**
+   * Property whether unassigned equivalence classes that have been covered should be reported
+   * (display equivalence classes in the test report that are not defined as mandatory and were
+   * hit).
+   */
+  public static final String REPORT_UNASSIGNED_COVERED_ECS = "report-unassigned-covered";
+
+  /**
+   * Property whether unassigned equivalence classes that have not been covered should be reported
+   * (display equivalence classes in the test report that are not defined as forbidden and were not
+   * hit).
+   */
+  public static final String REPORT_UNASSIGNED_NON_COVERED_ECS = "report-unassigned-non-covered";
+
+  /**
+   * Property whether the equivalence class information should also be reported in the overview.
+   */
+  public static final String REPORT_IN_OVERVIEW = "report-overview";
+
+  /**
+   * Property for the list of rows of the Equivalence Classes Assesslet. Each row checks how many
+   * test cases use values from any given equivalence class. This list is represented by the table
+   * in the GUI.
+   */
+  public static final String ROW_SPECIFICATIONS = "row-specifications";
+
+  /**
+   * Property whether this row is enabled. Only enabled rows will be considered during execution.
+   */
+  public static final String ROW_ENABLED = "row-enabled";
+
+  /**
+   * Property for the signal name that shall be evaluated for a row.
+   */
+  public static final String ROW_VARIABLE = "row-variable";
+
+  /**
+   * Property for the list of equivalence classes that shall be covered by the test cases for the
+   * signal.
+   */
+  public static final String ROW_MANDATORY = "row-mandatory";
+
+  /**
+   * Property for the list of equivalence classes that shall be not covered by the test cases for
+   * the signal.
+   */
+  public static final String ROW_FORBIDDEN = "row-forbidden";
 
 }

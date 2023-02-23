@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,11 +24,13 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.Map;
 
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+
 /**
  * Configuration of the test execution for a particular platform, test set and parameter set. Part
  * of a {@link ExecutionConfiguration}
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 
@@ -126,7 +128,7 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getParameterFilePath()}
-   *             instead. Will be removed in TPT-18.
+   *             instead. Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public File getParameterFile() throws RemoteException;
@@ -169,7 +171,7 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * Set a particular {@link PlatformConfiguration} for this ExecutionConfigurationItem.
    * 
    * @param pc
-   *          The Platform Configuration
+   *          The platform configuration
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -186,7 +188,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use
-   *             {@link #setParameterFilePath(String)} instead. Will be removed in TPT-18.
+   *             {@link #setParameterFilePath(String)} instead. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setParameterFile(File f) throws RemoteException;
@@ -206,8 +209,8 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * Enable or disable whether assessments should be executed for this
    * <code>ExecutionConfigItem</code>.
    * <p>
-   * This option enables the user to omit the assessments for a particular Platform Configuration
-   * although the execution of assessments is enabled for the Execution Configuration.
+   * This option enables the user to omit the assessments for a particular platform configuration
+   * although the execution of assessments is enabled for the execution configuration.
    * </p>
    * <p>
    * However, in the opposite case, disabling the assessment in the Execution Configuration and

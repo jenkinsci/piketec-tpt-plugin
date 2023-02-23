@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,5 +24,28 @@ package com.piketec.tpt.api.steplist;
  * Operators for the comparison.
  */
 public enum Operator {
-  Equal, EqualOrLess, EqualOrGreater, Greater, Less, NotEqual;
+  /**
+   * <code>==</code>
+   */
+  Equal,
+  /**
+   * <code>&lt;=</code>
+   */
+  EqualOrLess,
+  /**
+   * <code>&gt;=</code>
+   */
+  EqualOrGreater,
+  /**
+   * <code>&gt;</code>
+   */
+  Greater,
+  /**
+   * <code>&lt;</code>
+   */
+  Less,
+  /**
+   * <code>!=</code>
+   */
+  NotEqual;
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,14 +21,17 @@
 package com.piketec.tpt.api.matlabplatform;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
+import com.piketec.tpt.api.ApiException;
+import com.piketec.tpt.api.Pair;
 import com.piketec.tpt.api.PlatformConfiguration;
 import com.piketec.tpt.api.Project.SynchronizationMethod;
 
 /**
  * The TPT API representation of the MATLAB/Simulink platform in TPT
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface MatlabPlatformConfiguration extends PlatformConfiguration {
 
@@ -90,6 +93,15 @@ public interface MatlabPlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public String getTestframeFilePath() throws RemoteException;
+
+  /**
+   * @return The absolute path to the TPT I/O file (with suffix "_tpt_io.m"). This is automatically
+   *         derived from the configured test frame file path.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getIOFilePath() throws RemoteException;
 
   /**
    * Set a custom test frame file path.
@@ -169,6 +181,68 @@ public interface MatlabPlatformConfiguration extends PlatformConfiguration {
   public String getTestRunScript() throws RemoteException;
 
   /**
+   * Set the code coverage custom script
+   * 
+   * @param codeCoverageCustomScript
+   *          the new code coverage custom script
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setCodeCoverageCustomScript(String codeCoverageCustomScript) throws RemoteException;
+
+  /**
+   * @return the code coverage custom script
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getCodeCoverageCustomScript() throws RemoteException;
+
+  /**
+   * Set the finalize script
+   * 
+   * @param finalizeScript
+   *          the new finalize script
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setFinalizeScript(String finalizeScript) throws RemoteException;
+
+  /**
+   * @return the finalize script
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getFinalizeScript() throws RemoteException;
+
+  /**
+   * Returns the environment variables for the MATLAB/Simulink platform configuration as specified
+   * by the user. This list corresponds to the "Environments Variables" tab of the MATLAB/Simulink
+   * platform configuration GUI.
+   * 
+   * @return User attributes as list.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public List<Pair<String, String>> getEnvironmentVariablesList() throws RemoteException;
+
+  /**
+   * Set a list of user-defined environment variables given by <code>pair.first</code> to the value
+   * given by the <code>pair.second</code> parameter.
+   * 
+   * @param attributes
+   *          user-defined attribute list
+   * 
+   * @throws ApiException
+   *           if
+   *           <code>attributes==null || pair.second == null || pair.first==null || pair.first.contains("<span>&#92;</span>n") </code>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setEnvironmentVariablesList(List<Pair<String, String>> attributes)
+      throws ApiException, RemoteException;
+
+  /**
    * Import the interface from the configured original model and subsystem block path (default all)
    * 
    * @param syncMethod
@@ -179,7 +253,15 @@ public interface MatlabPlatformConfiguration extends PlatformConfiguration {
   public void importIO(SynchronizationMethod syncMethod) throws RemoteException;
 
   /**
-   * Generate the test frame for the model specified in the Matlab-configuration.
+   * Import any offline loggings that are activated in the model but not registered in TPT.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void importOfflineLoggings() throws RemoteException;
+
+  /**
+   * Generate the test frame for the model specified in the MATLAB-configuration.
    * 
    * @param reuseExistingInterfaceData
    *          Specify if interface data from a previous interface import that still exists in the
@@ -188,6 +270,29 @@ public interface MatlabPlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public void generateTestframe(boolean reuseExistingInterfaceData) throws RemoteException;
+
+  /**
+   * Generate the model for FUSION (named "&lt;testframe&gt;_fusion") from the test frame specified
+   * in the MATLAB-configuration. This model model will then automatically be built into a custom
+   * fusion node dll file using the Simulink Coder or Embedded Coder (unless the
+   * <code>prepareForBuildOnly</code> flag is set).
+   * 
+   * @param prepareForBuildOnly
+   *          Set to <code>true</code> if the model for FUSION shall only be generated and not be
+   *          built automatically.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void buildModelForFusion(boolean prepareForBuildOnly) throws RemoteException;
+
+  /**
+   * Generate the TPT I/O file (see {@link #getIOFilePath()} for details). If this file already
+   * exists it will be overwritten.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void generateIOFile() throws RemoteException;
 
   /**
    * Open the original model in MATLAB via running the configured original model load script in
@@ -238,4 +343,5 @@ public interface MatlabPlatformConfiguration extends PlatformConfiguration {
                                      String sourceBlockPath, int portNumber, String slLogName,
                                      String tlLogdataStructName, boolean useTlddLogging)
       throws RemoteException;
+
 }

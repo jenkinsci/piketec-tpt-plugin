@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,8 +22,12 @@ package com.piketec.tpt.api;
 
 import java.net.URI;
 import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.piketec.tpt.api.steplist.formalrequirements.FormalRequirementStep;
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
 /**
  * TPT API representation of a requirement. This interface allows more manipulation than the user
@@ -38,9 +42,9 @@ import java.util.Set;
 public interface Requirement extends IdentifiableRemote {
 
   /**
-   * We distinguish between three types of requirements. Two of them are only informative.
+   * There are three types of requirements. Two of them are only informative.
    */
-  enum RequirementType {
+  public enum RequirementType {
 
     /**
      * A real requirement.
@@ -61,12 +65,18 @@ public interface Requirement extends IdentifiableRemote {
       this.displayName = name;
     }
 
+    /**
+     * @return A better readable name than the enum constant name
+     */
     public String getDisplayName() {
       return displayName;
     }
   }
 
-  enum RequirementStatus {
+  /**
+   * There are three types of status for requirements.
+   */
+  public enum RequirementStatus {
 
     /**
      * A new requirement.
@@ -87,6 +97,9 @@ public interface Requirement extends IdentifiableRemote {
       this.displayName = name;
     }
 
+    /**
+     * @return A better readable name than the enum constant name
+     */
     public String getDiplayableName() {
       return displayName;
     }
@@ -152,7 +165,8 @@ public interface Requirement extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Use {@link #getDocument()} instead. Will be removed in TPT-18.
+   * @deprecated Use {@link #getDocument()} instead. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   String getModule() throws RemoteException;
@@ -212,6 +226,18 @@ public interface Requirement extends IdentifiableRemote {
   URI getURI() throws RemoteException;
 
   /**
+   * Get the indent level of the requirement. This is the indentation of the requirement in the
+   * requirement table. There may be another user attribute indent level or object level. This
+   * method returns the internal attribute, that is used to layout the requirements in the UI.
+   * 
+   * @return The indent level of the requirement.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  int getIndentLevel() throws RemoteException;
+
+  /**
    * Set the URI of the requirement. If a requirement has a URI a clickable link symbol will be
    * displayed in the UI.
    * 
@@ -237,13 +263,12 @@ public interface Requirement extends IdentifiableRemote {
   /**
    * Set the attribute value of the requirement. A requirement can have additional attributes. Each
    * attribute has a value associated for the requirement. If the attribute does not exist yet it
-   * will be created. If you set the <code>value</code> to <code>null</code> the attribute will be
-   * removed. If you remove an attribute the associated attachments will be removed, too.
+   * will be created.
    * 
    * @param attributeName
-   *          the name of the attribute.
+   *          The name of the attribute.
    * @param value
-   *          The new value or <code>null</code> to remove the attribute from the requirement.
+   *          The new value of the attribute.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -293,6 +318,34 @@ public interface Requirement extends IdentifiableRemote {
    *           remote communication problem
    */
   RemoteList<Attachment> getAttributeAttachments(String attributeName) throws RemoteException;
+
+  /**
+   * Removes the attachment of the requirement attribute with the given name.
+   * 
+   * @param attributeName
+   *          The name of the attribute.
+   * @param attachment
+   *          The attachment to remove
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the attachment and the requirement from different projects or if the name of the
+   *           attribute is empty or {@code null}
+   */
+  void removeAttributeAttachment(String attributeName, Attachment attachment)
+      throws RemoteException;
+
+  /**
+   * Removes all attachments of the requirement attribute with the given name.
+   * 
+   * @param attributeName
+   *          The name of the attribute.
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the name of the attribute is empty or {@code null}
+   */
+  void removeAllAttributeAttachments(String attributeName) throws RemoteException;
 
   /**
    * Adds a new attachment to the list of attachments every requirement attribute can have. If no
@@ -420,6 +473,50 @@ public interface Requirement extends IdentifiableRemote {
   boolean isModified() throws RemoteException;
 
   /**
+   * Returns <code>true</code> if the requirement is a sub-requirement, otherwise
+   * <code>false</code>.
+   * 
+   * @return <code>true</code> if requirement is a sub-requirement, otherwise <code>false</code>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  boolean isSubRequirement() throws RemoteException;
+
+  /**
+   * Returns a parent {@link Requirement} if this is a sub-requirement, otherwise {@code null}
+   * 
+   * @return the parent requirement or {@code null} if this is not a sub-requirement
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Requirement getParentRequirement() throws RemoteException;
+
+  /**
+   * Adds a new sub-requirement to this requirement
+   * 
+   * @param id
+   *          The unique ID of the requirement
+   * 
+   * @return The newly created requirement.
+   * 
+   * @throws ApiException
+   *           If a requirement with the same id already exists.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  Requirement createSubRequirement(String id) throws ApiException, RemoteException;
+
+  /**
+   * Returns all sub-requirements of this {@link Requirement}
+   * 
+   * @return all sub-requirements of this {@link Requirement}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<Requirement> getSubRequirements() throws RemoteException;
+
+  /**
    * Returns all (explicit and implicit) to this {@link Requirement} linked {@link Scenario test
    * cases}.
    * 
@@ -430,5 +527,43 @@ public interface Requirement extends IdentifiableRemote {
    *           remote communication problem
    */
   Set<Scenario> getLinkedTestCases() throws RemoteException;
+
+  /**
+   * 
+   * Creates a formal requirement step of a given type at the given position. The indices of the
+   * formal requirement steps start at 0.
+   * 
+   * <p>
+   * Formal requirements are a TPT feature that facilitates requirement-driven development. A clear,
+   * requirements pattern helps to be concise, unambiguous, and testable. The formal requirements
+   * are created and managed in <code>FormalRequirementsStepList</code> via and belong to a
+   * requirement.
+   * </p>
+   * 
+   * @param index
+   *          indicates the position where the new step shall be inserted in the step list
+   * 
+   * @param type
+   *          the type of the newly created step as String, possible types are : When, While, Until,
+   *          Shall, From, Between, Documentation
+   * @return the newly created Step.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the given <code>type</code> does not exist.
+   */
+  public FormalRequirementStep createFormalRequirmentsStep(int index, String type)
+      throws ApiException, RemoteException;
+
+  /**
+   * Returns all formal requirement steps of the requirement.
+   * 
+   * @return the list of {@link FormalRequirementStep Steps} in their given order.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<FormalRequirementStep> getFormalRequirmentsSteps() throws RemoteException;
 
 }

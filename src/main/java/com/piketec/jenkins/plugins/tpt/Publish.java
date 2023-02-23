@@ -76,6 +76,7 @@ public final class Publish {
       xmlPub = new XmlStreamWriter();
       xmlPub.initalize(jUnitXMLFile);
       xmlPub.writeTestsuite(tptFileName);
+      logger.info("Collecting test cases");
       List<Testcase> testdata = getTestcases(testDataDir, logger);
       logger.info("Found " + testdata.size() + " test results.");
       for (Testcase tc : testdata) {
@@ -166,12 +167,9 @@ public final class Publish {
    */
   public static void find(FilePath rootdir, String pattern, Collection<FilePath> files)
       throws IOException, InterruptedException {
-
     if (rootdir.isDirectory()) {
       List<FilePath> children = rootdir.list();
-
       if (children != null) {
-
         for (FilePath child : children) {
           find(child, pattern, files);
         }

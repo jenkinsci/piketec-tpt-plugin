@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,9 @@ package com.piketec.tpt.api;
 
 import java.awt.Point;
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.piketec.tpt.api.diagram.DiagramNode;
 import com.piketec.tpt.api.diagram.DiagramScenario;
@@ -53,6 +56,24 @@ public interface Testlet extends DiagramNode, Positioned {
    *           remote communication problem
    */
   public boolean hasDefinedContent() throws RemoteException;
+
+  /**
+   * @return Returns {@link Testlet} that owns content. If no reference exists or
+   *         <code>TestletContent</code> is null, it returns <code>null</code>.
+   * @throws RemoteException
+   *           remote communication problem
+   * @see #isReferencing()
+   */
+  public Testlet getReference() throws RemoteException;
+
+  /**
+   * @return <code>true</code> if content of {@link Testlet} has different owner, otherwise
+   *         <code>false</code>.
+   * @throws RemoteException
+   *           remote communication problem
+   * @see #getReference()
+   */
+  public Boolean isReferencing() throws RemoteException;
 
   /**
    * Creates a new local definition for this state that has not been referenced so far.
@@ -133,6 +154,33 @@ public interface Testlet extends DiagramNode, Positioned {
       throws ApiException, RemoteException;
 
   /**
+   * Set if diagram elements (states, transitions, junctions etc.) can be moved in the TPT UI.
+   * 
+   * @param diagramElementsMovable
+   *          <code>true</code> if diagram elements should be movable in the TPT UI
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the content of the <code>Testlet</code> is empty
+   */
+  public void setDiagramElementsMovable(boolean diagramElementsMovable)
+      throws ApiException, RemoteException;
+
+  /**
+   * Returns if diagram elements (states, transitions, junctions etc.) can be moved in the TPT UI.
+   * 
+   * @return <code>true</code> if diagram elements can be moved in the TPT UI. <code>false</code>
+   *         otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the content of the <code>Testlet</code> is empty
+   */
+  public boolean isDiagramElementsMovable() throws ApiException, RemoteException;
+
+  /**
    * Returns the <u>CONTENTS</u> of the top level {@link ScenarioGroup} of this <code>Testlet</code>
    * as list of {@link ScenarioOrGroup}.
    * 
@@ -151,6 +199,47 @@ public interface Testlet extends DiagramNode, Positioned {
    *           remote communication problem
    */
   public RemoteCollection<Transition> getTransitions() throws RemoteException;
+
+  /**
+   * Delivers the first transition with the given name or <code>null</code> if no such transition
+   * exists.
+   * 
+   * @param name
+   *          The name of the <code>Transition</code>.
+   * @return The {@link PlatformConfiguration} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Transition getTransitionByName(String name) throws RemoteException;
+
+  /**
+   * Delivers all transitions, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link Transition Transitions}, matching the given name pattern.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Collection<Transition> getTransitionsByNamePattern(Pattern namepattern)
+      throws RemoteException;
+
+  /**
+   * Delivers all transitions, matching the given name pattern.
+   * 
+   * @param namepattern
+   *          A regular expression for the name pattern.
+   * @return Collection of all {@link Transition Transitions}, matching the given name pattern.
+   * 
+   * @throws PatternSyntaxException
+   *           If the expression's syntax is invalid
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Collection<Transition> getTransitionsByNamePattern(String namepattern)
+      throws PatternSyntaxException, RemoteException;
 
   /**
    * @return Returns a {@link RemoteCollection} that contains all {@link Line Lines} in this
@@ -266,6 +355,23 @@ public interface Testlet extends DiagramNode, Positioned {
   public TextArea createTextArea(String text, Point pos) throws RemoteException;
 
   /**
+   * Create a new {@link TextArea} at the given position with the content <code>text</code>.
+   * 
+   * @param text
+   *          The text that should be displayed in the <code>TextArea</code>. <code>Null</code> will
+   *          be reduced to an empty string.
+   * @param x
+   *          The x position in the diagram.
+   * @param y
+   *          The y position in the diagram.
+   * @return The newly created <code>TextArea</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public TextArea createTextArea(String text, int x, int y) throws RemoteException;
+
+  /**
    * Create a new diagram state ({@link Testlet}) at the given position
    *
    * @param name
@@ -279,6 +385,23 @@ public interface Testlet extends DiagramNode, Positioned {
    *           remote communication problem
    */
   public Testlet createTestlet(String name, Point pos) throws RemoteException;
+
+  /**
+   * Create a new diagram state ({@link Testlet}) at the given position
+   *
+   * @param name
+   *          The name of the newly created state <code>Testlet</code>. <code>Null</code> will be
+   *          reduced to an empty string.
+   * @param x
+   *          The x position of the <code>Testlet</code> in the diagram
+   * @param y
+   *          The y position of the <code>Testlet</code> in the diagram
+   * @return the newly created {@link Testlet}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Testlet createTestlet(String name, int x, int y) throws RemoteException;
 
   /**
    * Create a new state ({@link Testlet}) which is not visible in the diagram and is intended for
@@ -307,7 +430,21 @@ public interface Testlet extends DiagramNode, Positioned {
   public Junction createJunction(Point pos) throws RemoteException;
 
   /**
-   * Creat a new {@link Final} junction at the given position <code>pos</code>
+   * Create a new {@link Junction} at the by x and y given position
+   * 
+   * @param x
+   *          The x position in the diagram.
+   * @param y
+   *          The y position in the diagram.
+   * @return The newly created {@link Junction}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Junction createJunction(int x, int y) throws RemoteException;
+
+  /**
+   * Create a new {@link Final} junction at the given position <code>pos</code>
    * 
    * @param pos
    *          The Position in the Diagram given as {@link Point}.
@@ -317,6 +454,20 @@ public interface Testlet extends DiagramNode, Positioned {
    *           remote communication problem
    */
   public Final createFinal(Point pos) throws RemoteException;
+
+  /**
+   * Create a new {@link Final} junction at the by x and y given position
+   * 
+   * @param x
+   *          The x Position in the Diagram given as {@link Point}.
+   * @param y
+   *          The y Position in the Diagram given as {@link Point}.
+   * @return The newly created {@link Final}
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Final createFinal(int x, int y) throws RemoteException;
 
   /**
    * Copies <code>this</code> into the given <code>target</code> that can be from a different

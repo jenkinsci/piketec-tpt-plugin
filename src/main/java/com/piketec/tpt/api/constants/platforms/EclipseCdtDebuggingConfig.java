@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,7 @@ package com.piketec.tpt.api.constants.platforms;
 /**
  * For further information, please refer to the User Guide, C Code Platform.
  */
-public interface EclipseCdtDebuggingConfig {
+public interface EclipseCdtDebuggingConfig extends DebuggingConfig {
 
   // ---- KEYS FOR PROPERTIES ----
   public final String ECLIPSE = "eclipse";
@@ -31,7 +31,5 @@ public interface EclipseCdtDebuggingConfig {
   public final String ECLIPSE_WORKSPACE_DEFAULT = "eclipse.workspace.default";
 
   public final String ECLIPSE_WORKSPACE = "eclipse.workspace.path";
-
-  public final String DEBUGENABLED = "debugenabled";
 
 }

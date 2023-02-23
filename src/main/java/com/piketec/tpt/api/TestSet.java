@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,8 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+
 /**
  * A <code>TestSet</code> represents a set of {@link Scenario test cases}. Test cases have to be
  * selected explicitly but they can be restricted further dynamically by a {@link #getCondition()
@@ -38,7 +40,8 @@ public interface TestSet extends TestSetOrGroup {
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Use {@link #getSelectedTestCasesOrGroups()}. This method will be removed in TPT 18.
+   * @deprecated Use {@link #getSelectedTestCasesOrGroups()}. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}
    */
   @Deprecated
   public RemoteCollection<Scenario> getTestCases() throws RemoteException;
@@ -82,8 +85,36 @@ public interface TestSet extends TestSetOrGroup {
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated will be removed in TPT 21. Use {@link #addTestCaseOrGroup(ScenarioOrGroup tcg)}
+   *             wich support sceanrio groups.
    */
+  @Deprecated
   public void addTestCase(Scenario tc) throws ApiException, RemoteException;
+
+  /**
+   * Add a new test case to the test set.
+   * <p>
+   * A test case is a {@link Scenario} that is placed directly or in any sub-group of the top level
+   * {@link ScenarioGroup} of the top level {@link Testlet} of a TPT project.
+   * </p>
+   * 
+   * @see ScenarioOrGroup#isTestcaseOrGroup()
+   * @see Project#getTopLevelTestlet()
+   * @see Testlet#getTopLevelScenarioOrGroup()
+   * @see #isLocked()
+   * 
+   * @param tcg
+   *          The test case or the test case group to be added to the <code>TestSet</code>
+   * @throws ApiException
+   *           <ul>
+   *           <li>If the test set is locked
+   *           <li>If the given <code>Scenario</code> is not a test case or not from the current TPT
+   *           instance.
+   *           </ul>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void addTestCaseOrGroup(ScenarioOrGroup tcg) throws ApiException, RemoteException;
 
   /**
    * A test set can be locked to avoid accidental changes of the set of selected

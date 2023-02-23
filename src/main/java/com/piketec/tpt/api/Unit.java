@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,6 +23,11 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 import java.util.Map;
 
+/**
+ * A physical unit.
+ * 
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ */
 public interface Unit extends IdentifiableRemote {
 
   /**
@@ -118,19 +123,6 @@ public interface Unit extends IdentifiableRemote {
    *           if unit is not editable
    */
   void setNumerator(int numerator) throws ApiException, RemoteException;
-
-  /**
-   * Returns the denominator of this units factor.
-   * 
-   * @return denominator
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * 
-   * @deprecated Use {@link #getDenominator()} instead. Will be removed in TPT-18.
-   */
-  @Deprecated
-  int getDenomintaor() throws RemoteException;
 
   /**
    * Returns the denominator of this units factor.

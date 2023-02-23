@@ -38,9 +38,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Util;
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -155,19 +153,6 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
 
   // --------------------------------------------------------------
 
-  @Override
-  public boolean perform(AbstractBuild< ? , ? > build, Launcher launcher, BuildListener listener)
-      throws InterruptedException, IOException {
-    FilePath workspace = build.getWorkspace();
-    if (workspace == null) {
-      throw new IOException("No workspace available");
-    }
-    TptLogger logger = new TptLogger(listener.getLogger());
-    perform(build, workspace, launcher, listener, Utils.getEnvironment(build, launcher, logger),
-        logger);
-    return true;
-  }
-
   /**
    * It collects the necesary data (tpt exe path, tpt Port, tpt bindingname and tpt
    * expandedTptStartupWaitTime) from the environment. Then collects the necesary data from the
@@ -177,15 +162,15 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
    * schedules builds for the slaves and those builds will be executed here.
    */
   @Override
-  public void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+  public void perform(Run< ? , ? > run, FilePath workspace, EnvVars env, Launcher launcher,
                       TaskListener listener)
       throws InterruptedException, IOException {
     TptLogger logger = new TptLogger(listener.getLogger());
-    perform(run, workspace, launcher, listener, null, logger);
+    perform(run, workspace, launcher, listener, env, logger);
   }
 
-  public void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
-                      TaskListener listener, @CheckForNull EnvVars environment, TptLogger logger)
+  private void perform(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+                       TaskListener listener, EnvVars environment, TptLogger logger)
       throws InterruptedException, IOException {
     String[] expandedStringExePaths = expand(environment, exePaths).split("[,;]");
     FilePath[] expandedExePaths = new FilePath[expandedStringExePaths.length];
@@ -193,8 +178,7 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
       expandedExePaths[i] =
           new FilePath(workspace, expand(environment, expandedStringExePaths[i].trim()));
     }
-    String expandedArguments =
-        environment == null ? getArguments() : environment.expand(getArguments());
+    String expandedArguments = environment.expand(getArguments());
     int expandedTptPort;
     if (tptPort != null && !tptPort.isEmpty()) {
       try {
@@ -242,8 +226,7 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
     FilePath masterReportDir = workloadToDo.getMasterReportDir();
 
     // Replace $-Vars:
-    JenkinsConfiguration resolvedConfig =
-        environment == null ? unresolvedConfig : unresolvedConfig.replaceAndNormalize(environment);
+    JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(environment);
 
     logger.info("File Name :               " + resolvedConfig.getTptFile());
     logger.info("Execution Configuration : " + resolvedConfig.getConfiguration());

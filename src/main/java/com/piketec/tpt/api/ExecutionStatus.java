@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
  * This object provides an interface to the current state of the test execution which is the
  * information as provided by the "Build Progress" Dialog.
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionStatus extends TptRemote {
 
@@ -78,7 +78,7 @@ public interface ExecutionStatus extends TptRemote {
 
   /**
    * Returns the number of all test cases of the current test execution. Test cases that are part of
-   * the test set in more that one {@link ExecutionConfigurationItem} (e.g. in a Back2Back test
+   * the test set in more than one {@link ExecutionConfigurationItem} (e.g. in a Back2Back test
    * scenario), will be counted for each {@link ExecutionConfigurationItem} separately.
    *
    * @return Number of total test cases executed
@@ -92,7 +92,7 @@ public interface ExecutionStatus extends TptRemote {
    * Returns the number of test cases that are part of the current test execution that are currently
    * not finished (with state {@link TestCaseStatus#Pending}).
    * <p>
-   * Test cases that are part of the test set in more that one {@link ExecutionConfigurationItem}
+   * Test cases that are part of the test set in more than one {@link ExecutionConfigurationItem}
    * (e.g. in a Back2Back test scenario), will be counted for each
    * {@link ExecutionConfigurationItem} separately.
    * </p>
@@ -117,11 +117,11 @@ public interface ExecutionStatus extends TptRemote {
   /**
    * Returns the current (cumulative) execution state of the overall test execution.
    * <p>
-   * The cumulative execution state of all test cases is derived from the following priority (from
-   * high to low): ResultError, ResultFailed, ResultUnknown, ResultSuccess, Running, Pending
+   * The cumulative execution state is derived from the following priority (from high to low):
+   * ResultError, ResultFailed, ResultSuccess, ResultUnknown, Running, Pending
    * </p>
-   * The cumulative state is derived from at highest priority set for at least one of all test
-   * cases.
+   * The cumulative state is derived from the highest priority of all test cases and the result of
+   * the global assessment.
    * 
    * @return The test case execution state with the highest priority.
    * 
@@ -134,11 +134,49 @@ public interface ExecutionStatus extends TptRemote {
   public TestCaseStatus getTotalExecutionStatus() throws ApiException, RemoteException;
 
   /**
+   * Returns the global assessment state of the overall test execution as
+   * {@link GlobalAssessmentStatus}.
+   * 
+   * @return The global assessment state.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public GlobalAssessmentStatus getGlobalAssessmentStatus() throws RemoteException;
+
+  /**
    * @return Returns a list of log entries as <code>String</code>
    * 
    * @throws RemoteException
    *           remote communication problem
    */
   public List<String> getExecutionLog() throws RemoteException;
+
+  /**
+   * Waits for the execution to finish, then returns. Returns immediately if execution is already
+   * finished. Will return if execution is canceled or <b>paused</b> e.g. because the limit of test
+   * cases allowed to fail is reached or some user interaction.
+   * 
+   * @param timeout
+   *          The maximum time in seconds to wait for the execution to finish. A timeout of
+   *          {@code 0} or less means to wait forever.
+   * 
+   * @throws ApiException
+   *           If thread is interrupted
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void join(int timeout) throws ApiException, RemoteException;
+
+  /**
+   * Waits for the execution to finish. Shorthand for {@link #join(int)} with a timeout 0 or less.
+   * See {@link #join(int)} for details.
+   * 
+   * @throws ApiException
+   *           If thread is interrupted
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void join() throws ApiException, RemoteException;
 
 }

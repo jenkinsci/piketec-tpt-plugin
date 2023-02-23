@@ -12,7 +12,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -24,10 +23,8 @@ import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.jenkins.plugins.tpt.Utils;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
-import com.piketec.tpt.api.ExecutionConfigurationItem;
 import com.piketec.tpt.api.OpenResult;
 import com.piketec.tpt.api.Project;
-import com.piketec.tpt.api.Scenario;
 import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
@@ -275,29 +272,6 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
       }
     }
     return null;
-  }
-
-  /**
-   * Get the testcases from an Execution configuration.
-   * 
-   * @param execution
-   *          configuration , we will iterate over its items in order to get the testcases
-   * 
-   * @return a list with the test cases
-   */
-  Collection<String> getTestCaseNames(ExecutionConfiguration config)
-      throws RemoteException, ApiException {
-    HashSet<String> result = new HashSet<>();
-    for (ExecutionConfigurationItem item : config.getItems()) {
-      if (item.getTestSet() == null || item.getTestSet().getTestCases() == null
-          || item.getTestSet().getTestCases().getItems() == null) {
-        return null;
-      }
-      for (Scenario testcase : item.getTestSet().getTestCases().getItems()) {
-        result.add(testcase.getName());
-      }
-    }
-    return result;
   }
 
   /**

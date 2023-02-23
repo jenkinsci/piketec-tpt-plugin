@@ -1,11 +1,13 @@
 package com.piketec.jenkins.plugins.tpt;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.CheckForNull;
 
 import com.piketec.jenkins.plugins.tpt.api.callables.ExecuteTestsSlaveCallable;
 import com.piketec.jenkins.plugins.tpt.api.callables.GetTestCasesCallable;
+import com.piketec.jenkins.plugins.tpt.api.callables.GetTestCasesCallableResult;
 import com.piketec.jenkins.plugins.tpt.api.callables.RunOverviewReportCallable;
 
 import hudson.FilePath;
@@ -72,26 +74,27 @@ public class TptApiAccess {
    *          execution configuration
    * @param testSet
    *          test set from which to get the test cases
-   * @return a list of test case names for the given settings
+   * @return a list of test case names for the given settings and the total test case count
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public Collection<String> getTestCases(FilePath tptFilePath, String executionConfigName,
-                                         String testSet)
+  @CheckForNull
+  public GetTestCasesCallableResult getTestCases(FilePath tptFilePath, String executionConfigName,
+                                                 String testSet)
       throws InterruptedException {
     GetTestCasesCallable callable =
         new GetTestCasesCallable(launcher.getListener(), tptPort, tptBindingName, exePaths,
             arguments, startUpWaitTime, tptFilePath, executionConfigName, testSet);
-    Collection<String> testCases = null;
+    GetTestCasesCallableResult testCases = null;
     try {
       VirtualChannel channel = launcher.getChannel();
       if (channel == null) {
-        logger.error("Getting test cases did not work: Agent does not support virtual channels.");
+        logger.error("Unable to get test cases: Agent does not support virtual channels.");
         return testCases;
       }
       testCases = channel.call(callable);
     } catch (IOException e) {
-      logger.error("Getting test cases did not work: " + e.getMessage());
+      logger.error("Unable to get test cases: " + e.getMessage());
     }
     return testCases;
   }
@@ -124,13 +127,12 @@ public class TptApiAccess {
     try {
       VirtualChannel channel = launcher.getChannel();
       if (channel == null) {
-        logger.error(
-            "Running overview report did not work: Agent does not support virtual channels.");
+        logger.error("Unable to run overview report: Agent does not support virtual channels.");
         return worked;
       }
       worked = channel.call(callable);
     } catch (IOException e) {
-      logger.error("Running overview report did not work: " + e.getMessage());
+      logger.error("Unable to run overview report: " + e.getMessage());
     }
     return worked;
   }
@@ -165,13 +167,12 @@ public class TptApiAccess {
     try {
       VirtualChannel channel = launcher.getChannel();
       if (channel == null) {
-        logger.error(
-            "Executing tests on agent did not work: Agent does not support virtual channels.");
+        logger.error("Unable to execute tests on agent: Agent does not support virtual channels.");
         return worked;
       }
       worked = channel.call(callable);
     } catch (IOException e) {
-      logger.error("Executing tests on agent did not work: " + e.getMessage());
+      logger.error("\"Unable to execute tests on agent: " + e.getMessage());
     }
     return worked;
   }

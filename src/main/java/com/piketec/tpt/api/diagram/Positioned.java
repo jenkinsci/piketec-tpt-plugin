@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -52,5 +52,18 @@ public interface Positioned extends TptRemote {
    *           remote communication problem
    */
   public void setPosition(Point p) throws RemoteException;
+
+  /**
+   * Set the position of a object.
+   * 
+   * @param x
+   *          the x value of the desired position of the object in the two-dimensional drawing area.
+   * @param y
+   *          the y value of the desired position of the object in the two-dimensional drawing area.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setPosition(int x, int y) throws RemoteException;
 
 }

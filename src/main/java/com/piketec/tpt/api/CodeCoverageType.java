@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,6 +20,17 @@
  */
 package com.piketec.tpt.api;
 
+/**
+ * The type of code coverage
+ */
 public enum CodeCoverageType {
-  CTC, GCOV;
+  /**
+   * CTC code coverage
+   */
+  CTC,
+  /**
+   * GCOV code coverage
+   */
+  @Deprecated
+  GCOV;
 }

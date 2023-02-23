@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,12 +29,42 @@ import java.rmi.registry.Registry;
 /**
  * This class contains static utility methods that can be used when working with the TPT RMI API.
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public class TptApiUtils {
 
   /**
    * Connect to TPT api with the given binding name and port.
+   * 
+   * @param binding
+   *          The binding name to be used for lookup. This should match the configuration in TPT via
+   *          the Preference page "TPT API".
+   * @param hostname
+   *          The host name to connect to. Most of the time this will be "localhost".
+   * @param port
+   *          The port to connect to. This should match the configuration in TPT via the Preference
+   *          page "TPT API".
+   * @return The {link: TptApi} object which is the root object for all further operations with the
+   *         TPT API
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws NotBoundException
+   *           If There is no binding with the given binding name
+   */
+  public static TptApi connect(String binding, String hostname, int port)
+      throws RemoteException, NotBoundException {
+    Registry registry = LocateRegistry.getRegistry(hostname, port);
+    Remote apiObj = registry.lookup(binding);
+    if (apiObj instanceof TptApi) {
+      return (TptApi)apiObj;
+    } else {
+      throw new ApiException("Remote reference with binding \"" + binding + "\" on port " + port
+          + "is not an instance of \"" + TptApi.class.getName() + "\"");
+    }
+  }
+
+  /**
+   * Connect to TPT api with the given binding name and port. As hostname "localhost" is assumed.
    * 
    * @param binding
    *          The binding name to be used for lookup. This should match the configuration in TPT via
@@ -50,13 +80,6 @@ public class TptApiUtils {
    *           If There is no binding with the given binding name
    */
   public static TptApi connect(String binding, int port) throws RemoteException, NotBoundException {
-    Registry registry = LocateRegistry.getRegistry("localhost", port);
-    Remote apiObj = registry.lookup(binding);
-    if (apiObj instanceof TptApi) {
-      return (TptApi)apiObj;
-    } else {
-      throw new ApiException("Remote reference with binding \"" + binding + "\" on port " + port
-          + "is not an instance of \"" + TptApi.class.getName() + "\"");
-    }
+    return connect(binding, "localhost", port);
   }
 }

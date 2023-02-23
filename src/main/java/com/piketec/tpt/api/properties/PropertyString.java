@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,6 +21,7 @@
 package com.piketec.tpt.api.properties;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A String property value.
@@ -62,10 +63,7 @@ public class PropertyString implements Property, Serializable {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
-    return result;
+    return Objects.hash(value);
   }
 
   @Override
@@ -80,11 +78,7 @@ public class PropertyString implements Property, Serializable {
       return false;
     }
     PropertyString other = (PropertyString)obj;
-    if (value == null) {
-      if (other.value != null) {
-        return false;
-      }
-    } else if (!value.equals(other.value)) {
+    if (!Objects.equals(value, other.value)) {
       return false;
     }
     return true;

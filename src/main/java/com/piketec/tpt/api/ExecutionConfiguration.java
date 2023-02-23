@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,6 +25,11 @@ import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
+import com.piketec.tpt.api.constants.assessments.GlobalEquivalenceClasses;
+import com.piketec.tpt.api.constants.assessments.GlobalScript;
+import com.piketec.tpt.api.constants.assessments.GlobalVariable;
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+
 /**
  * This object represents all settings for a particular execution configuration.
  * <p>
@@ -36,36 +41,82 @@ import java.util.Map;
  * For a detailed description of the attributes please refer to the User Guide.
  * 
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
-public interface ExecutionConfiguration
-    extends ExecutionConfigurationOrGroup, RemoteList<ExecutionConfigurationItem> {
+public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
+    RemoteList<ExecutionConfigurationItem>, PlatformOrExecutionItemEnabler {
 
   /**
    * Enumeration representing the possible output formats of the report.
    * 
-   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   public enum ReportFormat {
-    Html, HtmlAllInOne, Pdf, AllInOnePdf
+    /**
+     * HTML
+     */
+    Html,
+    /**
+     * HTML with embedded resources
+     */
+    HtmlAllInOne,
+    /**
+     * PDF
+     */
+    Pdf,
+    /**
+     * PDF with overview and test resports in one big document
+     */
+    AllInOnePdf
   }
 
   /**
    * Enumeration representing the possible reference modes.
    * 
-   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   public enum ReferenceMode {
-    EXECUTION_DIR, PLATFORM_DIR
+    /**
+     * The given refence directory path points to a execution directory containing platform
+     * directories which contain the test case folders.
+     */
+    EXECUTION_DIR,
+    /**
+     * The given refence directory path points to a platform directory containing the test case
+     * folders.
+     */
+    PLATFORM_DIR
   }
 
   /**
    * Enumeration representing the different directory structure configurations.
    * 
-   * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
    */
   public enum DataDirStructure {
-    HIERARCHICAL_WITH_INDEX, HIERARCHICAL_WITH_ID, FLAT_WITH_INDEX, FLAT_WITH_ID, FLAT_ONLY_ID,
+    /**
+     * Hierarchical layout with indexes (based on test case tree)
+     */
+    HIERARCHICAL_WITH_INDEX,
+    /**
+     * Hierarchical layout with unique IDs (based on test case tree)
+     */
+    HIERARCHICAL_WITH_ID,
+    /**
+     * Flat layout with indexes (no hierarchy)
+     */
+    FLAT_WITH_INDEX,
+    /**
+     * Flat layout with unique IDs (no hierarchy)
+     */
+    FLAT_WITH_ID,
+    /**
+     * Flat layout with unique IDs (no hierarchy and no test case names)
+     */
+    FLAT_ONLY_ID,
+    /**
+     * Flat layout with indexes and unique IDs (no hierarchy and no test case names)
+     */
     FLAT_WITH_INDEX_AND_ID
   }
 
@@ -88,7 +139,7 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getDataDirPath()}
-   *             instead. Will be removed in TPT-18.
+   *             instead. Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public File getDataDir() throws RemoteException;
@@ -116,7 +167,7 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #getReportDirPath()}
-   *             instead. Will be removed in TPT-18.
+   *             instead. Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public File getReportDir() throws RemoteException;
@@ -147,7 +198,7 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use {@link #setDataDirPath(String)}
-   *             instead. Will be removed in TPT-18.
+   *             instead. Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setDataDir(File f) throws RemoteException;
@@ -177,7 +228,8 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use
-   *             {@link #setReportDirPath(String)} instead. Will be removed in TPT-18.
+   *             {@link #setReportDirPath(String)} instead. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setReportDir(File f) throws RemoteException;
@@ -286,14 +338,15 @@ public interface ExecutionConfiguration
   public void setRunDashboard(boolean enabled) throws RemoteException;
 
   /**
-   * Returns the additional attributes for a Execution Configuration as specified by the user. This
-   * map corresponds to the "Attributes" tab of the Execution Configuration GUI.
+   * Returns the additional attributes for the execution configuration as specified by the user.
+   * This map corresponds to the "Attributes" tab of the execution configuration GUI.
    * 
    * @return User attributes as map
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @deprecated Please use {@link #getAttributesList()} instead
+   * @deprecated Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}. Please use
+   *             {@link #getAttributesList()} instead
    */
   @Deprecated
   public Map<String, String> getAttributes() throws RemoteException;
@@ -313,14 +366,15 @@ public interface ExecutionConfiguration
    *           if <code>key==null</code>
    * @throws RemoteException
    *           remote communication problem
-   * @deprecated Please use {@link #setAttributesList(List)} instead. Will be removed in TPT-18.
+   * @deprecated Please use {@link #setAttributesList(List)} instead. Removed in TPT-19. Throws
+   *             {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setAttributes(String key, String value) throws ApiException, RemoteException;
 
   /**
-   * Returns the additional attributes for a Execution Configuration as specified by the user. This
-   * list corresponds to the "Attributes" tab of the Execution Configuration GUI.
+   * Returns the additional attributes for the execution configuration as specified by the user.
+   * This list corresponds to the "Attributes" tab of the execution configuration GUI.
    * 
    * @return User attributes as list.
    * 
@@ -330,7 +384,7 @@ public interface ExecutionConfiguration
   public List<Pair<String, String>> getAttributesList() throws RemoteException;
 
   /**
-   * Set a list of user-defined attributes given by <code>pair.first</code> to the value given by
+   * Set the list of user-defined attributes given by <code>pair.first</code> to the value given by
    * the <code>pair.second</code> parameter.
    * 
    * @param attributes
@@ -422,7 +476,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
+   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
+  @Deprecated
   public boolean isGlobalAssessmentEnabled() throws RemoteException;
 
   /**
@@ -432,7 +490,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
+   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
+  @Deprecated
   public void setGlobalAssessmentEnabled(boolean enabled) throws RemoteException;
 
   /**
@@ -441,7 +503,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
+   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
+  @Deprecated
   public String getGlobalAssessmentScript() throws RemoteException;
 
   /**
@@ -451,7 +517,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
+   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
+  @Deprecated
   public void setGlobalAssessmentScript(String script) throws RemoteException;
 
   /**
@@ -459,7 +529,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
+   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
+  @Deprecated
   public RemoteList<GlobalAssessmentRow> getGlobalAssessmentRows() throws RemoteException;
 
   /**
@@ -471,7 +545,11 @@ public interface ExecutionConfiguration
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
+   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
+  @Deprecated
   public GlobalAssessmentRow createGlobalAssessmentRow() throws RemoteException;
 
   /**
@@ -505,8 +583,9 @@ public interface ExecutionConfiguration
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated No support for $-variables and relative paths - use {@link #getReportPackPath()}
-   *             instead. Will be removed in TPT-18.
+   * @deprecated No support for $-variables and relative paths - use
+   *             {@link AdvancedReportSettings#getCompressionPath()} instead. Removed in TPT-19.
+   *             Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public File getReportPackFile() throws RemoteException;
@@ -522,7 +601,8 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated No support for $-variables and relative paths - use
-   *             {@link #setReportPackPath(String)} instead. Will be removed in TPT-18.
+   *             {@link AdvancedReportSettings#setCompressionPath(String)} instead. Removed in
+   *             TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setReportPackFile(File zipFile) throws RemoteException;
@@ -534,8 +614,8 @@ public interface ExecutionConfiguration
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Use {@link AdvancedReportSettings#getCompressionPath()} instead. Will be removed in
-   *             TPT-18.
+   * @deprecated Use {@link AdvancedReportSettings#getCompressionPath()} instead. Removed in TPT-19.
+   *             Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public String getReportPackPath() throws RemoteException;
@@ -550,8 +630,8 @@ public interface ExecutionConfiguration
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Use {@link AdvancedReportSettings#setCompressionPath(String)} instead. Will be
-   *             removed in TPT-18.
+   * @deprecated Use {@link AdvancedReportSettings#setCompressionPath(String)} instead. Removed in
+   *             TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setReportPackPath(String zipFile) throws RemoteException;
@@ -564,7 +644,7 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated Use {@link AdvancedReportSettings#isDeleteReportDirAfterCompression()} instead.
-   *             Will be removed in TPT-18.
+   *             Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public boolean isDeleteReportDirAfterPack() throws RemoteException;
@@ -578,7 +658,7 @@ public interface ExecutionConfiguration
    *           remote communication problem
    * 
    * @deprecated Use {@link AdvancedReportSettings#setDeleteReportDirAfterCompression(boolean)}
-   *             instead. Will be removed in TPT-18.
+   *             instead. Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setDeleteReportDirAfterPack(boolean enable) throws RemoteException;

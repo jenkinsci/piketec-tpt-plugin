@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,13 +22,15 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.UUIDObject;
+
 /**
  * An object representing either a {@link TestSet} or a group of test sets ({@link TestSetGroup}).
  * These objects can build up a tree where both, test sets and test set groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
-public interface TestSetOrGroup extends IdentifiableRemote, NamedObject {
+public interface TestSetOrGroup extends IdentifiableRemote, NamedObject, UUIDObject {
 
   /**
    * Get the parent test set group or <code>null</code> if this object resides on the top level
@@ -40,6 +42,15 @@ public interface TestSetOrGroup extends IdentifiableRemote, NamedObject {
    *           remote communication problem
    */
   public TestSetGroup getGroup() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this is a {@link TestSetGroup}, <code>false</code> otherwise.
+   * 
+   * @return <code>true</code> if this is a {@link TestSetGroup}, <code>false</code> otherwise
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGroup() throws RemoteException;
 
   /**
    * Moves this {@link TestSetOrGroup} to a new position in the test set tree.

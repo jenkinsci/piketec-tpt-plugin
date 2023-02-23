@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,7 @@ package com.piketec.tpt.api.constants.platforms;
 /**
  * For further information, please refer to the User Guide, AUTOSAR Platform.
  */
-public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig {
+public interface Autosar extends ExeBased {
 
   public static final String PROJECT_DIR = "projectdir";
 
@@ -51,6 +51,8 @@ public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig 
 
   public static final String GEN_RTE_CONTRACT_PHASE_HEADERS = "genRteContractPhaseHeaders";
 
+  public static final String COMPU_METHOD_DEFINES_HEADER = "compuMethodDefinesHeader";
+
   public static final String CDS_IS_DEFINED_AS_STRUCT_TYPE_DEF = "cdsIsDefinedAsStructTypedef";
 
   public static final String CDS_INST_IS_CONST_POINTER = "cdsInstIsConstPointer";
@@ -60,6 +62,8 @@ public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig 
   public static final String CDS_IGNORED = "cdsIgnored";
 
   public static final String SWC_NAME = "swcname";
+
+  public static final String FILTERED_COMPONENTS = "filteredComponents";
 
   public static final String SYSTEM_CONSTANT_VALUE_SETS = "systemConstantValueSets";
 
@@ -85,6 +89,27 @@ public interface Autosar extends BasicPlatformConfig, EclipseCdtDebuggingConfig 
 
   public static final String USE_NAME_SPACES = "useNameSpaces";
 
+  public static final String OVERRIDE_SYSTEM_CONST_VALUES = "overrideSystemConstValues";
+
+  public static final String USE_SYSTEM_SIGNAL_MAPPING = "useSystemSignalMapping";
+
+  public static final String SYSTEM_FOR_SIGNAL_MAPPING = "systemForSignalMapping";
+
+  public static final String STATIC_MEMORY_NAMES = "staticMemoryNames";
+
+  public static final String IMPORT_CURVE_MAP_TYPES = "importCurveMapTypes";
+
+  public static final String ASSUME_ALL_EXPLICIT_ACCESS = "assumeAllExplicitAccess";
+
+  public static final String CONNECT_DELEGATED_PORTS = "connectDelegatedPorts";
+
   public static final String CUSTOM_INTERFACE_FILE = "customInterfaceFile";
+
+  public static final String INTERFACE_NAMES_PROVIDER = "interfaceNamesProvider";
+
+  /**
+   * Whether to add time measurements for scheduled functions
+   */
+  public static final String MEASURE_SUT_FUNCTION_TIMES = "measureSutFctTimes";
 
 }

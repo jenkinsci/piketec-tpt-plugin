@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,6 +21,10 @@
 package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
+import java.util.List;
+
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+import com.piketec.tpt.api.util.UUIDObject;
 
 /**
  * This object either represents a {@link Scenario} or a {@link ScenarioGroup}. It represents a node
@@ -30,7 +34,7 @@ import java.rmi.RemoteException;
  * test case groups. Both can be assigned with a description as well as parameters.
  * </p>
  */
-public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
+public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote, UUIDObject {
 
   /**
    * @return Returns the textual description of this <code>ScenarioOrGroup</code> (displayed int the
@@ -63,6 +67,15 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   public ScenarioGroup getGroup() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this is a {@link ScenarioGroup}, <code>false</code> otherwise.
+   * 
+   * @return <code>true</code> if this is a {@link ScenarioGroup}, <code>false</code> otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGroup() throws RemoteException;
 
   /**
    * @return Returns the {@link Testlet} this <code>ScenarioOrGroup</code> belongs to. In case this
@@ -136,13 +149,25 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
   public String getInitialValue(String declarationName) throws ApiException, RemoteException;
 
   /**
+   * Returns a list of variables for which this test case/variant directly defines an initial value.
+   * 
+   * @return list of variables for which this test case/variant directly defines an initial value.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public List<String> getInitialValues() throws RemoteException;
+
+  /**
    * Returns the value for a given {@link TestCaseAttribute} that is defined for this Scenario.
    * <p>
    * {@link TestCaseAttribute TestCaseAttributes} are only available for test cases. The type of the
    * Scenario can be determined using {@link ScenarioOrGroup#isTestcaseOrGroup()}.
    * </p>
    * 
-   * @see Project#createTestCaseAttribute(String, String)
+   * @see Project#createTestCaseAttribute(String,
+   *      com.piketec.tpt.api.TestCaseAttribute.TestCaseAttributeType)
+   *      createTestCaseAttribute(String, TestCaseAttributeType))
    * 
    * @param name
    *          The <code>name</code> of the {@link TestCaseAttribute}.
@@ -171,7 +196,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * @throws ApiException
    *           If <code>name==null</code> or if there exists no {@link TestCaseAttribute} with the
    *           given name or if the given value does not match the
-   *           {@link TestCaseAttribute#getType() type} of the attribute.
+   *           {@link TestCaseAttribute#getAttributeType() type} of the attribute.
    * @throws RemoteException
    *           remote communication problem
    */
@@ -206,8 +231,8 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote {
    * @throws ApiException
    *           If the ID of the assessment is not an integer
    * 
-   * @deprecated Will be removed in TPT-18. Since TPT-16 scenario IDs are strings. Use
-   *             {@link #getIdString()} instead.
+   * @deprecated Removed in TPT-19. Throws {@link DeprecatedAndRemovedException}. Since TPT-16
+   *             scenario IDs are strings. Use {@link #getIdString()} instead.
    */
   @Deprecated
   public int getId() throws RemoteException;

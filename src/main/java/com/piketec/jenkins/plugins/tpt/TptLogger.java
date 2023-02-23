@@ -43,6 +43,16 @@ public class TptLogger {
   }
 
   /**
+   * Report an debug message.
+   * 
+   * @param msg
+   *          Message to show.
+   */
+  public void debug(String msg) {
+    logger.println("[DEBUG " + Utils.getCurrentDateString() + "]: " + msg);
+  }
+
+  /**
    * Report an info message.
    * 
    * @param msg
@@ -50,6 +60,16 @@ public class TptLogger {
    */
   public void info(String msg) {
     logger.println("[Info " + Utils.getCurrentDateString() + "]: " + msg);
+  }
+
+  /**
+   * Report an warning message
+   * 
+   * @param msg
+   *          Message to show.
+   */
+  public void warn(String msg) {
+    logger.println("[Warning " + Utils.getCurrentDateString() + "]: " + msg);
   }
 
   /**

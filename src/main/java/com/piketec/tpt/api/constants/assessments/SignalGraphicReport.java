@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,6 +26,15 @@ package com.piketec.tpt.api.constants.assessments;
  */
 public interface SignalGraphicReport extends BasicAssessment, SignalFilter {
 
+  public interface YAxisOptions {
+
+    public static final String FIXED = "FIXED";
+
+    public static final String AUTOMATIC = "AUTOMATIC";
+
+    public static final String STACKED = "STACKED";
+  }
+
   public static final String ONE_GRAPHIC_PER_SIGNAL = "one-graphic-per-signal";
 
   public static final String HEIGHT = "height";
@@ -46,6 +55,11 @@ public interface SignalGraphicReport extends BasicAssessment, SignalFilter {
 
   public static final String YAXIS_VISIBLE = "yaxis-visible";
 
+  /** Only the value in {@link SignalGraphicReport.YAxisOptions} are possible */
+  public static final String YAXIS_SETTINGS = "yaxis-settings";
+
+  /** @deprecated Please use {@link #YAXIS_SETTINGS}. Will be removed in TPT-21. */
+  @Deprecated
   public static final String YAXIS_INTERVALL_FIXED = "yaxis-intervall-fixed";
 
   public static final String XAXIS_INTERVALL_FROM = "xaxis-intervall-from";

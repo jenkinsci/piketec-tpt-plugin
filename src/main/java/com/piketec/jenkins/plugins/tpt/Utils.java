@@ -221,6 +221,18 @@ public class Utils {
     return absPath.isAbsolute() ? absPath : absPath.getAbsoluteFile();
   }
 
+  /**
+   * Transforms the list into a String by calling toString() on every item, seperating them by the
+   * given <code>delimeter</code>
+   * 
+   * @param <T>
+   *          The types of items contained in the list
+   * @param list
+   *          The list to tranform to String
+   * @param delimeter
+   *          The sting seperating the items
+   * @return The list represneted as a string
+   */
   public static <T> String toString(Collection<T> list, String delimeter) {
     StringBuilder sb = new StringBuilder();
     for (T obj : list) {
@@ -235,7 +247,9 @@ public class Utils {
   /**
    * TPT changes its workind directory during execution, fails to set it back correctly after
    * multicore execution and prevents the deletion of test data directory. This method only deletes
-   * the files in a directory recursively if {@link FilePath#deleteContents()} fails.
+   * the files in a directory recursively if {@link FilePath#deleteContents()} fails. Also TPT may
+   * keep tptbin-Files open for some Time in a cache, so we will retry more often to delete the
+   * files than the standard implementation.
    * 
    * @param path
    *          The paths to delete
@@ -254,6 +268,7 @@ public class Utils {
         }
       } else {
         path.delete();
+        path.mkdirs();
       }
     } else {
       path.mkdirs();
@@ -275,9 +290,25 @@ public class Utils {
       if (subPath.isDirectory()) {
         deleteFilesRecursive(subPath);
       } else {
-        subPath.delete();
+        deleteWithAdditonalTries(subPath);
       }
     }
+  }
+
+  private static void deleteWithAdditonalTries(FilePath path)
+      throws IOException, InterruptedException {
+    final int tptbinCloseTimer = 11000; // Timer in TPT is 10s, let's try a bit longer
+    final int waitTime = 500;
+    for (int i = 0; i < (tptbinCloseTimer / waitTime) - 1; i++) {
+      try {
+        path.delete();
+        return; // successfull deleted!
+      } catch (IOException e) {
+        Thread.sleep(waitTime);
+        continue; // try again
+      }
+    }
+    path.delete(); // last try
   }
 
   /**

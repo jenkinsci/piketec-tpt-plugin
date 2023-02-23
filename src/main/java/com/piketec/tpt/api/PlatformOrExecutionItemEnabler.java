@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,12 +21,12 @@
 package com.piketec.tpt.api;
 
 /**
- * This interface either represents a general platform adapter {@link PlatformConfiguration} or a
- * platform within a particular execution configuration {@link ExecutionConfigurationItem} and is
- * used to enable and disable the execution of assessments for the platform.
+ * This interface either represents a general adapter for a {@link PlatformConfiguration}, an
+ * {@link ExecutionConfiguration} or an {@link ExecutionConfigurationItem} and is used to enable and
+ * disable the execution of assessments for the object.
  * 
  *
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface PlatformOrExecutionItemEnabler extends IdentifiableRemote {
 

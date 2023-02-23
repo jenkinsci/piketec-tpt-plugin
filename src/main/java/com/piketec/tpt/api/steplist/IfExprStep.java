@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -46,4 +46,23 @@ public interface IfExprStep extends Step {
    *           remote communication problem
    */
   public void setExpression(String expr) throws RemoteException;
+
+  /**
+   * @return <code>true</code> if this step should run "always".
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isAlways() throws RemoteException;
+
+  /**
+   * Determines if this step should run "always".
+   * 
+   * @param value
+   *          <code>true</code> to use always semantics
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setAlways(boolean value) throws RemoteException;
 }

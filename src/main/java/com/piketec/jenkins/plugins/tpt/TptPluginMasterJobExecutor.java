@@ -32,11 +32,13 @@ import org.apache.commons.lang.StringUtils;
 import com.piketec.jenkins.plugins.tpt.TptLog.LogLevel;
 import com.piketec.jenkins.plugins.tpt.Configuration.JenkinsConfiguration;
 import com.piketec.jenkins.plugins.tpt.api.callables.CleanUpCallable;
+import com.piketec.jenkins.plugins.tpt.api.callables.GetTestCasesCallableResult;
 
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.Job;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
@@ -188,27 +190,25 @@ class TptPluginMasterJobExecutor {
    */
   private boolean executeOneConfig(JenkinsConfiguration unresolvedConfig, TptApiAccess tptApiAccess)
       throws InterruptedException {
+    boolean success = true;
     if (!unresolvedConfig.isEnableTest()) {
       return true;
     }
-
     // Resolve $-vars in paths, test set and execution config names
     JenkinsConfiguration resolvedConfig = unresolvedConfig;
     if (build instanceof AbstractBuild) {
       resolvedConfig = unresolvedConfig.replaceAndNormalize(
           Utils.getEnvironment((AbstractBuild< ? , ? >)build, launcher, logger));
     }
-
     if (!(build instanceof AbstractBuild)) {
       // We cannot check all IDs beforehand for pipeline jobs so do it here
       if (!Utils.checkId(resolvedConfig, build, logger)) {
         return false;
       }
     }
-
     // Get necessery paths the user added in the job configuration:
     // These paths are resolved to work on the master.
-    Collection<String> testCases = null;
+    GetTestCasesCallableResult testCases = null;
     if (workspace == null) {
       logger.error("No workspace available");
       return false;
@@ -216,7 +216,6 @@ class TptPluginMasterJobExecutor {
     FilePath testDataPath = new FilePath(workspace, Utils.getGeneratedTestDataDir(resolvedConfig));
     FilePath reportPath = new FilePath(workspace, Utils.getGeneratedReportDir(resolvedConfig));
     FilePath tptFilePath = new FilePath(workspace, resolvedConfig.getTptFile());
-
     try {
       logger.info("Create and/or clean test data directory \"" + testDataPath.getRemote() + "\"");
       testDataPath.mkdirs();
@@ -228,12 +227,10 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not create or clear directories on master: " + e.getMessage());
       return false;
     }
-
     // Register cleanup task that is called in the end to close remote TPT Project
     CleanUpCallable cleanUpCallable = new CleanUpCallable(listener, "localhost", tptPort,
         tptBindingName, exePaths, tptStartupWaitTime, tptFilePath);
     new CleanUpTask(build, cleanUpCallable, launcher);
-
     // Get the list of testcases via the TPT API
     testCases = tptApiAccess.getTestCases(tptFilePath, resolvedConfig.getConfiguration(),
         resolvedConfig.getTestSet());
@@ -241,20 +238,20 @@ class TptPluginMasterJobExecutor {
       logger.error("Unable to get test cases via TPT API.");
       return false;
     }
-
     // Divide testcases into Workloads for the slave jobs to execute
     ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
     // create test sets for slave jobs
     int slaveJobSize;
     int remainer;
     if (slaveJobCount >= 1) {
-      slaveJobSize = testCases.size() / slaveJobCount;
-      remainer = testCases.size() % slaveJobCount;
+      slaveJobSize = testCases.testCases.size() / slaveJobCount;
+      remainer = testCases.testCases.size() % slaveJobCount;
     } else {
       slaveJobSize = 1;
       remainer = 0;
     }
-    ArrayList<List<String>> subTestSets = getSubTestSets(testCases, slaveJobSize, remainer);
+    ArrayList<List<String>> subTestSets =
+        getSubTestSets(testCases.testCases, slaveJobSize, remainer);
     // start one job for every test set
     Job slaveJob = null;
     Jenkins jenkinsInstance = Jenkins.getInstanceOrNull();
@@ -291,6 +288,11 @@ class TptPluginMasterJobExecutor {
     for (RetryableJob retryableJob : retryableJobs) {
       try {
         retryableJob.join();
+        Result result = retryableJob.getResult();
+        if (result != null && result.isWorseThan(Result.UNSTABLE)) {
+          success = false;
+          logger.error("Child job failed.");
+        }
       } catch (InterruptedException e) {
         logger.info("Stopping slave jobs.");
         logger.interrupt(e.getMessage());
@@ -300,7 +302,6 @@ class TptPluginMasterJobExecutor {
         throw e;
       }
     }
-
     // Build Overview report:
     logger.info("Building overview report.");
     boolean buildingReportWorked = tptApiAccess.runOverviewReport(tptFilePath,
@@ -308,18 +309,43 @@ class TptPluginMasterJobExecutor {
     if (!buildingReportWorked) {
       logger.error("Building overview report did not work!");
     }
-
     try {
       int foundTestData = 0;
       if (enableJunit) {
+        logger.info("*** Publishing as JUnit results now ***");
         foundTestData = Utils.publishAsJUnitResults(workspace, resolvedConfig, testDataPath,
             jUnitXmlPath, jUnitLogLevel, logger);
+        logger.info("*** Publishing finished ***");
       } else {
         foundTestData = Publish.getTestcases(testDataPath, logger).size();
       }
-      if (foundTestData != testCases.size()) {
-        logger.error("Found only " + foundTestData + " of " + testCases.size() + " test results.");
-        return false;
+      if (foundTestData != testCases.testCaseCount) {
+        // testCases.testCaseCount is some kind of maximal number of test cases that may have been
+        // executed. Test set conditions are only able to reduce the number of executed test cases.
+        // So, we found exaclty testCases.testCaseCount test results, we can assume that everything
+        // is fine.
+        if (foundTestData > testCases.testCaseCount) {
+          logger.error("More test results found than test cases executed.");
+          return false;
+        } else if (testCases.tptVersion.supportsTestCaseConditions()
+            && !testCases.tptVersion.supportsTestCaseConditionAccess()) {
+          logger.warn("Unable to check if all test results are present."
+              + " The used TPT version supports test set condtions but no API access to check if test"
+              + " set condtions are configured. We found " + foundTestData
+              + " test results and would expected to find " + testCases.testCaseCount
+              + " without any test set conditions.");
+        } else if (testCases.tptVersion.supportsTestCaseConditionAccess()
+            && testCases.testCaseConditionsPresent) {
+          logger.warn("Unable to check if all test results are present. Some test sets use"
+              + " test set condtions. Test set condtions cannot be evaluated to calculate the number"
+              + " of executed test cases. We found " + foundTestData
+              + " test results and would expected to find " + testCases.testCaseCount
+              + " without any test set conditions.");
+        } else {
+          logger.error(
+              "Found only " + foundTestData + " of " + testCases.testCaseCount + " test results.");
+          return false;
+        }
       }
     } catch (RemoteException e) {
       logger.error(e.getMessage());
@@ -328,7 +354,7 @@ class TptPluginMasterJobExecutor {
       logger.error("Could not publish result: " + e.getMessage());
       return false;
     }
-    return Utils.checkIdAndAddInvisibleActionTPTExecution(resolvedConfig, build, logger);
+    return Utils.checkIdAndAddInvisibleActionTPTExecution(resolvedConfig, build, logger) & success;
   }
 
   private ArrayList<List<String>> getSubTestSets(Collection<String> testCases, int slaveJobSize,

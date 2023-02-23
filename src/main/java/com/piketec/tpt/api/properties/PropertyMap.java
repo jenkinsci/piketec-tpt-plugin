@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 /**
  * A property consisting of multiple key-value-pairs.
@@ -124,6 +125,32 @@ public class PropertyMap implements Property, Serializable {
     map.put(key, new PropertyString(value));
   }
 
+  /**
+   * Shorthand for <code>setValue(key, new PropertyList())</code>
+   * 
+   * @param key
+   *          The property key
+   * @return the new {@link PropertyList}
+   */
+  public PropertyList setListValue(String key) {
+    PropertyList list = new PropertyList();
+    map.put(key, list);
+    return list;
+  }
+
+  /**
+   * Shorthand for <code>setValue(key, new PropertyMap())</code>
+   * 
+   * @param key
+   *          The property key
+   * @return the new {@link PropertyMap}
+   */
+  public PropertyMap setMapValue(String key) {
+    PropertyMap newMap = new PropertyMap();
+    map.put(key, newMap);
+    return newMap;
+  }
+
   @Override
   public String toString() {
     StringBuffer buffer = new StringBuffer();
@@ -160,10 +187,7 @@ public class PropertyMap implements Property, Serializable {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((map == null) ? 0 : map.hashCode());
-    return result;
+    return Objects.hash(map);
   }
 
   @Override
@@ -178,11 +202,7 @@ public class PropertyMap implements Property, Serializable {
       return false;
     }
     PropertyMap other = (PropertyMap)obj;
-    if (map == null) {
-      if (other.map != null) {
-        return false;
-      }
-    } else if (!map.equals(other.map)) {
+    if (!Objects.equals(map, other.map)) {
       return false;
     }
     return true;

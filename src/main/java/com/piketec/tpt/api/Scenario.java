@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,9 @@ package com.piketec.tpt.api;
 
 import java.io.File;
 import java.rmi.RemoteException;
+
+import com.piketec.tpt.api.diagram.DiagramScenario;
+import com.piketec.tpt.api.steplist.StepListScenario;
 
 /**
  * Either a test case or a Diagram/StepList variant of a TestLet. *
@@ -130,4 +133,19 @@ public interface Scenario extends ScenarioOrGroup {
    *           remote communication problem
    */
   public boolean isStatusOutdated() throws ApiException, RemoteException;
+
+  /**
+   * Generates a specification for this scenario including the initial values. This specification
+   * can be reimported via {@link StepListScenario#importTestSpecification(String)}.<br>
+   * Please note that the reimport is not a lossless process, especially when importing a
+   * specification that was exported from a {@link DiagramScenario}. Some complex steps cannot be
+   * imported and will be replaced with documentation steps (e.g. embedded signal step).
+   * 
+   * 
+   * @return generated test specification
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String exportTestSpecification() throws RemoteException;
+
 }

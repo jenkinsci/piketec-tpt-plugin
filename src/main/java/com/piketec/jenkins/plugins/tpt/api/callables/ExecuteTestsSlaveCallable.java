@@ -10,7 +10,9 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.remoting.RoleChecker;
 
+import com.piketec.jenkins.plugins.tpt.TptApiHelper;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
+import com.piketec.jenkins.plugins.tpt.TptVersion;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.ExecutionConfiguration;
 import com.piketec.tpt.api.ExecutionConfigurationItem;
@@ -45,19 +47,19 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
   private String testSetName;
 
   /**
-   * Created a new callable to execute a subset of tests of a given test set as part of a complete
+   * Create a new callable to execute a subset of tests of a given test set as part of a complete
    * test execution.
    * 
    * @param listener
    *          The task listener
-   * @param hostName
-   *          The host name for TPT RMI API calls
    * @param tptPort
    *          The port for TPT RMI API calls
    * @param tptBindingName
    *          The binding name for TPT RMI API calls
    * @param exePaths
    *          Paths to look for TPT installations
+   * @param arguments
+   *          startup arguments fo TPT
    * @param startUpWaitTime
    *          Timeto wait for TPT start up
    * @param tptFilePath
@@ -91,16 +93,17 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
   @Override
   public Boolean call() throws InterruptedException {
     TptLogger logger = getLogger();
-    TptApi api = getApi();
-    if (api == null) {
-      logger.error("Could not establish connection to the TPT API.");
-      return false;
-    }
-    Project project = getOpenProject(logger, api, tptFilePath);
-    if (project == null) {
-      return false;
-    }
     try {
+      TptApi api = getApi();
+      if (api == null) {
+        logger.error("Could not establish connection to the TPT API.");
+        return false;
+      }
+      TptVersion tptVersion = TptVersion.getVersion(api);
+      Project project = getOpenProject(logger, api, tptFilePath);
+      if (project == null) {
+        return false;
+      }
       // search execution configuration by name
       Collection<ExecutionConfiguration> execConfigs =
           project.getExecutionConfigurations().getItems();
@@ -127,23 +130,22 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
             .error("Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
         return false;
       }
-
       logger.info("Setting test data directory to " + slaveDataPath.getRemote());
       config.setDataDirPath(slaveDataPath.getRemote());
       logger.info("Setting report directory to " + slaveReportPath.getRemote());
       config.setReportDirPath(slaveReportPath.getRemote());
-
       // store information to undo changes
       List<TestSet> oldTestSets = new ArrayList<>();
       List<TestSet> newTestSets = new ArrayList<>();
       List<ExecutionConfigurationItem> deactivated = new ArrayList<>();
       int i = 0;
-      if (StringUtils.isEmpty(testSetName)) {
+      if (StringUtils.isEmpty(testSetName)) { // Use test sets defined in file
         for (ExecutionConfigurationItem item : config.getItems()) {
-          oldTestSets.add(item.getTestSet());
+          TestSet existingTestSet = item.getTestSet();
+          oldTestSets.add(existingTestSet);
           if (item.isActive()) {
-            Collection<Scenario> intersectionSet =
-                intersectByHash(item.getTestSet().getTestCases().getItems(), foundScenearios);
+            Collection<Scenario> intersectionSet = intersectByHash(
+                TptApiHelper.getTestCasesFromTestSet(tptVersion, existingTestSet), foundScenearios);
             if (intersectionSet.isEmpty()) {
               item.setActive(false);
               deactivated.add(item);
@@ -155,21 +157,21 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
               TestSet testSet = project.createTestSet(tmpTestSetName);
               newTestSets.add(testSet);
               for (Scenario scen : intersectionSet) {
-                testSet.addTestCase(scen);
+                TptApiHelper.addTestCase(tptVersion, testSet, scen);
               }
+              setTestSetCondtionIfPossible(existingTestSet, testSet, tptVersion, logger);
               item.setTestSet(testSet);
             }
           }
         }
-      } else {
+      } else { // explicitly defined test set in Jenkins
         String tmpTestSetName = "JENKINS Exec " + testSetName;
         logger.info("Create test set \"" + tmpTestSetName + "\" for execution of \""
             + remoteScenarioSetToString(foundScenearios) + "\" from File " + tptFilePath.getName());
-
         TestSet testSet = project.createTestSet(tmpTestSetName);
         newTestSets.add(testSet);
         for (Scenario scen : foundScenearios) {
-          testSet.addTestCase(scen);
+          TptApiHelper.addTestCase(tptVersion, testSet, scen);
         }
         for (ExecutionConfigurationItem item : config.getItems()) {
           oldTestSets.add(item.getTestSet());
@@ -177,8 +179,19 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
             item.setTestSet(testSet);
           }
         }
+        boolean testSetFound = false;
+        for (TestSet definedTestset : project.getTestSets().getItems()) {
+          if (definedTestset.getName().equals(testSetName)) {
+            testSetFound = true;
+            setTestSetCondtionIfPossible(definedTestset, testSet, tptVersion, logger);
+            break;
+          }
+        }
+        if (!testSetFound) {
+          logger.warn("Unable to find test set \"" + testSet
+              + "\" on agent. Unable to update test set condition.");
+        }
       }
-
       // execute test
       ExecutionStatus execStatus = api.run(config);
       try {
@@ -296,6 +309,27 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
       sb.append(scen.getName());
     }
     return sb.toString();
+  }
+
+  /**
+   * Sets the test condition if TPT version suports it via API. Prints a warning if TPT version can
+   * use test set conditions but the feature is not available via API.
+   */
+  private void setTestSetCondtionIfPossible(TestSet existingTestSet, TestSet newTestSet,
+                                            TptVersion tptVersion, TptLogger logger)
+      throws RemoteException {
+    if (tptVersion.supportsTestCaseConditionAccess()) {
+      // just set ist
+      newTestSet.setConditionEnabled(existingTestSet.isConditionEnabled());
+      newTestSet.setCondition(existingTestSet.getCondition());
+      newTestSet.setRequirementSet(existingTestSet.getRequirementSet());
+      newTestSet.setRestrictedToLinkedTestCases(existingTestSet.isRestrictedToLinkedTestCases());
+    } else if (tptVersion.supportsTestCaseConditions()) {
+      logger
+          .warn("The TPT version supports test set conditions but does not support configuration of"
+              + " test set conditions via API."
+              + "\nIf test set conditions are configured they will be ignored for the test run.");
+    }
   }
 
 }

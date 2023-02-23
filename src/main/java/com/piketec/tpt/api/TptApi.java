@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,6 +23,8 @@ package com.piketec.tpt.api;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.Collection;
+
+import com.piketec.tpt.api.util.WalkResult;
 
 /**
  * Main entry point for the access to TPT via the TPT API. This API can be accessed via API Script
@@ -69,6 +71,29 @@ public interface TptApi extends TptRemote {
   public OpenResult openProject(File f) throws ApiException, RemoteException;
 
   /**
+   * 
+   * Try to open an already existing project and to return a handle for the project
+   * ({@link OpenResult#getProject()}). If the project is already open, only the handle will be
+   * returned. The project is not re-opened. Changes will not been overwritten.
+   * <p>
+   * Any errors or warnings that occur during the open-operation are stored in the
+   * {@link OpenResult#getLogs()}.
+   * </p>
+   * 
+   * @param f
+   *          The path to the TPT-file
+   * @return A {@link OpenResult} containing the handle to the project and the log messages occurred
+   *         during the open-operation.
+   *
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If <code>f</code> do not exists or if <code>f</code> is not a TPT-file.
+   */
+  public OpenResult openProjectByPath(String f) throws ApiException, RemoteException;
+
+  /**
    * Create a new TPT {@link Project} assigned with the given {@link File}. The new
    * <code>Project</code> will not be saved during this operation. The given file is only relevant
    * for later save operations.
@@ -87,6 +112,26 @@ public interface TptApi extends TptRemote {
    *           If the given File is already opened in TPT
    */
   public Project newProject(File f) throws ApiException, RemoteException;
+
+  /**
+   * Create a new TPT {@link Project} assigned with the given {@link File}. The new
+   * <code>Project</code> will not be saved during this operation. The given file is only relevant
+   * for later save operations.
+   * 
+   * @see Project#saveProject()
+   * @see Project#saveAsProject(File)
+   * 
+   * @param f
+   *          the path to the file to use for this project
+   *
+   * @return the newly created TPT project
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the given File is already opened in TPT
+   */
+  public Project newProjectByPath(String f) throws ApiException, RemoteException;
 
   /**
    * @return Returns the set of all {@link Project Projects} that are currently open in this TPT
@@ -112,6 +157,15 @@ public interface TptApi extends TptRemote {
    *           remote communication problem
    */
   public File getTptInstallationDir() throws RemoteException;
+
+  /**
+   * @return Returns the absolute path to the installation directory of the TPT instance represented
+   *         by this API object.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getTptInstallationDirPath() throws RemoteException;
 
   /**
    * @return Returns the version number of file format this TPT version will use to store *.tpt-,
@@ -267,5 +321,103 @@ public interface TptApi extends TptRemote {
    *           remote communication problem
    */
   public void toFront() throws RemoteException;
+
+  /**
+   * @return Returns the "toolbox" which contains a set of auxillary functions which are not
+   *         directly related to a {@link Project} or the TPT-Application.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public UtilToolbox getToolbox() throws RemoteException;
+
+  /**
+   * Traverses the assessment tree and returns a triple consisting of the current root, a list of
+   * assessment groups and a list of assessments under the current root.
+   * 
+   * @param root
+   *          The node where the iterator should start, this can either be the project itself or an
+   *          assessment group.
+   * @return Iterable
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Iterable<WalkResult<AssessmentOwner, AssessmentGroup, Assessment>> walkAssessments(AssessmentOwner root)
+      throws RemoteException;
+
+  /**
+   * Traverses the test set tree and returns a triple consisting of the current root, a list of test
+   * set groups and a list of test sets under the current root.
+   * 
+   * @param root
+   *          The node where the iterator should start, this can either be the project itself or a
+   *          test set group.
+   * @return Iterable
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Iterable<WalkResult<TestSetOwner, TestSetGroup, TestSet>> walkTestSets(TestSetOwner root)
+      throws RemoteException;
+
+  /**
+   * Traverses the execution configuration tree and returns a triple consisting of the current root,
+   * a list of execution configuration groups and a list of execution configurations under the
+   * current root.
+   * 
+   * @param root
+   *          The node where the iterator should start, this can either be the project itself or an
+   *          execution configuration group.
+   * @return Iterable
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Iterable<WalkResult<ExecutionConfigurationOwner, ExecutionConfigurationGroup, ExecutionConfiguration>> walkExecutionConfigurations(ExecutionConfigurationOwner root)
+      throws RemoteException;
+
+  /**
+   * Traverses the scenario tree and returns a triple consisting of the current root, a list of
+   * scenario groups and a list of scenarios under the current root.
+   * 
+   * @param root
+   *          The scenario group where the iterator should start.
+   * @return Iterable
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Iterable<WalkResult<ScenarioGroup, ScenarioGroup, Scenario>> walkScenarios(ScenarioGroup root)
+      throws RemoteException;
+
+  /**
+   * Traverses the testlet tree and returns a triple consisting of the current root, a list of
+   * testlets under the current root and as the third component an empty list.
+   * 
+   * @param root
+   *          The testlet where the iterator should start. Note, you can use
+   *          {@link Project#getTopLevelTestlet()} to start traversing from the top of the testlet
+   *          tree.
+   * @return Iterable
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public Iterable<WalkResult<Testlet, Testlet, Testlet>> walkTestlets(Testlet root)
+      throws RemoteException;
+
+  /**
+   * Gets the {@link ExecutionStatus} of all test cases defined in the given
+   * {@link ExecutionConfiguration}.
+   * 
+   * @param config
+   *          The {@link ExecutionConfiguration} for which execution status should be verified.
+   * @return The state of execution for all test cases defined in the
+   *         <code>ExecutionConfiguration</code> or <code>null</code> if there is no active
+   *         execution.
+   *
+   * @throws ApiException
+   *           If there is no builder matching this configuration.
+   * @throws RemoteException
+   *           If <code>config</code> is not part of the TPT instance represented by this object.
+   */
+  public ExecutionStatus getExecutionStatus(ExecutionConfiguration config)
+      throws ApiException, RemoteException;
 
 }

@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import hudson.EnvVars;
@@ -55,6 +56,8 @@ class RetryableJob {
   private TptLogger logger;
 
   private InterruptedException interruptedException = null;
+
+  private Run lastRun = null;
 
   /**
    * @param tries
@@ -113,6 +116,7 @@ class RetryableJob {
 
             for (Future<Run> future : futures) {
               Run run = future.get();
+              lastRun = run;
               // retry if cancled or failed
               Result result = run.getResult();
               if (result != null) {
@@ -166,6 +170,18 @@ class RetryableJob {
    */
   void cancel() {
     runner.interrupt();
+  }
+
+  /**
+   * Get the result of the last execution. Returns <code>null</code> if no execution has finished
+   * yet.
+   * 
+   * @return The result of the last execution
+   */
+  @CheckForNull
+  Result getResult() {
+    Run runToGetResultFrom = lastRun;
+    return runToGetResultFrom == null ? null : runToGetResultFrom.getResult();
   }
 
   /**

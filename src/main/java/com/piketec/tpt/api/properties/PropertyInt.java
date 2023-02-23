@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,6 +21,7 @@
 package com.piketec.tpt.api.properties;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * A integer property value.
@@ -59,10 +60,7 @@ public class PropertyInt implements Property, Serializable {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + value;
-    return result;
+    return Objects.hash(value);
   }
 
   @Override

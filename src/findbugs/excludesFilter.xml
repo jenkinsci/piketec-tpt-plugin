@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<FindBugsFilter>
-  <Package name="~com.piketec.tpt.api.*"/>
-</FindBugsFilter>

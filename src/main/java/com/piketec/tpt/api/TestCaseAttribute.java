@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,28 +31,54 @@ public interface TestCaseAttribute extends IdentifiableRemote {
 
   /**
    * Type String for String Test Case Attribute
+   * 
+   * @deprecated Will be removed in TPT-21.
+   * 
    */
+  @Deprecated
   public static final String STRING_TYPE = "String";
 
   /**
-   * Type String for URI Test Case Attribute
-   * 
-   * @deprecated since TPT13 all attributes are strings. Will be removed in TPT-18.
+   * Different types of test case attributes.
    */
-  @Deprecated
-  public static final String URI_TYPE = "URI";
+  public enum TestCaseAttributeType {
+    /**
+     * (Free) text type.
+     */
+    TEXT,
+    /**
+     * Checkbox type (<code>Yes</code>/<code>No</code>).
+     */
+    CHECKBOX,
+    /**
+     * Enumeration type with single-select option.
+     */
+    ENUM_ONE,
+    /**
+     * Enumeration type with multi-select option.
+     */
+    ENUM_MANY,
+    /**
+     * File type.
+     */
+    FILE
+  }
 
   /**
-   * Returns the type of this attribute; currently it is always {@link #STRING_TYPE}.
+   * Returns the type of this attribute.
    * 
-   * @return The type as a <code>String</code> (which contains the text '<code>String</code>').
+   * @return The type as a <code>String</code>.
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated will be removed in TPT-21. Use {@link #getAttributeType()} instead.
    */
+  @Deprecated
   String getType() throws RemoteException;
 
   /**
+   * Get the name of this <code>TestCaseAttribute</code>
+   * 
    * @return Returns the name of this <code>TestCaseAttribute</code>
    * 
    * @throws RemoteException
@@ -66,7 +92,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * @param newName
    *          The new name.
    * @throws ApiException
-   *           If <code>newName==null</code> or <code>newName</code> does already exist.
+   *           If <code>newName</code> is <code>null</code> or does already exist.
    * @throws RemoteException
    *           remote communication problem
    */
@@ -96,5 +122,54 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    *           remote communication problem
    */
   void setCopyable(boolean on) throws RemoteException;
+
+  /**
+   * Returns the type of this attribute; it can be either <code>TEXT</code>, <code>CHECKBOX</code>,
+   * <code>ENUM_ONE</code>, <code>ENUM_MANY</code> or <code>FILE</code>.
+   * 
+   * @return The type of the <code>TestCaseAttribute</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  TestCaseAttributeType getAttributeType() throws RemoteException;
+
+  /**
+   * Sets the type of this attribute.
+   * 
+   * @param type
+   *          <code>TestCaseAttributeType.TEXT</code>, <code>TestCaseAttributeType.CHECKBOX</code>,
+   *          <code>TestCaseAttributeType.ENUM_ONE</code>,
+   *          <code>TestCaseAttributeType.ENUM_MANY</code> or
+   *          <code>TestCaseAttributeType.FILE</code>.
+   * @throws ApiException
+   *           If given <code>type</code> is <code>null</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setAttributeType(TestCaseAttributeType type) throws ApiException, RemoteException;
+
+  /**
+   * Creates an option for this test case attribute. Note that the options are only relevant for
+   * test case attriutes of type <code>ENUM_ONE</code> or <code>ENUM_MANY</code>.
+   * 
+   * @param optionName
+   *          The name of the option to be created
+   * @return The created option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  TestCaseAttributeOption createOption(String optionName) throws RemoteException;
+
+  /**
+   * Get the available options for this test case attribute. Note that the options are only relevant
+   * for test case attriutes of type <code>ENUM_ONE</code> or <code>ENUM_MANY</code>.
+   * 
+   * @return List of options for this test case attribute.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteIndexedList<String, TestCaseAttributeOption> getOptions() throws RemoteException;
 
 }

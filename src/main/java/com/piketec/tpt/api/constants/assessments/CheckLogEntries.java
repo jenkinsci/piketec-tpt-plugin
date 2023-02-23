@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,6 +27,30 @@ public interface CheckLogEntries extends BasicAssessment {
 
   public static final String PATTERN = "pattern";
 
-  public static final String FAIL_ON_MATCH = "fail-on-match";
+  /**
+   * Attribute key to set whether the "Assesslet is ..."
+   * <ul>
+   * <li><code>PASSED if pattern matches</code></li>
+   * <li><code>FAILED if pattern matches</code></li>
+   * <li><code>FAILED if pattern does not match</code></li>
+   * </ul>
+   */
+  public static final String CHECK_TYPE = "check-type";
+
+  /**
+   * Attribute value <code>FAILED if pattern matches</code> for the attribute {@link #CHECK_TYPE}.
+   */
+  public static final String FAILED_IF_MATCH = "failed_if_match";
+
+  /**
+   * Attribute value <code>FAILED if pattern does not match</code> for the attribute
+   * {@link #CHECK_TYPE}.
+   */
+  public static final String FAILED_IF_NOMATCH = "failed_if_nomatch";
+
+  /**
+   * Attribute value <code>PASSED if pattern matches</code> for the attribute {@link #CHECK_TYPE}.
+   */
+  public static final String SUCCESS_IF_MATCH = "success_if_match";
 
 }

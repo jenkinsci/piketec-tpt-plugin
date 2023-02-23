@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,12 +25,13 @@ import java.rmi.RemoteException;
 import com.piketec.tpt.api.ApiException;
 import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.NamedObject;
+import com.piketec.tpt.api.util.UUIDObject;
 
 /**
  * <code>TransitionSpecOrGroup</code> represents a tree structure. Nodes are
  * {@link TransitionSpecGroup}, leaves are {@link TransitionSpec}.
  */
-public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject {
+public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject, UUIDObject {
 
   /**
    * Returns a {@link TransitionSpecGroup} if the object is a child object or <code>null</code> if
@@ -42,6 +43,17 @@ public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject {
    *           remote communication problem
    */
   public TransitionSpecGroup getGroup() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this is a {@link TransitionSpecGroup}, <code>false</code>
+   * otherwise.
+   * 
+   * @return <code>true</code> if this is a {@link TransitionSpecGroup}, <code>false</code>
+   *         otherwise.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isGroup() throws RemoteException;
 
   /**
    * Returns the {@link Transition} object which directly or indirectly contains this

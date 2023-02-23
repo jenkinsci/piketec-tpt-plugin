@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2021 PikeTec GmbH
+ * Copyright (c) 2014-2022 PikeTec GmbH
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,10 +22,12 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.constants.assessments.RequirementsCoverage;
+
 /**
  * General configuration of the report created after a test run.
  * 
- * @author Copyright (c) 2014-2021 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
  */
 public interface AdvancedReportSettings extends IdentifiableRemote {
 
@@ -48,45 +50,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
      */
     ALWAYS;
 
-    /**
-     * @deprecated Will be removed in TPT 18. this attribute exists for backwards compatibility
-     *             reasons only. It has the same semantics as
-     *             {@link #PASSED_OR_FAILED_OR_EXECERROR_ONLY}. Please use
-     *             {@link #PASSED_OR_FAILED_OR_EXECERROR_ONLY} instead.
-     */
-    @Deprecated
-    public static final ShowAssessmentVariables PASSED_OR_FAILED_ONLY =
-        PASSED_OR_FAILED_OR_EXECERROR_ONLY;
-
   }
-
-  /**
-   * @deprecated Will be removed in TPT 18.
-   */
-  @Deprecated
-  public static final ShowAssessmentVariables SHOW_ASSESSMENT_VARIABLES_DEFAULT =
-      ShowAssessmentVariables.PASSED_OR_FAILED_OR_EXECERROR_ONLY;
-
-  /**
-   * Adds an additional attribute for the requirements result tables.
-   * 
-   * @param attr
-   *          the name of requirements attribute (column) to add to the report
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void addAdditionalRequirementAttr(String attr) throws RemoteException;
-
-  /**
-   * Gets all additional attributes for the requirements result tables.
-   * 
-   * @return get attribute additionalRequirementAttrs
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public RemoteList<String> getAdditionalRequirementAttrs() throws RemoteException;
 
   /**
    * Adds an attribute of the testcase to the testcase summary table.
@@ -179,29 +143,6 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
   public boolean isOverviewBuildAutomatically() throws RemoteException;
 
   /**
-   * Check only {@link Requirement Requirements} linked to the executed test case or variant: The
-   * overall result of a requirement is derived from all partial results accumulated during the test
-   * execution. Optionally you can restrict them to consider only results achieved while running
-   * linked test cases or variants by setting this boolean to <code>true</code>.
-   * 
-   * @return get attribute considerOnlyLinkedRequirements
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isOnlyLinkedRequirements() throws RemoteException;
-
-  /**
-   * Determines if a requirements overview section is generated.
-   * 
-   * @return get attribute createRequirementsOverview
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isCreateRequirementsOverviewSection() throws RemoteException;
-
-  /**
    * Determines if the report directory is deleted after writing the compressed report file. If and
    * only if the compressed report file isn't somewhere within the report directory.
    * 
@@ -211,30 +152,6 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    *           remote communication problem
    */
   public boolean isDeleteReportDirAfterCompression() throws RemoteException;
-
-  /**
-   * If this flag is set and a requirement was not checked in any assesslet
-   * (REQUIREMENTS.checked()), its result is set to the test case result.
-   * 
-   * @return get attribute deriveRequirementResultsFromTCIfNotChecked
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isDeriveRequirementResultsFromTCIfNotCheckedInAnyAssesslets()
-      throws RemoteException;
-
-  /**
-   * Determines if a requirements assesslet results table section is written in the requirements
-   * overview section, which shows which {@link Requirement} has been checked by what
-   * {@link Assessment Assesslets} and with what result.
-   * 
-   * @return get attribute generateRequirementsAssessletResultsTable
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isGenerateRequirementsAssessletResultsTable() throws RemoteException;
 
   /**
    * Determines if a variable summary section is generated.
@@ -342,7 +259,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
 
   /**
    * Determines if a directory column is generated for the Test Case Summary table in the Platform
-   * Overview section.
+   * Overview section. The directory column will be generated only if PDF Report is selected.
    * 
    * @return get attribute platformOverviewDirectory
    * 
@@ -352,50 +269,15 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
   public boolean isShowPlatformOverviewDirectory() throws RemoteException;
 
   /**
-   * When importing requirements, there might be requirements tagged as heading (for more detail see
-   * requirements import configure import types). They can not be linked to any test cases and are
-   * there for structural reasons. If set to <code>false</code>, they are not shown in the report
-   * (which might make it a bit smaller).
+   * Determines if a column with IDs of the linked requirements is generated for the Test Case
+   * Summary table in the Platform Overview section.
    * 
-   * @return get attribute showRequirementHeadings
+   * @return get attribute platformOverviewLinkedRequirements
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  public boolean isShowRequirementHeadings() throws RemoteException;
-
-  /**
-   * When importing requirements, there might be requirements tagged as information (for more detail
-   * see requirements Import Configure import types). They can not be linked to any test cases and
-   * are there for structural reasons. If set to false, they are not shown in the report (which
-   * might make it a bit smaller).
-   * 
-   * @return get attribute showInformation
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isShowRequirementInformation() throws RemoteException;
-
-  /**
-   * Determines if comments in the requirements results table are displayed.
-   * 
-   * @return get attribute showRequirementComments
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isShowRequirementComments() throws RemoteException;
-
-  /**
-   * Determines if document versions in the requirements results table are displayed.
-   * 
-   * @return get attribute showDocumentVersions
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public boolean isShowDocumentVersions() throws RemoteException;
+  public boolean isShowPlatformOverviewLinkedRequirements() throws RemoteException;
 
   /**
    * Get attribute checkAndShowTestCaseStatusInformation. If this is set to true, an overview table
@@ -450,30 +332,6 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
       throws RemoteException;
 
   /**
-   * Set if only linked {@link Requirement Requirements} are printed into the report.
-   * 
-   * @param considerOnlyLinkedRequirements
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setOnlyLinkedRequirements(boolean considerOnlyLinkedRequirements)
-      throws RemoteException;
-
-  /**
-   * Set if an requirement overview section is created.
-   * 
-   * @param createRequirementsOverview
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setCreateRequirementsOverviewSection(boolean createRequirementsOverview)
-      throws RemoteException;
-
-  /**
    * Set if the report-directory is deleted after generating the compressed report file. If and only
    * if the compressed report file isn't somewhere within the report directory.
    * 
@@ -484,19 +342,6 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    *           remote communication problem
    */
   public void setDeleteReportDirAfterCompression(boolean deleteReportDirAfterCompression)
-      throws RemoteException;
-
-  /**
-   * If this flag is set and a requirement was not checked in any assesslet
-   * (REQUIREMENTS.checked()), its result is set to the test case result.
-   * 
-   * @param deriveRequirementResultsFromTCIfNotChecked
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setDeriveRequirementResultsFromTCIfNotCheckedInAnyAssesslets(boolean deriveRequirementResultsFromTCIfNotChecked)
       throws RemoteException;
 
   /**
@@ -520,20 +365,6 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    *           remote communication problem
    */
   public void setOverviewText(String overviewText) throws RemoteException;
-
-  /**
-   * Changes if a requirements assesslet results table section is generated, which shows which
-   * {@link Requirement Requirements} have been checked by what {@link Assessment Assesslets} and
-   * with what result.
-   * 
-   * @param generateRequirementsAssessletResultsTable
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setGenerateRequirementsAssessletResultsTable(boolean generateRequirementsAssessletResultsTable)
-      throws RemoteException;
 
   /**
    * Changes if a Variables Summary section is generated.
@@ -661,7 +492,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
 
   /**
    * Changes if a directory column is generated for the Test Case Summary table in the Platform
-   * Overview section.
+   * Overview section. The directory column will be generated only if PDF Report is selected.
    * 
    * @param platformOverviewDirectory
    *          the new attribute value
@@ -670,6 +501,19 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    *           remote communication problem
    */
   public void setShowPlatformOverviewDirectory(boolean platformOverviewDirectory)
+      throws RemoteException;
+
+  /**
+   * Changes if a column with IDs of the linked requirements is generated for the Test Case Summary
+   * table in the Platform Overview section.
+   * 
+   * @param platformOverviewLinkedRequirements
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setShowPlatformOverviewLinkedRequirements(boolean platformOverviewLinkedRequirements)
       throws RemoteException;
 
   /**
@@ -700,56 +544,6 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
       throws RemoteException;
 
   /**
-   * When importing requirements, there might be requirements tagged as heading (for more detail see
-   * requirements import configure import types). They can not be linked to any test cases and are
-   * there for structural reasons. If set to false, they are not shown in the report (which might
-   * make it a bit smaller).
-   * 
-   * @param showHeadings
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setShowRequirementHeadings(boolean showHeadings) throws RemoteException;
-
-  /**
-   * When importing requirements, there might be requirements tagged as information (for more detail
-   * see requirements import configure import types). They can not be linked to any test cases and
-   * are there for structural reasons. If set to false, they are not shown in the report (which
-   * might make it a bit smaller).
-   * 
-   * @param showInformation
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setShowRequirementInformation(boolean showInformation) throws RemoteException;
-
-  /**
-   * Changes if comments are shown in the requirements results table.
-   * 
-   * @param showRequirementComments
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setShowRequirementComments(boolean showRequirementComments) throws RemoteException;
-
-  /**
-   * Changes if document versions are shown in the requirements results table.
-   * 
-   * @param showDocumentVersions
-   *          the new attribute value
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setShowDocumentVersions(boolean showDocumentVersions) throws RemoteException;
-
-  /**
    * If this is set to true, an overview table is added to the report, showing all test cases with
    * their status (e.g. stable, in progress, new, ...)
    * 
@@ -774,5 +568,288 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    */
   public void setCheckAndShowAssessmentStatusInformation(boolean checkAndShowAssessmentStatusInformation)
       throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#ADDITIONAL_ATTRIBUTES_IN_REQUIREMENTS_REPORT_TABLE}.
+   * 
+   * @param attr
+   *          without meaning
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void addAdditionalRequirementAttr(String attr) throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#ADDITIONAL_ATTRIBUTES_IN_REQUIREMENTS_REPORT_TABLE}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public RemoteList<String> getAdditionalRequirementAttrs() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#CHECK_ONLY_LINKED}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isOnlyLinkedRequirements() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#GENERATE_REQUIREMENTS_REPORT}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isCreateRequirementsOverviewSection() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#DERIVE_RESULT_FROM_TEST_CASE_IF_NOT_CHECKED}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isDeriveRequirementResultsFromTCIfNotCheckedInAnyAssesslets()
+      throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#GENERATE_ASSESSLET_RESULTS_TABLE}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isGenerateRequirementsAssessletResultsTable() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_HEADING_ROWS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isShowRequirementHeadings() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_INFORMATION_ROWS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isShowRequirementInformation() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_COMMENTS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isShowRequirementComments() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @return throws a RuntimeException
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_DOCUMENT_VERSIONS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public boolean isShowDocumentVersions() throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param considerOnlyLinkedRequirements
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#CHECK_ONLY_LINKED}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setOnlyLinkedRequirements(boolean considerOnlyLinkedRequirements)
+      throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param createRequirementsOverview
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#GENERATE_REQUIREMENTS_REPORT}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setCreateRequirementsOverviewSection(boolean createRequirementsOverview)
+      throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param deriveRequirementResultsFromTCIfNotChecked
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#DERIVE_RESULT_FROM_TEST_CASE_IF_NOT_CHECKED}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setDeriveRequirementResultsFromTCIfNotCheckedInAnyAssesslets(boolean deriveRequirementResultsFromTCIfNotChecked)
+      throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param generateRequirementsAssessletResultsTable
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#GENERATE_ASSESSLET_RESULTS_TABLE}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setGenerateRequirementsAssessletResultsTable(boolean generateRequirementsAssessletResultsTable)
+      throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param showHeadings
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_HEADING_ROWS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setShowRequirementHeadings(boolean showHeadings) throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param showInformation
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_INFORMATION_ROWS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setShowRequirementInformation(boolean showInformation) throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param showRequirementComments
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_COMMENTS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setShowRequirementComments(boolean showRequirementComments) throws RemoteException;
+
+  /**
+   * Does nothing except throw a RuntimeException.
+   * 
+   * @param showDocumentVersions
+   *          without meaning
+   * 
+   * @deprecated Will be removed in TPT-20. Replaced by
+   *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
+   *             {@link RequirementsCoverage#SHOW_DOCUMENT_VERSIONS}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Deprecated
+  public void setShowDocumentVersions(boolean showDocumentVersions) throws RemoteException;
 
 }
