@@ -237,10 +237,11 @@ public abstract class TptApiCallable<S> implements Callable<S, InterruptedExcept
     try {
       Collection<Project> openProjects = api.getOpenProjects();
       for (Project project : openProjects) {
-        if (!project.getFile().equals(file)) {
+        File tptFile = project.getFile();
+        if (tptFile == null || !tptFile.equals(file)) {
           continue;
         }
-        logger.info("Close project " + project.getFile().getName());
+        logger.info("Close project " + tptFile.getName());
         project.closeProject();
         return true;
       }
