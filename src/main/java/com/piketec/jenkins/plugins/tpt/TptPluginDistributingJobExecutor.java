@@ -43,7 +43,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 
-class TptPluginMasterJobExecutor {
+class TptPluginDistributingJobExecutor {
 
   private TptLogger logger;
 
@@ -65,13 +65,13 @@ class TptPluginMasterJobExecutor {
 
   private String tptBindingName;
 
-  private String slaveJobName;
+  private String workerJobName;
 
   private long tptStartupWaitTime;
 
-  private int slaveJobCount;
+  private int workerJobCount;
 
-  private int slaveJobTries;
+  private int workerJobTries;
 
   private String jUnitXmlPath;
 
@@ -81,7 +81,7 @@ class TptPluginMasterJobExecutor {
 
   /**
    * @param build
-   *          to get the workspace, for the cleanuptask and for triggering a build for a slave
+   *          to get the workspace, for the cleanuptask and for triggering a build for a worker job
    * @param launcher
    *          to execute a process
    * @param listener
@@ -94,13 +94,13 @@ class TptPluginMasterJobExecutor {
    *          the port for binding to the TptApi
    * @param tptBindingName
    *          the binding name used to connect to the TptApi (for the registry)
-   * @param slaveJobName
-   *          the name of the slave job, used for putting the workload to the right slave
+   * @param workerJobName
+   *          the name of the worker job, used for putting the workload to the right worker job
    * @param tptStartupWaitTime
    *          the time it should wait before start tpt
-   * @param slaveJobCount
-   *          the number of slaveJobs that will be executed
-   * @param slaveJobTries
+   * @param workerJobCount
+   *          the number of workerJobs that will be executed
+   * @param workerJobTries
    *          used for the retryablejob
    * @param jUnitXmlPath
    *          the path where the jUnit XML is going to be created
@@ -108,12 +108,13 @@ class TptPluginMasterJobExecutor {
    * @param enableJunit
    *          to know if is necessary to generate the jUnit XML
    */
-  TptPluginMasterJobExecutor(Run< ? , ? > build, FilePath workspace, Launcher launcher,
-                             TaskListener listener, FilePath[] exePaths, String arguments,
-                             List<JenkinsConfiguration> executionConfigs, int tptPort,
-                             String tptBindingName, String slaveJobName, long tptStartupWaitTime,
-                             int slaveJobCount, int slaveJobTries, String jUnitXmlPath,
-                             LogLevel jUnitLogLevel, boolean enableJunit) {
+  TptPluginDistributingJobExecutor(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+                                   TaskListener listener, FilePath[] exePaths, String arguments,
+                                   List<JenkinsConfiguration> executionConfigs, int tptPort,
+                                   String tptBindingName, String workerJobName,
+                                   long tptStartupWaitTime, int workertJobCount, int workerJobTries,
+                                   String jUnitXmlPath, LogLevel jUnitLogLevel,
+                                   boolean enableJunit) {
     this.logger = new TptLogger(listener.getLogger());
     this.launcher = launcher;
     this.build = build;
@@ -124,10 +125,10 @@ class TptPluginMasterJobExecutor {
     this.executionConfigs = executionConfigs;
     this.tptPort = tptPort;
     this.tptBindingName = tptBindingName;
-    this.slaveJobName = slaveJobName;
+    this.workerJobName = workerJobName;
     this.tptStartupWaitTime = tptStartupWaitTime;
-    this.slaveJobCount = slaveJobCount;
-    this.slaveJobTries = slaveJobTries;
+    this.workerJobCount = workertJobCount;
+    this.workerJobTries = workerJobTries;
     this.jUnitLogLevel = jUnitLogLevel;
     this.jUnitXmlPath = jUnitXmlPath;
     this.enableJunit = enableJunit;
@@ -137,12 +138,12 @@ class TptPluginMasterJobExecutor {
    * It binds to the Tpt Api , check if the given Execution Configuration exists. Prepares the test-
    * and data-directories. Then it split all the test cases (the currently set test set or the
    * explicitly given test set) in smaller chunks of tests cases, then creates the workloads for the
-   * slaves. After that by calling the retryable job , it schedules the builds for the slaves. Then
-   * it joins all the threads from the slaves, collect the results and regenerate a new Overview
-   * report with the data from the slaves. It publishes the Junit XML if configured and resets the
-   * temporary settings to the original values.
+   * worker jobs. After that by calling the retryable job , it schedules the builds of the worker
+   * jobs. Then it joins all the threads from the worker jobs, collect the results and regenerate a
+   * new Overview report with the data from the worker jobs. It publishes the Junit XML if
+   * configured and resets the temporary settings to the original values.
    * 
-   * @return true if the execution from slaves and master were successful.
+   * @return true if the execution from worker jobs and distributing job were successful.
    * @throws InterruptedException
    */
   boolean execute() throws InterruptedException {
@@ -160,7 +161,7 @@ class TptPluginMasterJobExecutor {
         success &= executeOneConfig(ec, tptApiAccess);
       }
     } finally {
-      logger.info("Close open TPT project on master and slaves.");
+      logger.info("Close open TPT project of distributing job and worker jobs.");
       if (!CleanUpTask.cleanUp(build, logger)) {
         logger.error("Could not close all open TPT files. "
             + "There is no guarantee next run will be be done with correct file version.");
@@ -185,7 +186,7 @@ class TptPluginMasterJobExecutor {
 
   /**
    * This method collects all testcases that are supposed to be executed via the TPT API, divides
-   * them into different workloads and calls the slave Agents to execute these. Then it collects
+   * them into different workloads and calls the worker jobs to execute these. Then it collects
    * their results.
    */
   private boolean executeOneConfig(JenkinsConfiguration unresolvedConfig, TptApiAccess tptApiAccess)
@@ -207,7 +208,6 @@ class TptPluginMasterJobExecutor {
       }
     }
     // Get necessery paths the user added in the job configuration:
-    // These paths are resolved to work on the master.
     GetTestCasesCallableResult testCases = null;
     if (workspace == null) {
       logger.error("No workspace available");
@@ -224,7 +224,7 @@ class TptPluginMasterJobExecutor {
       reportPath.mkdirs();
       reportPath.deleteContents();
     } catch (IOException e) {
-      logger.error("Could not create or clear directories on master: " + e.getMessage());
+      logger.error("Could not create or clear directories: " + e.getMessage());
       return false;
     }
     // Register cleanup task that is called in the end to close remote TPT Project
@@ -238,49 +238,49 @@ class TptPluginMasterJobExecutor {
       logger.error("Unable to get test cases via TPT API.");
       return false;
     }
-    // Divide testcases into Workloads for the slave jobs to execute
+    // Divide testcases into Workloads for the worker jobs to execute
     ArrayList<RetryableJob> retryableJobs = new ArrayList<>();
-    // create test sets for slave jobs
-    int slaveJobSize;
+    // create test sets for worker jobs
+    int workerJobSize;
     int remainer;
-    if (slaveJobCount >= 1) {
-      slaveJobSize = testCases.testCases.size() / slaveJobCount;
-      remainer = testCases.testCases.size() % slaveJobCount;
+    if (workerJobCount >= 1) {
+      workerJobSize = testCases.testCases.size() / workerJobCount;
+      remainer = testCases.testCases.size() % workerJobCount;
     } else {
-      slaveJobSize = 1;
+      workerJobSize = 1;
       remainer = 0;
     }
     ArrayList<List<String>> subTestSets =
-        getSubTestSets(testCases.testCases, slaveJobSize, remainer);
+        getSubTestSets(testCases.testCases, workerJobSize, remainer);
     // start one job for every test set
-    Job slaveJob = null;
+    Job workerJob = null;
     Jenkins jenkinsInstance = Jenkins.getInstanceOrNull();
     if (jenkinsInstance == null) {
       logger.error("No jenkins instance found");
       return false;
     }
     for (Job j : jenkinsInstance.getAllItems(Job.class)) {
-      if (j.getName().equals(slaveJobName)) {
-        slaveJob = j;
+      if (j.getName().equals(workerJobName)) {
+        workerJob = j;
       }
     }
-    if (slaveJob == null) {
-      logger.error("Slave Job \"" + slaveJobName + "\" not found");
+    if (workerJob == null) {
+      logger.error("Worker job \"" + workerJobName + "\" not found");
       return false;
 
     }
     for (List<String> subTestSet : subTestSets) {
       logger.info("Create job for \"" + subTestSet + "\"");
 
-      // creates the workloads for the slaves, with the smaller chunks of testsets
+      // creates the workloads for the worker jobs, with the smaller chunks of testsets
       WorkLoad workloadToAdd =
           new WorkLoad(unresolvedConfig, subTestSet, workspace, build, testDataPath, reportPath);
       // it adds the workloads to an static HashMap.
-      WorkLoad.putWorkLoad(slaveJobName, workloadToAdd);
+      WorkLoad.putWorkLoad(workerJobName, workloadToAdd);
       // Creates a retryable job , there are the builds scheduled. So the logic is : We put a
-      // workload in a static HashMap and then we trigger a build for a slave. In that way we are
-      // distributing the builds on the slaves.
-      RetryableJob retryableJob = new RetryableJob(slaveJobTries, logger, slaveJob);
+      // workload in a static HashMap and then we trigger a build for a worker job. In that way we
+      // are distributing the builds on the worker jobs.
+      RetryableJob retryableJob = new RetryableJob(workerJobTries, logger, workerJob);
       retryableJob.perform(build, listener);
       retryableJobs.add(retryableJob);
     }
@@ -294,7 +294,7 @@ class TptPluginMasterJobExecutor {
           logger.error("Child job failed.");
         }
       } catch (InterruptedException e) {
-        logger.info("Stopping slave jobs.");
+        logger.info("Stopping worker jobs.");
         logger.interrupt(e.getMessage());
         for (RetryableJob retryableJobToCancle : retryableJobs) {
           retryableJobToCancle.cancel();
@@ -357,14 +357,14 @@ class TptPluginMasterJobExecutor {
     return Utils.checkIdAndAddInvisibleActionTPTExecution(resolvedConfig, build, logger) & success;
   }
 
-  private ArrayList<List<String>> getSubTestSets(Collection<String> testCases, int slaveJobSize,
+  private ArrayList<List<String>> getSubTestSets(Collection<String> testCases, int workerJobSize,
                                                  int remainer) {
     ArrayList<List<String>> testSets = new ArrayList<>();
     ArrayList<String> currentTestSet = new ArrayList<>();
     Iterator<String> iterator = testCases.iterator();
     while (iterator.hasNext()) {
       currentTestSet.add(iterator.next());
-      if (currentTestSet.size() == slaveJobSize) {
+      if (currentTestSet.size() == workerJobSize) {
         if (remainer > 0) {
           assert iterator.hasNext();
           // distribute remainer evenly

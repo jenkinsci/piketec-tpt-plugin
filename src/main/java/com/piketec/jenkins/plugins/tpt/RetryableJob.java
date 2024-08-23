@@ -47,7 +47,7 @@ import jenkins.model.ParameterizedJobMixIn;
 
 class RetryableJob {
 
-  private Job slaveJob;
+  private Job workerJob;
 
   private int tries;
 
@@ -63,20 +63,22 @@ class RetryableJob {
    * @param tries
    *          , how many tries should be done pro build
    * @param logger
-   * @param slaveJob
+   *          for prinitng messages
+   * @param workerJob
+   *          the job that might be retried
    */
-  RetryableJob(int tries, TptLogger logger, Job slaveJob) {
+  RetryableJob(int tries, TptLogger logger, Job workerJob) {
     if (tries < 1) {
       tries = 1;
     }
     this.tries = tries;
     this.logger = logger;
-    this.slaveJob = slaveJob;
+    this.workerJob = workerJob;
 
   }
 
   /**
-   * Schedules the builds triggered by the masterJob by calling schedule()
+   * Schedules the builds triggered by the distributingJobRun by calling schedule()
    * 
    * @see schedule
    * 
@@ -107,8 +109,8 @@ class RetryableJob {
                 UUID.randomUUID().toString()));
             parameterActions.add(new ParametersAction(parameterValues));
 
-            final Future<Run> scheduled = schedule(build, slaveJob,
-                ((ParameterizedJobMixIn.ParameterizedJob)slaveJob).getQuietPeriod(),
+            final Future<Run> scheduled = schedule(build, workerJob,
+                ((ParameterizedJobMixIn.ParameterizedJob)workerJob).getQuietPeriod(),
                 parameterActions);
             if (scheduled != null) {
               futures.add(scheduled);
@@ -126,7 +128,7 @@ class RetryableJob {
                 success = true;
               }
               if (future.isCancelled()) {
-                logger.error("Execution of test slave was canceled.");
+                logger.error("Execution of test worker job was canceled.");
                 tries = 0;
               }
             }

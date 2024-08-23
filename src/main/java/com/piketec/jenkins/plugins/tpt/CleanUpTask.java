@@ -52,17 +52,18 @@ public class CleanUpTask {
    * Creates and enqueues an clean up taks that will be executed when calling
    * {@link #cleanUp(Run, TptLogger)}
    * 
-   * @param masterId
+   * @param distributingJobRun
    *          abstract build as id
    * @param cleanUpCallable
    *          the callable to execute for clean up
    * @param launcher
    *          the launcher
    */
-  public CleanUpTask(Run< ? , ? > masterId, CleanUpCallable cleanUpCallable, Launcher launcher) {
+  public CleanUpTask(Run< ? , ? > distributingJobRun, CleanUpCallable cleanUpCallable,
+                     Launcher launcher) {
     this.cleanUpCallable = cleanUpCallable;
     this.launcher = launcher;
-    register(this, masterId);
+    register(this, distributingJobRun);
   }
 
   /**
@@ -103,14 +104,14 @@ public class CleanUpTask {
    * 
    * @param task
    *          which is going to be added
-   * @param masterId
+   * @param distributingJobRun
    *          to identify to which registry the task is going to be added
    */
-  private static synchronized void register(CleanUpTask task, Run< ? , ? > masterId) {
-    List<CleanUpTask> list = registry.get(masterId);
+  private static synchronized void register(CleanUpTask task, Run< ? , ? > distributingJobRun) {
+    List<CleanUpTask> list = registry.get(distributingJobRun);
     if (list == null) {
       list = new ArrayList<>();
-      registry.put(masterId, list);
+      registry.put(distributingJobRun, list);
     }
     list.add(task);
   }
@@ -118,7 +119,7 @@ public class CleanUpTask {
   /**
    * removes and executes a list of CleanUpTask from the registry
    * 
-   * @param masterId
+   * @param distributingJobRun
    *          to identify to which registry the task is going to be removed
    * @param logger
    *          for dumping error messages
@@ -126,9 +127,9 @@ public class CleanUpTask {
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public static synchronized boolean cleanUp(Run< ? , ? > masterId, TptLogger logger)
+  public static synchronized boolean cleanUp(Run< ? , ? > distributingJobRun, TptLogger logger)
       throws InterruptedException {
-    List<CleanUpTask> tasks = registry.remove(masterId);
+    List<CleanUpTask> tasks = registry.remove(distributingJobRun);
     if (tasks == null) {
       // nothing to clean up
       return true;

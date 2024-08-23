@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.annotation.CheckForNull;
 
-import com.piketec.jenkins.plugins.tpt.api.callables.ExecuteTestsSlaveCallable;
+import com.piketec.jenkins.plugins.tpt.api.callables.ExecuteTestsWorkerJobCallable;
 import com.piketec.jenkins.plugins.tpt.api.callables.GetTestCasesCallable;
 import com.piketec.jenkins.plugins.tpt.api.callables.GetTestCasesCallableResult;
 import com.piketec.jenkins.plugins.tpt.api.callables.RunOverviewReportCallable;
@@ -146,9 +146,9 @@ public class TptApiAccess {
    *          - execution configuration that should be executed
    * @param testSetName
    *          - test set that should be executed
-   * @param slaveReportPath
+   * @param workerJobReportPath
    *          - path to where the report shall be put
-   * @param slaveDataPath
+   * @param workerJobDataPath
    *          - path to where the test data shall be put
    * @param testSetList
    *          The list of test cases to execute
@@ -156,13 +156,14 @@ public class TptApiAccess {
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public Boolean executeTestsSlave(FilePath tptFilePath, String executionConfigName,
-                                   String testSetName, FilePath slaveReportPath,
-                                   FilePath slaveDataPath, List<String> testSetList)
+  public Boolean executeTestsOnWorker(FilePath tptFilePath, String executionConfigName,
+                                     String testSetName, FilePath workerJobReportPath,
+                                     FilePath workerJobDataPath, List<String> testSetList)
       throws InterruptedException {
-    ExecuteTestsSlaveCallable callable = new ExecuteTestsSlaveCallable(launcher.getListener(),
-        tptPort, tptBindingName, exePaths, arguments, startUpWaitTime, tptFilePath, slaveReportPath,
-        slaveDataPath, executionConfigName, testSetList, testSetName);
+    ExecuteTestsWorkerJobCallable callable =
+        new ExecuteTestsWorkerJobCallable(launcher.getListener(), tptPort, tptBindingName, exePaths,
+            arguments, startUpWaitTime, tptFilePath, workerJobReportPath, workerJobDataPath,
+            executionConfigName, testSetList, testSetName);
     Boolean worked = false;
     try {
       VirtualChannel channel = launcher.getChannel();

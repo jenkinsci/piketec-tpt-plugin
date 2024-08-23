@@ -20,11 +20,11 @@ Integration* of TPT manual.
 The plugin provides two build steps:
 
 1.  *Execute TPT test cases:* The TPT test cases are executed and the
-    test results are converted into JUnit-XML files. If Jenkins is
-    operating as master in master-slave-mode, it will delegate the work
-    to slave jobs.
-2.  *Execute TPT tests slave:* Execute the work delegated to it by
-    *Execute TPT test cases* in master slave mode.
+    test results are converted into JUnit-XML files. If the build step is
+    operating in distributing mode, it will delegate the work
+    to worker jobs.
+2.  *Execute TPT tests as a worker for a TPT distributing job:* Execute the
+     work delegated to it by *Execute TPT test cases* in distributing mode.
 
 You have two options to publish the TPT test results:
 
@@ -36,11 +36,11 @@ You have two options to publish the TPT test results:
     [JUnit
     Plugin](https://plugins.jenkins.io/junit/).
 
-## Using only *Execute TPT test cases* (not master slave mode)
+## Using only *Execute TPT test cases* (not distributing mode)
 
 Simply create a new Jenkins Job and add the *Execute TPT test cases*
 build step and configure it as needed. Do not set the option "Distribute
-work to TPT slave jobs".
+work to TPT worker jobs".
 
 Make sure:
 
@@ -53,25 +53,25 @@ Make sure:
 -   The Junit XML directory is placed in the workspace of the job in
     case you want to publish the test results to Jenkins.
 
-## Using only *Execute TPT test cases* and *Execute TPT tests slave* (master slave mode)
+## Using only *Execute TPT test cases* and *Execute TPT tests as a worker for a TPT distributing job* (distributing mode)
 
 You can configure the *Execute TPT test cases* build step to delegate
-the work to a slave job by setting the option "Distribute work to TPT
-slave jobs". The slave job must contain a *Execute TPT tests slave*
+the work to a worker job by setting the option "Distribute work to TPT
+worker jobs". The worker job must contain a *Execute TPT tests as a worker for a TPT distributing job*
 build step.
 
 The *Execute TPT test cases* build step will open the specified TPT
 file, lookup the tests, split them in packages with an equal number of
-tests and starts for each package a build of the slave job.
+tests and starts for each package a build of the worker job.
 
-When all slave jobs are finished the *Execute TPT test cases* build step
+When all worker job build are finished the *Execute TPT test cases* build step
 will copy the test data into its workspace. The job will now generate an
 overall report and If you configured the job for publishing via JUnit
 the JUNit XML files.
 
 Make sure:
 
--   Only one slave job build runs on a node at any given time.
+-   Only one worker job build runs on a node at any given time.
 -   The TPT software is installed on the computers where tests should be
     run.
 -   All 3^(rd) party tools needed on the Jenkins node where the job will
@@ -81,7 +81,7 @@ Make sure:
 -   The Junit XML directory is placed in the workspace of the job in
     case you want to publish the test results to Jenkins.
 
-The *Execute TPT tests slave* will communicate with TPT via a network
+The *Execute TPT tests as a worker for a TPT distributing job* will communicate with TPT via a network
 protocol (Java RMI). If two builds are using the same port and would run
 on the same node the outcome of the execution would be nondeterministic.
 Use e.g. the [Throttle Concurrent Builds
@@ -113,7 +113,7 @@ node('windows') {
 ```
 </details>
 <details>
-    <summary>Example for master mode</summary>
+    <summary>Example for distributing mode</summary>
 
 ```groovy
 node('windows') {
@@ -123,10 +123,10 @@ node('windows') {
             executionConfiguration: [tptConfig(configuration: 'Lights Control FUSION',
                 id: 'aaa',
                 tptFile: 'C:\\temp\\examples\\04 Test Assessments - 01 GUI Assessments.tpt')],
-            isTptMaster: true,
+            isDistributing: true,
             jUnitreport: 'junit',
-            slaveJob: 'agentJob', // see "Example for agent job"
-            slaveJobCount: '2'
+            workerJob: 'agentJob', // see "Example for agent job"
+            workerJobCount: '2'
     }
     stage('Publish') {
         junit 'junit/*.xml'
@@ -136,7 +136,7 @@ node('windows') {
 ```
 </details>
 <details>
-    <summary>Example for agent job</summary>
+    <summary>Example for worker job</summary>
 
 ```groovy
 node('windows') {

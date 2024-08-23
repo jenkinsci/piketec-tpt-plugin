@@ -54,9 +54,9 @@ import jenkins.tasks.SimpleBuildStep;
  * This class is just a data container for the TPTPlugin configuration in Jenkins. <br>
  * If you use this Jenkins plugin you have two Options to run TPT-Test. The first option is just to
  * run TPT via command line and execute the tests. The second option is to execute the tests via
- * API. In this case for every testcase a single slave job will be started. This slvae job must have
- * a proper configured TptPluginSlave Build step. Master-slave execution was was introduced in the
- * year 2016.
+ * API. In this case for every testcase a single worker job will be started. This worker job must
+ * have a proper configured {@link TptPluginSlave} Build step. distribution job to worker job
+ * execution was introduced in the year 2016.
  */
 public class TptPlugin extends Builder implements SimpleBuildStep {
 
@@ -71,16 +71,16 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   @CheckForNull
   private String arguments = null;
 
-  private boolean isTptMaster = DescriptorImpl.getDefaultIsTptMaster();
+  private boolean isDistributing = DescriptorImpl.getDefaultIsDistributing();
 
   @CheckForNull
-  private String slaveJob = null;
+  private String workerJob = null;
 
   @CheckForNull
-  private String slaveJobCount = null;
+  private String workerJobCount = null;
 
   @CheckForNull
-  private String slaveJobTries = null;
+  private String workerJobTries = null;
 
   @CheckForNull
   private String tptBindingName = null;
@@ -103,6 +103,19 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   private final ArrayList<JenkinsConfiguration> executionConfiguration;
 
   private transient TptLogger logger;
+
+  // for pipeline we need setter or public fields
+  @Deprecated
+  public transient boolean isTptMaster = DescriptorImpl.getDefaultIsDistributing();
+
+  @Deprecated
+  public transient String slaveJobCount = null;
+
+  @Deprecated
+  public transient String slaveJob = null;
+
+  @Deprecated
+  public transient String slaveJobTries = null;
 
   // --------------------- DATA BINDING -----------------------------------------
 
@@ -150,6 +163,18 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
       arguments = arguments.replaceAll("\\s*" + TptPlugin.RUN_BUILD + "\\s*", " ");
       arguments = arguments.trim();
     }
+    if (slaveJob != null) {
+      workerJob = slaveJob;
+    }
+    if (slaveJobCount != null) {
+      workerJobCount = slaveJobCount;
+    }
+    if (slaveJobTries != null) {
+      workerJobTries = slaveJobTries;
+    }
+    if (isTptMaster != DescriptorImpl.getDefaultIsDistributing()) {
+      isDistributing = isTptMaster;
+    }
     return this;
   }
 
@@ -177,8 +202,8 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   /**
    * @return Should testcase execution be delegated to a sub job
    */
-  public boolean getIsTptMaster() {
-    return isTptMaster;
+  public boolean getIsDistributing() {
+    return isDistributing;
   }
 
   /**
@@ -188,69 +213,113 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
    *          <code>true</code> if the execution should be
    */
   @DataBoundSetter
+  public void setIsDistributing(boolean isDistributing) {
+    this.isDistributing = isDistributing;
+  }
+
+  /**
+   * Should testcase execution be delegated to a sub job or is this run as a single job.
+   * 
+   * @param isTptMaster
+   *          <code>true</code> if the execution should be
+   * @deprecated historic problematic name. Use {@link #setIsDistributing(boolean)}
+   */
+  @DataBoundSetter
+  @Deprecated
   public void setIsTptMaster(boolean isTptMaster) {
-    this.isTptMaster = isTptMaster;
+    this.isDistributing = isTptMaster;
   }
 
   /**
-   * @return Should testcase execution be deligated to a slave job
+   * @return The name of worker job if the plugin runs in distributing mode
    */
-  public boolean isIsTptMaster() {
-    return isTptMaster;
+  public String getWorkerJob() {
+    return Util.fixNull(workerJob);
   }
 
   /**
-   * @return The name of slave job if the plugin runs in master mode
+   * @param workerJob
+   *          The name of worker job if the plugin runs in distributing mode
    */
-  public String getSlaveJob() {
-    return Util.fixNull(slaveJob);
+  @DataBoundSetter
+  public void setWorkerJob(String workerJob) {
+    this.workerJob = Util.fixEmpty(workerJob);
   }
 
   /**
    * @param slaveJob
-   *          The name of slave job if the plugin runs in master mode
+   *          The name of worker job if the plugin runs in distributing mode
+   * @deprecated historic problematic name. Use {@link #setWorkerJob(String)}
    */
   @DataBoundSetter
+  @Deprecated
   public void setSlaveJob(String slaveJob) {
-    this.slaveJob = Util.fixEmpty(slaveJob);
+    this.workerJob = Util.fixEmpty(slaveJob);
   }
 
   /**
-   * @return The number of slave job the plugin will run in master mode. A value below 1 means every
-   *         test case will be started in its own job.
+   * @return The number of worker jobs the plugin will run in distributing mode. A value below 1
+   *         means every test case will be started in its own job.
    */
-  public String getSlaveJobCount() {
-    return slaveJobCount == null ? DescriptorImpl.DEFAULT_SLAVE_JOB_COUNT : slaveJobCount;
+  public String getWorkerJobCount() {
+    return workerJobCount == null ? DescriptorImpl.DEFAULT_WORKER_JOB_COUNT : workerJobCount;
+  }
+
+  /**
+   * @param workerJobCount
+   *          The number of worker jobs the plugin will run in distributing mode. A value below 1
+   *          means every test case will be started in its own job.
+   */
+  @DataBoundSetter
+  public void setWorkerJobCount(String workerJobCount) {
+    this.workerJobCount =
+        DescriptorImpl.DEFAULT_WORKER_JOB_COUNT.equals(workerJobCount) ? null : workerJobCount;
   }
 
   /**
    * @param slaveJobCount
-   *          The number of slave job the plugin will run in master mode. A value below 1 means
-   *          every test case will be started in its own job.
+   *          The number of worker jobs the plugin will run in distributing mode. A value below 1
+   *          means every test case will be started in its own job.
+   * @deprecated historic problematic name. Use {@link #setWorkerJobCount(String)}
    */
   @DataBoundSetter
+  @Deprecated
   public void setSlaveJobCount(String slaveJobCount) {
-    this.slaveJobCount =
-        DescriptorImpl.DEFAULT_SLAVE_JOB_COUNT.equals(slaveJobCount) ? null : slaveJobCount;
+    this.workerJobCount =
+        DescriptorImpl.DEFAULT_WORKER_JOB_COUNT.equals(slaveJobCount) ? null : slaveJobCount;
   }
 
   /**
-   * @return If the execution of a slave job fails it is possible to reschedule the job for another
+   * @return If the execution of a worker job fails it is possible to reschedule the job for another
    *         try. This is the maximal number of tries.
    */
-  public String getSlaveJobTries() {
-    return slaveJobTries == null ? DescriptorImpl.DEFAULT_SLAVE_JOB_TRIES : slaveJobTries;
+  public String getWorkerJobTries() {
+    return workerJobTries == null ? DescriptorImpl.DEFAULT_WORKER_JOB_TRIES : workerJobTries;
+  }
+
+  /**
+   * @param workerJobTries
+   *          If the execution of a worker job fails it is possible to reschedule the job for
+   *          another try. This is the maximal number of tries.
+   */
+  @DataBoundSetter
+  public void setWorkerJobTries(String workerJobTries) {
+    this.workerJobTries =
+        DescriptorImpl.DEFAULT_WORKER_JOB_TRIES.equals(workerJobTries) ? null : workerJobTries;
   }
 
   /**
    * @param slaveJobTries
-   *          If the execution of a slave job fails it is possible to reschedule the job for another
-   *          try. This is the maximal number of tries.
+   *          If the execution of a worker job fails it is possible to reschedule the job for
+   *          another try. This is the maximal number of tries.
+   * 
+   * @deprecated historic problematic name. Use {@link #setWorkerJobTries(String)}.
    */
   @DataBoundSetter
+  @Deprecated
   public void setSlaveJobTries(String slaveJobTries) {
-    this.slaveJobTries =
-        DescriptorImpl.DEFAULT_SLAVE_JOB_TRIES.equals(slaveJobTries) ? null : slaveJobTries;
+    this.workerJobTries =
+        DescriptorImpl.DEFAULT_WORKER_JOB_TRIES.equals(slaveJobTries) ? null : slaveJobTries;
   }
 
   /**
@@ -388,11 +457,12 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
       throws InterruptedException, IOException {
     logger = new TptLogger(listener.getLogger());
     boolean result = false;
-    if (isTptMaster) {
-      result = performAsMaster(run, workspace, launcher, listener, env, executionConfiguration);
+    if (isDistributing) {
+      result =
+          performAsDistributingJob(run, workspace, launcher, listener, env, executionConfiguration);
     } else {
       result =
-          performWithoutSlaves(run, workspace, launcher, listener, env, executionConfiguration);
+          performWithoutWorkerJobs(run, workspace, launcher, listener, env, executionConfiguration);
     }
     if (!result) {
       throw new AbortException();
@@ -400,8 +470,8 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   }
 
   /**
-   * Get the required data to create a TptPluginSingleJobExecutor and excecutes it. It is called
-   * when there are no distributed builds.
+   * Get the required data to create a {@link TptPluginSingleJobExecutor} and excecutes it. It is
+   * called when there are no distributed builds.
    * 
    * All the parameters are used to get the data for creating a new TptPluginSingleJobExecutor
    * 
@@ -419,9 +489,9 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public boolean performWithoutSlaves(Run< ? , ? > run, FilePath workspace, Launcher launcher,
-                                      TaskListener listener, EnvVars environment,
-                                      ArrayList<JenkinsConfiguration> configs)
+  public boolean performWithoutWorkerJobs(Run< ? , ? > run, FilePath workspace, Launcher launcher,
+                                          TaskListener listener, EnvVars environment,
+                                          ArrayList<JenkinsConfiguration> configs)
       throws InterruptedException, IOException {
     // split and expand list of ptahs to TPT installations
     String[] expandedStringExePaths = environment.expand(getExePaths()).split("[,;]");
@@ -446,10 +516,13 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   }
 
   /**
-   * Get the required data to create a TptPluginMasterJobExecutor and excecutes it. It is called
-   * when there are distributed builds. @see the execute() method from TptPluginMasterJobExecutor.
+   * Get the required data to create a {@link TptPluginDistributingJobExecutor} and excecutes it. It
+   * is called when there are distributed builds.
    * 
-   * All the parameters are used to get the data for creating a new TptPluginMasterJobExecutor
+   * @see TptPluginDistributingJobExecutor#execute()
+   * 
+   *      All the parameters are used to get the data for creating a new
+   *      {@link TptPluginDistributingJobExecutor}
    * 
    * @param build
    *          The current Jenkins build
@@ -461,13 +534,13 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
    *          The map of envrionment varibales and their value
    * @param configs
    *          The configs with unresolved $-variables
-   * @return true if the execution from slaves and master were successful.
+   * @return true if the execution from worker jobs and distributing job were successful.
    * @throws InterruptedException
    *           If thread was interrupted
    */
-  public boolean performAsMaster(Run< ? , ? > build, FilePath workspace, Launcher launcher,
-                                 TaskListener listener, EnvVars environment,
-                                 ArrayList<JenkinsConfiguration> configs)
+  public boolean performAsDistributingJob(Run< ? , ? > build, FilePath workspace, Launcher launcher,
+                                          TaskListener listener, EnvVars environment,
+                                          ArrayList<JenkinsConfiguration> configs)
       throws InterruptedException {
     // split and expand list of paths to TPT installations
     String[] expandedStringExePaths = environment.expand(getExePaths()).split("[,;]");
@@ -520,41 +593,41 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
       expandedTptStartupWaitTime = Utils.DEFAULT_STARTUP_WAIT_TIME * 1000;
     }
     // expand slaveJobCount
-    int parsedSlaveJobCount = 1;
-    String slaveJobCount = getSlaveJobCount();
-    if (!slaveJobCount.isEmpty()) {
+    int parsedWorkerJobCount = 1;
+    String workerJobCount = getWorkerJobCount();
+    if (!workerJobCount.isEmpty()) {
       try {
-        parsedSlaveJobCount = Integer.parseInt(environment.expand(slaveJobCount));
+        parsedWorkerJobCount = Integer.parseInt(environment.expand(workerJobCount));
       } catch (NumberFormatException e) {
-        logger.error("The given number of slave jobs to start \""
-            + environment.expand(slaveJobCount) + "\" is not an integer. Using default value.");
+        logger.error("The given number of wroker jobs to start \""
+            + environment.expand(workerJobCount) + "\" is not an integer. Using default value.");
       }
     }
     // expand slaveJobTries
-    int parsedSlaveJobTries = 1;
-    String slaveJobTries = getSlaveJobTries();
-    if (!slaveJobTries.isEmpty()) {
+    int parsedWorkerJobTries = 1;
+    String workerJobTries = getWorkerJobTries();
+    if (!workerJobTries.isEmpty()) {
       try {
-        parsedSlaveJobTries = Integer.parseInt(environment.expand(slaveJobTries));
+        parsedWorkerJobTries = Integer.parseInt(environment.expand(workerJobTries));
       } catch (NumberFormatException e) {
-        logger.error("The given number of tries to execute a slave jobs \""
-            + environment.expand(slaveJobCount) + "\" is not an integer. Using default value.");
+        logger.error("The given number of tries to execute worker jobs \""
+            + environment.expand(workerJobCount) + "\" is not an integer. Using default value.");
       }
     }
     // expand other variables
-    String expandedSlaveJobName = environment.expand(getSlaveJob());
+    String expandedWorkerJobName = environment.expand(getWorkerJob());
     // start execution
-    TptPluginMasterJobExecutor executor =
-        new TptPluginMasterJobExecutor(build, workspace, launcher, listener, expandedExePaths,
+    TptPluginDistributingJobExecutor executor =
+        new TptPluginDistributingJobExecutor(build, workspace, launcher, listener, expandedExePaths,
             expandedArguments, configs, expandedTptPort, expandedTptBindingName,
-            expandedSlaveJobName, expandedTptStartupWaitTime, parsedSlaveJobCount,
-            parsedSlaveJobTries, jUnitXmlPath, getJUnitLogLevel(), isEnableJunit());
+            expandedWorkerJobName, expandedTptStartupWaitTime, parsedWorkerJobCount,
+            parsedWorkerJobTries, jUnitXmlPath, getJUnitLogLevel(), isEnableJunit());
     try {
       return executor.execute();
     } finally {
       // clean the workload, if the process is interrupted it removes the workload that did not
       // execute.
-      WorkLoad.clean(expandedSlaveJobName, build);
+      WorkLoad.clean(expandedWorkerJobName, build);
     }
   }
 
@@ -574,9 +647,9 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   @Symbol("tptExecute")
   public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-    public static final String DEFAULT_SLAVE_JOB_COUNT = "1";
+    public static final String DEFAULT_WORKER_JOB_COUNT = "1";
 
-    public static final String DEFAULT_SLAVE_JOB_TRIES = "1";
+    public static final String DEFAULT_WORKER_JOB_TRIES = "1";
 
     /**
      * @return "TptApi"
@@ -588,7 +661,7 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
     /**
      * @return <code>false</code>
      */
-    public static boolean getDefaultIsTptMaster() {
+    public static boolean getDefaultIsDistributing() {
       return false;
     }
 

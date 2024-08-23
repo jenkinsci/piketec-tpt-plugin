@@ -66,8 +66,8 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
 
   /**
    * 
-   * Those arguments are processed and then passed to the TptPluginSlaveExecutor. This class is used
-   * as a wrapper
+   * Those arguments are processed and then passed to the {@link TptPluginWorkerJobExecutor}. This
+   * class is used as a wrapper
    * 
    * @param exePaths
    *          the paths to the Tpt Executables
@@ -157,9 +157,9 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
    * It collects the necesary data (tpt exe path, tpt Port, tpt bindingname and tpt
    * expandedTptStartupWaitTime) from the environment. Then collects the necesary data from the
    * workload (put by the TptPluginMasterJobExecutor). After collecting all the necesary data it
-   * creates a new TptPluginSlaveExecutor and execute it. This method will be called from Jenkins
-   * when a build for a slave is scheduled. @see retryableJob. The logic is that the retryableJob
-   * schedules builds for the slaves and those builds will be executed here.
+   * creates a new {@link TptPluginWorkerJobExecutor} and execute it. This method will be called
+   * from Jenkins when a build for a worker job is scheduled. @see retryableJob. The logic is that
+   * the retryableJob schedules builds for the worker job and those builds will be executed here.
    */
   @Override
   public void perform(Run< ? , ? > run, FilePath workspace, EnvVars env, Launcher launcher,
@@ -220,10 +220,10 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
 
     JenkinsConfiguration unresolvedConfig = workloadToDo.getJenkinsConfig();
     List<String> testCasesFromWorkload = workloadToDo.getTestCases();
-    Run masterId = workloadToDo.getMasterId();
-    FilePath masterWorkspace = workloadToDo.getMasterWorkspace();
-    FilePath masterDataDir = workloadToDo.getMasterDataDir();
-    FilePath masterReportDir = workloadToDo.getMasterReportDir();
+    Run distributingJobRun = workloadToDo.getDistributingJobRun();
+    FilePath distributingJobWorkspace = workloadToDo.getDistributingJobWorkspace();
+    FilePath distributingJobDataDir = workloadToDo.getDistributingJobDataDir();
+    FilePath distributingJobReportDir = workloadToDo.getDistributingJobReportDir();
 
     // Replace $-Vars:
     JenkinsConfiguration resolvedConfig = unresolvedConfig.replaceAndNormalize(environment);
@@ -240,10 +240,10 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
       logger.info("Path to tpt.exe :         " + f.getRemote());
     }
 
-    TptPluginSlaveExecutor executor = new TptPluginSlaveExecutor(launcher, workspace, listener,
-        expandedExePaths, expandedArguments, expandedTptPort, expandedTptBindingName,
-        resolvedConfig, testCasesFromWorkload, expandedTptStartupWaitTime, masterId,
-        masterWorkspace, masterDataDir, masterReportDir);
+    TptPluginWorkerJobExecutor executor = new TptPluginWorkerJobExecutor(launcher, workspace,
+        listener, expandedExePaths, expandedArguments, expandedTptPort, expandedTptBindingName,
+        resolvedConfig, testCasesFromWorkload, expandedTptStartupWaitTime, distributingJobRun,
+        distributingJobWorkspace, distributingJobDataDir, distributingJobReportDir);
 
     boolean result = executor.execute();
     if (!result) {
@@ -269,7 +269,7 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
   // --------------------------- Descriptor Class -----------------------------------
 
   /**
-   * The Descriptor of TptPluginSlave
+   * The Descriptor of {@link TptPluginSlave}
    * 
    * @author jkuhnert, PikeTec GmbH
    */
@@ -285,7 +285,7 @@ public class TptPluginSlave extends Builder implements SimpleBuildStep {
 
     @Override
     public String getDisplayName() {
-      return "Execute TPT tests as a worker for a TPT master job";
+      return "Execute TPT tests as a worker for a TPT distributing job";
     }
 
     /**

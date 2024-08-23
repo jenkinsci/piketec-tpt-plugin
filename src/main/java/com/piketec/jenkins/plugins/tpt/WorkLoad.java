@@ -33,8 +33,8 @@ import hudson.FilePath;
 import hudson.model.Run;
 
 /**
- * Through this class is how the data from master to slave is passed. A way to tell the slave what
- * testcases should be executed.
+ * Through this class is how the data from a distributing job to a worker job is passed. A way to
+ * tell the worker job what testcases should be executed.
  * 
  * @author FInfantino, PikeTec GmbH
  */
@@ -44,13 +44,13 @@ public class WorkLoad {
 
   private List<String> testCases;
 
-  private Run< ? , ? > masterId;
+  private Run< ? , ? > distributingJobRun;
 
-  private FilePath masterWorkspace;
+  private FilePath distributingJobWorkspace;
 
-  private FilePath masterDataDir;
+  private FilePath distributingJobDataDir;
 
-  private FilePath masterReportDir;
+  private FilePath distributingJobReportDir;
 
   private JenkinsConfiguration jenkinsConfig;
 
@@ -58,25 +58,25 @@ public class WorkLoad {
    * @param unresolvedConfig
    *          JenkinsConfiguration that contains paths and tpt file names with unresolved $-vars
    * @param subTestSet
-   *          the test cases that should be executed by the slave
-   * @param masterWorkspace
-   *          the workspace from master, used for knowing where to copy the results
-   * @param masterId
+   *          the test cases that should be executed by the worker
+   * @param distributingJobWorkspace
+   *          the workspace from the distributing job, used for knowing where to copy the results
+   * @param distributingJobRun
    *          the current build, used in order to get an unique id
-   * @param masterDataDir
-   *          The test data directory on the agent the master job is running on
-   * @param masterReportDir
-   *          The report directory on the agent the master job is running on
+   * @param distributingJobDataDir
+   *          The test data directory of the distributing job
+   * @param distributingJobReportDir
+   *          The report directory the distributing job
    */
   public WorkLoad(JenkinsConfiguration unresolvedConfig, List<String> subTestSet,
-                  FilePath masterWorkspace, Run< ? , ? > masterId, FilePath masterDataDir,
-                  FilePath masterReportDir) {
+                  FilePath distributingJobWorkspace, Run< ? , ? > distributingJobRun,
+                  FilePath distributingJobDataDir, FilePath distributingJobReportDir) {
     this.jenkinsConfig = unresolvedConfig;
     this.testCases = subTestSet;
-    this.masterId = masterId;
-    this.masterWorkspace = masterWorkspace;
-    this.masterDataDir = masterDataDir;
-    this.masterReportDir = masterReportDir;
+    this.distributingJobRun = distributingJobRun;
+    this.distributingJobWorkspace = distributingJobWorkspace;
+    this.distributingJobDataDir = distributingJobDataDir;
+    this.distributingJobReportDir = distributingJobReportDir;
   }
 
   /**
@@ -94,41 +94,41 @@ public class WorkLoad {
   }
 
   /**
-   * @return the workspace from master
+   * @return the workspace from the distributing job
    */
-  public FilePath getMasterWorkspace() {
-    return masterWorkspace;
+  public FilePath getDistributingJobWorkspace() {
+    return distributingJobWorkspace;
   }
 
   /**
    * @return the current build, used to get an unique Id
    */
-  public Run< ? , ? > getMasterId() {
-    return masterId;
+  public Run< ? , ? > getDistributingJobRun() {
+    return distributingJobRun;
   }
 
   /**
-   * @return the path to the data directory on the master
+   * @return the path to the data directory of the distributing job
    */
-  public FilePath getMasterDataDir() {
-    return this.masterDataDir;
+  public FilePath getDistributingJobDataDir() {
+    return this.distributingJobDataDir;
   }
 
   /**
-   * @return the path to the report directory on the master
+   * @return the path to the report directory of the distributing job
    */
-  public FilePath getMasterReportDir() {
-    return this.masterReportDir;
+  public FilePath getDistributingJobReportDir() {
+    return this.distributingJobReportDir;
   }
 
   /**
-   * Adds a workload to the static HashMap. This method is used when the masterJob put the workload
-   * here and then triggers the slave job.
+   * Adds a workload to the static HashMap. This method is used when the distributing job put the
+   * workload here and then triggers the worker job.
    * 
    * @param jobName
-   *          The name of the jenkins job serving as a slave.
+   *          The name of the jenkins job serving as a worker.
    * @param workloadToAdd
-   *          The work package to be executed by the slave job
+   *          The work package to be executed by the worker job
    */
   public static synchronized void putWorkLoad(String jobName, WorkLoad workloadToAdd) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
@@ -142,12 +142,12 @@ public class WorkLoad {
   }
 
   /**
-   * Pops the workload from the static HashMap. This method is used from the slave when a build has
+   * Pops the workload from the static HashMap. This method is used from the worker when a build has
    * been triggered and it needs to do some workload.
    * 
    * @param jobName
-   *          The name of the jenkins job serving as a slave.
-   * @return the workload that has been removed , null if there is nothing to remove.
+   *          The name of the jenkins job serving as a worker job.
+   * @return the workload that has been removed, null if there is nothing to remove.
    */
   public static synchronized WorkLoad pollWorkload(String jobName) {
     Queue<WorkLoad> queue = workloads.get(jobName);
@@ -162,11 +162,11 @@ public class WorkLoad {
    * something goes wrong.
    * 
    * @param jobName
-   *          The name of the jenkins job serving as a slave.
-   * @param masterBuild
-   *          the build of the master job
+   *          The name of the jenkins job serving as a worker.
+   * @param distributingJobRun
+   *          the build of the distributing job
    */
-  public static synchronized void clean(String jobName, Run< ? , ? > masterBuild) {
+  public static synchronized void clean(String jobName, Run< ? , ? > distributingJobRun) {
     LinkedList<WorkLoad> queue = workloads.get(jobName);
     if (queue == null) {
       return;
@@ -174,7 +174,7 @@ public class WorkLoad {
     Iterator<WorkLoad> iterator = queue.iterator();
     while (iterator.hasNext()) {
       WorkLoad next = iterator.next();
-      if (Objects.equals(next.masterId, masterBuild)) {
+      if (Objects.equals(next.distributingJobRun, distributingJobRun)) {
         iterator.remove();
       }
     }

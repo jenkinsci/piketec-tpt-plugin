@@ -4,11 +4,12 @@
     <li>Just execute the tests within this Job. The given values will be used to create a command
         that will be executed. This command could be typed into the command line and would work.
     </li>
-    <li>Use this Job as a Master. In this mode the TPT RMI API is used to read the test cases that
-        must be executed. For every test case a slave job is started and parameters are provided
-        that can be used by the "Execute TPT tests slave" build step. The slaves copy their reults
-        back to the master and the master will aggregate the test results.
+    <li>Use this job as a distributing job. In this mode the TPT RMI API is used to read the test
+        cases that must be executed. For every test case an worker job is started and parameters are
+        provided that can be used by the "Execute TPT tests as a worker for a TPT distributing job"
+        build step. The worker jobs copy their reults back to the distributing job and the
+        distributing job will aggregate the test results.
     </li>
   </ul>
-  The master mode can be activated and configured by clicking on the "Advanced" button.
+  The distributing mode can be activated and configured by clicking on the "Advanced" button.
 </div>

@@ -30,15 +30,15 @@ import hudson.model.TaskListener;
 /**
  * The Callable executes tpt test cases on a Jenkins Agent via the TPT API.
  */
-public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
+public class ExecuteTestsWorkerJobCallable extends TptApiCallable<Boolean> {
 
   private static final long serialVersionUID = 1L;
 
   private FilePath tptFilePath;
 
-  private FilePath slaveReportPath;
+  private FilePath workerJobReportPath;
 
-  private FilePath slaveDataPath;
+  private FilePath workerJobDataPath;
 
   private String execCfg;
 
@@ -64,9 +64,9 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
    *          Timeto wait for TPT start up
    * @param tptFilePath
    *          The TPT file which tests shall be executeds
-   * @param slaveReportPath
+   * @param workerJobReportPath
    *          Path where the report shall be stored in the workspace
-   * @param slaveDataPath
+   * @param workerJobDataPath
    *          Path where the test data shall be stored in the workspace
    * @param executionConfigName
    *          The execution configuration to execute
@@ -75,16 +75,16 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
    * @param testSetName
    *          The test set to execute
    */
-  public ExecuteTestsSlaveCallable(TaskListener listener, int tptPort, String tptBindingName,
-                                   FilePath[] exePaths, List<String> arguments,
-                                   long startUpWaitTime, FilePath tptFilePath,
-                                   FilePath slaveReportPath, FilePath slaveDataPath,
-                                   String executionConfigName, List<String> testSet,
-                                   String testSetName) {
+  public ExecuteTestsWorkerJobCallable(TaskListener listener, int tptPort, String tptBindingName,
+                                       FilePath[] exePaths, List<String> arguments,
+                                       long startUpWaitTime, FilePath tptFilePath,
+                                       FilePath workerJobReportPath, FilePath workerJobDataPath,
+                                       String executionConfigName, List<String> testSet,
+                                       String testSetName) {
     super(listener, tptPort, tptBindingName, exePaths, arguments, startUpWaitTime);
     this.tptFilePath = tptFilePath;
-    this.slaveReportPath = slaveReportPath;
-    this.slaveDataPath = slaveDataPath;
+    this.workerJobReportPath = workerJobReportPath;
+    this.workerJobDataPath = workerJobDataPath;
     this.execCfg = executionConfigName;
     this.testSetList = testSet;
     this.testSetName = testSetName;
@@ -130,10 +130,10 @@ public class ExecuteTestsSlaveCallable extends TptApiCallable<Boolean> {
             .error("Could only find " + foundScenearios.size() + " of " + testSetList.size() + ".");
         return false;
       }
-      logger.info("Setting test data directory to " + slaveDataPath.getRemote());
-      config.setDataDirPath(slaveDataPath.getRemote());
-      logger.info("Setting report directory to " + slaveReportPath.getRemote());
-      config.setReportDirPath(slaveReportPath.getRemote());
+      logger.info("Setting test data directory to " + workerJobDataPath.getRemote());
+      config.setDataDirPath(workerJobDataPath.getRemote());
+      logger.info("Setting report directory to " + workerJobReportPath.getRemote());
+      config.setReportDirPath(workerJobReportPath.getRemote());
       // store information to undo changes
       List<TestSet> oldTestSets = new ArrayList<>();
       List<TestSet> newTestSets = new ArrayList<>();

@@ -30,16 +30,16 @@
     <f:textbox />
   </f:entry>
   <f:block>
-  <f:optionalBlock name="isTptMaster" title="Distribute work to TPT slave jobs" checked="${instance.isTptMaster}" default="${descriptor.defaultEnableJunit}" inline="true" help="/plugin/piketec-tpt/masterMode.html" field="isTptMaster" >
+  <f:optionalBlock name="isDistributing" title="Distribute work to TPT worker jobs" checked="${instance.isDistributing}" default="${descriptor.defaultEnableJunit}" inline="true" help="/plugin/piketec-tpt/distributingMode.html" field="isDistributing" >
   
-  <f:entry field="slaveJob" title="Slave job" help="/plugin/piketec-tpt/slaveJob.html">
-      <f:textbox value="${instance.slaveJob}"/>
+  <f:entry field="workerJob" title="Wroker job" help="/plugin/piketec-tpt/workerJob.html">
+      <f:textbox value="${instance.workerJob}"/>
     </f:entry>
-    <f:entry field="slaveJobCount" title="Number of slave jobs" help="/plugin/piketec-tpt/slaveJobCount.html">
-      <f:textbox default="${descriptor.DEFAULT_SLAVE_JOB_COUNT}"/>
+    <f:entry field="workerJobCount" title="Number of worker jobs" help="/plugin/piketec-tpt/workerJobCount.html">
+      <f:textbox default="${descriptor.DEFAULT_WORKER_JOB_COUNT}"/>
     </f:entry>
-    <f:entry field="slaveJobTries" title="Number of slave jobs execution tries" help="/plugin/piketec-tpt/slaveJobTries.html">
-      <f:textbox default="${descriptor.DEFAULT_SLAVE_JOB_TRIES}"/>
+    <f:entry field="workerJobTries" title="Number of worker jobs execution tries" help="/plugin/piketec-tpt/workerJobTries.html">
+      <f:textbox default="${descriptor.DEFAULT_WORKER_JOB_TRIES}"/>
     </f:entry>
     <f:entry field="tptBindingName" title="TPT Binding Name" help="/plugin/piketec-tpt/bindingName.html">
       <f:textbox default="${descriptor.defaultTptBindingName}"/>

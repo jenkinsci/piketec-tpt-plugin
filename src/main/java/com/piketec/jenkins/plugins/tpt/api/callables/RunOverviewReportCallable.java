@@ -79,9 +79,8 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
       executionConfig.setReportDirPath(reportPath.getRemote());
 
       // set explicit defined test set for all items
-      // This is done, because the slaves don't execute the testsets that were set originally in the
-      // file
-      // but the one that is defined in Jenkins.
+      // This is done, because the worker jobs don't execute the testsets that were set originally
+      // in the file but the one that is defined in Jenkins.
       ArrayList<TestSet> oldTestSets = new ArrayList<>();
       if (StringUtils.isNotEmpty(testSet)) {
         RemoteCollection<TestSet> allTestSets = project.getTestSets();
