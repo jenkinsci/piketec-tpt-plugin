@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,7 +27,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 /**
  * A <code>TestSet</code> represents a set of {@link Scenario test cases}. Test cases have to be
  * selected explicitly but they can be restricted further dynamically by a {@link #getCondition()
- * test set conditon} or by restricting}them to test cases linked to requirments of a
+ * test set conditon} or by restricting}them to test cases linked to requirements of a
  * {@link #getRequirementSet() selected requirement set}.
  */
 public interface TestSet extends TestSetOrGroup {
@@ -85,8 +85,8 @@ public interface TestSet extends TestSetOrGroup {
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
-   * @deprecated will be removed in TPT 21. Use {@link #addTestCaseOrGroup(ScenarioOrGroup tcg)}
-   *             wich support sceanrio groups.
+   * @deprecated Removed in TPT-21. Throws {@link DeprecatedAndRemovedException}. Use
+   *             {@link #addTestCaseOrGroup(ScenarioOrGroup tcg)} which support sceanrio groups.
    */
   @Deprecated
   public void addTestCase(Scenario tc) throws ApiException, RemoteException;

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,6 +28,44 @@ import java.rmi.RemoteException;
  * will be used for instrumentation afterwards
  */
 public interface TPTCoverageSettings extends CoverageSettings {
+
+  /**
+   * @return If statement coverage is measured
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isStatementCoverage() throws RemoteException;
+
+  /**
+   * En- or disable statement coverage measurement
+   * 
+   * @param statementCoverage
+   *          Should statement coverage be measured
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setStatementCoverage(boolean statementCoverage) throws RemoteException;
+
+  /**
+   * @return If function coverage is measured
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isFunctionCoverage() throws RemoteException;
+
+  /**
+   * En- or disable function coverage measurement
+   * 
+   * @param functionCoverage
+   *          Should function coverage be measured
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setFunctionCoverage(boolean functionCoverage) throws RemoteException;
 
   /**
    * @return If decision coverage is measured

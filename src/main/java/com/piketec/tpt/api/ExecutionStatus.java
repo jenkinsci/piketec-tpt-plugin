@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,8 +20,8 @@
  */
 package com.piketec.tpt.api;
 
+import java.io.File;
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.List;
 
 import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
  * This object provides an interface to the current state of the test execution which is the
  * information as provided by the "Build Progress" Dialog.
  *
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionStatus extends TptRemote {
 
@@ -74,7 +74,7 @@ public interface ExecutionStatus extends TptRemote {
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<TestCaseExecutionStatus> getAllTestCases() throws RemoteException;
+  public List<TestCaseExecutionStatus> getAllTestCases() throws RemoteException;
 
   /**
    * Returns the number of all test cases of the current test execution. Test cases that are part of
@@ -178,5 +178,24 @@ public interface ExecutionStatus extends TptRemote {
    *           remote communication problem
    */
   public void join() throws ApiException, RemoteException;
+
+  /**
+   * Reclassify test results from a file with reclassification information of a former test
+   * execution.<br>
+   * Existing reclassifications of the current test execution are not overridden.
+   * 
+   * @param file
+   *          the XML file with reclassification information
+   * 
+   * @return a list of warnings, e.g., if tests with reclassification information in the given file
+   *         are not present in the current test execution.
+   * 
+   * @throws ApiException
+   *           if the execution is running, the file does not exist or is not a valid XML file with
+   *           reclassification information
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public List<String> reclassifyFromFile(File file) throws ApiException, RemoteException;
 
 }

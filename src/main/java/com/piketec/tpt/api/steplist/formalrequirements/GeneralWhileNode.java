@@ -4,10 +4,7 @@ import java.rmi.RemoteException;
 
 import com.piketec.tpt.api.ApiException;
 
-/**
- * This {@link FormalRequirementStep} yields intervals for which the expression is true
- */
-public interface WhileStep extends FormalRequirementStep {
+public interface GeneralWhileNode extends ConditionTreeNode {
 
   /**
    * The possible when types. Which describe how often a condition should become true.
@@ -16,26 +13,9 @@ public interface WhileStep extends FormalRequirementStep {
     Always, For_At_Least, For_More_Than, For_At_Most;
   }
 
-  /**
-   * @return the expression.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public String getExpression() throws RemoteException;
-
-  /**
-   * Sets the expression.
-   * 
-   * @param expr
-   *          the expression
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           if the expr is {@code null}
-   */
-  public void setExpression(String expr) throws RemoteException, ApiException;
+  enum YToleranceType {
+    Absolute, Relative;
+  }
 
   /**
    * @return The type of evaluation of the expression.
@@ -78,4 +58,5 @@ public interface WhileStep extends FormalRequirementStep {
    *           if the time is {@code null}
    */
   public void setTime(String time) throws RemoteException, ApiException;
+
 }

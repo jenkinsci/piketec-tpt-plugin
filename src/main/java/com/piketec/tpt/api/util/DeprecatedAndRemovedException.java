@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2023 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -43,8 +43,10 @@ public class DeprecatedAndRemovedException extends RuntimeException {
    */
   public DeprecatedAndRemovedException(String fullQualifiedName, int tptversion) {
     super("The method " + fullQualifiedName + " has been removed since TPT-" + tptversion);
-    assert fullQualifiedName.contains("com.piketec.tpt.api.") && !fullQualifiedName.contains(
-        ".apiimpl.") : "Please use the full qualified names of the interface and not the internal implementation.";
+    assert (fullQualifiedName.contains("com.piketec.tpt.api")
+        || fullQualifiedName.contains("tptplugins.vw.api"))
+        && !fullQualifiedName.contains(
+            ".apiimpl.") : "Please use the full qualified names of the interface and not the internal implementation.";
   }
 
 }

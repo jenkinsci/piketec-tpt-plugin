@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,6 +28,7 @@ import com.piketec.tpt.api.PlatformConfiguration;
 import com.piketec.tpt.api.Project.SynchronizationMethod;
 import com.piketec.tpt.api.RemoteIndexedList;
 import com.piketec.tpt.api.RemoteList;
+import com.piketec.tpt.api.TptApi;
 import com.piketec.tpt.api.codecoverage.CTCCoverageSettings;
 import com.piketec.tpt.api.codecoverage.CoverageSettings;
 import com.piketec.tpt.api.codecoverage.GCovCoverageSettings;
@@ -37,7 +38,7 @@ import com.piketec.tpt.api.codecoverage.TPTCoverageSettings;
  * The TPT API representation of the C\C++ platform in TPT
  * 
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface CCodePlatformConfiguration extends PlatformConfiguration {
 
@@ -167,7 +168,8 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * Set the name of the compiler to be used
    * 
    * @param name
-   *          The name of the desired compiler
+   *          The name of the desired compiler. Use {@link TptApi#DEFAULT_COMPILER} to set the
+   *          default compiler.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -216,7 +218,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    *             COVERAGE_MEASUREMENT will enable TPT-Coverage and thus enable coverage measurement
    *             or TASMO testcase generation. Setting this to NO_INSTRUMENTATION will disable Tasmo
    *             coverage if it was enabled before.<br>
-   * 
+   *             Will be removed in TPT-23.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -235,8 +237,8 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    *             <code>TPTCoverageSettings</code> to check if the platform will be instrumented.<br>
    *             From TPT-19 a C\C++ platform can either be instrumented or not. For compatibility
    *             this method returns FULL_INSTRUMENTATION if TPT-Coverage is selected as coverage
-   *             tool and <code>null</code> if TPT-Coverage is not enabled. <br>
-   * 
+   *             tool and <code>null</code> if TPT-Coverage is not enabled.<br>
+   *             Will be removed in TPT-23.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -245,6 +247,8 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public TasmoCCodeInstrumentationLevel getTasmoInstrumentationLevel() throws RemoteException;
 
   /**
+   * Get the current state of the "use effective interface" option
+   * 
    * @return Is the "use effective interface" option enabled
    * @throws RemoteException
    *           remote communication problem
@@ -252,12 +256,113 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public boolean isUseEffectiveInterface() throws RemoteException;
 
   /**
+   * Set the "use effective interface" option
+   * 
    * @param useEffectiveInterface
    *          En- or disable the "use effective interface" option
    * @throws RemoteException
    *           remote communication problem
    */
   public void setUseEffectiveInterface(boolean useEffectiveInterface) throws RemoteException;
+
+  /**
+   * Get the current state of the "initialize interface variables with pointer types in C" option
+   * 
+   * @return Is the "initialize interface variables with pointer types in C" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isInitInterfaceVariablesWithPointerTypesInC() throws RemoteException;
+
+  /**
+   * Set the "initialize interface variables with pointer types in C" option
+   * 
+   * @param isInitInterfaceVariablesWithPointerTypesInC
+   *          En- or disable the "initialize interface variables with pointer types in C" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setInitInterfaceVariablesWithPointerTypesInC(boolean isInitInterfaceVariablesWithPointerTypesInC)
+      throws RemoteException;
+
+  /**
+   * Get the current state of the "enable read/write for output channels" option
+   * 
+   * @return Is the "enable read/write for output channels" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isEnableReadWriteForOutputChannels() throws RemoteException;
+
+  /**
+   * Set the "enable read/write for output channels" option
+   * 
+   * @param isEnableReadWriteForOutputChannels
+   *          En- or disable the "enable read/write for output channels" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setEnableReadWriteForOutputChannels(boolean isEnableReadWriteForOutputChannels)
+      throws RemoteException;
+
+  /**
+   * Get the current state of the "read initial values for output channels from SUT" option
+   * 
+   * @return Is the "read initial values for output channels from SUT" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isReadInitialValuesForOutputChanneslFromSUT() throws RemoteException;
+
+  /**
+   * Set the "read initial values for output channels from SUT" option
+   * 
+   * @param isReadInitialValuesForOutputChanneslFromSUT
+   *          En- or disable the "read initial values for output channels from SUT" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setReadInitialValuesForOutputChanneslFromSUT(boolean isReadInitialValuesForOutputChanneslFromSUT)
+      throws RemoteException;
+
+  /**
+   * Get the current state of the "include I/O consistency check" option
+   * 
+   * @return Is the "include I/O consistency check" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isIncludeIOConsistencyCheck() throws RemoteException;
+
+  /**
+   * Set the "include I/O consistency check" option
+   *
+   * @param useIncludeIOConsistencyCheck
+   *          En- or disable the "include I/O consistency check" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setIncludeIOConsistencyCheck(boolean useIncludeIOConsistencyCheck)
+      throws RemoteException;
+
+  /**
+   * Get the current state of the "round scaling results" option
+   * 
+   * @return Is the "round scaling results" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isRoundScalingResults() throws RemoteException;
+
+  /**
+   * Set the "round scaling results" option
+   * 
+   * @param useRoundScalingInterface
+   *          En- or disable the "round scaling results" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setRoundScalingResults(boolean useRoundScalingInterface) throws RemoteException;
 
   /**
    * Generate the code to connect your c-code to TPT.
@@ -377,7 +482,8 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public void syncSchedulingItems() throws RemoteException;
 
   /**
-   * Set the linker options used when linking the test frame
+   * Set the linker options used when generating the test frame. When calling this function,
+   * <code>useCustomLinkerOptions</code> is set to <code>true</code>.
    * 
    * @param linkerOptions
    *          The new options for the linker
@@ -387,7 +493,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public void setLinkerOptions(String linkerOptions) throws RemoteException;
 
   /**
-   * Get the linker options used when linking the test frame
+   * Get the linker options used when generating the test frame
    * 
    * @return The current linker options
    * @throws RemoteException
@@ -396,7 +502,29 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public String getLinkerOptions() throws RemoteException;
 
   /**
-   * Set the compiler options used when linking the test frame
+   * Set to use the custom linker options
+   * 
+   * @param shouldTheCustomLinkerOptionsBeUsed
+   *          Use the custom linker options
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setUseCustomLinkerOptions(boolean shouldTheCustomLinkerOptionsBeUsed)
+      throws RemoteException;
+
+  /**
+   * Get if the custom linker options are getting used
+   * 
+   * @return If custom linker options are getting used
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isUseCustomLinkerOptions() throws RemoteException;
+
+  /**
+   * Set the compiler options used when generating the test frame. When calling this function,
+   * <code>useCustomCompilerOptions</code> is set to <code>true</code>.
    * 
    * @param compilerOptions
    *          The new arguments for the compiler
@@ -406,7 +534,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public void setCompilerOptions(String compilerOptions) throws RemoteException;
 
   /**
-   * Get the compiler options used when linking the test frame
+   * Get the compiler options used when generating the test frame
    * 
    * @return The current compiler options
    * 
@@ -414,6 +542,27 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public String getCompilerOptions() throws RemoteException;
+
+  /**
+   * Set to use the custom compiler options
+   * 
+   * @param shouldTheCustomCompilerOptionsBeUsed
+   *          Use the custom compiler options
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setUseCustomCompilerOptions(boolean shouldTheCustomCompilerOptionsBeUsed)
+      throws RemoteException;
+
+  /**
+   * Get if the custom compiler options are getting used
+   * 
+   * @return If custom compiler options are getting used
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isUseCustomCompilerOptions() throws RemoteException;
 
   /**
    * Get the macro definitions
@@ -517,4 +666,14 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    */
   public String importSourceFromCMakeJSonFile(String jsonFile) throws RemoteException, ApiException;
 
+  /**
+   * Refresh includes from the source files. Searches all source files for includes, adding the new
+   * include paths and updating changed include paths.
+   * 
+   * @return List with paths to includes or null due to an unexpected error.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public List<String> refreshIncludePaths() throws RemoteException;
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,7 +22,7 @@ package com.piketec.tpt.api;
 
 import java.awt.Point;
 import java.rmi.RemoteException;
-import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -218,27 +218,26 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link Transition Transitions}, matching the given name pattern.
+   * @return List of all {@link Transition Transitions}, matching the given name pattern.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<Transition> getTransitionsByNamePattern(Pattern namepattern)
-      throws RemoteException;
+  public List<Transition> getTransitionsByNamePattern(Pattern namepattern) throws RemoteException;
 
   /**
    * Delivers all transitions, matching the given name pattern.
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link Transition Transitions}, matching the given name pattern.
+   * @return List of all {@link Transition Transitions}, matching the given name pattern.
    * 
    * @throws PatternSyntaxException
    *           If the expression's syntax is invalid
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<Transition> getTransitionsByNamePattern(String namepattern)
+  public List<Transition> getTransitionsByNamePattern(String namepattern)
       throws PatternSyntaxException, RemoteException;
 
   /**

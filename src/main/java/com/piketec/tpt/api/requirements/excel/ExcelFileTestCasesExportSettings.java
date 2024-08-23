@@ -5,7 +5,7 @@ import com.piketec.tpt.api.requirements.tabular.TabularTestCasesExportSettings;
 /**
  * The settings for the requirements export of test cases to an Excel file.
  * 
- * @author Copyright (c) 2014-2022 PikeTec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class ExcelFileTestCasesExportSettings extends TabularTestCasesExportSettings {
 

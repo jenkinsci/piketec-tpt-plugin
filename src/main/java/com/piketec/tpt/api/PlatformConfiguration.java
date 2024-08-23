@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,7 +32,7 @@ import com.piketec.tpt.api.tasmo.TasmoTestDataGenerationController;
  * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
  * </p>
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
 
@@ -72,11 +72,6 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String AUTOSAR_FUSION_PLATFORM_TYPE = "autosarfusion";
 
   /**
-   * Type String for BOSCH FUSION Platform
-   */
-  public static final String BOSCH_FUSION_PLATFORM_TYPE = "bosch-fusion";
-
-  /**
    * Type String for C Platform
    */
   public static final String C_PLATFORM_TYPE = "ccode";
@@ -100,6 +95,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * Type String for CarMaker Platform
    */
   public static final String CARMAKER_FMU_FUSION_PLATFORM_TYPE = "carmakerfmu";
+
+  /**
+   * Type String for CarMaker HiL Platform
+   */
+  public static final String CARMAKER_HIL_FUSION_PLATFORM_TYPE = "carmakerhil";
 
   /**
    * Type String for Concurrent HiL Platform
@@ -187,11 +187,6 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String PLS_UDE_FUSION_PLATFORM_TYPE = "plsude";
 
   /**
-   * Type String for RADARCAN Platform
-   */
-  public static final String RADARCAN_PLATFORM_TYPE = "radarcan";
-
-  /**
    * Type String for RealtimeMaker Platform
    */
   public static final String REALTIMEMAKER_PLATFORM_TYPE = "realtimemaker";
@@ -242,9 +237,9 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String VTD_FUSION_PLATFORM_TYPE = "vtd";
 
   /**
-   * Type String for VW / Audi Platform
+   * Type String for winIDEA Platform
    */
-  public static final String VW_AUDI_PLATFORM_TYPE = "vw-audi";
+  public static final String WINIDEA_FUSION_PLATFORM_TYPE = "winidea";
 
   /**
    * Type String for ASAM XIL@FUSION Platform

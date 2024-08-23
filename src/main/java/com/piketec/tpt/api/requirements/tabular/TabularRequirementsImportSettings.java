@@ -1,8 +1,29 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2014-2024 Synopsys Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.tpt.api.requirements.tabular;
 
 import java.util.List;
 
 import com.piketec.tpt.api.Pair;
+import com.piketec.tpt.api.Project;
 import com.piketec.tpt.api.Requirement;
 import com.piketec.tpt.api.requirements.RequirementsImportSettings;
 import com.piketec.tpt.api.requirements.csv.CsvFileRequirementsImportSettings;
@@ -13,7 +34,6 @@ import com.piketec.tpt.api.requirements.excel.ExcelFileRequirementsImportSetting
  * For the requirements import from a CSV file use {@link CsvFileRequirementsImportSettings}.<br>
  * For the requirements import from an Excel file use {@link ExcelFileRequirementsImportSettings}.
  * 
- * @author Copyright (c) 2014-2022 PikeTec GmbH - MIT License (MIT) - All rights reserved
  */
 public abstract class TabularRequirementsImportSettings extends RequirementsImportSettings {
 
@@ -305,10 +325,7 @@ public abstract class TabularRequirementsImportSettings extends RequirementsImpo
 
   /**
    * @return Optional list of column names in the source file to import them as additional
-   *         requirements attributes. To enable the automatic review of possible changes of an
-   *         requirement attribute add the column name also to the {@link #getAutoReviewColumns()
-   *         list of autoreview attributes}.
-   * @see #setAutoReviewColumns(List)
+   *         requirements attributes.
    */
   public List<String> getAttributeColumns() {
     return attributeColumns;
@@ -317,10 +334,11 @@ public abstract class TabularRequirementsImportSettings extends RequirementsImpo
   /**
    * @param attributeColumns
    *          Optional list of column names in the source file to import them as additional
-   *          requirements attributes. To enable the automatic review of possible changes of an
-   *          requirement attribute add the column name also to the {@link #getAutoReviewColumns()
-   *          list of autoreview attributes}.
-   * @see #setAutoReviewColumns(List)
+   *          requirements attributes.To enable the automatic review of possible changes of an
+   *          requirement attribute
+   *          {@link Project#setRequirementAttributeAutoReview(String, boolean) change the auto
+   *          review flag of existing requirement attributes}.
+   * @see Project#setRequirementAttributeAutoReview(String, boolean)
    */
   public void setAttributeColumns(List<String> attributeColumns) {
     this.attributeColumns = attributeColumns;

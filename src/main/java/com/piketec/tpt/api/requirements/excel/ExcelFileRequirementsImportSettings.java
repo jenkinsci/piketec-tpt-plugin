@@ -5,7 +5,7 @@ import com.piketec.tpt.api.requirements.tabular.TabularRequirementsImportSetting
 /**
  * The settings for the requirements import from an Excel file.
  * 
- * @author Copyright (c) 2014-2022 PikeTec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class ExcelFileRequirementsImportSettings extends TabularRequirementsImportSettings {
 

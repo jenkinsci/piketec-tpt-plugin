@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,11 +23,12 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 import com.piketec.tpt.api.constants.assessments.RequirementsCoverage;
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
 /**
  * General configuration of the report created after a test run.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface AdvancedReportSettings extends IdentifiableRemote {
 
@@ -254,8 +255,22 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Renamed, use {@link #isShowTestCommentColumn()}. Will be removed in TPT-22.
    */
+  @Deprecated
   public boolean isShowPlatformOverviewComment() throws RemoteException;
+
+  /**
+   * Determines if a comment column is generated for the Test Case Summary table in the Platform
+   * Overview section.
+   * 
+   * @return get attribute platformOverviewComment
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   **/
+  public boolean isShowTestCommentColumn() throws RemoteException;
 
   /**
    * Determines if a directory column is generated for the Test Case Summary table in the Platform
@@ -265,7 +280,11 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Option is removed
+   *             without replacement.
    */
+  @Deprecated
   public boolean isShowPlatformOverviewDirectory() throws RemoteException;
 
   /**
@@ -276,8 +295,22 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Renamed, use {@link #isShowLinkedRequirementsColumn()}. Will be removed in TPT-22.
    */
+  @Deprecated
   public boolean isShowPlatformOverviewLinkedRequirements() throws RemoteException;
+
+  /**
+   * Determines if a column with IDs of the linked requirements is generated for the Test Case
+   * Summary table in the Platform Overview section.
+   * 
+   * @return get attribute platformOverviewLinkedRequirements
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isShowLinkedRequirementsColumn() throws RemoteException;
 
   /**
    * Get attribute checkAndShowTestCaseStatusInformation. If this is set to true, an overview table
@@ -486,9 +519,24 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Renamed, use {@link #setShowTestCommentColumn(boolean)}. Will be removed in TPT-22.
    */
+  @Deprecated
   public void setShowPlatformOverviewComment(boolean platformOverviewComment)
       throws RemoteException;
+
+  /**
+   * Changes if a comment column is generated for the Test Case Summary table in the Platform
+   * Overview section.
+   * 
+   * @param showTestCommentColumn
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setShowTestCommentColumn(boolean showTestCommentColumn) throws RemoteException;
 
   /**
    * Changes if a directory column is generated for the Test Case Summary table in the Platform
@@ -499,7 +547,10 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Option is removed
+   *             without replacement.
    */
+  @Deprecated
   public void setShowPlatformOverviewDirectory(boolean platformOverviewDirectory)
       throws RemoteException;
 
@@ -512,8 +563,25 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   *
+   * @deprecated Renamed, use {@link #setShowLinkedRequirementsColumn(boolean)}. Will be removed in
+   *             TPT-22.
    */
+  @Deprecated
   public void setShowPlatformOverviewLinkedRequirements(boolean platformOverviewLinkedRequirements)
+      throws RemoteException;
+
+  /**
+   * Changes if a column with IDs of the linked requirements is generated for the Test Case Summary
+   * table in the Platform Overview section.
+   * 
+   * @param showLinkedRequirementsColumn
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setShowLinkedRequirementsColumn(boolean showLinkedRequirementsColumn)
       throws RemoteException;
 
   /**
@@ -572,7 +640,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
   /**
    * Does nothing except throw a RuntimeException.
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#ADDITIONAL_ATTRIBUTES_IN_REQUIREMENTS_REPORT_TABLE}.
    * 
@@ -589,7 +657,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#ADDITIONAL_ATTRIBUTES_IN_REQUIREMENTS_REPORT_TABLE}.
    * 
@@ -604,7 +672,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#CHECK_ONLY_LINKED}.
    * 
@@ -619,7 +687,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#GENERATE_REQUIREMENTS_REPORT}.
    * 
@@ -634,7 +702,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#DERIVE_RESULT_FROM_TEST_CASE_IF_NOT_CHECKED}.
    * 
@@ -650,7 +718,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#GENERATE_ASSESSLET_RESULTS_TABLE}.
    * 
@@ -665,7 +733,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_HEADING_ROWS}.
    * 
@@ -680,7 +748,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_INFORMATION_ROWS}.
    * 
@@ -695,7 +763,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_COMMENTS}.
    * 
@@ -710,7 +778,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * 
    * @return throws a RuntimeException
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_DOCUMENT_VERSIONS}.
    * 
@@ -726,7 +794,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param considerOnlyLinkedRequirements
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#CHECK_ONLY_LINKED}.
    * 
@@ -743,7 +811,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param createRequirementsOverview
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#GENERATE_REQUIREMENTS_REPORT}.
    * 
@@ -760,7 +828,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param deriveRequirementResultsFromTCIfNotChecked
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#DERIVE_RESULT_FROM_TEST_CASE_IF_NOT_CHECKED}.
    * 
@@ -777,7 +845,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param generateRequirementsAssessletResultsTable
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#GENERATE_ASSESSLET_RESULTS_TABLE}.
    * 
@@ -794,7 +862,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param showHeadings
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_HEADING_ROWS}.
    * 
@@ -810,7 +878,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param showInformation
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_INFORMATION_ROWS}.
    * 
@@ -826,7 +894,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param showRequirementComments
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_COMMENTS}.
    * 
@@ -842,7 +910,7 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @param showDocumentVersions
    *          without meaning
    * 
-   * @deprecated Will be removed in TPT-20. Replaced by
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Replaced by
    *             {@link Assessment#REQUIREMENTS_COVERAGE_TYPE} with property
    *             {@link RequirementsCoverage#SHOW_DOCUMENT_VERSIONS}.
    * 

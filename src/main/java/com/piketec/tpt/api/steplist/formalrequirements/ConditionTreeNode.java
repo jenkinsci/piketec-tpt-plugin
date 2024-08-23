@@ -8,10 +8,10 @@ import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.Requirement;
 
 /**
- * A step is one entry in a @{@link List} of @{@link FormalRequirementStep} in {@link Requirement}
- * it can be created via {@code addFormalRequirmentsStep(String type)}.
+ * A step is one entry in a @{@link List} of @{@link ConditionTreeNode} in {@link Requirement} it
+ * can be created via {@code addConditionTreeNode(String type)}.
  */
-public interface FormalRequirementStep extends IdentifiableRemote {
+public interface ConditionTreeNode extends IdentifiableRemote {
 
   /**
    * @return the name of the step type.
@@ -68,7 +68,7 @@ public interface FormalRequirementStep extends IdentifiableRemote {
    * @return the hierarchy level (indent) of the FormalRequiermentStep. The hierarchy level starts
    *         from 0 and counts upwards. The indentation concatenates the indented step with the
    *         parent step using boolean AND. Formal requirement steps at the same indentation level
-   *         are concatenated using boolean OR
+   *         are concatenated using boolean OR.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -79,7 +79,7 @@ public interface FormalRequirementStep extends IdentifiableRemote {
    * Sets the hierarchy level (indent) of the FormalRequiermentStep. The hierarchy level starts from
    * 0 and counts upwards. The indentation concatenates the indented step with the parent step using
    * boolean AND. Formal requirement steps at the same indentation level are concatenated using
-   * boolean OR
+   * boolean OR.
    * 
    * @param level
    *          the hierarchy level.

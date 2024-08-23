@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * Configuration of the test execution for a particular platform, test set and parameter set. Part
  * of a {@link ExecutionConfiguration}
  *
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 
@@ -143,6 +143,14 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
   public String getParameterFilePath() throws RemoteException;
 
   /**
+   * @return The parameter multi set or <code>null</code> if none has yet been selected.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public ParameterMultiSet getParameterMultiSet() throws RemoteException;
+
+  /**
    * Returns the variables defined for <b>this</b> <code>ExecutionConfigurationItem</code>.
    * <p>
    * These variable could potentially overwrite variables defined in a parent scope. However, other
@@ -195,7 +203,9 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
   public void setParameterFile(File f) throws RemoteException;
 
   /**
-   * Set the parameter file as <code>String</code> or delete the entry if <code>path==null</code>
+   * Set the parameter file as <code>String</code> or delete the entry if <code>path==null</code>.
+   * If <code>path==null</code> also a previously set <code>ParameterMultiSet</code> will be
+   * deleted.
    * 
    * @param path
    *          A string containing the path to the parameter file.
@@ -204,6 +214,25 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    *           remote communication problem
    */
   public void setParameterFilePath(String path) throws RemoteException;
+
+  /**
+   * Sets the parameter multi set with the given name or deletes the entry if
+   * <code>parameterMultiSet==null</code>. If <code>parameterMultiSet==null</code> also a previously
+   * set parameter file path will be deleted.
+   * 
+   * @param parameterMultiSet
+   *          The name of the parameter multi set.
+   * @param defaultSet
+   *          Boolean if <code>true</code> only the default set of the parameter set is used else
+   *          the complete multi set.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           referred to <code>ParameterMultiSet</code> is not present in this project.
+   */
+  public void setParameterMultiSet(String parameterMultiSet, boolean defaultSet)
+      throws RemoteException, ApiException;
 
   /**
    * Enable or disable whether assessments should be executed for this

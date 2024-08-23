@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,7 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  *
  */
 public interface Back2BackSettings extends IdentifiableRemote {
@@ -48,7 +48,12 @@ public interface Back2BackSettings extends IdentifiableRemote {
     /**
      * Parameters
      */
-    PARAMETER
+    PARAMETER,
+
+    /**
+     * Measurements
+     */
+    MEASUREMENT
   }
 
   /**
@@ -65,14 +70,37 @@ public interface Back2BackSettings extends IdentifiableRemote {
   public Back2BackRow addRow(String variable) throws RemoteException;
 
   /**
-   * Get all added {@link Back2BackRow signal comparison rows}.
+   * Get all added {@link Back2BackRow signal comparison rows}. To update the rows based on the
+   * current settings and declarations you must call {@link #updateRows()} else automatically
+   * created rows are not up to date after changes to declarations or wanted variable types are
+   * made. Calling <code>getRows()</code> will implicitly call <code>updateRows()</code>.
    * 
    * @return get attribute rows
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @see #updateRows()
    */
   public RemoteList<Back2BackRow> getRows() throws RemoteException;
+
+  /**
+   * Updates the automatically created rows based on the current settings and available
+   * declarations.
+   * <ul>
+   * <li>Automatically created rows of removed decalarations will be removed
+   * <li>Automatically created rows of decalarations with no longer wanted variable type are removed
+   * <li>Not yet existing rows for declarations with wanted variable type are created
+   * </ul>
+   * This method must be called manually for performance reasons.
+   * 
+   * @see #setAutoUpdate(VariableType, boolean)
+   * @see #getRows()
+   * @see Back2BackRow#createdByAutoMode()
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void updateRows() throws RemoteException;
 
   /**
    * @return the suffix added to the reference signals.
@@ -382,7 +410,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    */
 
   /**
-   * turn on/off auto-update feature for the specified {@link VariableType}
+   * turn on/off auto-update feature for the specified {@link VariableType}. The method
+   * {@link #updateRows()} must be called to refresh the automatically created rows aferwards.
    * 
    * @param type
    *          variable type to change the settings for
@@ -391,6 +420,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @see #updateRows()
    */
   public void setAutoUpdate(VariableType type, boolean on) throws RemoteException;
 

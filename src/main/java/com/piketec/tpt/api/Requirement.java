@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.piketec.tpt.api.steplist.formalrequirements.FormalRequirementStep;
+import com.piketec.tpt.api.steplist.CompareStep;
+import com.piketec.tpt.api.steplist.formalrequirements.ConditionTreeNode;
+import com.piketec.tpt.api.steplist.formalrequirements.GeneralShallNode;
 import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
 /**
@@ -75,7 +77,10 @@ public interface Requirement extends IdentifiableRemote {
 
   /**
    * There are three types of status for requirements.
+   * 
+   * * @deprecated use {@link #markAsDeleted(boolean)} and {@link #isMarkedAsDeleted()} instead
    */
+  @Deprecated
   public enum RequirementStatus {
 
     /**
@@ -107,7 +112,7 @@ public interface Requirement extends IdentifiableRemote {
   }
 
   /**
-   * Get the type of the requirement.
+   * Gets the type of the requirement.
    * 
    * @return The type of the requirement.
    * 
@@ -117,7 +122,7 @@ public interface Requirement extends IdentifiableRemote {
   RequirementType getType() throws RemoteException;
 
   /**
-   * Set the type of the requirement.
+   * Sets the type of the requirement.
    * 
    * @param type
    *          The new type of the Requirement
@@ -148,7 +153,7 @@ public interface Requirement extends IdentifiableRemote {
   String getDocument() throws RemoteException;
 
   /**
-   * Get the document version of the requirement.
+   * Gets the document version of the requirement.
    * 
    * @return The requirement's document version.
    * 
@@ -172,7 +177,7 @@ public interface Requirement extends IdentifiableRemote {
   String getModule() throws RemoteException;
 
   /**
-   * Get the describing text a requirement normally has.
+   * Gets the describing text a requirement normally has.
    * 
    * @return The describing text of the requirement.
    * 
@@ -182,7 +187,7 @@ public interface Requirement extends IdentifiableRemote {
   String getText() throws RemoteException;
 
   /**
-   * Set the describing text a requirement normally has.
+   * Sets the describing text a requirement normally has.
    * 
    * @param text
    *          The new describing text. <code>Null</code> will be reduced to an empty string.
@@ -193,7 +198,7 @@ public interface Requirement extends IdentifiableRemote {
   void setText(String text) throws RemoteException;
 
   /**
-   * Get the comment of the requirement. This comment is also editable from the UI.
+   * Gets the comment of the requirement. This comment is also editable from the UI.
    * 
    * @return The comment of the requirement.
    * 
@@ -203,7 +208,7 @@ public interface Requirement extends IdentifiableRemote {
   String getComment() throws RemoteException;
 
   /**
-   * Set the comment of the requirement. This comment is also editable from the UI.
+   * Sets the comment of the requirement. This comment is also editable from the UI.
    * 
    * @param comment
    *          The new comment of the requirement. <code>Null</code> will be reduced to an empty
@@ -215,7 +220,31 @@ public interface Requirement extends IdentifiableRemote {
   void setComment(String comment) throws RemoteException;
 
   /**
-   * Get the URI of the requirement. If a requirement has a URI a clickable link symbol will be
+   * Gets the tag of the requirement. This tag is also editable from the UI.
+   * 
+   * @return The tag of the requirement.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getTag() throws RemoteException;
+
+  /**
+   * Sets the tag of the requirement. This tag is also editable from the UI.
+   * 
+   * @param tagName
+   *          The name of the new tag of the requirement.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the name of the tag empty or <code>null</code> or a tag with the given name does
+   *           not exist
+   */
+  void setTag(String tagName) throws RemoteException, ApiException;
+
+  /**
+   * Gets the URI of the requirement. If a requirement has a URI a clickable link symbol will be
    * displayed in the UI.
    * 
    * @return The URI of the requirement or <code>null</code>.
@@ -226,7 +255,7 @@ public interface Requirement extends IdentifiableRemote {
   URI getURI() throws RemoteException;
 
   /**
-   * Get the indent level of the requirement. This is the indentation of the requirement in the
+   * Gets the indent level of the requirement. This is the indentation of the requirement in the
    * requirement table. There may be another user attribute indent level or object level. This
    * method returns the internal attribute, that is used to layout the requirements in the UI.
    * 
@@ -238,7 +267,7 @@ public interface Requirement extends IdentifiableRemote {
   int getIndentLevel() throws RemoteException;
 
   /**
-   * Set the URI of the requirement. If a requirement has a URI a clickable link symbol will be
+   * Sets the URI of the requirement. If a requirement has a URI a clickable link symbol will be
    * displayed in the UI.
    * 
    * @param uri
@@ -261,7 +290,7 @@ public interface Requirement extends IdentifiableRemote {
   Map<String, String> getAttributes() throws RemoteException;
 
   /**
-   * Set the attribute value of the requirement. A requirement can have additional attributes. Each
+   * Sets the attribute value of the requirement. A requirement can have additional attributes. Each
    * attribute has a value associated for the requirement. If the attribute does not exist yet it
    * will be created.
    * 
@@ -370,7 +399,7 @@ public interface Requirement extends IdentifiableRemote {
       throws RemoteException;
 
   /**
-   * Get all assesslets linked to this requirement.
+   * Gets all assesslets linked to this requirement.
    * 
    * @return The list of linked assessments.
    * 
@@ -395,7 +424,7 @@ public interface Requirement extends IdentifiableRemote {
   void linkAssessment(AssessmentOrGroup aog) throws ApiException, RemoteException;
 
   /**
-   * Get all test cases and variants linked to this requirement.
+   * Gets all test cases and variants linked to this requirement.
    * 
    * @return The list of linked test cases and variants.
    * 
@@ -420,6 +449,55 @@ public interface Requirement extends IdentifiableRemote {
   void linkScenario(ScenarioOrGroup sog) throws ApiException, RemoteException;
 
   /**
+   * Gets all {@link CompareStep CompareSteps} linked to this requirement.
+   * 
+   * @return The list of linked compare steps.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteCollection<CompareStep> getLinkedCompareSteps() throws RemoteException;
+
+  /**
+   * Creates a link between this requirement and the given {@link CompareStep}. You can remove a
+   * link by removing the <code>CompareStep</code> from {@link #getLinkedCompareSteps()}.
+   * 
+   * @param compareStep
+   *          The {@link CompareStep} to create a link to this requirement.
+   * @throws ApiException
+   *           If the {@link RequirementType type} of the requirement is not linkable or if
+   *           compareStep is not of the same project as the requirement.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void linkCompareStep(CompareStep compareStep) throws ApiException, RemoteException;
+
+  /**
+   * Gets all {@link CompareStep CompareSteps} linked to this requirement.
+   * 
+   * @return The list of linked compare steps.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteCollection<GeneralShallNode> getLinkedShallNodes() throws RemoteException;
+
+  /**
+   * Creates a link between this requirement and the given {@link GeneralShallNode}. You can remove
+   * a link by removing the <code>GeneralShallNode</code> from {@link #getLinkedShallNodes()}.
+   * 
+   * @param shallNode
+   *          The {@link GeneralShallNode} to create a link to this requirement.
+   * @throws ApiException
+   *           If the {@link RequirementType type} of the requirement is not linkable or if
+   *           shallNode is not of the same project as the requirement or if the shallNode does not
+   *           belong to a {@link Assessment} of type {@link Assessment#CONDITION_TREE_TYPE}
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void linkShallNode(GeneralShallNode shallNode) throws ApiException, RemoteException;
+
+  /**
    * Sets the requirement status.
    * 
    * @param status
@@ -428,7 +506,9 @@ public interface Requirement extends IdentifiableRemote {
    *           If the the given status is not allowed or <code>null</code>.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated use {@link #markAsDeleted(boolean)} instead.
    */
+  @Deprecated
   void setStatus(RequirementStatus status) throws ApiException, RemoteException;
 
   /**
@@ -438,7 +518,9 @@ public interface Requirement extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated use {@link #isMarkedAsDeleted()} instead.
    */
+  @Deprecated
   RequirementStatus getStatus() throws RemoteException;
 
   /**
@@ -460,6 +542,28 @@ public interface Requirement extends IdentifiableRemote {
    * @see #markAsModified()
    */
   void markAsReviewed() throws RemoteException;
+
+  /**
+   * Marks this requirement as deleted.
+   * 
+   * @param markAsDeleted
+   *          if <code>true</code> the requirement will be marked as deleted and unmarked otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void markAsDeleted(boolean markAsDeleted) throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if the requirement is marked as deleted, otherwise
+   * <code>false</code>.
+   * 
+   * @return <code>true</code> if requirement is marked as deleted, otherwise <code>false</code>
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  boolean isMarkedAsDeleted() throws RemoteException;
 
   /**
    * Returns <code>true</code> if the requirement is marked as modified, otherwise
@@ -529,41 +633,54 @@ public interface Requirement extends IdentifiableRemote {
   Set<Scenario> getLinkedTestCases() throws RemoteException;
 
   /**
-   * 
+   *
    * Creates a formal requirement step of a given type at the given position. The indices of the
    * formal requirement steps start at 0.
-   * 
+   *
    * <p>
    * Formal requirements are a TPT feature that facilitates requirement-driven development. A clear,
    * requirements pattern helps to be concise, unambiguous, and testable. The formal requirements
-   * are created and managed in <code>FormalRequirementsStepList</code> via and belong to a
+   * are created and managed in <code>FormalRequirementNodeList</code> via and belong to a
    * requirement.
    * </p>
-   * 
+   *
    * @param index
    *          indicates the position where the new step shall be inserted in the step list
-   * 
+   *
    * @param type
-   *          the type of the newly created step as String, possible types are : When, While, Until,
-   *          Shall, From, Between, Documentation
+   *          the type of the newly created step as String, possible types are : While, While Bounds
+   *          Check, While Signal Compare, Between, When, Time Restriction, Shall, Shall Signal
+   *          Compare, Shall Bounds Check, Set Signal Rule, Otherwise or Documentation
    * @return the newly created Step.
-   * 
+   *
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
    *           if the given <code>type</code> does not exist.
    */
-  public FormalRequirementStep createFormalRequirmentsStep(int index, String type)
+  public ConditionTreeNode createFormalRequirementNode(int index, String type)
       throws ApiException, RemoteException;
 
   /**
    * Returns all formal requirement steps of the requirement.
-   * 
-   * @return the list of {@link FormalRequirementStep Steps} in their given order.
-   * 
+   *
+   * @return the list of {@link ConditionTreeNode} in their given order.
+   *
    * @throws RemoteException
    *           remote communication problem
    */
-  public RemoteList<FormalRequirementStep> getFormalRequirmentsSteps() throws RemoteException;
+  public RemoteList<ConditionTreeNode> getFormalRequirementsNodes() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this {@link Requirement} was loaded from the parent project.
+   * 
+   * @return <code>true</code> if this requirement was loaded from parent project,
+   *         <code>false</code> otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @see ParentProjectSettings
+   */
+  boolean isLoadedFromParent() throws RemoteException;
 
 }

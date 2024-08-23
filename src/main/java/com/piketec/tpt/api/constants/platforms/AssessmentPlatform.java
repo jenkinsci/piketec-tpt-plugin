@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,13 +28,4 @@ public interface AssessmentPlatform extends BasicPlatformConfig {
   public static final String MEASUREMENT_FILE = "measurementfile";
 
   public static final String MEASUREMENT_FILE_ATTRIBUTE = "measurementfileattribute";
-
-  /**
-   * Automatically create and export all signals contained in the measurement file
-   * 
-   * @deprecated Will be removed in TPT 21. Flag is no longer supported. The assessment platform
-   *             will always create and export the signals cointained in the measurement file.
-   */
-  @Deprecated
-  public static final String AUTO_CREATE_SIGNALS = "autoCreateSignals";
 }

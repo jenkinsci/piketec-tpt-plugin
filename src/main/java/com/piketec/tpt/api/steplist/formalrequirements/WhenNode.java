@@ -5,16 +5,23 @@ import java.rmi.RemoteException;
 import com.piketec.tpt.api.ApiException;
 
 /**
- * This {@link FormalRequirementStep} defines an interval which happens when a condition is
- * evaluated based on the {@link WhenType}.
+ * This {@link ConditionTreeNode} defines an interval which happens when a condition is evaluated
+ * based on the {@link WhenType}.
  */
-public interface WhenStep extends FormalRequirementStep {
+public interface WhenNode extends ConditionTreeNode {
 
   /**
    * The possible when types.
    */
   enum WhenType {
     BECOMES_TRUE, HAS_BECOME_TRUE, WILL_BECOME_TRUE, HAS_BEEN_TRUE;
+  }
+
+  /**
+   * The possible when extension types.
+   */
+  enum WhenExtensionType {
+    NONE, PRECEDING, FOLLOWING;
   }
 
   /**
@@ -83,4 +90,48 @@ public interface WhenStep extends FormalRequirementStep {
    *           if the time is {@code null}
    */
   public void setTime(String time) throws RemoteException, ApiException;
+
+  /**
+   * The time for which the interval gets extended.
+   * 
+   * @return The time for which the interval gets extended
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getIntervalLength() throws RemoteException;
+
+  /**
+   * Sets the time for which the interval shall be extended.
+   * 
+   * @param intervalLength
+   *          the time for which the interval shall be extended
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the time is {@code null}
+   */
+  public void setIntervalLength(String intervalLength) throws RemoteException, ApiException;
+
+  /**
+   * Sets the {@code WhenExtensionType} with which the interval shall be extended.
+   * {@code WhenExtensionType} are NONE, PROCEEDING, FOLLOWING.
+   * 
+   * @param extensionType
+   *          the {@code WhenExtensionType}
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the {@code WhenExtensionType} is null
+   */
+  public void setExtensionType(WhenExtensionType extensionType)
+      throws RemoteException, ApiException;
+
+  /**
+   * The {@code WhenExtensionType} with wich the intervall is extended.
+   * 
+   * @return the {@code WhenExtensionType} with wich the intervall is extended.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public WhenExtensionType getExtensionType() throws RemoteException;
 }

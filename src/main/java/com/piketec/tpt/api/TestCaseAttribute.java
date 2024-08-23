@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,21 +22,14 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+
 /**
  * A <code>TestCaseAttribute</code> represents a row in the Test Case Details view. It consists of a
  * name and a type.
  * 
  */
 public interface TestCaseAttribute extends IdentifiableRemote {
-
-  /**
-   * Type String for String Test Case Attribute
-   * 
-   * @deprecated Will be removed in TPT-21.
-   * 
-   */
-  @Deprecated
-  public static final String STRING_TYPE = "String";
 
   /**
    * Different types of test case attributes.
@@ -71,7 +64,8 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @deprecated will be removed in TPT-21. Use {@link #getAttributeType()} instead.
+   * @deprecated Removed in TPT-21. Throws{@link DeprecatedAndRemovedException}. Use
+   *             {@link #getAttributeType()} instead.
    */
   @Deprecated
   String getType() throws RemoteException;
@@ -122,6 +116,31 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    *           remote communication problem
    */
   void setCopyable(boolean on) throws RemoteException;
+
+  boolean isReadonly() throws RemoteException;
+
+  void setReadonly(boolean on) throws RemoteException;
+
+  /**
+   * Returns the auto review flag of the {@link TestCaseAttribute}. If set and the attribute value
+   * changes during an import, the change will be reviewed automatically.
+   * 
+   * @return the auto review flag
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  boolean isAutoReview() throws RemoteException;
+
+  /**
+   * Sets the auto review flag of the {@link TestCaseAttribute}. If set and the attribute value
+   * changes during an import, the change will be reviewed automatically.
+   * 
+   * @param on
+   *          the new value of the auto review flag
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setAutoReview(boolean on) throws RemoteException;
 
   /**
    * Returns the type of this attribute; it can be either <code>TEXT</code>, <code>CHECKBOX</code>,

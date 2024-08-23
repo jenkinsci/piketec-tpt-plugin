@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -39,9 +39,9 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
   public static final String A2L_FLAVOR = "A2L";
 
   /**
-   * Adtf flavor
+   * FEP flavor
    */
-  public static final String ADTF_FLAVOR = "Adtf";
+  public static final String FEP_FLAVOR = "FEP";
 
   /**
    * CTB Mapping flavor
@@ -282,5 +282,34 @@ public interface Mapping extends IdentifiableRemote, NamedObject {
    */
   String getMappingFlavorColumnDefaultValue(Declaration decl, String subElement, String column)
       throws ApiException, RemoteException;
+
+  /**
+   * Returns <code>true</code> if this {@link Mapping} was loaded from the parent project.
+   * 
+   * @return <code>true</code> if this mapping was loaded from parent project, <code>false</code>
+   *         otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @see ParentProjectSettings
+   */
+  boolean isLoadedFromParent() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if the flavor with the provided name exists in this {@link Mapping}
+   * and was loaded from the parent project.
+   * 
+   * @param flavorName
+   *          The name of the flavor.
+   * @return <code>true</code> if this flavor was loaded from parent project, <code>false</code>
+   *         otherwise.
+   * @throws ApiException
+   *           If <code>flavorName == null</code> or the mapping does not contain the flavor or the
+   *           name of the flavor is unknown to TPT.
+   * @throws RemoteException
+   *           remote communication problem
+   * @see ParentProjectSettings
+   */
+  public boolean isFlavorLoadedFromParent(String flavorName) throws ApiException, RemoteException;
 
 }

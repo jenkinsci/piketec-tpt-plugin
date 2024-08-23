@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * This class represents an assessment. The particular properties of the different assessment types
  * are mapped to generic properties (see {@link PropertyMap}).
  *
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Assessment extends AssessmentOrGroup {
 
@@ -156,6 +156,11 @@ public interface Assessment extends AssessmentOrGroup {
   public static final String GLOBAL_SCRIPT_TYPE = "GlobalType";
 
   /**
+   * Type String for Global Coverage Assesslet
+   */
+  public static final String GLOBAL_COVERAGE_TYPE = "GlobalCoverageType";
+
+  /**
    * Type String for Global Variable Assesslet
    */
   public static final String GLOBAL_VARIABLE_TYPE = "GlobalVariableType";
@@ -166,15 +171,9 @@ public interface Assessment extends AssessmentOrGroup {
   public static final String GLOBAL_EQUIVALENCE_CLASSES_TYPE = "GlobalEquivalenceClassesType";
 
   /**
-   * @deprecated Will be removed in TPT-20.
-   */
-  @Deprecated
-  public static final String REPORT_LINKED_REQUIREMENTS_TYPE = "rmassesslet";
-
-  /**
    * Type String for Requirements Coverage Assesslet
    */
-  public static final String REQUIREMENTS_COVERAGE_TYPE = REPORT_LINKED_REQUIREMENTS_TYPE;
+  public static final String REQUIREMENTS_COVERAGE_TYPE = "rmassesslet";
 
   /**
    * @return The name of the assessment type.

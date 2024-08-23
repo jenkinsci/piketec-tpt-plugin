@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,10 +22,12 @@ package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+
 /**
  * A <code>Declaration</code> is either a signal or a parameter or a constant.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Declaration extends NamedObject, IdentifiableRemote {
 
@@ -51,8 +53,7 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
 
   /**
    * Returns the name of the unit of the declaration. For complex types units of subvariables are
-   * united. <br>
-   * For unstructured declarations it is recommended to use {@link #getUnitObject()}.
+   * united.
    * 
    * @return current unit as a string
    * 
@@ -62,26 +63,12 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
   String getUnit() throws RemoteException;
 
   /**
-   * Returns the {@link Unit} set to this declaration. The method is only allowed on non-structured
-   * declarations. Use {@link #getUnit()} for structured declarations.
-   * 
-   * @return the unit for this declaration or <code>null</code> if no unit is set.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ApiException
-   *           If this declaration has a structured type.
-   */
-  Unit getUnitObject() throws ApiException, RemoteException;
-
-  /**
    * Set the unit of the declaration. For structs, maps and curves provide a comma separated list of
-   * units in braces, which fits their structure. The units name and symbol can be used. <br>
-   * For unstructured declarations it is recommended to use {@link #setUnit(Unit)}.<br>
+   * units in braces, which fits their structure.<br>
    * <br>
    * <b>Note:</b> At the moment single units without curly braces (e.g. "km") are accepted for
    * curves and maps. In this case the unit of the value element will be set. In the future this
-   * might be rejected.
+   * might be rejected. This, this abbreviation is <i>not</i> recommended.
    * 
    * @param unit
    *          The new unit of the declaration. <code>Null</code> will be reduced to an empty string.
@@ -92,19 +79,6 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   void setUnit(String unit) throws ApiException, RemoteException;
-
-  /**
-   * Set the unit of this declaration. The method is only allowed on unstructured declarations. Use
-   * {@link #setUnit(String)} for structured declarations.
-   * 
-   * @param unit
-   *          to be set or <code>null</code> to remove unit.
-   * @throws ApiException
-   *           If this declaration has a structured type.
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  void setUnit(Unit unit) throws ApiException, RemoteException;
 
   /**
    * Get the default value of the declaration. The format is the same as seen in tptaif or the
@@ -185,5 +159,52 @@ public interface Declaration extends NamedObject, IdentifiableRemote {
    *           remote communication problem
    */
   void setDescription(String description) throws RemoteException;
+
+  /**
+   * Returns the {@link Unit} set to this declaration. The method is only allowed on non-structured
+   * declarations. Use {@link #getUnit()} for structured declarations.
+   * 
+   * @return the unit for this declaration or <code>null</code> if no unit is set.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If this declaration has a structured type.
+   * 
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Units are
+   *             represented as Strings only.
+   */
+
+  /**
+   * Returns <code>true</code> if this declaration was loaded from the parent project.
+   * 
+   * @return <code>true</code> if this declaration was loaded from parent project,
+   *         <code>false</code> otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @see ParentProjectSettings
+   */
+  boolean isLoadedFromParent() throws RemoteException;
+
+  @Deprecated
+  Unit getUnitObject() throws ApiException, RemoteException;
+
+  /**
+   * Set the unit of this declaration. The method is only allowed on unstructured declarations. Use
+   * {@link #setUnit(String)} for structured declarations.
+   * 
+   * @param unit
+   *          to be set or <code>null</code> to remove unit.
+   * @throws ApiException
+   *           If this declaration has a structured type.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Units are
+   *             represented as Strings only.
+   */
+  @Deprecated
+  void setUnit(Unit unit) throws ApiException, RemoteException;
 
 }

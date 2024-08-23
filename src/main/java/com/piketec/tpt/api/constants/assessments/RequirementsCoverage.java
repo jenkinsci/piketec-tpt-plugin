@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -73,6 +73,12 @@ public interface RequirementsCoverage extends BasicAssessment {
 
   /**
    * Property whether the requirements results table in the requirements report will have a column
+   * with requirement tags
+   */
+  public static final String SHOW_TAGS = "show-tags";
+
+  /**
+   * Property whether the requirements results table in the requirements report will have a column
    * with document versions
    */
   public static final String SHOW_DOCUMENT_VERSIONS = "show-document-versions";
@@ -82,6 +88,22 @@ public interface RequirementsCoverage extends BasicAssessment {
    * requirements report
    */
   public static final String GENERATE_ASSESSLET_RESULTS_TABLE = "generate-assesslet-results-table";
+
+  /**
+   * Property whether to display test cases in tables with their names in the requirements report
+   */
+  public static final String SHOW_TEST_CASE_NAMES = "show-test-case-names";
+
+  /**
+   * Property whether to display test cases in tables with their IDs in the requirements report
+   */
+  public static final String SHOW_TEST_CASE_IDS = "show-test-case-ids";
+
+  /**
+   * Property whether to display the value of an attribute of a test cases in tables in the
+   * requirements report
+   */
+  public static final String TEST_CASE_ATTRIBUTE_TO_SHOW = "test-case-attribute-to-show";
 
   /**
    * Property whether to check that all requirements are linked to an executed test case, directly

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,7 +27,7 @@ import java.rmi.RemoteException;
  * {@link Project#createType(String, String)}, {@link Project#getTypes()}. For predefined types use
  * for example {@link Project#getTypeDouble()}.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Type extends IdentifiableRemote {
 
@@ -95,5 +95,17 @@ public interface Type extends IdentifiableRemote {
    * @see #isAnonymous()
    */
   boolean isDeclared() throws RemoteException;
+
+  /**
+   * Returns <code>true</code> if this {@link Type} was loaded from the parent project.
+   * 
+   * @return <code>true</code> if this {@link Type} is loaded from parent project,
+   *         <code>false</code> otherwise.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @see ParentProjectSettings
+   */
+  boolean isLoadedFromParent() throws RemoteException;
 
 }

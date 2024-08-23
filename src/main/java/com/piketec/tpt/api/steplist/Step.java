@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,6 +30,16 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * A step is one entry in a {@link StepListScenario}.
  */
 public interface Step extends IdentifiableRemote {
+
+  /**
+   * Type String for script-step
+   */
+  public static final String SCRIPT = "script";
+
+  /**
+   * Type String for define-function-step
+   */
+  public static final String DEFINE_FUNCTION = "define-function";
 
   /**
    * Type String for call-function-step

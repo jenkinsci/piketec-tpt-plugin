@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -38,7 +38,7 @@ import com.piketec.tpt.api.RemoteCollection;
  * implements the {@link Iterable} interface. Since the methods of the latter do not throw
  * <code>RemoteException</code> this Object <i>cannot</i> be exported as a {@link RemoteObject}.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  * 
  * @param <T>
  *          the type of elements in this collection

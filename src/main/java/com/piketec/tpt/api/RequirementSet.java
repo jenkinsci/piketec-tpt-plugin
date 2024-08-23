@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,6 +21,7 @@
 package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 /**
  * TPT API representation of a requirement set. A Requirement set can be used to filter the test
@@ -29,7 +30,7 @@ import java.rmi.RemoteException;
  * is defined by a condition that is evaluated when runnig an {@link ExecutionConfiguration}. When
  * it is used in the UI, default values may be assumed for variables used in the condition.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface RequirementSet extends NamedObject, IdentifiableRemote {
 
@@ -38,7 +39,6 @@ public interface RequirementSet extends NamedObject, IdentifiableRemote {
    * requirement set.
    * 
    * @return the condition.
-   * 
    * @throws RemoteException
    *           remote communication error
    */
@@ -54,4 +54,17 @@ public interface RequirementSet extends NamedObject, IdentifiableRemote {
    *           remote communication error
    */
   void setCondition(String condition) throws RemoteException;
+
+  /**
+   * Calculates the {@link List} of {@link Requirement Requirements} contained in the requirement
+   * set, that is, those for which the condition is satisfied.
+   * 
+   * @return a list of requirements
+   * @throws ApiException
+   *           if requirements are not accessible or the calculation causes errors
+   * @throws RemoteException
+   *           remote communication error
+   */
+  List<Requirement> getRequirements() throws ApiException, RemoteException;
+
 }

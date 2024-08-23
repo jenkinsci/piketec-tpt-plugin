@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -50,6 +50,16 @@ public interface GlobalEquivalenceClasses extends BasicAssessment {
    * Property whether the equivalence class information should also be reported in the overview.
    */
   public static final String REPORT_IN_OVERVIEW = "report-overview";
+
+  /**
+   * Property whether the two-point boundary value coverage should be tested.
+   */
+  public static final String BOUNDARY_TWO_POINT = "boundary-two-point";
+
+  /**
+   * Property whether the three-point boundary value coverage should be tested.
+   */
+  public static final String BOUNDARY_THREE_POINT = "boundary-three-point";
 
   /**
    * Property for the list of rows of the Global Equivalence Classes Assesslet. Each row checks if

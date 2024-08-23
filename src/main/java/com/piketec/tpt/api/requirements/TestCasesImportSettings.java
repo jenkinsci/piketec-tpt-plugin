@@ -1,8 +1,29 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2014-2024 Synopsys Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.tpt.api.requirements;
 
 import java.io.Serializable;
 import java.util.List;
 
+import com.piketec.tpt.api.TestCaseAttribute;
 import com.piketec.tpt.api.requirements.codebeamer.CodeBeamerTestCasesImportSettings;
 import com.piketec.tpt.api.requirements.csv.CsvFileTestCasesImportSettings;
 import com.piketec.tpt.api.requirements.excel.ExcelFileTestCasesImportSettings;
@@ -15,7 +36,7 @@ import com.piketec.tpt.api.requirements.polarion.PolarionTestCasesImportSettings
  * For the test cases import from Polarion use {@link PolarionTestCasesImportSettings}.<br>
  * For the test cases import from codeBeamer use {@link CodeBeamerTestCasesImportSettings}.
  * 
- * @author Copyright (c) 2014-2022 PikeTec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class TestCasesImportSettings implements Serializable {
 
@@ -116,6 +137,7 @@ public abstract class TestCasesImportSettings implements Serializable {
 
   private TestCaseType preferredTestCaseType = TestCaseType.TIME_PARTITION;
 
+  @Deprecated
   private List<String> autoReviewAttributes = null;
 
   /**
@@ -247,7 +269,11 @@ public abstract class TestCasesImportSettings implements Serializable {
   /**
    * @return Optional list of column names in the source file for which the automatic review of
    *         possible changes of a test case attribute should be enabled.
+   *
+   * @deprecated This list has no effect anymore. Use {@link TestCaseAttribute#isAutoReview()}
+   *             instead.
    */
+  @Deprecated
   public List<String> getAutoReviewAttributes() {
     return autoReviewAttributes;
   }
@@ -256,7 +282,11 @@ public abstract class TestCasesImportSettings implements Serializable {
    * @param autoReviewAttributes
    *          Optional list of column names in the source file for which the automatic review of
    *          possible changes of a test case attribute should be enabled.
+   *
+   * @deprecated This list has no effect anymore. Use
+   *             {@link TestCaseAttribute#setAutoReview(boolean)} instead.
    */
+  @Deprecated
   public void setAutoReviewAttributes(List<String> autoReviewAttributes) {
     this.autoReviewAttributes = autoReviewAttributes;
   }

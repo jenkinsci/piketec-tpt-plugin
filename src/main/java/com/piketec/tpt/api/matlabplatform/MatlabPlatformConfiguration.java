@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,7 +31,7 @@ import com.piketec.tpt.api.Project.SynchronizationMethod;
 /**
  * The TPT API representation of the MATLAB/Simulink platform in TPT
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface MatlabPlatformConfiguration extends PlatformConfiguration {
 
@@ -51,6 +51,23 @@ public interface MatlabPlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public String getMatlabVersionName() throws RemoteException;
+
+  /**
+   * Set the Option "Stub Simulink Function"
+   * 
+   * @param stubSimulink
+   *          True: Simulink Functions will be stubbed.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setStubSimulinkFunctions(boolean stubSimulink) throws RemoteException;
+
+  /**
+   * @return The "Stub Simulink Functions" Option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean getStubSimulinkFunctions() throws RemoteException;
 
   /**
    * Set the subsystem block path.

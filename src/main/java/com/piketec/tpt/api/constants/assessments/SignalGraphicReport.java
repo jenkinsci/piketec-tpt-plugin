@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -47,20 +47,22 @@ public interface SignalGraphicReport extends BasicAssessment, SignalFilter {
 
   public static final String INCLUDE_IN_TABLE_OF_FIGURES = "include-in-table-of-figures";
 
-  public static final String GRID_ENABLED = "grid-enabled";
-
   public static final String XAXIS_VISIBLE = "xaxis-visible";
+
+  public static final String XGRID_VISIBLE = "xgrid-visible";
+
+  public static final String XAXIS_SCALING = "xaxis-scaling";
 
   public static final String XAXIS_INTERVALL_FIXED = "xaxis-intervall-fixed";
 
   public static final String YAXIS_VISIBLE = "yaxis-visible";
 
+  public static final String YGRID_VISIBLE = "ygrid-visible";
+
+  public static final String YAXIS_SCALING = "yaxis-scaling";
+
   /** Only the value in {@link SignalGraphicReport.YAxisOptions} are possible */
   public static final String YAXIS_SETTINGS = "yaxis-settings";
-
-  /** @deprecated Please use {@link #YAXIS_SETTINGS}. Will be removed in TPT-21. */
-  @Deprecated
-  public static final String YAXIS_INTERVALL_FIXED = "yaxis-intervall-fixed";
 
   public static final String XAXIS_INTERVALL_FROM = "xaxis-intervall-from";
 

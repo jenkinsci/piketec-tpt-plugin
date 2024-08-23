@@ -1,8 +1,29 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2014-2024 Synopsys Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.tpt.api.requirements.tabular;
 
 import java.util.List;
 
 import com.piketec.tpt.api.Pair;
+import com.piketec.tpt.api.TestCaseAttribute;
 import com.piketec.tpt.api.requirements.TestCasesImportSettings;
 import com.piketec.tpt.api.requirements.TestCasesImportSettings.TargetTypeAssignment.TargetType;
 import com.piketec.tpt.api.requirements.csv.CsvFileTestCasesImportSettings;
@@ -13,7 +34,7 @@ import com.piketec.tpt.api.requirements.excel.ExcelFileTestCasesImportSettings;
  * For the test cases import from a CSV file use {@link CsvFileTestCasesImportSettings}.<br>
  * For the test cases import from an Excel file use {@link ExcelFileTestCasesImportSettings}.
  * 
- * @author Copyright (c) 2014-2022 PikeTec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class TabularTestCasesImportSettings extends TestCasesImportSettings {
 
@@ -264,10 +285,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
 
   /**
    * @return Optional list of assigments of column names in the source file to test case attribute
-   *         names. To enable the automatic review of possible changes of an attribute add the
-   *         column name also to the {@link #getAutoReviewAttributes() list of autoreview
-   *         attributes}.
-   * @see #setAutoReviewAttributes(List)
+   *         names.
    */
   public List<Pair<String, String>> getAttributeAssignments() {
     return attributeAssignments;
@@ -276,10 +294,10 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
   /**
    * @param attributeAssignments
    *          Optional list of assigments of column names in the source file to test case attribute
-   *          names. To enable the automatic review of possible changes of an attribute add the
-   *          column name also to the {@link #getAutoReviewAttributes() list of autoreview
-   *          attributes}.
-   * @see #setAutoReviewAttributes(List)
+   *          names. To enable the automatic review of possible changes of an test case attribute
+   *          {@link TestCaseAttribute#setAutoReview(boolean) change the auto review flag of
+   *          existing test case attributes}.
+   * @see TestCaseAttribute#setAutoReview(boolean)
    */
   public void setAttributeAssignments(List<Pair<String, String>> attributeAssignments) {
     this.attributeAssignments = attributeAssignments;

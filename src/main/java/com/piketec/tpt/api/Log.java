@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * A Log is a list of messages where each messages has a {@link LogType}.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class Log implements Serializable {
 
@@ -119,7 +119,7 @@ public class Log implements Serializable {
   /**
    * The log type or severity of a log message.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public static enum LogType {
     /**
@@ -139,7 +139,7 @@ public class Log implements Serializable {
   /**
    * A log message and its {@link LogType}.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public static class LogEntry implements Serializable {
 

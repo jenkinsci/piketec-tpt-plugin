@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,13 +21,13 @@
 package com.piketec.tpt.api;
 
 import java.rmi.RemoteException;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The status of a test case or assesslet.
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Status extends IdentifiableRemote {
 
@@ -88,5 +88,5 @@ public interface Status extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<String> getTags() throws RemoteException;
+  List<String> getTags() throws RemoteException;
 }

@@ -1,3 +1,23 @@
+/*
+ * The MIT License (MIT)
+ * 
+ * Copyright (c) 2014-2024 Synopsys Inc.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+ * NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 package com.piketec.tpt.api.steplist;
 
 import java.rmi.RemoteException;
@@ -88,6 +108,11 @@ public abstract interface ServiceStep extends Step {
   public static final String SVC_XIL_DOWNLOAD_PARAMETER_FILE = "xil-download-parameter-file";
 
   /**
+   * Type String for xil-download-parameter-sets
+   */
+  public static final String SVC_XIL_DOWNLOAD_PARAMETER_SETS = "xil-download-parameter-sets";
+
+  /**
    * Type String for xil-pause-simulation
    */
   public static final String SVC_XIL_PAUSE_SIMULATION = "xil-pause-simulation";
@@ -119,9 +144,19 @@ public abstract interface ServiceStep extends Step {
   public static final String SVC_XIL_SET_ELECTRICAL_ERROR = "xil-set-electrical-error";
 
   /**
+   * Type String for xil-start-recording
+   */
+  public static final String SVC_XIL_START_RECORDING = "xil-start-recording";
+
+  /**
    * Type String for xil-start-simulation
    */
   public static final String SVC_XIL_START_SIMULATION = "xil-start-simulation";
+
+  /**
+   * Type String for xil-stop-recording
+   */
+  public static final String SVC_XIL_STOP_RECORDING = "xil-stop-recording";
 
   /**
    * Type String for xil-stop-simulation
@@ -191,6 +226,12 @@ public abstract interface ServiceStep extends Step {
    */
   public static final String SVC_CANAPE_DIAG_SEND_WRITE_STRING_REQUEST =
       "canape-send-diagnostic-write-string-request";
+
+  /**
+   * Type String for canape-send-raw-diagnostic-request
+   */
+  public static final String SVC_CANAPE_DIAG_SEND_RAW_REQUEST =
+      "canape-send-raw-diagnostic-request";
 
   /**
    * Type String for canape-set-ecu-tester-present
@@ -344,6 +385,36 @@ public abstract interface ServiceStep extends Step {
   public static final String SVC_CANOE_STOP_SIMULATION = "canoe-stop-simulation";
 
   /**
+   * Type String for carmaker-hil-load-test-run
+   */
+  public static final String SVC_CARMAKER_HIL_LOAD_TEST_RUN = "carmaker-hil-load-test-run";
+
+  /**
+   * Type String for carmaker-hil-start-simulation
+   */
+  public static final String SVC_CARMAKER_HIL_START_SIMULATION = "carmaker-hil-start-simulation";
+
+  /**
+   * Type String for carmaker-hil-start-simulation
+   */
+  public static final String SVC_CARMAKER_HIL_STOP_SIMULATION = "carmaker-hil-stop-simulation";
+
+  /**
+   * Type String for carmaker-hil-send-command
+   */
+  public static final String SVC_CARMAKER_HIL_SEND_COMMAND = "carmaker-hil-send-command";
+
+  /**
+   * Type String for carmaker-hil-read-value
+   */
+  public static final String SVC_CARMAKER_HIL_READ_VALUE = "carmaker-hil-read-value";
+
+  /**
+   * Type String for carmaker-hil-write-value
+   */
+  public static final String SVC_CARMAKER_HIL_WRITE_VALUE = "carmaker-hil-write-value";
+
+  /**
    * Type String for ctb-model-switch-value
    */
   public static final String SVC_CTB_MODEL_SWITCH = "ctb-model-switch-value";
@@ -444,7 +515,12 @@ public abstract interface ServiceStep extends Step {
   public static final String SVC_DSPACE_DOWNLOAD_PARAMETER_FILE = "dspace-download-parameter-file";
 
   /**
-   * Type String for dspace-pause-simulation
+   * Type String for dspace-download-parameter-sets
+   */
+  public static final String SVC_DSPACE_DOWNLOAD_PARAMETER_SETS = "dspace-download-parameter-sets";
+
+  /**
+   * /** Type String for dspace-pause-simulation
    */
   public static final String SVC_DSPACE_PAUSE_SIMULATION = "dspace-pause-simulation";
 
@@ -475,9 +551,19 @@ public abstract interface ServiceStep extends Step {
   public static final String SVC_DSPACE_SET_ELECTRICAL_ERROR = "dspace-set-electrical-error";
 
   /**
+   * Type String for dspace-start-recording
+   */
+  public static final String SVC_DSPACE_START_RECORDING = "dspace-start-recording";
+
+  /**
    * Type String for dspace-start-simulation
    */
   public static final String SVC_DSPACE_START_SIMULATION = "dspace-start-simulation";
+
+  /**
+   * Type String for dspace-stop-recording
+   */
+  public static final String SVC_DSPACE_STOP_RECORDING = "dspace-stop-recording";
 
   /**
    * Type String for dspace-stop-simulation

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -33,6 +33,7 @@ import java.util.regex.PatternSyntaxException;
 
 import com.piketec.tpt.api.Requirement.RequirementType;
 import com.piketec.tpt.api.importinterface.ImportInterfaceSettings;
+import com.piketec.tpt.api.issues.jira.JiraIssuesCreateSettings;
 import com.piketec.tpt.api.requirements.RequirementsExportSettings;
 import com.piketec.tpt.api.requirements.RequirementsImportSettings;
 import com.piketec.tpt.api.requirements.TestCasesExportSettings;
@@ -54,20 +55,21 @@ import com.piketec.tpt.api.requirements.polarion.PolarionTestCasesImportSettings
 import com.piketec.tpt.api.requirements.reqif.ReqIfRequirementsImportSettings;
 import com.piketec.tpt.api.requirements.reqif.ReqIfTestCasesExportSettings;
 import com.piketec.tpt.api.steplist.formalrequirements.FormalRequirementDefine;
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
 /**
  * This object represents a TPT project. It has been either newly created with
  * {@link TptApi#newProject(File)} or opened via {@link TptApi#openProject(File)}.
  * 
  *
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, TestSetOwner {
 
   /**
    * Modes how to match existing declarations and imported declarations.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    *
    */
   public static enum SynchronizationMethod {
@@ -84,7 +86,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   /**
    * Modes that determine which types of requirement links are included in calculations.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    *
    */
   public static enum RequirementsLinking {
@@ -256,13 +258,13 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link ExecutionConfigurationOrGroup ExecutionConfigurationOrGroups},
+   * @return List of all {@link ExecutionConfigurationOrGroup ExecutionConfigurationOrGroups},
    *         matching the given name pattern.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<ExecutionConfigurationOrGroup> getExecutionConfigurationOrGroupByNamePattern(Pattern namepattern)
+  List<ExecutionConfigurationOrGroup> getExecutionConfigurationOrGroupByNamePattern(Pattern namepattern)
       throws RemoteException;
 
   /**
@@ -270,7 +272,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link ExecutionConfigurationOrGroup ExecutionConfigurationOrGroups},
+   * @return List of all {@link ExecutionConfigurationOrGroup ExecutionConfigurationOrGroups},
    *         matching the given name pattern.
    * 
    * @throws PatternSyntaxException
@@ -278,7 +280,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<ExecutionConfigurationOrGroup> getExecutionConfigurationOrGroupByNamePattern(String namepattern)
+  List<ExecutionConfigurationOrGroup> getExecutionConfigurationOrGroupByNamePattern(String namepattern)
       throws PatternSyntaxException, RemoteException;
 
   /**
@@ -312,14 +314,13 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param namepattern
    *          A regular expression for the name pattern.
    * 
-   * @return Collection of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups},
-   *         matching the given name pattern.
+   * @return List of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups}, matching
+   *         the given name pattern.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<TestSetOrGroup> getTestSetOrGroupByNamePattern(Pattern namepattern)
-      throws RemoteException;
+  List<TestSetOrGroup> getTestSetOrGroupByNamePattern(Pattern namepattern) throws RemoteException;
 
   /**
    * Delivers all test sets and test set groups, matching the given name pattern.
@@ -327,15 +328,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param namepattern
    *          A regular expression for the name pattern.
    * 
-   * @return Collection of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups},
-   *         matching the given name pattern.
+   * @return List of all {@link TestSet TestSets} and {@link TestSetGroup TestSetGroups}, matching
+   *         the given name pattern.
    * 
    * @throws PatternSyntaxException
    *           If the expression's syntax is invalid
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<TestSetOrGroup> getTestSetOrGroupByNamePattern(String namepattern)
+  List<TestSetOrGroup> getTestSetOrGroupByNamePattern(String namepattern)
       throws RemoteException, PatternSyntaxException;
 
   /**
@@ -374,13 +375,13 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link PlatformConfiguration PlatformConfigurations}, matching the
-   *         given name pattern.
+   * @return List of all {@link PlatformConfiguration PlatformConfigurations}, matching the given
+   *         name pattern.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<PlatformConfiguration> getPlatformConfigurationByNamePattern(Pattern namepattern)
+  List<PlatformConfiguration> getPlatformConfigurationByNamePattern(Pattern namepattern)
       throws RemoteException;
 
   /**
@@ -388,15 +389,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link PlatformConfiguration PlatformConfigurations}, matching the
-   *         given name pattern.
+   * @return List of all {@link PlatformConfiguration PlatformConfigurations}, matching the given
+   *         name pattern.
    * 
    * @throws PatternSyntaxException
    *           If the expression's syntax is invalid
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<PlatformConfiguration> getPlatformConfigurationByNamePattern(String namepattern)
+  List<PlatformConfiguration> getPlatformConfigurationByNamePattern(String namepattern)
       throws PatternSyntaxException, RemoteException;
 
   /**
@@ -520,6 +521,19 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
       throws RemoteException, ApiException;
 
   /**
+   * Creates a requirement attribute with the given name.
+   * 
+   * @param attributeName
+   *          The name of the new attribute.
+   * @throws ApiException
+   *           If there already exists an attribute with the given name or the name is empty or
+   *           {@code null}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void createRequirementAttribute(String attributeName) throws RemoteException, ApiException;
+
+  /**
    * Removes the requirement attribute with the given name. The attribute will be removed in all
    * requirements of the project.
    * 
@@ -531,6 +545,84 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           if the name of the attribute is empty or {@code null}
    */
   void removeRequirementAttribute(String attributeName) throws RemoteException;
+
+  /**
+   * Returns a list of names of the declared requirement attributes for this project.
+   * 
+   * @return A list of requirement attribute names.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> getRequirementAttributes() throws RemoteException;
+
+  /**
+   * Sets the auto review flag for the given requirement attribute. If set and the attribute value
+   * of a requirement is changing during an import, the change will be reviewed automatically.
+   * 
+   * @param attributeName
+   *          The name of the new attribute.
+   * @param autoReview
+   *          The new value for the flag.
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the attribute name is empty or {@code null} or an attribute with that name does
+   *           not exist
+   */
+  void setRequirementAttributeAutoReview(String attributeName, boolean autoReview)
+      throws RemoteException, ApiException;
+
+  /**
+   * Gets the auto review flag for the given requirement attribute. If set and the attribute value
+   * of a requirement is changing during an import, the change will be reviewed automatically.
+   * 
+   * @param attributeName
+   *          The name of the new attribute.
+   * @return the auto review flag of the given requirement attribute
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the attribute name is empty or {@code null} or an attribute with that name does
+   *           not exist
+   */
+  boolean isRequirementAttributeAutoReview(String attributeName)
+      throws RemoteException, ApiException;
+
+  /**
+   * Adds a requirement tag with the given name.
+   * 
+   * @param tagName
+   *          The name of the attribute to add.
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the name of the tag is empty or {@code null}
+   */
+  void addRequirementTag(String tagName) throws RemoteException, ApiException;
+
+  /**
+   * Removes the requirement tag with the given name. The tag will be removed in all requirements
+   * using it.
+   * 
+   * @param tagName
+   *          The name of the attribute to remove.
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           if the name of the tag is empty or {@code null}
+   */
+  void removeRequirementTag(String tagName) throws RemoteException, ApiException;
+
+  /**
+   * Returns the list of the defined requirement tags for this project.
+   * 
+   * @return A list of requirement tags.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> getRequirementTags() throws RemoteException;
 
   /**
    * Sets the name spaces which will be used for the Defines of this TPT project. If several name
@@ -602,29 +694,26 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link ScenarioOrGroup ScenarioOrGroups}, matching the given name
-   *         pattern.
+   * @return List of all {@link ScenarioOrGroup ScenarioOrGroups}, matching the given name pattern.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<ScenarioOrGroup> getScenarioOrGroupByNamePattern(Pattern namepattern)
-      throws RemoteException;
+  List<ScenarioOrGroup> getScenarioOrGroupByNamePattern(Pattern namepattern) throws RemoteException;
 
   /**
    * Delivers all scenarios and/or scenario groups, matching the given name pattern.
    * 
    * @param namepattern
    *          A regular expression for the name pattern.
-   * @return Collection of all {@link ScenarioOrGroup ScenarioOrGroups}, matching the given name
-   *         pattern.
+   * @return List of all {@link ScenarioOrGroup ScenarioOrGroups}, matching the given name pattern.
    * 
    * @throws PatternSyntaxException
    *           If the expression's syntax is invalid
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<ScenarioOrGroup> getScenarioOrGroupByNamePattern(String namepattern)
+  List<ScenarioOrGroup> getScenarioOrGroupByNamePattern(String namepattern)
       throws PatternSyntaxException, RemoteException;
 
   /**
@@ -1239,12 +1328,12 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param namepattern
    *          A regular expression for the name pattern.
    * 
-   * @return Collection of all {@link Mapping Mappings}, matching the given name pattern.
+   * @return List of all {@link Mapping Mappings}, matching the given name pattern.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<Mapping> getMappingByNamePattern(Pattern namepattern) throws RemoteException;
+  List<Mapping> getMappingByNamePattern(Pattern namepattern) throws RemoteException;
 
   /**
    * Delivers all mappings, matching the given name pattern.
@@ -1252,14 +1341,14 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param namepattern
    *          A regular expression for the name pattern.
    * 
-   * @return Collection of all {@link Mapping Mappings}, matching the given name pattern.
+   * @return List of all {@link Mapping Mappings}, matching the given name pattern.
    * 
    * @throws PatternSyntaxException
    *           If the expression's syntax is invalid
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<Mapping> getMappingByNamePattern(String namepattern)
+  List<Mapping> getMappingByNamePattern(String namepattern)
       throws PatternSyntaxException, RemoteException;
 
   /**
@@ -1289,6 +1378,8 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          A regular expression to constrain the set of files that are imported to TPT.<br>
    *          For example, use <code>".*\.mdf"</code> to consider only MDF files (i.e., all files
    *          whose file name ends with '.mdf').<br>
+   *          <i>Please note</i> that the equivalent option in the UI escapes certain characters and
+   *          may need to be escaped when utilizing this API function. <br>
    *          If the expression is <code>null</code> or empty, all available files with supported
    *          file format will be imported.
    * @param includeSubdirs
@@ -1348,7 +1439,13 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in TPT 22. Use
+   *             {@link #generateTestCasesFromTestData(ScenarioGroup, File, String, boolean, String, boolean, String, boolean, String, String, boolean, boolean, boolean, boolean, boolean)}
+   *             instead.
    */
+
+  // REMOVE_DEPRECATED 22M1
+  @Deprecated
   String generateTestCasesFromTestData(ScenarioGroup scenarioGroup, File dir,
                                        String filePatternOrNull, boolean includeSubdirs,
                                        String channelPatternOrNull, boolean linkSignals,
@@ -1367,11 +1464,13 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param scenarioGroup
    *          A variant group where the imported test data should be inserted.
    * @param dir
-   *          The path to the directory where the test data resides.
+   *          The directory where the test data resides.
    * @param filePatternOrNull
    *          A regular expression to constrain the set of files that are imported to TPT.<br>
    *          For example, use <code>".*\.mdf"</code> to consider only MDF files (i.e., all files
    *          whose file name ends with '.mdf').<br>
+   *          <i>Please note</i> that the equivalent option in the UI escapes certain characters and
+   *          may need to be escaped when utilizing this API function. <br>
    *          If the expression is <code>null</code> or empty, all available files with supported
    *          file format will be imported.
    * @param includeSubdirs
@@ -1418,6 +1517,98 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          scheme <code>"Import DD.MM.YY HH:MM:SS - RootDirName"</code> and there exists a test
    *          case group of the same name.
    *          </p>
+   * @param createInNewGroup
+   *          If this argument is set to <code>true</code>, the new test cases or variants will be
+   *          created in a new group, otherwise they will be created in the selected group.
+   * @return Returns a <code>String</code> containing the error and warning messages occurred during
+   *         the import.
+   * @throws ApiException
+   *           <ul>
+   *           <li>If <code>dir</code> cannot be read.</li>
+   *           <li>If no mapping with the name <code>renameMappingNameOrNull</code> can be found or
+   *           the Mapping does not have a Rename Flavor.
+   *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
+   *           a Signal Comparison Assesslet could be created.</li>
+   *           <li>If an error occurs during the import.</li>
+   *           </ul>
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String generateTestCasesFromTestData(ScenarioGroup scenarioGroup, File dir,
+                                       String filePatternOrNull, boolean includeSubdirs,
+                                       String channelPatternOrNull, boolean linkSignals,
+                                       String renameMappingNameOrNull, boolean createAssesslets,
+                                       String timeTolOrNull, String valueTolOrNull,
+                                       boolean createLocalReferenceChannels,
+                                       boolean addTerminationCondition, boolean assignParameters,
+                                       boolean updateExistingGeneratedScenarios,
+                                       boolean createInNewGroup)
+      throws ApiException, RemoteException;
+
+  /**
+   * Imports existing test data as step lists to TPT. This corresponds to "Tools | Generate Test
+   * Cases from Test Data". This function could either try to update an already existing set of
+   * imported test data or create a new set. *
+   * 
+   * @param scenarioGroup
+   *          A variant group where the imported test data should be inserted.
+   * @param dir
+   *          The path to the directory where the test data resides.
+   * @param filePatternOrNull
+   *          A regular expression to constrain the set of files that are imported to TPT.<br>
+   *          For example, use <code>".*\.mdf"</code> to consider only MDF files (i.e., all files
+   *          whose file name ends with '.mdf').<br>
+   *          <i>Please note</i> that the equivalent option in the UI escapes certain characters and
+   *          may need to be escaped when utilizing this API function. <br>
+   *          If the expression is <code>null</code> or empty, all available files with supported
+   *          file format will be imported.
+   * @param includeSubdirs
+   *          Enable/disable the traversal of sub-directories of <code>dir</code> for further data
+   *          to import.
+   * @param channelPatternOrNull
+   *          Provide a regular expression to define a mapping between channels in TPT and signal
+   *          names in the file. The placeholder ${CHANNEL} can be used to refer to a arbitrary
+   *          channel name in TPT: the expression <code>"prefix_${CHANNEL}_postfix"</code> would
+   *          match a TPT channel <code>"mysignal"</code> to the signal
+   *          <code>"prefix_mysignal_postfix"</code> in the file.
+   * @param linkSignals
+   *          Enable or disable the linking of test data files. If set to <code>false</code>, test
+   *          date will be imported as Embedded Signal Step, instead.
+   * @param renameMappingNameOrNull
+   *          The name of a existing mapping with a rename flavor, that should be used to map the
+   *          channels in TPT to the signal in the file.
+   * @param createAssesslets
+   *          Enable/Disable the automatic creation of Signal Comparison Assesslets for the input
+   *          channels in the test data.
+   * @param timeTolOrNull
+   *          Specify the time tolerance for the Signal Comparison Assesslets. <code>null</code>
+   *          means none.
+   * @param valueTolOrNull
+   *          Specify the value tolerance for the Signal Comparison Assesslets. <code>null</code>
+   *          means none.
+   * @param createLocalReferenceChannels
+   *          Create local signals for the reference channels of the Signal comparison from the
+   *          channels of the file to have the reference data available for embedded signals, too.
+   * @param addTerminationCondition
+   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          replayed.
+   * @param assignParameters
+   *          Enable the assignment of parameter values to test cases, if those are present in the
+   *          test data file and a respective mapping flavor is present.
+   * @param updateExistingGeneratedScenarios
+   *          If this argument is set to <code>true</code>, TPT tries to find an older import to
+   *          update with the new data. If it finds an older import, TPT updates already existing
+   *          test cases, adds missing test cases, and removes such test cases, that do not have
+   *          corresponding test data anymore.
+   *          <p>
+   *          A older updateable import exists, if the testlet for the provided
+   *          <code>scenarioGroup</code> contains exactly one child group that matches the name
+   *          scheme <code>"Import DD.MM.YY HH:MM:SS - RootDirName"</code> and there exists a test
+   *          case group of the same name.
+   *          </p>
+   * @param createInNewGroup
+   *          If this argument is set to <code>true</code>, the new test cases or variants will be
+   *          created in a new group, otherwise they will be created in the selected group.
    * @return Returns a <code>String</code> containing the error and warning messages occurred during
    *         the import.
    * @throws ApiException
@@ -1441,7 +1632,117 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
                                              boolean createLocalReferenceChannels,
                                              boolean addTerminationCondition,
                                              boolean assignParameters,
+                                             boolean updateExistingGeneratedScenarios,
+                                             boolean createInNewGroup)
+      throws ApiException, RemoteException;
+
+  /**
+   * Imports existing test data as step lists to TPT. This corresponds to "Tools | Generate Test
+   * Cases from Test Data". This function could either try to update an already existing set of
+   * imported test data or create a new set. *
+   * 
+   * @param scenarioGroup
+   *          A variant group where the imported test data should be inserted.
+   * @param dir
+   *          The path to the directory where the test data resides.
+   * @param filePatternOrNull
+   *          A regular expression to constrain the set of files that are imported to TPT.<br>
+   *          For example, use <code>".*\.mdf"</code> to consider only MDF files (i.e., all files
+   *          whose file name ends with '.mdf').<br>
+   *          <i>Please note</i> that the equivalent option in the UI escapes certain characters and
+   *          may need to be escaped when utilizing this API function. <br>
+   *          If the expression is <code>null</code> or empty, all available files with supported
+   *          file format will be imported.
+   * @param includeSubdirs
+   *          Enable/disable the traversal of sub-directories of <code>dir</code> for further data
+   *          to import.
+   * @param channelPatternOrNull
+   *          Provide a regular expression to define a mapping between channels in TPT and signal
+   *          names in the file. The placeholder ${CHANNEL} can be used to refer to a arbitrary
+   *          channel name in TPT: the expression <code>"prefix_${CHANNEL}_postfix"</code> would
+   *          match a TPT channel <code>"mysignal"</code> to the signal
+   *          <code>"prefix_mysignal_postfix"</code> in the file.
+   * @param linkSignals
+   *          Enable or disable the linking of test data files. If set to <code>false</code>, test
+   *          date will be imported as Embedded Signal Step, instead.
+   * @param renameMappingNameOrNull
+   *          The name of a existing mapping with a rename flavor, that should be used to map the
+   *          channels in TPT to the signal in the file.
+   * @param createAssesslets
+   *          Enable/Disable the automatic creation of Signal Comparison Assesslets for the input
+   *          channels in the test data.
+   * @param timeTolOrNull
+   *          Specify the time tolerance for the Signal Comparison Assesslets. <code>null</code>
+   *          means none.
+   * @param valueTolOrNull
+   *          Specify the value tolerance for the Signal Comparison Assesslets. <code>null</code>
+   *          means none.
+   * @param createLocalReferenceChannels
+   *          Create local signals for the reference channels of the Signal comparison from the
+   *          channels of the file to have the reference data available for embedded signals, too.
+   * @param addTerminationCondition
+   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          replayed.
+   * @param assignParameters
+   *          Enable the assignment of parameter values to test cases, if those are present in the
+   *          test data file and a respective mapping flavor is present.
+   * @param updateExistingGeneratedScenarios
+   *          If this argument is set to <code>true</code>, TPT tries to find an older import to
+   *          update with the new data. If it finds an older import, TPT updates already existing
+   *          test cases, adds missing test cases, and removes such test cases, that do not have
+   *          corresponding test data anymore.
+   *          <p>
+   *          A older updateable import exists, if the testlet for the provided
+   *          <code>scenarioGroup</code> contains exactly one child group that matches the name
+   *          scheme <code>"Import DD.MM.YY HH:MM:SS - RootDirName"</code> and there exists a test
+   *          case group of the same name.
+   *          </p>
+   * @return Returns a <code>String</code> containing the error and warning messages occurred during
+   *         the import.
+   * @throws ApiException
+   *           <ul>
+   *           <li>If <code>dir</code> cannot be read.</li>
+   *           <li>If no mapping with the name <code>renameMappingNameOrNull</code> can be found or
+   *           the Mapping does not have a Rename Flavor.
+   *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
+   *           a Signal Comparison Assesslet could be created.</li>
+   *           <li>If an error occurs during the import.</li>
+   *           </ul>
+   * @throws RemoteException
+   *           remote communication problem
+   * @deprecated Will be removed in TPT 22. Use
+   *             {@link #generateTestCasesFromTestDataByPath(ScenarioGroup, String, String, boolean, String, boolean, String, boolean, String, String, boolean, boolean, boolean, boolean, boolean)}
+   *             instead.
+   */
+  // REMOVE_DEPRECATED 22M1
+  @Deprecated
+  String generateTestCasesFromTestDataByPath(ScenarioGroup scenarioGroup, String dir,
+                                             String filePatternOrNull, boolean includeSubdirs,
+                                             String channelPatternOrNull, boolean linkSignals,
+                                             String renameMappingNameOrNull,
+                                             boolean createAssesslets, String timeTolOrNull,
+                                             String valueTolOrNull,
+                                             boolean createLocalReferenceChannels,
+                                             boolean addTerminationCondition,
+                                             boolean assignParameters,
                                              boolean updateExistingGeneratedScenarios)
+      throws ApiException, RemoteException;
+
+  /**
+   * Exports the interface to the given file. Supported are tptaif, xml and xlsx files.
+   * 
+   * @param f
+   *          The file the interface is getting exported to. If it is an existing file it must be a
+   *          valid excel file.
+   * @param mappingOrNull
+   *          The mapping whose information shall be exported or <code>null</code>.
+   * @return A list of warnings that occurred during import.
+   * @throws ApiException
+   *           If an error occurs during export or the file format is not supported.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> exportIO(File f, com.piketec.tpt.api.Mapping mappingOrNull)
       throws ApiException, RemoteException;
 
   /**
@@ -1618,7 +1919,11 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Units are
+   *             represented as Strings only.
    */
+  @Deprecated
   RemoteList<Unit> getUnits() throws RemoteException;
 
   /**
@@ -1635,11 +1940,18 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws ApiException
    *           if the given symbol or name is <code>null</code>, has illegal characters or a unit
    *           with the same name or symbol already exists
+   * 
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Units are
+   *             represented as Strings only.
    */
+  @Deprecated
   Unit createUnit(String name, String symbol) throws ApiException, RemoteException;
 
   /**
-   * @return A list of all status types defined for this project.
+   * A list of all status types defined for this project. If you delete an element in the list, the
+   * status will also be deleted if it is used.
+   * 
+   * @return Remote List of all status types.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -1810,5 +2122,55 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   List<String> getRequirementsDocuments() throws RemoteException;
+
+  /**
+   * Delivers all parameter multi sets in this project.
+   * 
+   * @return A list of all parameter multi sets
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteCollection<ParameterMultiSet> getParameterMultiSets() throws RemoteException;
+
+  /**
+   * Returns the {@link ParameterMultiSet} with the given name, {@code null} if none exists with the
+   * name.
+   * 
+   * @param name
+   *          the name of the {@link ParameterMultiSet}.
+   * @return the ParameterMultiSet with the given name.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  ParameterMultiSet getParameterMultiSet(String name) throws RemoteException;
+
+  /**
+   * Adds a new ParameterMultiSet to this project
+   * 
+   * @param name
+   *          the name of the new ParameterMultiSet
+   * @return the newly created ParameterMultiSet
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           problem while creating the new ParameterMultiSet
+   */
+  ParameterMultiSet addParameterMultiSet(String name) throws RemoteException, ApiException;
+
+  /**
+   * Creates a new issue in Jira
+   * 
+   * @param testCases
+   *          Test cases for which the issues are created and linked to.
+   * @param createSettings
+   *          The settings for the creation of an issue.<br>
+   *          To create an issue in Jira use {@link JiraIssuesCreateSettings}.
+   * @throws ApiException
+   *           If any problems occur during issue creation
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void createIssue(List<Scenario> testCases, JiraIssuesCreateSettings createSettings)
+      throws ApiException, RemoteException;
 
 }

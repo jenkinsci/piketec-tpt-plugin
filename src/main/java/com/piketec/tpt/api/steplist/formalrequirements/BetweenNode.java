@@ -5,10 +5,10 @@ import java.rmi.RemoteException;
 import com.piketec.tpt.api.ApiException;
 
 /**
- * This {@link FormalRequirementStep} defines intervals between a start expression and a stop
+ * This {@link ConditionTreeNode} defines intervals between a start expression and a stop
  * expression, the abort expression aborts the interval before the stop expression becomes true.
  */
-public interface BetweenStep extends FormalRequirementStep {
+public interface BetweenNode extends ConditionTreeNode {
 
   /**
    * The start expression.

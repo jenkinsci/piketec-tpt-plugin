@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -41,6 +41,13 @@ public interface ImportMeasurements extends BasicAssessment {
 
   public static final String CREATE_PARAMETERS = "create-parameters";
 
+  /**
+   * Property whether to create measurement variables missing from the data file as a new boolean
+   * variable and set its status to TPT.FAILED.
+   * 
+   * @deprecated Flag is no longer supported. Will be removed in TPT-22.
+   */
+  @Deprecated
   public static final String CREATE_MISSING = "create-missing";
 
   public static final String SPLITUP_GAPS = "split-up-gaps";

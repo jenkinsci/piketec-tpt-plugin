@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,19 +28,21 @@ import com.piketec.tpt.api.PlatformConfiguration;
 import com.piketec.tpt.api.Project.SynchronizationMethod;
 import com.piketec.tpt.api.RemoteCollection;
 import com.piketec.tpt.api.RemoteList;
+import com.piketec.tpt.api.TptApi;
 import com.piketec.tpt.api.codecoverage.CTCCoverageSettings;
 import com.piketec.tpt.api.codecoverage.CoverageSettings;
 import com.piketec.tpt.api.codecoverage.GCovCoverageSettings;
+import com.piketec.tpt.api.codecoverage.TPTCoverageSettings;
 
 /**
  * The TPT API representation of the AUTOSAR platform in TPT
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface AutosarPlatformConfiguration extends PlatformConfiguration {
 
   /**
-   * Set the path to the project root folder.
+   * Sets the path to the project root folder.
    * 
    * @param path
    *          The new path to the project root folder
@@ -51,7 +53,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setProjectRootFolderPath(String path) throws RemoteException;
 
   /**
-   * Get the path to the project root folder.
+   * Gets the path to the project root folder.
    * 
    * @return The path to the project root folder
    * 
@@ -61,7 +63,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public String getProjectRootFolderPath() throws RemoteException;
 
   /**
-   * Set the path to the output folder.
+   * Sets the path to the output folder.
    * 
    * @param path
    *          The new path to the output folder
@@ -72,7 +74,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setOutputFolderPath(String path) throws RemoteException;
 
   /**
-   * Get the path to the output folder.
+   * Gets the path to the output folder.
    * 
    * 
    * @return The path to the output folder
@@ -83,15 +85,18 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public String getOutputFolderPath() throws RemoteException;
 
   /**
-   * Set the name of the compiler to be used
+   * Sets the name of the compiler to be used
    * 
    * @param name
-   *          The name of the desired compiler
+   *          The name of the desired compiler. Use {@link TptApi#DEFAULT_COMPILER} to set the
+   *          default compiler.
+   * @throws ApiException
+   *           if name is empty or null
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  public void setCompiler(String name) throws RemoteException;
+  public void setCompiler(String name) throws ApiException, RemoteException;
 
   /**
    * @return The name of the currently used compiler
@@ -100,6 +105,25 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public String getCompiler() throws RemoteException;
+
+  /**
+   * Sets additional compiler options
+   * 
+   * @param compilerOptions
+   *          The compiler options to be applied
+   * @throws ApiException
+   *           if compilerOptions is null
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setCompilerOptions(String compilerOptions) throws ApiException, RemoteException;
+
+  /**
+   * @return The compiler Options or an empty String if none are set
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getCompilerOptions() throws RemoteException;
 
   /**
    * Configure if the test frame should be compiled in 64 bit
@@ -321,6 +345,8 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setUseRepository(boolean useRepository) throws RemoteException;
 
   /**
+   * Get the current state of the "use effective interface" option
+   * 
    * @return Is the the "use effective interface" option enabled
    * @throws RemoteException
    *           remote communication problem
@@ -328,12 +354,53 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public boolean isUseEffectiveInterface() throws RemoteException;
 
   /**
+   * Set the "use effective interface" option
+   * 
    * @param useEffectiveInterface
    *          En- or disable the "use effective interface" option
    * @throws RemoteException
    *           remote communication problem
    */
   public void setUseEffectiveInterface(boolean useEffectiveInterface) throws RemoteException;
+
+  /**
+   * Get the current state of the "include I/O consistency check" option
+   * 
+   * @return Is the "include I/O consistency check" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isIncludeIOConsistencyCheck() throws RemoteException;
+
+  /**
+   * Set the "include I/O consistency check" option
+   *
+   * @param useIncludeIOConsistencyCheck
+   *          En- or disable the "include I/O consistency check" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setIncludeIOConsistencyCheck(boolean useIncludeIOConsistencyCheck)
+      throws RemoteException;
+
+  /**
+   * Get the current state of the "round scaling results" option
+   * 
+   * @return Is the "round scaling results" option enabled
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isRoundScalingResults() throws RemoteException;
+
+  /**
+   * Set the "round scaling results" option
+   * 
+   * @param useRoundScalingInterface
+   *          En- or disable the "round scaling results" option
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setRoundScalingResults(boolean useRoundScalingInterface) throws RemoteException;
 
   /**
    * Add an arxm file from the repository. This paths must be relative to the repository root
@@ -541,10 +608,8 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    * 
    * @throws RemoteException
    *           remote communication problem
-   * @throws ApiException
-   *           If the current coverage type is not supported
    */
-  public CoverageSettings getCoverageSettings() throws RemoteException, ApiException;
+  public CoverageSettings getCoverageSettings() throws RemoteException;
 
   /**
    * Enable CTC++ coverage measurement to be used for this platform
@@ -565,6 +630,17 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    *           remote communication problem
    */
   public GCovCoverageSettings setCoverageToGCov() throws RemoteException;
+
+  /**
+   * Enable TPT coverage measurement to be used for this platform, enables TASMO test case
+   * generation
+   * 
+   * @return The TPT coverage settings that will be used
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public TPTCoverageSettings setCoverageToTPT() throws RemoteException;
 
   /**
    * Disable any sort of code coverage measurement in this platform

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -49,6 +49,16 @@ public interface Scenario extends ScenarioOrGroup {
    *           remote communication problem
    */
   RemoteCollection<Requirement> getLinkedRequirements() throws RemoteException;
+
+  /**
+   * Get all Jira issues currently linked to this scenario.
+   * 
+   * @return The currently linked issues.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteCollection<Issue> getLinkedIssues() throws RemoteException;
 
   /**
    * Returns the test data directory of scenario for a given execution configuration item. Since

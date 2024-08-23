@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -41,7 +41,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * For a detailed description of the attributes please refer to the User Guide.
  * 
  * 
- * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
     RemoteList<ExecutionConfigurationItem>, PlatformOrExecutionItemEnabler {
@@ -49,7 +49,7 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   /**
    * Enumeration representing the possible output formats of the report.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public enum ReportFormat {
     /**
@@ -73,7 +73,7 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   /**
    * Enumeration representing the possible reference modes.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public enum ReferenceMode {
     /**
@@ -91,7 +91,7 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   /**
    * Enumeration representing the different directory structure configurations.
    * 
-   * @author Copyright (c) 2014-2022 Piketec GmbH - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public enum DataDirStructure {
     /**
@@ -471,14 +471,52 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   public void setDataDirStructure(DataDirStructure dds) throws ApiException, RemoteException;
 
   /**
+   * Get the Python script that will be executed at the start of the execution.
+   *
+   * @return The Python script.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getBeforeExecutionStartupScript() throws RemoteException;
+
+  /**
+   * Set the Python script that will be executed at the start of the execution.
+   *
+   * @param script
+   *          The Python script. <code>Null</code> will be replaced by an empty String
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setBeforeExecutionStartupScript(String script) throws RemoteException;
+
+  /**
+   * Get the Python script that will be executed at the end of the execution.
+   *
+   * @return The Python script.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getAfterExecutionShutdownScript() throws RemoteException;
+
+  /**
+   * Set the Python script that will be executed at the start of the execution.
+   *
+   * @param script
+   *          The Python script. <code>Null</code> will be replaced by an empty String
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setAfterExecutionShutdownScript(String script) throws RemoteException;
+
+  /**
    * 
    * @return true, if the global assessment is enabled and false if not.
    * 
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
-   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Use assesslets
+   *             {@link GlobalVariable}, {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
   @Deprecated
   public boolean isGlobalAssessmentEnabled() throws RemoteException;
@@ -491,8 +529,8 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
-   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Use assesslets
+   *             {@link GlobalVariable}, {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
   @Deprecated
   public void setGlobalAssessmentEnabled(boolean enabled) throws RemoteException;
@@ -504,8 +542,8 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
-   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Use assesslets
+   *             {@link GlobalVariable}, {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
   @Deprecated
   public String getGlobalAssessmentScript() throws RemoteException;
@@ -518,8 +556,8 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
-   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Use assesslets
+   *             {@link GlobalVariable}, {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
   @Deprecated
   public void setGlobalAssessmentScript(String script) throws RemoteException;
@@ -530,15 +568,15 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
-   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Use assesslets
+   *             {@link GlobalVariable}, {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
   @Deprecated
-  public RemoteList<GlobalAssessmentRow> getGlobalAssessmentRows() throws RemoteException;
+  public RemoteList<Object> getGlobalAssessmentRows() throws RemoteException;
 
   /**
-   * Creates a new {@link GlobalAssessmentRow} and adds it to the tail of the GlobalAssessmentRows
-   * list. This list is represented by the table in the GUI.
+   * Creates a new GlobalAssessmentRow and adds it to the tail of the GlobalAssessmentRows list.
+   * This list is represented by the table in the GUI.
    * 
    * 
    * @return A fresh GlobalAssessmentRow
@@ -546,11 +584,11 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Will be removed in TPT-20. Use assesslets {@link GlobalVariable},
-   *             {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
+   * @deprecated Removed in TPT-20. Throws {@link DeprecatedAndRemovedException}. Use assesslets
+   *             {@link GlobalVariable}, {@link GlobalScript} or {@link GlobalEquivalenceClasses}.
    */
   @Deprecated
-  public GlobalAssessmentRow createGlobalAssessmentRow() throws RemoteException;
+  public Object createGlobalAssessmentRow() throws RemoteException;
 
   /**
    * Set the number of cores used during execution. Contrary to the TPT UI you can set more cores
@@ -662,5 +700,26 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    */
   @Deprecated
   public void setDeleteReportDirAfterPack(boolean enable) throws RemoteException;
+
+  /**
+   * Sets the number of times each test case should be repeated.
+   * 
+   * @param repetitions
+   *          the number of repetitions which should be done per test case
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           not allowed number of repetitions
+   */
+  public void setTestRepetitions(int repetitions) throws RemoteException, ApiException;
+
+  /**
+   * Returns the number of times each test case is repeated.
+   * 
+   * @return number of repetitions
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public int getTestRepetitions() throws RemoteException;
 
 }

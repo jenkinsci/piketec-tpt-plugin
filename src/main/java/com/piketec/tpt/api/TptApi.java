@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2022 PikeTec GmbH
+ * Copyright (c) 2014-2024 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,8 +22,10 @@ package com.piketec.tpt.api;
 
 import java.io.File;
 import java.rmi.RemoteException;
-import java.util.Collection;
+import java.util.List;
 
+import com.piketec.tpt.api.autosarplatform.AutosarPlatformConfiguration;
+import com.piketec.tpt.api.cplatform.CCodePlatformConfiguration;
 import com.piketec.tpt.api.util.WalkResult;
 
 /**
@@ -31,6 +33,13 @@ import com.piketec.tpt.api.util.WalkResult;
  * editor or via Java RMI.
  */
 public interface TptApi extends TptRemote {
+
+  /**
+   * String for setting the default compiler in
+   * {@link CCodePlatformConfiguration#setCompiler(String)} and
+   * {@link AutosarPlatformConfiguration#setCompiler(String)}.
+   */
+  public static final String DEFAULT_COMPILER = "<DEFAULT>";
 
   /**
    * Close the TPT instance represented by this object.
@@ -134,13 +143,13 @@ public interface TptApi extends TptRemote {
   public Project newProjectByPath(String f) throws ApiException, RemoteException;
 
   /**
-   * @return Returns the set of all {@link Project Projects} that are currently open in this TPT
+   * @return Returns the list of all {@link Project Projects} that are currently open in this TPT
    *         instance.
    * 
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<Project> getOpenProjects() throws RemoteException;
+  public List<Project> getOpenProjects() throws RemoteException;
 
   /**
    * @return Returns the version name of the TPT instance represented by this API object.
@@ -179,7 +188,8 @@ public interface TptApi extends TptRemote {
   /**
    * Starts a run for the given {@link ExecutionConfiguration}. The test run is started
    * asynchronously. The progress of the test run can be monitored via the returned
-   * {@link ExecutionStatus} object.
+   * {@link ExecutionStatus} object. Use ExecutionStatus.join() to ensure TPT is waiting for the
+   * test execution.
    * 
    * @param config
    *          The {@link ExecutionConfiguration} to be executed.
@@ -193,6 +203,21 @@ public interface TptApi extends TptRemote {
    *           If <code>config</code> is not part of the TPT instance represented by this object.
    */
   public ExecutionStatus run(ExecutionConfiguration config) throws ApiException, RemoteException;
+
+  /**
+   * Starts a run for the given {@link ExecutionConfiguration} and waits for it to terminate. If you
+   * want to monitor the progress of the test run use the asynchronous method {@link #run} instead.
+   * 
+   * @param config
+   *          The {@link ExecutionConfiguration} to be executed.
+   * 
+   * @throws ApiException
+   *           if there is already a running test execution or if the test execution could not be
+   *           started
+   * @throws RemoteException
+   *           If <code>config</code> is not part of the TPT instance represented by this object.
+   */
+  public void runAndWait(ExecutionConfiguration config) throws ApiException, RemoteException;
 
   /**
    * Start the generation of the overview report. The generation is done asynchronously.
@@ -255,22 +280,21 @@ public interface TptApi extends TptRemote {
    * @param traverseSelectedGroups
    *          <code>true</code> if scenarios contained in selected groups shall be returned
    *          <code>false</code> if selected groups shall be ignored.
-   * @return The selected scenarios
+   * @return Returns a list of the selected {@link Scenario scenarios}
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<Scenario> getSelectedScenarios(boolean traverseSelectedGroups)
-      throws RemoteException;
+  public List<Scenario> getSelectedScenarios(boolean traverseSelectedGroups) throws RemoteException;
 
   /**
-   * Retruns the explicitly selected {@link ScenarioGroup scenario groups}. If only {@link Scenario
+   * Returns the explicitly selected {@link ScenarioGroup scenario groups}. If only {@link Scenario
    * scenarios} are selected the returned collection will be empty.
    * 
-   * @return The explicitly selected scenario groups
+   * @return Returns a list of the explicitly selected {@link ScenarioGroup scenario groups}
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<ScenarioGroup> getSelectedScenarioGroups() throws RemoteException;
+  public List<ScenarioGroup> getSelectedScenarioGroups() throws RemoteException;
 
   /**
    * Returns the selected {@link Assessment assessments}. If assessments and/or
@@ -282,22 +306,22 @@ public interface TptApi extends TptRemote {
    * @param traverseSelectedGroups
    *          <code>true</code> if assessments contained in selected groups shall be returned
    *          <code>false</code> if selected groups shall be ignored.
-   * @return The selected assessmentss
+   * @return Returns a list of the selected {@link Assessment assessments}
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<Assessment> getSelectedAssessments(boolean traverseSelectedGroups)
+  public List<Assessment> getSelectedAssessments(boolean traverseSelectedGroups)
       throws RemoteException;
 
   /**
-   * Retruns the explicitly selected {@link AssessmentGroup assessment groups}. If only
+   * Returns the explicitly selected {@link AssessmentGroup assessment groups}. If only
    * {@link Assessment assessments} are selected the returned collection will be empty.
    * 
-   * @return The explicitly selected scenario groups
+   * @return Returns a list of the explicitly selected {@link AssessmentGroup assessment groups}
    * @throws RemoteException
    *           remote communication problem
    */
-  public Collection<AssessmentGroup> getSelectedAssessmentGroups() throws RemoteException;
+  public List<AssessmentGroup> getSelectedAssessmentGroups() throws RemoteException;
 
   /**
    * Depending on its configuration, TPT requires some time to load all plugins. Since the API is
