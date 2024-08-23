@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
+import com.piketec.jenkins.plugins.tpt.TptResult;
 
 /**
  * Parser for paring the TPT test_summary.xml file.
@@ -42,6 +43,10 @@ class TPTReportSAXHandler extends DefaultHandler {
 
   private static final String TESTCASE = "Testcase";
 
+  private static final String GLOBAL_ASSESSLET = "GlobAssesslet";
+
+  private TPTTestCase failedGlobalAssesslet = null;
+
   private ArrayList<TPTTestCase> failedTests;
 
   private TPTFile tptFile;
@@ -52,9 +57,6 @@ class TPTReportSAXHandler extends DefaultHandler {
   private Map<String, String> nameAndId;
 
   private String executionConfiguration;
-
-  // Key Result , Value how many of these
-  private Map<String, Integer> resultCount;
 
   private boolean isFileCorrupt;
 
@@ -86,12 +88,6 @@ class TPTReportSAXHandler extends DefaultHandler {
     this.isFileCorrupt = isFileCorrupt;
     this.logger = logger;
     nameAndId = new HashMap<>();
-    resultCount = new HashMap<>();
-    // Adding the start values
-    resultCount.put("PASSED", 0);
-    resultCount.put("INCONCLUSIVE", 0);
-    resultCount.put("FAILED", 0);
-    resultCount.put("ERROR", 0);
   }
 
   @Override
@@ -106,8 +102,7 @@ class TPTReportSAXHandler extends DefaultHandler {
       // If the file is corrupt, than we do not have a testsummary tag, so we are filling the things
       // here.
       if (isFileCorrupt) {
-        int currentResultValue = resultCount.get("ERROR") + 1;
-        resultCount.put("ERROR", currentResultValue);
+        tptFile.addResult(TptResult.EXECUTION_ERROR);
         TPTTestCase t = new TPTTestCase();
         t.setId(id);
         t.setExecutionDate(new Date().toString());
@@ -119,23 +114,22 @@ class TPTReportSAXHandler extends DefaultHandler {
         t.setTestCaseName(name);
         t.setJenkinsConfigId(tptFile.getJenkinsConfigId());
         failedTests.add(t);
-        setResultsToTPTFile();
       }
     }
     // setFailedTests
     if (TESTCASEINFORMATION.equalsIgnoreCase(qName)) {
-      String result = attributes.getValue("Result").toUpperCase();
-      int currentResultValue = resultCount.get(result) + 1;
-      resultCount.put(result, currentResultValue);
+      String resultString = attributes.getValue("Result");
+      TptResult result = TptResult.fromString(resultString);
+      tptFile.addResult(result);
       String id = attributes.getValue("Testcase");
       String executionDate = attributes.getValue("ExecutionDate");
       String reportFile = attributes.getValue("ReportFile");
       String fileName = tptFile.getFileName();
-      if (!result.equals("PASSED")) {
+      if (result != TptResult.PASSED) {
         TPTTestCase t = new TPTTestCase();
         t.setId(id);
         t.setExecutionDate(executionDate);
-        t.setResult(result);
+        t.setResult(resultString);
         t.setFileName(fileName);
         t.setPlatform(getPlatformName(reportFile, reportDir));
         t.setReportFile(getLinkToFailedReport(reportFile, reportDir));
@@ -144,22 +138,40 @@ class TPTReportSAXHandler extends DefaultHandler {
         t.setJenkinsConfigId(tptFile.getJenkinsConfigId());
         failedTests.add(t);
       }
-      // set the result
-      setResultsToTPTFile();
+    }
+    // set global assesslet results
+    if (GLOBAL_ASSESSLET.equalsIgnoreCase(qName)) {
+      String resultString = attributes.getValue("Result");
+      if (resultString != null) {
+        TptResult result = TptResult.fromString(resultString);
+        // some global assesslets simply have no result (e.g. Regquirements Coverage), thats not
+        // even "inconclusive"
+        if (result != TptResult.PASSED) {
+          if (failedGlobalAssesslet == null) {
+            failedGlobalAssesslet = new TPTTestCase();
+            failedGlobalAssesslet.setFileName(tptFile.getFileName());
+            failedGlobalAssesslet.setExecutionConfiguration(this.executionConfiguration);
+            failedGlobalAssesslet.setTestCaseName("global assesslet");
+            failedGlobalAssesslet.setJenkinsConfigId(tptFile.getJenkinsConfigId());
+            failedGlobalAssesslet.setReportFile("globalassessment.html");
+            failedGlobalAssesslet.setResult(result.name());
+            failedTests.add(failedGlobalAssesslet);
+          } else {
+            TptResult oldResult = TptResult.fromString(failedGlobalAssesslet.getResult());
+            failedGlobalAssesslet.setResult(TptResult.worstCase(oldResult, result).name());
+          }
+        }
+      }
     }
   }
 
-  private void setResultsToTPTFile() {
-    int error = resultCount.get("ERROR");
-    int failed = resultCount.get("FAILED");
-    int inconclusive = resultCount.get("INCONCLUSIVE");
-    int passed = resultCount.get("PASSED");
-    int total = error + failed + inconclusive + passed;
-    tptFile.setExecutionError(error);
-    tptFile.setFailed(failed);
-    tptFile.setInconclusive(inconclusive);
-    tptFile.setPassed(passed);
-    tptFile.setTotal(total);
+  @Override
+  public void endElement(String uri, String localName, String qName) throws SAXException {
+    if ("GlobAssesslets".equalsIgnoreCase(qName)) {
+      if (failedGlobalAssesslet != null) {
+        tptFile.addResult(TptResult.fromString(failedGlobalAssesslet.getResult()));
+      }
+    }
   }
 
   /**

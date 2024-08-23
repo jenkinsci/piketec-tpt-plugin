@@ -20,13 +20,19 @@ import hudson.FilePath;
  * Execution Error in TPT occurs and no testcase_infomation.xml are available. In such case the
  * test_summary.xml will be parsed and all testcases will be marked as execution errors.
  * 
+ * Additonally global assesslet results are only available here.
+ * 
  * 
  * @author FInfantino, PikeTec GmbH
  *
  */
 public class TestcaseSummaryParser extends DefaultHandler {
 
+  private String executionConfigName;
+
   private List<Testcase> testCases = new ArrayList<>();
+
+  private TptResult globalAssessletsResult = null;
 
   /**
    * Parse an XML file to retrieve a testcase info instance (non null)
@@ -40,11 +46,20 @@ public class TestcaseSummaryParser extends DefaultHandler {
    * @throws InterruptedException
    *           If the Job is cancelled
    */
-  public static List<Testcase> parseXml(FilePath xmlFile) throws IOException, InterruptedException {
+  public static TestCasesParseResult parseXml(FilePath xmlFile)
+      throws IOException, InterruptedException {
     try (InputStream inputStream = xmlFile.read()) {
       TestcaseSummaryParser parser = new TestcaseSummaryParser();
       SAXParserFactory.newInstance().newSAXParser().parse(inputStream, parser);
-      return parser.testCases;
+      Testcase virtualGlobalAssessletTestCase = null;
+      if (parser.globalAssessletsResult != null) {
+        virtualGlobalAssessletTestCase = new Testcase();
+        virtualGlobalAssessletTestCase.setPlatformName("global assesslet");
+        virtualGlobalAssessletTestCase.setName("result");
+        virtualGlobalAssessletTestCase.setExecutionConfigName(parser.executionConfigName);
+        virtualGlobalAssessletTestCase.setResult(parser.globalAssessletsResult);
+      }
+      return new TestCasesParseResult(parser.testCases, virtualGlobalAssessletTestCase);
     } catch (ParserConfigurationException e) {
       throw new IOException("XML parser config error: " + e.getMessage());
     } catch (SAXException e) {
@@ -62,7 +77,9 @@ public class TestcaseSummaryParser extends DefaultHandler {
   @Override
   public void startElement(String s, String s1, String elementName, Attributes attributes)
       throws SAXException {
-    if (elementName.equalsIgnoreCase("Testcase")) {
+    if (elementName.equals("Header")) {
+      executionConfigName = attributes.getValue("ExecutionConfig");
+    } else if (elementName.equalsIgnoreCase("Testcase")) {
       Testcase ti = new Testcase();
       ti.setName(attributes.getValue("Name"));
       try {
@@ -70,9 +87,17 @@ public class TestcaseSummaryParser extends DefaultHandler {
       } catch (NumberFormatException e) {
         throw new SAXException("Could not parse ScenarioId", e);
       }
-      ti.setResult("ERROR");
+      ti.setResult(TptResult.EXECUTION_ERROR);
       ti.setExecDate(new Date());
       testCases.add(ti);
+    } else if (elementName.equals("GlobAssesslet")) {
+      String resultString = attributes.getValue("Result");
+      // some global assesslets simply have no result (e.g. Regquirements Coverage), thats not even
+      // "inconclusive"
+      if (resultString != null) {
+        globalAssessletsResult =
+            TptResult.worstCase(globalAssessletsResult, TptResult.fromString(resultString));
+      }
     }
   }
 
@@ -83,4 +108,7 @@ public class TestcaseSummaryParser extends DefaultHandler {
   @Override
   public void characters(char[] ac, int i, int j) throws SAXException {
   }
+
+  // ---------------------
+
 }

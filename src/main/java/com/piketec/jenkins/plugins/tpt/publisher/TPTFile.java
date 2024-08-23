@@ -20,18 +20,18 @@
  */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
+import com.piketec.jenkins.plugins.tpt.TptResult;
+
 /**
  * Metainformation of a executed TPT file.
  * 
  * @author FInfantino, PikeTec GmbH
  */
-public class TPTFile {
+public class TPTFile extends InvisibleActionHostingHtml {
 
   private String fileName;
 
   private String configuration;
-
-  private String jenkinsConfigId;
 
   private int passed;
 
@@ -56,7 +56,7 @@ public class TPTFile {
   public TPTFile(String fileName, String configuration, String jenkinsConfigId) {
     this.fileName = fileName;
     this.configuration = configuration;
-    this.jenkinsConfigId = jenkinsConfigId;
+    setJenkinsConfigId(jenkinsConfigId);
   }
 
   /**
@@ -79,13 +79,6 @@ public class TPTFile {
 
   void setConfiguration(String configuration) {
     this.configuration = configuration;
-  }
-
-  /**
-   * @return The unique id of the jenkins configuration
-   */
-  public String getJenkinsConfigId() {
-    return this.jenkinsConfigId;
   }
 
   /**
@@ -141,6 +134,24 @@ public class TPTFile {
 
   void setTotal(int total) {
     this.total = total;
+  }
+
+  public void addResult(TptResult result) {
+    total++;
+    switch (result) {
+      case EXECUTION_ERROR:
+        this.executionError++;
+        break;
+      case FAILED:
+        this.failed++;
+        break;
+      case INCONCLUSIVE:
+        this.inconclusive++;
+        break;
+      case PASSED:
+        this.passed++;
+        break;
+    }
   }
 
 }

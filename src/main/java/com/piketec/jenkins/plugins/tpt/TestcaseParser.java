@@ -103,7 +103,7 @@ public class TestcaseParser extends DefaultHandler {
         throw new SAXException("Could not parse ScenarioId", e);
       }
       ti.setExecDuration(attributes.getValue("ExecutionDuration"));
-      ti.setResult(attributes.getValue("Result"));
+      ti.setResult(TptResult.fromString(attributes.getValue("Result")));
       ti.setExecDate(parseDate(attributes.getValue("ExecDate")));
 
     } else if (elementName.equalsIgnoreCase("Log")) {

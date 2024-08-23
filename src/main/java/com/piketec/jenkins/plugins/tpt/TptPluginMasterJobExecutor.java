@@ -317,7 +317,7 @@ class TptPluginMasterJobExecutor {
             jUnitXmlPath, jUnitLogLevel, logger);
         logger.info("*** Publishing finished ***");
       } else {
-        foundTestData = Publish.getTestcases(testDataPath, logger).size();
+        foundTestData = Publish.getTestcases(testDataPath, logger).testCases.size();
       }
       if (foundTestData != testCases.testCaseCount) {
         // testCases.testCaseCount is some kind of maximal number of test cases that may have been

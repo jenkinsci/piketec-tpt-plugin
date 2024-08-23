@@ -167,7 +167,8 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
         }
       }
     }
-    TPTReportPage filesAction = new TPTReportPage(build, failedTests, tptFiles);
+    TPTReportPage filesAction = new TPTReportPage(build, failedTests.toArray(TPTTestCase[]::new),
+        tptFiles.toArray(TPTFile[]::new));
     filesAction.createGraph();
     build.addAction(filesAction);
     listener.getLogger().println("Finished Post Build Action");

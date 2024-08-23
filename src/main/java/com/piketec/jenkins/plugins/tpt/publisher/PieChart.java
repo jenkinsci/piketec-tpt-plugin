@@ -69,15 +69,15 @@ class PieChart {
     }
   }
 
-  final int centerX = 296;
+  static final int centerX = 296;
 
-  final int centerY = 287;
+  static final int centerY = 287;
 
-  final int radius = 263;
+  static final int radius = 263;
 
-  final int totalHeight = 616;
+  static final int totalHeight = 616;
 
-  final int totalWidth = 1232;
+  static final int totalWidth = 1232;
 
   double zoom = 1;
 
@@ -97,7 +97,7 @@ class PieChart {
 
   private final int[] legendSegmentOrder;
 
-  private final String totalText = "in total";
+  private static final String totalText = "in total";
 
   private ImageIcon pieShadow;
 

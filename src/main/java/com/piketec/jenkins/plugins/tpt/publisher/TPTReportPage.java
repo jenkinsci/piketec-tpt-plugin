@@ -31,9 +31,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.kohsuke.stapler.StaplerProxy;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import com.google.common.io.Files;
@@ -43,6 +40,7 @@ import hudson.model.Action;
 import hudson.model.Result;
 import hudson.model.Run;
 import jenkins.model.RunAction2;
+import jenkins.security.stapler.StaplerDispatchable;
 import jenkins.tasks.SimpleBuildStep;
 
 /**
@@ -51,15 +49,15 @@ import jenkins.tasks.SimpleBuildStep;
  * 
  * @author FInfantino, PikeTec GmbH
  */
-public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildAction, StaplerProxy {
+public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildAction {
 
   private Run< ? , ? > build;
 
   private transient Run run;
 
-  private List<TPTTestCase> failedTests;
+  private TPTTestCase[] failedTests;
 
-  private List<TPTFile> tptFiles;
+  private TPTFile[] tptFiles;
 
   private int passedCount = 0;
 
@@ -87,18 +85,23 @@ public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildActio
    * @param tptFiles
    *          The List of TPT files
    */
-  public TPTReportPage(Run< ? , ? > build, ArrayList<TPTTestCase> failedTests,
-                       ArrayList<TPTFile> tptFiles) {
-
+  public TPTReportPage(Run< ? , ? > build, TPTTestCase[] failedTests, TPTFile[] tptFiles) {
+    this.build = build;
     for (TPTFile f : tptFiles) {
       passedCount += f.getPassed();
       inconclusiveCount += f.getInconclusive();
       errorCount += f.getExecutionError();
       failedCount += f.getFailed();
     }
-    this.build = build;
     this.setFailedTests(failedTests);
     this.setTptFiles(tptFiles);
+  }
+
+  protected Object readResolve() {
+    // set parent page
+    setFailedTests(failedTests);
+    setTptFiles(tptFiles);
+    return this;
   }
 
   @Override
@@ -136,7 +139,6 @@ public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildActio
   @Override
   public void onAttached(Run< ? , ? > run) {
     this.run = run;
-
   }
 
   @Override
@@ -151,15 +153,16 @@ public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildActio
     return run;
   }
 
-  @Override
-  public Object getTarget() {
-    return this;
-  }
+  // @Override
+  // public Object getTarget() {
+  // return this;
+  // }
 
   /**
    * @return The list of executed TPT files
    */
-  public List<TPTFile> getTptFiles() {
+  @StaplerDispatchable
+  public TPTFile[] getTptFiles() {
     return tptFiles;
   }
 
@@ -169,14 +172,18 @@ public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildActio
    * @param tptFiles
    *          The list of executed TPT files
    */
-  public void setTptFiles(List<TPTFile> tptFiles) {
+  public void setTptFiles(TPTFile[] tptFiles) {
     this.tptFiles = tptFiles;
+    for (TPTFile tptFile : tptFiles) {
+      tptFile.setParentPage(this);
+    }
   }
 
   /**
    * @return The list of failed test cases
    */
-  public List<TPTTestCase> getFailedTests() {
+  @StaplerDispatchable
+  public TPTTestCase[] getFailedTests() {
     return failedTests;
   }
 
@@ -186,8 +193,11 @@ public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildActio
    * @param failedTests
    *          The list of failed test cases
    */
-  public void setFailedTests(ArrayList<TPTTestCase> failedTests) {
+  public void setFailedTests(TPTTestCase[] failedTests) {
     this.failedTests = failedTests;
+    for (TPTTestCase testCase : failedTests) {
+      testCase.setParentPage(this);
+    }
   }
 
   /**
@@ -287,37 +297,6 @@ public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildActio
     } catch (IOException e) {
       return "";
     }
-  }
-
-  /**
-   * Host images, HTML report and failed report
-   * 
-   * @see "http://stapler.kohsuke.org/reference.html"
-   * @param name
-   *          string on the requested url
-   * @param req
-   *          The request
-   * @param rsp
-   *          The response
-   * @return an new Action that is going to be host
-   */
-  public Object getDynamic(String name, StaplerRequest req, StaplerResponse rsp) {
-    if (name.equals("Images")) {
-      return new InvisibleActionHostingImages(build);
-    }
-    for (TPTTestCase t : failedTests) {
-      if (name.equals(t.getJenkinsConfigId() + t.getFileName() + t.getExecutionConfiguration()
-          + t.getId() + t.getPlatform() + t.getExecutionDate())) {
-        return new OpenReportForFailedTestAction(build, t.getFileName(), t.getReportFile(),
-            t.getId(), t.getExecutionConfiguration(), t.getExecutionDate(), t.getJenkinsConfigId());
-      }
-    }
-    for (TPTFile t : this.tptFiles) {
-      if (name.equals(t.getJenkinsConfigId())) {
-        return new InvisibleActionHostingHtml(build, t.getJenkinsConfigId());
-      }
-    }
-    return null;
   }
 
   @Override

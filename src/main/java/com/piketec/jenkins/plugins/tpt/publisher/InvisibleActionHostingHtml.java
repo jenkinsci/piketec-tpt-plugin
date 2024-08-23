@@ -25,75 +25,51 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import org.apache.commons.io.FileUtils;
-import org.kohsuke.stapler.StaplerProxy;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.FilePath;
-import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
-import hudson.model.Run;
-import hudson.util.HttpResponses;
+import hudson.model.InvisibleAction;
 
 /**
  * An invisibale action to show HTML reports
  * 
  * @author FInfantino, PikeTec GmbH
  */
-public class InvisibleActionHostingHtml implements Action, StaplerProxy {
+public abstract class InvisibleActionHostingHtml extends InvisibleAction {
 
-  private Run< ? , ? > build;
+  private String jenkinsConfigId;
 
-  private String id;
+  private transient TPTReportPage parentPage = null;
 
   /**
-   * This class is for hosting the HTML Report in an action. After requesting the url in the
-   * TPTReportPage it redirects to this class and here will be the HTML displayed through the
-   * doDynamic method.(It uses the DirectoryBrowserSupport)
+   * @return The name of the executed platform
+   */
+  public String getJenkinsConfigId() {
+    return jenkinsConfigId;
+  }
+
+  /**
+   * Set the unique id of the jenkins configuartion that test case ran on.
    * 
-   * @param build
-   *          to locate where the file is
-   * @param id
-   *          unique id of the jenkins configuration
+   * @param jenkinsConfigId
+   *          The unique id
    */
-  public InvisibleActionHostingHtml(Run< ? , ? > build, String id) {
-    this.build = build;
-    this.id = id;
+  public void setJenkinsConfigId(String jenkinsConfigId) {
+    this.jenkinsConfigId = jenkinsConfigId;
   }
 
-  @Override
-  public String getDisplayName() {
-    return null;
-  }
-
-  @Override
-  public String getIconFileName() {
-    return null;
-  }
-
-  @Override
-  public String getUrlName() {
-    return id;
-  }
-
-  @Override
-  public Object getTarget() {
-    return this;
-  }
-
-  /**
-   * @return The uique id of the execution item
-   */
-  public String getId() {
-    return id;
+  void setParentPage(TPTReportPage parentPage) {
+    this.parentPage = parentPage;
   }
 
   /**
    * @return The path to the html file
    */
-  private File pathToHtml() {
-    return TPTReportUtils.getReportDir(TPTReportUtils.getPikeTecDir(build), id);
+  protected File pathToHtml() {
+    return TPTReportUtils.getReportDir(TPTReportUtils.getPikeTecDir(parentPage.getBuild()),
+        jenkinsConfigId);
   }
 
   /**
@@ -111,14 +87,9 @@ public class InvisibleActionHostingHtml implements Action, StaplerProxy {
    */
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
-    File f = new File(pathToHtml(), "index.html");
-    FileUtils.touch(f); // refresh the index if security changed
-    // this displays the "index.html" in the given path
-    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml()),
+    File pathToHtml = pathToHtml();
+    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml),
         "TPT Report", "clipboard.png", false);
-    if (req.getRestOfPath().equals("")) {
-      throw HttpResponses.forwardToView(this, "index.jelly");
-    }
     dbs.generateResponse(req, rsp, this);
   }
 

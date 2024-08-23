@@ -41,7 +41,7 @@ public class Testcase {
 
   private int id;
 
-  private String result;
+  private TptResult result = TptResult.INCONCLUSIVE;
 
   private Date execDate;
 
@@ -52,7 +52,7 @@ public class Testcase {
   Testcase() {
     log = new TptLog();
     execDuration = "0";
-    result = "";
+    result = null;
     executionConfigName = "";
     platformName = "";
     name = "";
@@ -158,16 +158,16 @@ public class Testcase {
 
   /**
    * @param result
-   *          , set the result from a test case
+   *          set the result from a test case
    */
-  void setResult(String result) {
+  void setResult(TptResult result) {
     this.result = result;
   }
 
   /**
    * @return get the result from a test case
    */
-  String getResult() {
+  TptResult getResult() {
     return result;
   }
 

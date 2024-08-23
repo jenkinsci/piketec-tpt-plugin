@@ -20,6 +20,19 @@
  */
 package com.piketec.jenkins.plugins.tpt.publisher;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import javax.servlet.ServletException;
+
+import org.apache.commons.io.FileUtils;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+
+import hudson.FilePath;
+import hudson.model.DirectoryBrowserSupport;
+
 /**
  * This class is for the failed test. Objects from this class will be created when parsing the
  * "test_summary.xml". We get a list of failed tests (inconclusive, error or failed).
@@ -27,7 +40,7 @@ package com.piketec.jenkins.plugins.tpt.publisher;
  * @author FInfantino, PikeTec GmbH
  *
  */
-public class TPTTestCase {
+public class TPTTestCase extends InvisibleActionHostingHtml {
 
   private String result;
 
@@ -46,8 +59,6 @@ public class TPTTestCase {
   private String testCaseName;
 
   private String platform;
-
-  private String jenkinsConfigId;
 
   /**
    * Creates a new TPTTestCase data container
@@ -212,21 +223,21 @@ public class TPTTestCase {
     this.platform = platform;
   }
 
-  /**
-   * @return The name of the executed platform
-   */
-  public String getJenkinsConfigId() {
-    return jenkinsConfigId;
-  }
-
-  /**
-   * Set the unique id of the jenkins configuartion that test case ran on.
-   * 
-   * @param jenkinsConfigId
-   *          The unique id
-   */
-  public void setJenkinsConfigId(String jenkinsConfigId) {
-    this.jenkinsConfigId = jenkinsConfigId;
+  public void doIndex(StaplerRequest req, StaplerResponse rsp)
+      throws IOException, ServletException {
+    File pathToHtml = pathToHtml();
+    // TODO: This is approach is not working with parallel access
+    // we simply write a failedTest.html where the page of the right frame is replaced
+    File indexFromFile = new File(pathToHtml, "index.html");
+    String indexFromFileAsString =
+        FileUtils.readFileToString(indexFromFile, Charset.forName("UTF-8"));
+    String failedHtmlAsString = indexFromFileAsString.replace("overview.html", reportFile);
+    File failedHTML = new File(pathToHtml, "failedTest.html");
+    FileUtils.writeStringToFile(failedHTML, failedHtmlAsString, Charset.forName("UTF-8"));
+    DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml),
+        "TPT Report", "clipboard.png", false);
+    dbs.setIndexFileName("failedTest.html");
+    dbs.generateResponse(req, rsp, this);
   }
 
 }

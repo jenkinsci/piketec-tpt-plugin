@@ -21,7 +21,6 @@
 package com.piketec.jenkins.plugins.tpt;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -77,23 +76,30 @@ public final class Publish {
       xmlPub.initalize(jUnitXMLFile);
       xmlPub.writeTestsuite(tptFileName);
       logger.info("Collecting test cases");
-      List<Testcase> testdata = getTestcases(testDataDir, logger);
-      logger.info("Found " + testdata.size() + " test results.");
-      for (Testcase tc : testdata) {
-        if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && "SUCCESS".equals(tc.getResult())) {
+      TestCasesParseResult testdata = getTestcases(testDataDir, logger);
+      logger.info("Found " + testdata.testCases.size() + " test results.");
+      for (Testcase tc : testdata.testCases) {
+        if (tc.getLogEntries(LogLevel.ERROR).isEmpty() && TptResult.PASSED.equals(tc.getResult())) {
           xmlPub.writeTestcase(tptFileName, tc);
         } else {
           StringBuilder log = new StringBuilder();
+          log.append(tc.getResult().name());
           for (LogEntry entry : tc.getLogEntries(logLevel)) {
-            if (log.length() > 0) {
-              log.append('\n');
-            }
+            log.append('\n');
             log.append('[').append(entry.level.name()).append("] ").append(entry.message);
           }
           xmlPub.writeTestcaseError(tptFileName, tc, log.toString());
         }
       }
-      return testdata.size();
+      if (testdata.virtualGlobalAssessletTestCase != null) {
+        if (testdata.virtualGlobalAssessletTestCase.getResult() == TptResult.PASSED) {
+          xmlPub.writeTestcase(tptFileName, testdata.virtualGlobalAssessletTestCase);
+        } else {
+          xmlPub.writeTestcaseError(tptFileName, testdata.virtualGlobalAssessletTestCase,
+              testdata.virtualGlobalAssessletTestCase.getResult().name());
+        }
+      }
+      return testdata.testCases.size();
     } catch (XMLStreamException e) {
       throw new IOException("XML stream error: " + e.getMessage());
     } catch (FactoryConfigurationError e) {
@@ -122,31 +128,32 @@ public final class Publish {
    * @throws InterruptedException
    *           If the job was interrupted
    */
-  public static List<Testcase> getTestcases(FilePath testDataDir, TptLogger logger)
+  public static TestCasesParseResult getTestcases(FilePath testDataDir, TptLogger logger)
       throws IOException, InterruptedException {
     Collection<FilePath> files = new HashSet<>();
     find(testDataDir, "testcase_information.xml", files);
-    List<Testcase> testcases = new ArrayList<>(files.size());
-    // Wenn es kein testcase_information.xml gibt bedeutet nicht, dass es keine Tests gibt. (Es ist
-    // wegen den GenerateOverviewReport bug)
-    if (files.size() == 0) {
-      // Es muss dann trotzdem eine test_summary.xml geben bei der testDataDir
-      FilePath xmlFile = new FilePath(testDataDir, "test_summary.xml");
-      if (!xmlFile.exists()) {
-        logger.error("No \"test_summary.xml\" found.");
-      }
-      testcases = TestcaseSummaryParser.parseXml(xmlFile);
-    } else {
+    FilePath xmlFile = new FilePath(testDataDir, "test_summary.xml");
+    if (!xmlFile.exists()) {
+      logger.error("No \"test_summary.xml\" found.");
+    }
+    TestCasesParseResult testSummaryTestcases = TestcaseSummaryParser.parseXml(xmlFile);
+    // Wenn es kein testcase_information.xml gibt bedeutet nicht, dass es keine Tests gibt. (Es
+    // ist wegen den GenerateOverviewReport bug)
+    // Es muss dann trotzdem eine test_summary.xml geben bei der testDataDir
+    if (files.size() > 0) {
+      // we use the testcase_information.xml files, if available. But we need to add the global
+      // assesslet result from test summary xml.
+      testSummaryTestcases.testCases.clear();
       for (FilePath f : files) {
         try {
           Testcase tc = TestcaseParser.parseXml(f);
-          testcases.add(tc);
+          testSummaryTestcases.testCases.add(tc);
         } catch (IOException e) {
           logger.error("File \"" + f + "\": " + e.getMessage() + "\n\r");
         }
       }
     }
-    return testcases;
+    return testSummaryTestcases;
   }
 
   /**

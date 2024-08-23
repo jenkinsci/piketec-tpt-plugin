@@ -100,15 +100,15 @@
 					<th class="pane-header" id="executionE">${%Execution Error}</th>
 					<th class="pane-header" id="whiteT">${%Total}</th>
 				</tr>
-				<j:forEach items="${it.tptFiles}" var="file">
+				<j:forEach items="${it.tptFiles}" var="file" indexVar="fileIndex">
 					<tr>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.fileName}</a></td>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.configuration}</a></td>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.passed}</a></td>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.inconclusive}</a></td>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.failed}</a></td>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.executionError}</a></td>
-						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${file.jenkinsConfigId}/index.html">${file.total}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.fileName}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.configuration}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.passed}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.inconclusive}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.failed}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.executionError}</a></td>
+						<td class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/tptFiles/${fileIndex}/">${file.total}</a></td>
 					</tr>
 				</j:forEach>
 			</table>
@@ -130,17 +130,17 @@
 					<th class="pane-header" >${%Execution Configuration}</th>
 					<th class="pane-header" >${%Execution Date}</th>
 				</tr>
-				<j:forEach items="${it.failedTests}" var="failedTests">
+				<j:forEach items="${it.failedTests}" var="failedTest" indexVar="failedIndex">
 					<tr>
-							<!-- <a href="${it.rootUrl}/job/${it.build.getProject().getName()}/ws/Builds/${it.build.getNumber()}/${failedTests.reportFile}/${failedTests.}">${failedTests.id}</a> -->
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.jenkinsConfigId}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.id}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.testCaseName}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.result}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.project.getUrl()}${it.getNumberFromHistory(failedTests.failedSince)}/TPT_Report">${failedTests.failedSince}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.fileName}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}/TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.executionConfiguration}</a></td>
-							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}/TPT_Report/${failedTests.jenkinsConfigId}${failedTests.fileName}${failedTests.executionConfiguration}${failedTests.id}${failedTests.platform}${failedTests.executionDate}/failedTest.html">${failedTests.executionDate}</a></td>
+							<!-- <a href="${it.rootUrl}/job/${it.build.getProject().getName()}/ws/Builds/${it.build.getNumber()}/${failedTest.reportFile}/${failedTest.}">${failedTest.id}</a> -->
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.jenkinsConfigId}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.id}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.testCaseName}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.result}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.project.getUrl()}${it.getNumberFromHistory(failedTest.failedSince)}/TPT_Report">${failedTest.failedSince}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.fileName}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.executionConfiguration}</a></td>
+							<td  class="pane" ><a href="${rootURL}/${it.build.getUrl()}TPT_Report/failedTests/${failedIndex}/">${failedTest.executionDate}</a></td>
 					</tr>
 				</j:forEach>
 			</table>

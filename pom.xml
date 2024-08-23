@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>4.55</version>
+		<version>4.86</version>
 	</parent>
 
 	<groupId>com.piketec.jenkins.plugins</groupId>
@@ -78,8 +78,7 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<maven-hpi-plugin>3.0.2</maven-hpi-plugin>
-		<jenkins.version>2.361.1</jenkins.version> <!-- which version of Jenkins is this plugin built against? -->
+		<jenkins.version>2.440.3</jenkins.version> <!-- which version of Jenkins is this plugin built against? -->
 		<hpi.compatibleSinceVersion>8.8</hpi.compatibleSinceVersion>
 	</properties>
 
@@ -104,7 +103,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
 				<configuration>
 					<excludePackageNames>com.piketec.tpt.api:com.piketec.tpt.api.*</excludePackageNames>
 				</configuration>
