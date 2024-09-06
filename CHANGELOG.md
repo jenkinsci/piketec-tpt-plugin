@@ -1,5 +1,11 @@
 Release History
 ===
+## Version 9.4
+- Plugin now needs at least Jenkins 2.440.3
+- Global assessment results are now evaluated for the report
+- Updated TPT API to the newest version
+- Replaced occurrences of the words master and slave
+
 ## Version 9.3
 
 - Plugin now needs at least Jenkin 2.361.1
