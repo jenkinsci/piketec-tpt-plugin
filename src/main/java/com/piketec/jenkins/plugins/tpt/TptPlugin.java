@@ -209,7 +209,7 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
   /**
    * Should testcase execution be delegated to a sub job or is this run as a single job.
    * 
-   * @param isTptMaster
+   * @param isDistributing
    *          <code>true</code> if the execution should be
    */
   @DataBoundSetter

@@ -47,7 +47,7 @@ import jenkins.tasks.SimpleBuildStep;
 
 /**
  * Plugin executes a single given TPT test case. Intended to be used in the job started by
- * {@link TptPluginMasterJobExecutor}.
+ * {@link TptPluginDistributingJobExecutor}.
  */
 public class TptPluginSlave extends Builder implements SimpleBuildStep {
 

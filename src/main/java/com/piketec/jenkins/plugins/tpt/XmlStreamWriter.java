@@ -82,10 +82,8 @@ class XmlStreamWriter {
    * 
    * @param tptFileName
    *          the name of the TPT file the test originates from
-   * @param testname
-   *          the name of the test
-   * @param timeMillis
-   *          The duration of the test
+   * @param tc
+   *          the test case to write
    * @throws XMLStreamException
    *           If the XML cannot be created
    */
@@ -103,10 +101,8 @@ class XmlStreamWriter {
    * 
    * @param tptFileName
    *          the name of the TPT file the test originates from
-   * @param testname
-   *          the name of the test
-   * @param timeMillis
-   *          The duration of the test
+   * @param tc
+   *          the test case to write
    * @param error
    *          the error message
    * @throws XMLStreamException
