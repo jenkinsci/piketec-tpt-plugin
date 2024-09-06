@@ -32,7 +32,7 @@ public class TestcaseSummaryParser extends DefaultHandler {
 
   private List<Testcase> testCases = new ArrayList<>();
 
-  private TptResult globalAssessletsResult = null;
+  private TptResult globalAssessmentResult = null;
 
   /**
    * Parse an XML file to retrieve a testcase info instance (non null)
@@ -51,15 +51,15 @@ public class TestcaseSummaryParser extends DefaultHandler {
     try (InputStream inputStream = xmlFile.read()) {
       TestcaseSummaryParser parser = new TestcaseSummaryParser();
       SAXParserFactory.newInstance().newSAXParser().parse(inputStream, parser);
-      Testcase virtualGlobalAssessletTestCase = null;
-      if (parser.globalAssessletsResult != null) {
-        virtualGlobalAssessletTestCase = new Testcase();
-        virtualGlobalAssessletTestCase.setPlatformName("global assesslet");
-        virtualGlobalAssessletTestCase.setName("result");
-        virtualGlobalAssessletTestCase.setExecutionConfigName(parser.executionConfigName);
-        virtualGlobalAssessletTestCase.setResult(parser.globalAssessletsResult);
+      Testcase virtualGlobalAssessmentTestCase = null;
+      if (parser.globalAssessmentResult != null) {
+        virtualGlobalAssessmentTestCase = new Testcase();
+        virtualGlobalAssessmentTestCase.setPlatformName("global assessment");
+        virtualGlobalAssessmentTestCase.setName("result");
+        virtualGlobalAssessmentTestCase.setExecutionConfigName(parser.executionConfigName);
+        virtualGlobalAssessmentTestCase.setResult(parser.globalAssessmentResult);
       }
-      return new TestCasesParseResult(parser.testCases, virtualGlobalAssessletTestCase);
+      return new TestCasesParseResult(parser.testCases, virtualGlobalAssessmentTestCase);
     } catch (ParserConfigurationException e) {
       throw new IOException("XML parser config error: " + e.getMessage());
     } catch (SAXException e) {
@@ -95,8 +95,8 @@ public class TestcaseSummaryParser extends DefaultHandler {
       // some global assesslets simply have no result (e.g. Regquirements Coverage), thats not even
       // "inconclusive"
       if (resultString != null) {
-        globalAssessletsResult =
-            TptResult.worstCase(globalAssessletsResult, TptResult.fromString(resultString));
+        globalAssessmentResult =
+            TptResult.worstCase(globalAssessmentResult, TptResult.fromString(resultString));
       }
     }
   }

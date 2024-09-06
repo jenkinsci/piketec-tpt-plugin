@@ -139,7 +139,7 @@ class TPTReportSAXHandler extends DefaultHandler {
         failedTests.add(t);
       }
     }
-    // set global assesslet results
+    // set global assessment results
     if (GLOBAL_ASSESSLET.equalsIgnoreCase(qName)) {
       String resultString = attributes.getValue("Result");
       if (resultString != null) {
@@ -151,7 +151,7 @@ class TPTReportSAXHandler extends DefaultHandler {
             failedGlobalAssesslet = new TPTTestCase();
             failedGlobalAssesslet.setFileName(tptFile.getFileName());
             failedGlobalAssesslet.setExecutionConfiguration(this.executionConfiguration);
-            failedGlobalAssesslet.setTestCaseName("global assesslet");
+            failedGlobalAssesslet.setTestCaseName("global assessment");
             failedGlobalAssesslet.setJenkinsConfigId(tptFile.getJenkinsConfigId());
             failedGlobalAssesslet.setReportFile("globalassessment.html");
             failedGlobalAssesslet.setResult(result.name());
