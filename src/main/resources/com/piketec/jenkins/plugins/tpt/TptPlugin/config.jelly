@@ -32,7 +32,7 @@
   <f:block>
   <f:optionalBlock name="isDistributing" title="Distribute work to TPT worker jobs" checked="${instance.isDistributing}" default="${descriptor.defaultEnableJunit}" inline="true" help="/plugin/piketec-tpt/distributingMode.html" field="isDistributing" >
   
-  <f:entry field="workerJob" title="Wroker job" help="/plugin/piketec-tpt/workerJob.html">
+  <f:entry field="workerJob" title="Worker job" help="/plugin/piketec-tpt/workerJob.html">
       <f:textbox value="${instance.workerJob}"/>
     </f:entry>
     <f:entry field="workerJobCount" title="Number of worker jobs" help="/plugin/piketec-tpt/workerJobCount.html">
