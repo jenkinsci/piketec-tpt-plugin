@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.remoting.RoleChecker;
 
 import com.piketec.jenkins.plugins.tpt.TptApiHelper;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
@@ -235,10 +234,6 @@ public class ExecuteTestsWorkerJobCallable extends TptApiCallable<Boolean> {
       return false;
     }
     return true;
-  }
-
-  @Override
-  public void checkRoles(RoleChecker arg0) throws SecurityException {
   }
 
   /**

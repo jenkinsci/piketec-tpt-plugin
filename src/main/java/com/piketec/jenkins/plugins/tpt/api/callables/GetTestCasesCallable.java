@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.remoting.RoleChecker;
 
 import com.piketec.jenkins.plugins.tpt.TptApiHelper;
 import com.piketec.jenkins.plugins.tpt.TptLogger;
@@ -43,10 +42,6 @@ public class GetTestCasesCallable extends TptApiCallable<GetTestCasesCallableRes
     this.tptFilePath = tptFilePath;
     this.executionConfigName = executionConfigName;
     this.testSet = testSet;
-  }
-
-  @Override
-  public void checkRoles(RoleChecker arg0) throws SecurityException {
   }
 
   @Override
