@@ -29,7 +29,7 @@ import com.piketec.tpt.api.TptApi;
 
 import hudson.FilePath;
 import hudson.model.TaskListener;
-import hudson.remoting.Callable;
+import jenkins.security.MasterToSlaveCallable;
 
 /**
  * This class can open a TPT API connection. It is a Callable, which means it will be executed on a
@@ -40,7 +40,7 @@ import hudson.remoting.Callable;
  *          is the return type of the call method, i.e. the type of whatever you want to get from
  *          the TPT API. NOTE: This type must be Serializable
  */
-public abstract class TptApiCallable<S> implements Callable<S, InterruptedException> {
+public abstract class TptApiCallable<S> extends MasterToSlaveCallable<S, InterruptedException> {
 
   private static final long serialVersionUID = 1L;
 

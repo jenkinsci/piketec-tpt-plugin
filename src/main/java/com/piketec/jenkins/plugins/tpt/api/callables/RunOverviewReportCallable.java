@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.remoting.RoleChecker;
 
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.tpt.api.ApiException;
@@ -133,7 +132,4 @@ public class RunOverviewReportCallable extends TptApiCallable<Boolean> {
     }
   }
 
-  @Override
-  public void checkRoles(RoleChecker arg0) throws SecurityException {
-  }
 }

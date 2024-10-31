@@ -2,8 +2,6 @@ package com.piketec.jenkins.plugins.tpt.api.callables;
 
 import java.util.Collections;
 
-import org.jenkinsci.remoting.RoleChecker;
-
 import com.piketec.jenkins.plugins.tpt.TptLogger;
 import com.piketec.tpt.api.TptApi;
 
@@ -34,10 +32,6 @@ public class CleanUpCallable extends TptApiCallable<Boolean> {
       return true;
     }
     return closeProject(logger, api, tptFilePath);
-  }
-
-  @Override
-  public void checkRoles(RoleChecker arg0) throws SecurityException {
   }
 
   public FilePath getFilePath() {
