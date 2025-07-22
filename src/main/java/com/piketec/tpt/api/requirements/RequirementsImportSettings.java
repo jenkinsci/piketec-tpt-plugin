@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -39,13 +39,15 @@ import com.piketec.tpt.api.requirements.reqif.ReqIfRequirementsImportSettings;
  * For the requirements import from codeBeamer use {@link CodeBeamerRequirementsImportSettings}.<br>
  * For the requirements import from refIF use {@link ReqIfRequirementsImportSettings}.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class RequirementsImportSettings implements Serializable {
 
   static final long serialVersionUID = 1L;
 
   private String document = "";
+
+  private String statusTypeForChanged = "";
 
   @Deprecated
   private List<String> autoReviewColumns = null;
@@ -83,6 +85,23 @@ public abstract class RequirementsImportSettings implements Serializable {
   }
 
   /**
+   * @return The name of the status type that is set for items that are changed during the import.
+   *         Only status types that aren't stable are used.
+   */
+  public String getSetStatusTypeForChanged() {
+    return statusTypeForChanged;
+  }
+
+  /**
+   * @param statusType
+   *          The name of the status type that is set for items that are changed during the import.
+   *          Only status types that aren't stable are used.
+   */
+  public void setStatusTypeForChanged(String statusType) {
+    this.statusTypeForChanged = statusType;
+  }
+
+  /**
    * @return Optional list of column names in the source file for which the automatic review of
    *         possible changes of a requirement attribute should be enabled.
    *
@@ -99,7 +118,7 @@ public abstract class RequirementsImportSettings implements Serializable {
    *          Optional list of column names in the source file for which the automatic review of
    *          possible changes of a requirement attribute should be enabled.
    *
-   * @deprecated This list has no effect anymore. Use // *
+   * @deprecated This list has no effect anymore. Use
    *             {@link Project#setRequirementAttributeAutoReview(String, boolean)} instead.
    */
   @Deprecated

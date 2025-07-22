@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,6 +26,8 @@ import java.util.List;
 /**
  * This object provides an interface to obtain the current state of execution as well as any log
  * messages for the assigned test case.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TestCaseExecutionStatus extends TptRemote {
 
@@ -87,8 +89,8 @@ public interface TestCaseExecutionStatus extends TptRemote {
   public List<String> getStatusLog() throws RemoteException;
 
   /**
-   * Manuall set (reclassify) the execution status to either {@link TestCaseStatus#ResultSuccess} or
-   * {@link TestCaseStatus#ResultFailed} for the report. The actual test case result will not be
+   * Manually set (reclassify) the execution status to either {@link TestCaseStatus#ResultSuccess}
+   * or {@link TestCaseStatus#ResultFailed} for the report. The actual test case result will not be
    * overwritten by this operation.
    * <p>
    * This function corresponds to the "reclassify" button in the TPT GUI.

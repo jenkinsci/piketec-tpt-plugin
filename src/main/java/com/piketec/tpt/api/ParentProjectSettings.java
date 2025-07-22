@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,7 +26,7 @@ import java.rmi.RemoteException;
  * Configuration to use a parent project when loading projects.
  *
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ParentProjectSettings extends IdentifiableRemote {
 
@@ -155,7 +155,7 @@ public interface ParentProjectSettings extends IdentifiableRemote {
   void setLoadParameters(boolean load) throws RemoteException;
 
   /**
-   * Returns <code>true</code> if parametes are loaded from the parent project, <code>false</code>
+   * Returns <code>true</code> if parameters are loaded from the parent project, <code>false</code>
    * otherwise.
    * 
    * @return <code>true</code> if parameters are loaded, false otherwise.

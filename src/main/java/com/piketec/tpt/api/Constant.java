@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,7 +25,7 @@ import java.rmi.RemoteException;
 /**
  * A Constant is a value that stays the same during execution time.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Constant extends Declaration {
 
@@ -65,7 +65,7 @@ public interface Constant extends Declaration {
    * Set if the constant should be recorded during test execution.
    * 
    * @param on
-   *          <code>true</code> if the constan should be recorded, <code>false</code> otherwise.
+   *          <code>true</code> if the constant should be recorded, <code>false</code> otherwise.
    * 
    * @throws RemoteException
    *           remote communication problem

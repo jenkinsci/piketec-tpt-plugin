@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,8 @@ package com.piketec.tpt.api.constants.platforms;
 
 /**
  * For further information, please refer to the User Guide, MATLAB Platform.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Matlab extends BasicPlatformConfig {
 
@@ -66,8 +68,6 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String ORIGINALMODELFILE = "originalModelFile";
 
-  public static final String ORIGINALMODELVERSION = "originalModelVersion";
-
   public static final String ORIGINALMODELLOADSCRIPT = "originalModelLoadScript";
 
   public static final String PARAMETERIMPORTMODE = "parameterImportMode";
@@ -108,6 +108,8 @@ public interface Matlab extends BasicPlatformConfig {
 
   public static final String IMPORTALLENUMS = "importAllEnums";
 
+  public static final String SPLITDSCHANNELS = "splitDsChannels";
+
   public static final String STARTVECTORINDEXWT0 = "STARTVECTORINDEXWT0";
 
   public static final String CHECKALLOWSREDUCEDIO = "checkAllowsReducedIO";
@@ -117,6 +119,8 @@ public interface Matlab extends BasicPlatformConfig {
   public static final String FIXINTERNALSIGNALSAUTOMATICALLY = "fixInternalSignalsAutomatically";
 
   public static final String INTERNALSIGNALSBREAKLINKS = "internalSignalsBreakLinks";
+
+  public static final String LOGONLYUSEDINTERNALSIGNALS = "logOnlyUsedInternalSignals";
 
   public static final String DATASTOREHANDLINGMODE = "dataStoreHandlingMode";
 
@@ -157,8 +161,6 @@ public interface Matlab extends BasicPlatformConfig {
   public static final String CODECOVERAGETOOL = "code_coverage_tool";
 
   public static final String CUMULATIVE_COVERAGE_DATA_NAME = "cumulativeCoverageDataName";
-
-  public static final String EXEGENIGNOREUNUSEDPARAMS = "exeGenIgnoreUnusedParams";
 
   public static final String INTERFACEORDERSORTMANUAL = "interfaceOrderSortManual";
 

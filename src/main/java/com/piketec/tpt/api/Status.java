@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,10 +24,12 @@ import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
+import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
+
 /**
  * The status of a test case or assesslet.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Status extends IdentifiableRemote {
 
@@ -62,6 +64,16 @@ public interface Status extends IdentifiableRemote {
   Date getDate() throws RemoteException;
 
   /**
+   * Returns the date of this status in format "yyyy-MM-dd HH:mm:ss".
+   * 
+   * @return date of this status in format "yyyy-MM-dd HH:mm:ss".
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getDateString() throws RemoteException;
+
+  /**
    * Returns the type of this status.
    * 
    * @return type of this status
@@ -78,8 +90,13 @@ public interface Status extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws DeprecatedAndRemovedException
+   *           always, due to the feature is canceled without substitution
+   * 
+   * @deprecated Feature is canceled without substitution in X-2025.09.
    */
-  int getRevisionNumber() throws RemoteException;
+  @Deprecated
+  int getRevisionNumber() throws RemoteException, DeprecatedAndRemovedException;
 
   /**
    * All tags assigned to this status.

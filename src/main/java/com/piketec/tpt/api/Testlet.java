@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -34,6 +34,7 @@ import com.piketec.tpt.api.diagram.Line;
 import com.piketec.tpt.api.diagram.Positioned;
 import com.piketec.tpt.api.diagram.TextArea;
 import com.piketec.tpt.api.diagram.Transition;
+import com.piketec.tpt.api.pythonstate.PythonStateScenario;
 import com.piketec.tpt.api.steplist.StepListScenario;
 
 /**
@@ -44,6 +45,8 @@ import com.piketec.tpt.api.steplist.StepListScenario;
  * It could contain variants for both, {@link StepListScenario StepListScenarios} or
  * {@link DiagramScenario DiagramScenarios}.
  * </p>
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Testlet extends DiagramNode, Positioned {
 
@@ -73,7 +76,7 @@ public interface Testlet extends DiagramNode, Positioned {
    *           remote communication problem
    * @see #getReference()
    */
-  public Boolean isReferencing() throws RemoteException;
+  public boolean isReferencing() throws RemoteException;
 
   /**
    * Creates a new local definition for this state that has not been referenced so far.
@@ -108,6 +111,29 @@ public interface Testlet extends DiagramNode, Positioned {
    *           If the content of the <code>Testlet</code> is empty.
    */
   public StepListScenario createSLVariant(String name, ScenarioGroup groupOrNull)
+      throws ApiException, RemoteException;
+
+  /**
+   * Creates a new Python state scenario ({@link PythonStateScenario}) or a new test case (if the
+   * current <code>Testlet</code> is the top-level <code>Testlet</code>). If the parameter
+   * <code>groupOrNull==null</code>, the newly created Python state scenario is placed directly
+   * below the testlet ({@link Testlet#getTopLevelScenarioOrGroup()}). If a specific
+   * {@link ScenarioGroup} is given, the newly created scenario is placed there.
+   * 
+   * @param name
+   *          The name of the new Python state scenario. <code>Null</code> will be reduced to an
+   *          empty string.
+   * @param groupOrNull
+   *          Either the group where the newly created {@link PythonStateScenario} should be added
+   *          or <code>null</code> to add it in the top-level group of this <code>Testlet</code>.
+   * @return the newly created {@link PythonStateScenario}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * @throws ApiException
+   *           If the content of the <code>Testlet</code> is empty.
+   */
+  public PythonStateScenario createPythonStateVariant(String name, ScenarioGroup groupOrNull)
       throws ApiException, RemoteException;
 
   /**
@@ -320,7 +346,7 @@ public interface Testlet extends DiagramNode, Positioned {
    *           {@link Testlet}</li>
    *           </ul>
    * @throws RemoteException
-   *           If <code>from</code> or <code>to</code> are not part ot this TPT instance.
+   *           If <code>from</code> or <code>to</code> are not part of this TPT instance.
    */
   public Transition createTransition(DiagramNode from, DiagramNode to)
       throws ApiException, RemoteException;
@@ -475,7 +501,7 @@ public interface Testlet extends DiagramNode, Positioned {
    * 
    * @param target
    *          The testlet to copy <code>this</code> into. Can be from another <code>Project</code>.
-   * @return The copy of this and all log messages that occured during copying.
+   * @return The copy of this and all log messages that occurred during copying.
    * @throws ApiException
    *           If target is <code>null</code> or copying failed.
    * @throws RemoteException

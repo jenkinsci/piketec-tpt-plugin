@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * Configuration of the test execution for a particular platform, test set and parameter set. Part
  * of a {@link ExecutionConfiguration}
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabler {
 
@@ -143,6 +143,19 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
   public String getParameterFilePath() throws RemoteException;
 
   /**
+   * Set the parameter file as <code>String</code> or delete the entry if <code>path==null</code>.
+   * If <code>path==null</code> also a previously set <code>ParameterMultiSet</code> will be
+   * deleted.
+   * 
+   * @param path
+   *          A string containing the path to the parameter file.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setParameterFilePath(String path) throws RemoteException;
+
+  /**
    * @return The parameter multi set or <code>null</code> if none has yet been selected.
    * 
    * @throws RemoteException
@@ -157,7 +170,7 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    * variables defined in a parent scope are not returned by this function.
    * </p>
    * 
-   * @return A map containing the names of the "locally" defined variables and there "local" values.
+   * @return A map containing the names of the "locally" defined variables and their "local" values.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -201,19 +214,6 @@ public interface ExecutionConfigurationItem extends PlatformOrExecutionItemEnabl
    */
   @Deprecated
   public void setParameterFile(File f) throws RemoteException;
-
-  /**
-   * Set the parameter file as <code>String</code> or delete the entry if <code>path==null</code>.
-   * If <code>path==null</code> also a previously set <code>ParameterMultiSet</code> will be
-   * deleted.
-   * 
-   * @param path
-   *          A string containing the path to the parameter file.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public void setParameterFilePath(String path) throws RemoteException;
 
   /**
    * Sets the parameter multi set with the given name or deletes the entry if

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,9 +30,39 @@ import com.piketec.tpt.api.util.UUIDObject;
  * ({@link AssessmentGroup}). These objects can build up a tree where both, assessments and
  * assessment groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote, UUIDObject {
+
+  /**
+   * Get the current name of this {@link AssessmentOrGroup}.
+   * 
+   * @return the current name of this AssessmentOrGroup.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link AssessmentOrGroup}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
+
+  /**
+   * @return Returns the UUID of the {@link AssessmentOrGroup}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Override
+  public String getUUIDString() throws RemoteException;
 
   /**
    * Returns the parent group ({@link AssessmentGroup}) of this assessment or <code>null</code> if
@@ -94,7 +124,7 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote, UUID
    * @param status
    *          The status type of the status.
    * @throws ApiException
-   *           If <code>auhor</code> contains line break or the given <code>status</code> is
+   *           If <code>author</code> contains line break or the given <code>status</code> is
    *           invalid.
    * @throws RemoteException
    *           remote communication problem
@@ -126,7 +156,7 @@ public interface AssessmentOrGroup extends NamedObject, IdentifiableRemote, UUID
    * @param targetIndex
    *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
    *          copy at the end.
-   * @return The copy of this and all log messages that occured during copying.
+   * @return The copy of this and all log messages that occurred during copying.
    * @throws ApiException
    *           If targetGroup is <code>null</code> or copying failed.
    * @throws RemoteException

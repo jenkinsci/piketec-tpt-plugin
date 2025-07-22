@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 /**
  * General configuration of the report created after a test run.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface AdvancedReportSettings extends IdentifiableRemote {
 
@@ -256,7 +256,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Renamed, use {@link #isShowTestCommentColumn()}. Will be removed in TPT-22.
+   * @deprecated Renamed, use {@link #isShowTestCommentColumn()}. Removed in TPT X-2025.09. Throws
+   *             {@link DeprecatedAndRemovedException}
    */
   @Deprecated
   public boolean isShowPlatformOverviewComment() throws RemoteException;
@@ -296,7 +297,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Renamed, use {@link #isShowLinkedRequirementsColumn()}. Will be removed in TPT-22.
+   * @deprecated Renamed, use {@link #isShowLinkedRequirementsColumn()}. Removed in TPT X-2025.09.
+   *             Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public boolean isShowPlatformOverviewLinkedRequirements() throws RemoteException;
@@ -520,7 +522,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @deprecated Renamed, use {@link #setShowTestCommentColumn(boolean)}. Will be removed in TPT-22.
+   * @deprecated Renamed, use {@link #setShowTestCommentColumn(boolean)}. Removed in TPT X-2025.09.
+   *             Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setShowPlatformOverviewComment(boolean platformOverviewComment)
@@ -564,8 +567,8 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    *
-   * @deprecated Renamed, use {@link #setShowLinkedRequirementsColumn(boolean)}. Will be removed in
-   *             TPT-22.
+   * @deprecated Renamed, use {@link #setShowLinkedRequirementsColumn(boolean)}.Removed in TPT
+   *             X-2025.09. Throws {@link DeprecatedAndRemovedException}.
    */
   @Deprecated
   public void setShowPlatformOverviewLinkedRequirements(boolean platformOverviewLinkedRequirements)
@@ -636,6 +639,28 @@ public interface AdvancedReportSettings extends IdentifiableRemote {
    */
   public void setCheckAndShowAssessmentStatusInformation(boolean checkAndShowAssessmentStatusInformation)
       throws RemoteException;
+
+  /**
+   * Sets the custom footer text for the report. This text will appear at the bottom-right of each
+   * page in both the test report and overview report. Supports markup and $-variables.
+   * 
+   * @param customFooterText
+   *          the new attribute value
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setCustomFooterText(String customFooterText) throws RemoteException;
+
+  /**
+   * Gets the custom footer text for the report.
+   * 
+   * @return get attribute customFooterText
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getCustomFooterText() throws RemoteException;
 
   /**
    * Does nothing except throw a RuntimeException.

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -41,15 +41,15 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * For a detailed description of the attributes please refer to the User Guide.
  * 
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
-    RemoteList<ExecutionConfigurationItem>, PlatformOrExecutionItemEnabler {
+    AccessList<ExecutionConfigurationItem>, PlatformOrExecutionItemEnabler {
 
   /**
    * Enumeration representing the possible output formats of the report.
    * 
-   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public enum ReportFormat {
     /**
@@ -65,7 +65,7 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
      */
     Pdf,
     /**
-     * PDF with overview and test resports in one big document
+     * PDF with overview and test reports in one big document
      */
     AllInOnePdf
   }
@@ -73,16 +73,16 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   /**
    * Enumeration representing the possible reference modes.
    * 
-   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public enum ReferenceMode {
     /**
-     * The given refence directory path points to a execution directory containing platform
+     * The given reference directory path points to a execution directory containing platform
      * directories which contain the test case folders.
      */
     EXECUTION_DIR,
     /**
-     * The given refence directory path points to a platform directory containing the test case
+     * The given reference directory path points to a platform directory containing the test case
      * folders.
      */
     PLATFORM_DIR
@@ -91,7 +91,7 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   /**
    * Enumeration representing the different directory structure configurations.
    * 
-   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
    */
   public enum DataDirStructure {
     /**
@@ -290,7 +290,7 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
 
   /**
    * @return Returns <code>true</code> if the dashboard should be enabled during test execution.
-   *         Represent the "Dashboard" check box.
+   *         Represents the "Dashboard" check box.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -591,6 +591,17 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
   public Object createGlobalAssessmentRow() throws RemoteException;
 
   /**
+   * returns the list of all execution config items of this {@link ExecutionConfiguration}
+   * 
+   * @return list of all execution config items
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<ExecutionConfigurationItem> getExecutionConfigurationItems()
+      throws RemoteException;
+
+  /**
    * Set the number of cores used during execution. Contrary to the TPT UI you can set more cores
    * than actually available on the current machine. At test execution at most actually available
    * cores will be used.
@@ -598,14 +609,14 @@ public interface ExecutionConfiguration extends ExecutionConfigurationOrGroup,
    * @param cores
    *          the maximum number of cores to use.
    * @throws ApiException
-   *           if cores ist less than 1
+   *           if cores is less than 1
    * @throws RemoteException
    *           remote communication problem
    */
   public void setCores(int cores) throws ApiException, RemoteException;
 
   /**
-   * Get the maximal number of cores used during test exectuion. That number may be greater than
+   * Get the maximal number of cores used during test execution. That number may be greater than
    * actually available cores on the current machine.
    * 
    * @return the maximal number of cores used during test execution.

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -34,6 +34,7 @@ import com.piketec.tpt.api.requirements.excel.ExcelFileRequirementsImportSetting
  * For the requirements import from a CSV file use {@link CsvFileRequirementsImportSettings}.<br>
  * For the requirements import from an Excel file use {@link ExcelFileRequirementsImportSettings}.
  * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class TabularRequirementsImportSettings extends RequirementsImportSettings {
 
@@ -334,7 +335,7 @@ public abstract class TabularRequirementsImportSettings extends RequirementsImpo
   /**
    * @param attributeColumns
    *          Optional list of column names in the source file to import them as additional
-   *          requirements attributes.To enable the automatic review of possible changes of an
+   *          requirements attributes. To enable the automatic review of possible changes of a
    *          requirement attribute
    *          {@link Project#setRequirementAttributeAutoReview(String, boolean) change the auto
    *          review flag of existing requirement attributes}.

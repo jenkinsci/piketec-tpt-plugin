@@ -1,5 +1,9 @@
 Release History
 ===
+## Version 9.5
+- Plugin now needs at least Jenkins 2.479.3
+- Plugin only works with TPT X-2025.09 if using distributing mode
+
 ## Version 9.4
 - Plugin now needs at least Jenkins 2.440.3
 - Global assessment results are now evaluated for the report

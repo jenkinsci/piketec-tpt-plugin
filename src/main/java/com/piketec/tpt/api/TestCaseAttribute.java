@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,6 +28,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * A <code>TestCaseAttribute</code> represents a row in the Test Case Details view. It consists of a
  * name and a type.
  * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TestCaseAttribute extends IdentifiableRemote {
 
@@ -117,8 +118,28 @@ public interface TestCaseAttribute extends IdentifiableRemote {
    */
   void setCopyable(boolean on) throws RemoteException;
 
+  /**
+   * Indicates whether the value of a <code>TestCaseAttribute</code> is editable. In the TPT GUI
+   * this setting corresponds to the lock button in the <code>TestCaseAttribute</code> definition
+   * dialog.
+   * 
+   * @return <code>true</code>, if the <code>TestCaseAttribute</code> is read-only
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
   boolean isReadonly() throws RemoteException;
 
+  /**
+   * Set a <code>TestCaseAttribute</code> to be "readonly". The values of a "readonly"
+   * <code>TestCaseAttribute</code> can't be edited.
+   * 
+   * @param on
+   *          <code>true</code>, if TestCaseAttribute should be "readonly".
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
   void setReadonly(boolean on) throws RemoteException;
 
   /**
@@ -171,7 +192,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
 
   /**
    * Creates an option for this test case attribute. Note that the options are only relevant for
-   * test case attriutes of type <code>ENUM_ONE</code> or <code>ENUM_MANY</code>.
+   * test case attributes of type <code>ENUM_ONE</code> or <code>ENUM_MANY</code>.
    * 
    * @param optionName
    *          The name of the option to be created
@@ -183,7 +204,7 @@ public interface TestCaseAttribute extends IdentifiableRemote {
 
   /**
    * Get the available options for this test case attribute. Note that the options are only relevant
-   * for test case attriutes of type <code>ENUM_ONE</code> or <code>ENUM_MANY</code>.
+   * for test case attributes of type <code>ENUM_ONE</code> or <code>ENUM_MANY</code>.
    * 
    * @return List of options for this test case attribute.
    * @throws RemoteException

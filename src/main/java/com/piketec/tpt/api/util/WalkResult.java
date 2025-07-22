@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,14 +28,14 @@ import java.util.List;
 /**
  * An object of this class is returned when WalkIterator is used.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  * @param <R>
  *          Root class, owner of group.
  * @param <G>
  *          Group class.
  * @param <E>
  *          Elements class.
- *
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class WalkResult<R, G, E> implements Iterable<Object>, Serializable {
 
@@ -82,6 +82,12 @@ public class WalkResult<R, G, E> implements Iterable<Object>, Serializable {
     return this.elements;
   }
 
+  // implements "Iterable" to allow Jython to unpack this instance as a tuple
+  // (root, groups, elements) directly. This is useful in for loops:
+  //
+  // for (root, groups, elements) in TPTAPI.walkXxxxx(proj):
+  // ...
+  //
   @Override
   public Iterator<Object> iterator() {
     List<Object> l = new ArrayList<>();

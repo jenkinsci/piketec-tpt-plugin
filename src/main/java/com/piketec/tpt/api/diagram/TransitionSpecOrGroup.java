@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,8 +30,40 @@ import com.piketec.tpt.api.util.UUIDObject;
 /**
  * <code>TransitionSpecOrGroup</code> represents a tree structure. Nodes are
  * {@link TransitionSpecGroup}, leaves are {@link TransitionSpec}.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TransitionSpecOrGroup extends IdentifiableRemote, NamedObject, UUIDObject {
+
+  /**
+   * Get the current name of this {@link TransitionSpecOrGroup}.
+   * 
+   * @return the current name of this {@link TransitionSpecOrGroup}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link TransitionSpecOrGroup}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
+
+  /**
+   * @return Returns the UUID of the {@link TransitionSpecOrGroup}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Override
+  public String getUUIDString() throws RemoteException;
 
   /**
    * Returns a {@link TransitionSpecGroup} if the object is a child object or <code>null</code> if

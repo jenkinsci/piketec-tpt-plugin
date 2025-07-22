@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,8 @@ package com.piketec.tpt.api.importinterface;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.piketec.tpt.api.Parameter.ExchangeMode;
 import com.piketec.tpt.api.Project;
@@ -30,11 +32,11 @@ import com.piketec.tpt.api.Project;
  * {@link ImportInterfaceSettings} to import from an A2L file (including dcm, hex and txt file
  * import).
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class ImportA2LSettings extends ImportInterfaceSettings {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2L;
 
   private File a2lFile;
 
@@ -44,7 +46,7 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
 
   private boolean arrayDimensionsFromA2L = false;
 
-  private Collection<String> functionsForMeasurementImportOrNull = null;
+  private Set<String> functionsForMeasurementImportOrNull = null;
 
   private File hexFileOrNull = null;
 
@@ -217,7 +219,7 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
    * 
    * @return the collection of function names or <code>null</code>
    */
-  public Collection<String> getFunctionsForMeasurementImportOrNull() {
+  public Set<String> getFunctionsForMeasurementImportOrNull() {
     return functionsForMeasurementImportOrNull;
   }
 
@@ -230,7 +232,8 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
    *          the collection of function names or <code>null</code>
    */
   public void setFunctionsForMeasurementImportOrNull(Collection<String> functionsOrNull) {
-    this.functionsForMeasurementImportOrNull = functionsOrNull;
+    this.functionsForMeasurementImportOrNull =
+        functionsOrNull == null ? null : new HashSet<>(functionsOrNull);
   }
 
   /**
@@ -438,4 +441,5 @@ public class ImportA2LSettings extends ImportInterfaceSettings {
   public void setParameterExchangeMode(ExchangeMode parameterExchangeMode) {
     this.parameterExchangeMode = parameterExchangeMode;
   }
+
 }

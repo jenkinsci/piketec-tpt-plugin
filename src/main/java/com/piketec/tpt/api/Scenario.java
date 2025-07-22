@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -35,6 +35,8 @@ import com.piketec.tpt.api.steplist.StepListScenario;
  * </p>
  * 
  * @see Project#getTopLevelTestlet()
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Scenario extends ScenarioOrGroup {
 
@@ -79,6 +81,24 @@ public interface Scenario extends ScenarioOrGroup {
       throws RemoteException, ApiException;
 
   /**
+   * Returns the test data directory of scenario for a given execution configuration item. Since
+   * ${tpt.date} and ${tpt.time} placeholders are only valid during runtime they cannot be used in
+   * the test data path and an {@link ApiException} will be thrown.
+   * 
+   * @param execConfigItem
+   *          The execution configuration item to calculate the test data directory.
+   * @return The test data directory as an absolute file
+   * @throws ApiException
+   *           If the execution configuration does not belong to the model of the scenario, the
+   *           execution configuration has no platform configuration set or the test data path of
+   *           the execution configuration has unresolvable placeholder variables.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getTestDataDirectoryPath(ExecutionConfigurationItem execConfigItem)
+      throws RemoteException, ApiException;
+
+  /**
    * Returns <code>null</code> if scenario can be compiled without errors, the compile error message
    * otherwise.
    * 
@@ -95,7 +115,7 @@ public interface Scenario extends ScenarioOrGroup {
    * 
    * @return The current status or <code>null</code> if status is "new".
    * @throws ApiException
-   *           If this {@link Scenario} is not a test case.
+   *           If this {@link Scenario} is not attached to the project.
    * @throws RemoteException
    *           remote communication problem
    */
@@ -106,7 +126,7 @@ public interface Scenario extends ScenarioOrGroup {
    * 
    * @return A list of all {@link Status Statuses}.
    * @throws ApiException
-   *           If this {@link Scenario} is not a test case.
+   *           If this {@link Scenario} is not attached to the project.
    * @throws RemoteException
    *           remote communication problem
    */
@@ -116,32 +136,28 @@ public interface Scenario extends ScenarioOrGroup {
    * Returns <code>true</code> if this scenario has been modified since the last status history
    * entry or if it has no revision. Otherwise, returns <code>false</code>.
    *
-   * @return
-   *         <ul>
-   *         <li><code>true</code> if it is modified or new</li>
-   *         <li><code>false</code> if it is up-to-date</li>
-   *         </ul>
+   * @return always <code>false</code> since revision is deprecated.
    * @throws ApiException
    *           If this {@link Scenario} is not a test case.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in Z-2027.03. Feature is canceled without substitution.
    */
+  @Deprecated
   public boolean checkForNewRevision() throws ApiException, RemoteException;
 
   /**
    * Returns <code>true</code> if this scenario is marked as "modified"(=outdated) or has no
    * revision. Otherwise, returns <code>false</code>.
    *
-   * @return
-   *         <ul>
-   *         <li><code>true</code> if it is outdated or new</li>
-   *         <li><code>false</code> if it is up-to-date</li>
-   *         </ul>
+   * @return always <code>false</code> since revision is deprecated.
    * @throws ApiException
    *           If this {@link Scenario} is not a test case.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in Z-2027.03. Feature is canceled without substitution.
    */
+  @Deprecated
   public boolean isStatusOutdated() throws ApiException, RemoteException;
 
   /**

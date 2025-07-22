@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,7 @@ package com.piketec.tpt.api.diagram;
 
 import java.rmi.RemoteException;
 
+import com.piketec.tpt.api.AssessmentOrGroup;
 import com.piketec.tpt.api.IdentifiableRemote;
 import com.piketec.tpt.api.NamedObject;
 import com.piketec.tpt.api.Project;
@@ -31,8 +32,40 @@ import com.piketec.tpt.api.util.UUIDObject;
 /**
  * This interface is implemented by all element that can be connected by a transition with each
  * other.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface DiagramNode extends NamedObject, IdentifiableRemote, UUIDObject {
+
+  /**
+   * Get the current name of this {@link DiagramNode}.
+   * 
+   * @return the current name of this {@link DiagramNode}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link AssessmentOrGroup}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
+
+  /**
+   * @return Returns the UUID of the {@link DiagramNode}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Override
+  public String getUUIDString() throws RemoteException;
 
   /**
    * Get the parent testlet of this digram node. The top level testlet

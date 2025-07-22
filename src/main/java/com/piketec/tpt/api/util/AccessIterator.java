@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,42 +25,49 @@ import java.rmi.RemoteException;
 import java.util.Iterator;
 
 /**
- * An interface to provide iterable functionallity for remote objects. Since all methods of a
- * {@link Remote} interface <i>must</i> throw a {@link RemoteException} we cannot implement
- * {@link Iterable} directly.
+ * An <code>AccessIterator</code> has the same interface as an {@link Iterator} but since all
+ * {@link Remote} objetcs must throw a {@link RemoteException} every method does exactly that. An
+ * <code>AccessIterator</code> can be wrapped in a {@link RemoteIterator} to get a conventional
+ * <code>Iterator</code>.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @param <E>
+ *          the type of elements returned by this iterator
  * 
- * @param <T>
- *          the type of elements in this collection
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
-public interface RemoteIterable<T> extends Remote {
+public interface AccessIterator<E> extends Remote {
 
   /**
-   * Provides a remote iterator that has the same interface as {@link Iterator} but every method can
-   * throw a {@link RemoteException} as required by Java RMI. This method is most likely not
-   * relevant for API users but needed for {@link #asIterable()}.
+   * Returns <code>true</code> if the iteration has more elements, <code>false</code> otherwise.
    * 
-   * @see #asIterable()
-   * 
-   * @return a remote iterator
+   * @return <code>true</code> if the iteration has more elements, <code>false</code> otherwise.
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @see Iterator#hasNext()
    */
-  RemoteIterator<T> remoteIterator() throws RemoteException;
+  public boolean hasNext() throws RemoteException;
 
   /**
-   * Provides an {@link Iterable} view of this <code>RemoteIterable</code>. This normally uses
-   * {@link #remoteIterator()} and wraps the return value into a real {@link Iterator} that throws
-   * {@link RuntimeException RuntimeExceptions} instead of <code>RemoteExceptions</code> so that
-   * this view can be used in for-each loops.
+   * Get the next element of the iteration.
    * 
-   * @see ApiIterator
-   * 
-   * @return an iterable view of this <code>RemoteIterable</code>
+   * @return the next element of the iteration.
    * @throws RemoteException
    *           remote communication problem
+   * 
+   * @see Iterator#next()
    */
-  Iterable<T> asIterable() throws RemoteException;
+  public E next() throws RemoteException;
+
+  /**
+   * Removes the last element returned by this iterator from the underlying collection (optional
+   * operation).
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see Iterator#remove()
+   */
+  public void remove() throws RemoteException;
 
 }

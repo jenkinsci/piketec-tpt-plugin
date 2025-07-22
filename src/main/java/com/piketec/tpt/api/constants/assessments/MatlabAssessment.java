@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,6 +23,8 @@ package com.piketec.tpt.api.constants.assessments;
 /**
  * For further information, please refer to the User Guide or Assessment Manual, section TPT
  * Assessment Module 'MATLAB'.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface MatlabAssessment extends BasicAssessment {
 

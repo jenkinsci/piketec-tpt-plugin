@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,8 +29,32 @@ import com.piketec.tpt.api.RemoteList;
 
 /**
  * This object represents the graphical transition between two {@link DiagramNode DiagramNodes}.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Transition extends NamedObject, IdentifiableRemote {
+
+  /**
+   * Get the current name of this {@link Transition}.
+   * 
+   * @return the current name of this {@link Transition}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link Transition}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
 
   /**
    * @return The starting diagram node of the <code>Transition</code>

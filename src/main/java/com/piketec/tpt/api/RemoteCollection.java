@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,35 +20,27 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.RemoteException;
+import java.io.Serializable;
 import java.util.Collection;
-
-import com.piketec.tpt.api.util.IterableRemoteCollection;
-import com.piketec.tpt.api.util.RemoteIterable;
+import java.util.Iterator;
 
 /**
  * A collection of items where changes to the items are directly performed in TPT
- *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
  * 
  * @param <E>
  *          the type of elements in this collection
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
-public interface RemoteCollection<E> extends TptRemote, RemoteIterable<E> {
+public interface RemoteCollection<E> extends Collection<E>, Serializable {
 
   /**
-   * Returns all items of this <code>RemoteCollection</code>. Any change to the returned
-   * <code>Collection</code> is local and will not be sent to TPT.<br>
-   * If you just want to iterate over the items use {@link #asIterable()}.
+   * Returns all items in a copy of this collection. Any change to the returned collection is
+   * <i>local</i> and will not be sent to TPT.<br>
    * 
    * @return all items of this <code>RemoteCollection</code> at once.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * 
-   * @see #asIterable()
    */
-  public Collection<E> getItems() throws RemoteException;
+  public Collection<E> getItems();
 
   /**
    * Delete an element from the list. This function directly deletes the corresponding
@@ -62,31 +54,24 @@ public interface RemoteCollection<E> extends TptRemote, RemoteIterable<E> {
    * 
    * @param element
    *          The element to remove.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public void delete(E element) throws RemoteException;
+  public void delete(E element);
 
   /**
    * Returns the number of elements in this collection.
    *
    * @return the number of elements in this collection
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public int size() throws RemoteException;
+  @Override
+  public int size();
 
   /**
    * Returns <code>true</code> if this collection contains no elements.
    *
    * @return {@code true} if this collection contains no elements
-   *
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public boolean isEmpty() throws RemoteException;
+  @Override
+  public boolean isEmpty();
 
   /**
    * Returns <code>true</code>e if this collection contains the specified element.
@@ -94,10 +79,9 @@ public interface RemoteCollection<E> extends TptRemote, RemoteIterable<E> {
    * @param o
    *          element whose presence in this collection is to be tested
    * @return <code>true</code>e if this collection contains the specified element
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public boolean contains(E o) throws RemoteException;
+  @Override
+  public boolean contains(Object o);
 
   /**
    * Returns <code>true</code> if this collection contains all the elements in the given collection.
@@ -105,10 +89,9 @@ public interface RemoteCollection<E> extends TptRemote, RemoteIterable<E> {
    * @param c
    *          collection of elements whose presence in this collection is to be tested
    * @return <code>true</code>e if this collection contains all the specified elements
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public boolean containsAll(Collection< ? extends E> c) throws RemoteException;
+  @Override
+  public boolean containsAll(Collection< ? > c);
 
   /**
    * Removes all of this collection's elements that are contained in the given collection.
@@ -116,10 +99,8 @@ public interface RemoteCollection<E> extends TptRemote, RemoteIterable<E> {
    * @param c
    *          collection containing elements to be removed from this collection
    * @return <code>true</code> if this collection was changed as a result of the call
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public boolean deleteAll(Collection< ? > c) throws RemoteException;
+  public boolean deleteAll(Collection< ? > c);
 
   /**
    * Removes all of this collection's elements that are not contained in the specified collection.
@@ -127,20 +108,33 @@ public interface RemoteCollection<E> extends TptRemote, RemoteIterable<E> {
    * @param c
    *          collection containing elements to be retained in this collection
    * @return <code>true</code> if this collection was changed as a result of the call
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public boolean retainAll(Collection< ? > c) throws RemoteException;
+  @Override
+  public boolean retainAll(Collection< ? > c);
 
   /**
    * Remove all elements from this collection.
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public void clear() throws RemoteException;
-
   @Override
-  IterableRemoteCollection<E> asIterable() throws RemoteException;
+  public void clear();
+
+  /**
+   * @return returns "this". The method exists for legacy reasons only.
+   * 
+   * @deprecated This method is useless after redesign of the API with TPT 2025.09. The collection
+   *             itself is iterable now. Will be removed in TPT 2026.06.
+   */
+  @Deprecated
+  public RemoteCollection<E> asIterable();
+
+  /**
+   * @return same as {@link #iterator()}. The method exists for legacy reasons only.
+   * 
+   * @deprecated This method is useless after redesign of the API with TPT 2025.09. Use the common
+   *             {@link #iterator()} method instead with the same effect. Will be removed in TPT
+   *             2026.06.
+   */
+  @Deprecated
+  public Iterator<E> remoteIterator();
 
 }

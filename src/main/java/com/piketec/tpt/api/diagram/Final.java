@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,6 +23,8 @@ package com.piketec.tpt.api.diagram;
 /**
  * A {@link DiagramNode} where {@link Transition Transitions} can end but never. Reaching this node
  * during test execution will terminate the corresponding region in the automaton.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Final extends DiagramNode, Positioned {
 

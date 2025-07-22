@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -21,7 +21,6 @@
 package com.piketec.tpt.api;
 
 import java.io.File;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
@@ -62,14 +61,14 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * {@link TptApi#newProject(File)} or opened via {@link TptApi#openProject(File)}.
  * 
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, TestSetOwner {
 
   /**
    * Modes how to match existing declarations and imported declarations.
    * 
-   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
    *
    */
   public static enum SynchronizationMethod {
@@ -86,7 +85,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   /**
    * Modes that determine which types of requirement links are included in calculations.
    * 
-   * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+   * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
    *
    */
   public static enum RequirementsLinking {
@@ -95,13 +94,30 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
      */
     TEST_CASES_ONLY,
     /**
-     * Only links to assesslets are considered for calculations.
+     * Only links to assessments are considered for calculations.
      */
-    ASSESSLETS_ONLY,
+    ASSESSMENTS_ONLY,
     /**
      * All kinds of links, i.e. test cases, variants and assesslets are considered for calculations.
      */
     ALL_KINDS;
+  }
+
+  /**
+   * Kinds of status that can be assigned to a project.
+   * 
+   * @author luisav, Synopsys Inc.
+   *
+   */
+  public enum StatusKind {
+    /**
+     * Indecates that a statusType still needs review
+     */
+    REVIEW,
+    /**
+     * Indicates that a statusType is stable and that modifications can be discarded
+     */
+    STABLE;
   }
 
   /**
@@ -414,6 +430,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   RemoteList<AssessmentOrGroup> getTopLevelAssessments() throws RemoteException;
 
   /**
+   * Returns the {@link RequirementsLinking} used for this project.
+   * 
+   * @return the requirements linking used for this project
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RequirementsLinking getRequirementsLinking() throws RemoteException;
+
+  /**
    * Sets the {@link RequirementsLinking} for this project.
    * 
    * @param requirementsLinking
@@ -422,15 +447,6 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   void setRequirementsLinking(RequirementsLinking requirementsLinking) throws RemoteException;
-
-  /**
-   * Returns the {@link RequirementsLinking} used for this project.
-   * 
-   * @return the requirements linking used for this project
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  RequirementsLinking getRequirementsLinking() throws RemoteException;
 
   /**
    * Adds a new requirement to this project.
@@ -469,7 +485,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param name
    *          The name of the requirement set
    * @param condition
-   *          the condtion of the requirement set. The value <code>null</code> will be corrected to
+   *          the condition of the requirement set. The value <code>null</code> will be corrected to
    *          an empty string.
    * @return The newly created requirement set.
    * @throws ApiException
@@ -561,7 +577,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * of a requirement is changing during an import, the change will be reviewed automatically.
    * 
    * @param attributeName
-   *          The name of the new attribute.
+   *          The name of the attribute.
    * @param autoReview
    *          The new value for the flag.
    * @throws RemoteException
@@ -578,8 +594,8 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * of a requirement is changing during an import, the change will be reviewed automatically.
    * 
    * @param attributeName
-   *          The name of the new attribute.
-   * @return the auto review flag of the given requirement attribute
+   *          The name of the attribute.
+   * @return The auto review flag of the given requirement attribute.
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
@@ -625,6 +641,17 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   List<String> getRequirementTags() throws RemoteException;
 
   /**
+   * Gets the name spaces which will be used for the Defines of this TPT project.
+   * 
+   * @return the name spaces as String
+   * 
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getUsedNameSpaces() throws RemoteException;
+
+  /**
    * Sets the name spaces which will be used for the Defines of this TPT project. If several name
    * spaces are used the names have to be comma separated.
    * 
@@ -638,17 +665,6 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           if nameSpace is {@code null}
    */
   void setUsedNameSpaces(String nameSpaces) throws RemoteException, ApiException;
-
-  /**
-   * Gets the name spaces which will be used for the Defines of this TPT project.
-   * 
-   * @return the name spaces as String
-   * 
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  String getUsedNameSpaces() throws RemoteException;
 
   /**
    * Delivers the scenario or scenario group with the given id or <code>null</code> if no such
@@ -675,6 +691,19 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   ScenarioOrGroup getScenarioOrGroupByUUID(UUID uuid) throws RemoteException;
+
+  /**
+   * Delivers the scenario or scenario group with the given uuid or <code>null</code> if no such
+   * scenario or scenario group exists.
+   * 
+   * @param uuid
+   *          The <code>UUID</code> of the <code>ScenarioOrGroup</code> as string.
+   * @return The {@link ScenarioOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  ScenarioOrGroup getScenarioOrGroupByUUIDString(String uuid) throws RemoteException;
 
   /**
    * Delivers the first scenario or scenario group with the given name or <code>null</code> if no
@@ -812,7 +841,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param oldName
    *          name of the declared type to be renamed
    * @param newName
-   *          new name for the renamed type. No other type must ne declared using this name.
+   *          new name for the renamed type. No other type must be declared using this name.
    * @throws ApiException
    *           if another type named <code>newName</code> exists.
    * @throws RemoteException
@@ -1124,6 +1153,19 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   AssessmentOrGroup getAssessmentOrGroupByUUID(UUID uuid) throws RemoteException;
 
   /**
+   * Delivers the assessment or assessment group with the given uuid or <code>null</code> if no such
+   * assessment or assessment group exists.
+   * 
+   * @param uuid
+   *          The <code>UUID</code> of the <code>AssessmentOrGroup</code> as string.
+   * @return The {@link AssessmentOrGroup} or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  AssessmentOrGroup getAssessmentOrGroupByUUIDString(String uuid) throws RemoteException;
+
+  /**
    * Delivers the first assessment or assessment group with the given name or <code>null</code> if
    * no such assessment or assessment group exists.
    * 
@@ -1147,7 +1189,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<AssessmentOrGroup> getAssessmentOrGroupByNamePattern(Pattern namepattern)
+  List<AssessmentOrGroup> getAssessmentOrGroupByNamePattern(Pattern namepattern)
       throws RemoteException;
 
   /**
@@ -1163,7 +1205,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  Collection<AssessmentOrGroup> getAssessmentOrGroupByNamePattern(String namepattern)
+  List<AssessmentOrGroup> getAssessmentOrGroupByNamePattern(String namepattern)
       throws PatternSyntaxException, RemoteException;
 
   /**
@@ -1236,7 +1278,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  RemoteCollection<TestCaseAttribute> getTestCaseAttributes() throws RemoteException;
+  RemoteIndexedList<String, TestCaseAttribute> getTestCaseAttributes() throws RemoteException;
 
   /**
    * Create a new {@link TestCaseAttribute}
@@ -1255,7 +1297,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           is unknown.
    * @throws RemoteException
    *           remote communication problem
-   * @deprecated will be removed in TPT-21. Use
+   * @deprecated Removed in TPT 21. Use
    *             {@link #createTestCaseAttribute(String, com.piketec.tpt.api.TestCaseAttribute.TestCaseAttributeType)
    *             createTestCaseAttribute(String, TestCaseAttributeType)} instead.
    */
@@ -1300,7 +1342,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           If an extension has been found but is not available for the current TPT instance
    *           (e.g. missing license option).
    */
-  Remote getExtensionOrNull(String key) throws RemoteException, ApiException;
+  TptRemote getExtensionOrNull(String key) throws RemoteException, ApiException;
 
   /**
    * @return Returns a list of the {@link Mapping Mappings} that are defined for this project.
@@ -1410,16 +1452,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          Create local signals for the reference channels of the Signal comparison from the
    *          channels of the file to have the reference data available for embedded signals, too.
    * @param addTerminationCondition
-   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          Add a wait step that terminates the variant when the test data has been fully
    *          replayed.
    * @param assignParameters
    *          Enable the assignment of parameter values to test cases, if those are present in the
    *          test data file and a respective mapping flavor is present.
    * @param updateExistingGeneratedScenarios
    *          If this argument is set to <code>true</code>, TPT tries to find an older import to
-   *          update with the new data. If it finds an older import, TPT updates already existing
-   *          test cases, adds missing test cases, and removes such test cases, that do not have
-   *          corresponding test data anymore.
+   *          update with the new data. If it finds an older import, the old import data is
+   *          effectively overridden.
    *          <p>
    *          A older updateable import exists, if the testlet for the provided
    *          <code>scenarioGroup</code> contains exactly one child group that matches the name
@@ -1436,6 +1477,8 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
    *           a Signal Comparison Assesslet could be created.</li>
    *           <li>If an error occurs during the import.</li>
+   *           <li>If <code>updateExistingGeneratedScenarios == true</code> and multiple past
+   *           imports have been found.
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
@@ -1501,16 +1544,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          Create local signals for the reference channels of the Signal comparison from the
    *          channels of the file to have the reference data available for embedded signals, too.
    * @param addTerminationCondition
-   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          Add a wait step that terminates the variant when the test data has been fully
    *          replayed.
    * @param assignParameters
    *          Enable the assignment of parameter values to test cases, if those are present in the
    *          test data file and a respective mapping flavor is present.
    * @param updateExistingGeneratedScenarios
    *          If this argument is set to <code>true</code>, TPT tries to find an older import to
-   *          update with the new data. If it finds an older import, TPT updates already existing
-   *          test cases, adds missing test cases, and removes such test cases, that do not have
-   *          corresponding test data anymore.
+   *          update with the new data. If it finds an older import, the old import data is
+   *          effectively overridden.
    *          <p>
    *          A older updateable import exists, if the testlet for the provided
    *          <code>scenarioGroup</code> contains exactly one child group that matches the name
@@ -1530,6 +1572,8 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
    *           a Signal Comparison Assesslet could be created.</li>
    *           <li>If an error occurs during the import.</li>
+   *           <li>If <code>updateExistingGeneratedScenarios == true</code> and multiple past
+   *           imports have been found.
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
@@ -1590,16 +1634,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          Create local signals for the reference channels of the Signal comparison from the
    *          channels of the file to have the reference data available for embedded signals, too.
    * @param addTerminationCondition
-   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          Add a wait step that terminates the variant when the test data has been fully
    *          replayed.
    * @param assignParameters
    *          Enable the assignment of parameter values to test cases, if those are present in the
    *          test data file and a respective mapping flavor is present.
    * @param updateExistingGeneratedScenarios
    *          If this argument is set to <code>true</code>, TPT tries to find an older import to
-   *          update with the new data. If it finds an older import, TPT updates already existing
-   *          test cases, adds missing test cases, and removes such test cases, that do not have
-   *          corresponding test data anymore.
+   *          update with the new data. If it finds an older import, the old import data is
+   *          effectively overridden.
    *          <p>
    *          A older updateable import exists, if the testlet for the provided
    *          <code>scenarioGroup</code> contains exactly one child group that matches the name
@@ -1619,6 +1662,8 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
    *           a Signal Comparison Assesslet could be created.</li>
    *           <li>If an error occurs during the import.</li>
+   *           <li>If <code>updateExistingGeneratedScenarios == true</code> and multiple past
+   *           imports have been found.
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
@@ -1681,16 +1726,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *          Create local signals for the reference channels of the Signal comparison from the
    *          channels of the file to have the reference data available for embedded signals, too.
    * @param addTerminationCondition
-   *          Add a wait stept that terminates the variant when the test data has been fully
+   *          Add a wait step that terminates the variant when the test data has been fully
    *          replayed.
    * @param assignParameters
    *          Enable the assignment of parameter values to test cases, if those are present in the
    *          test data file and a respective mapping flavor is present.
    * @param updateExistingGeneratedScenarios
    *          If this argument is set to <code>true</code>, TPT tries to find an older import to
-   *          update with the new data. If it finds an older import, TPT updates already existing
-   *          test cases, adds missing test cases, and removes such test cases, that do not have
-   *          corresponding test data anymore.
+   *          update with the new data. If it finds an older import, the old import data is
+   *          effectively overridden.
    *          <p>
    *          A older updateable import exists, if the testlet for the provided
    *          <code>scenarioGroup</code> contains exactly one child group that matches the name
@@ -1707,6 +1751,8 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           <li>If <code>createAssesslets == true</code>, but are no TPT-Input-Channels for which
    *           a Signal Comparison Assesslet could be created.</li>
    *           <li>If an error occurs during the import.</li>
+   *           <li>If <code>updateExistingGeneratedScenarios == true</code> and multiple past
+   *           imports have been found.
    *           </ul>
    * @throws RemoteException
    *           remote communication problem
@@ -1746,6 +1792,23 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
       throws ApiException, RemoteException;
 
   /**
+   * Exports the interface to the given file. Supported are tptaif, xml and xlsx files.
+   * 
+   * @param f
+   *          The file the interface is getting exported to. If it is an existing file it must be a
+   *          valid excel file.
+   * @param mappingOrNull
+   *          The mapping whose information shall be exported or <code>null</code>.
+   * @return A list of warnings that occurred during import.
+   * @throws ApiException
+   *           If an error occurs during export or the file format is not supported.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  List<String> exportIOByPath(String f, com.piketec.tpt.api.Mapping mappingOrNull)
+      throws ApiException, RemoteException;
+
+  /**
    * Imports the interface from the given file. Supported are tpt, tptprj, tptz, tptaif, xml and
    * xlsx files.
    * 
@@ -1769,7 +1832,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * Imports the interface from the given file. Supported are tpt, tptprj, tptz, tptaif, xml and
    * xlsx files.
    * 
-   * @param f
+   * @param path
    *          The path to the interface file containing the declarations to import.
    * @param mappingOrNull
    *          The mapping where mapping information shall be imported or <code>null</code> if a new
@@ -1782,7 +1845,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @throws RemoteException
    *           remote communication problem
    */
-  List<String> importIOByPath(String f, Mapping mappingOrNull, SynchronizationMethod syncMethod)
+  List<String> importIOByPath(String path, Mapping mappingOrNull, SynchronizationMethod syncMethod)
       throws ApiException, RemoteException;
 
   /**
@@ -1793,7 +1856,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * @param settings
    *          A sub class of {@link ImportInterfaceSettings} for a specific import type containing
    *          the needed information to execute the import without user interactions.
-   * @return The log containing warning und error messages, that occured during import and did not
+   * @return The log containing warning and error messages, that occurred during import and did not
    *         result in an {@link ApiException}
    * @throws ApiException
    *           If an error occurs during import or the file format is not supported.
@@ -1811,7 +1874,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   boolean createdWithCurrentVersion() throws RemoteException;
 
   /**
-   * @return Fileformat version number of the tpt-project-file.
+   * @return File format version number of the tpt-project file.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -1819,7 +1882,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
   int getCreatedWithFileFormatVersion() throws RemoteException;
 
   /**
-   * @return TPT version name of the tpt-project-file.
+   * @return TPT version name of the tpt-project file.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -1850,7 +1913,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
 
   /**
    * @param f
-   *          target-{@link File} for export.
+   *          target {@link File} for export.
    * @return {@link List} with warnings occurred during import.
    * 
    * @throws RemoteException
@@ -1860,7 +1923,7 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
 
   /**
    * @param f
-   *          path to the target File for export.
+   *          path to the target file for export.
    * @return {@link List} with warnings occurred during import.
    * @throws ApiException
    *           if the path is null
@@ -1963,13 +2026,15 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    * 
    * @param status
    *          The status type to be created.
+   * @param kind
+   *          If the status type needs a review or is marking the object as stable.
    * @throws ApiException
    *           If status is empty, <code>null</code>, contains line breaks, or a status with the
    *           given name already exists.
    * @throws RemoteException
    *           remote communication problem
    */
-  void createStatusType(String status) throws ApiException, RemoteException;
+  void createStatusType(String status, StatusKind kind) throws ApiException, RemoteException;
 
   /**
    * Get all tags already used for tagging statuses.
@@ -1990,11 +2055,26 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           name already exists.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in Z-2027.03. Use {@link #tagCurrentStatuses(String)} instead.
    */
+  @Deprecated
   void tagCurrentRevisions(String tag) throws ApiException, RemoteException;
 
   /**
-   * Exports the last test results to an extern destination.
+   * Adds the same tag to all current statuses of test cases and assesslets.
+   * 
+   * @param tag
+   *          The tag to be added.
+   * @throws ApiException
+   *           If tag is empty, <code>null</code>, contains line breaks, or a tag with the given
+   *           name already exists.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void tagCurrentStatuses(String tag) throws ApiException, RemoteException;
+
+  /**
+   * Exports the last test results to an external destination.
    * 
    * @param key
    *          the key of the exporter to use
@@ -2171,6 +2251,171 @@ public interface Project extends AssessmentOwner, ExecutionConfigurationOwner, T
    *           remote communication problem
    */
   void createIssue(List<Scenario> testCases, JiraIssuesCreateSettings createSettings)
+      throws ApiException, RemoteException;
+
+  /**
+   * @return if coverage thresholds reporting is enabled.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  boolean isCoverageThresholdsEnabled() throws RemoteException;
+
+  /**
+   * Enables or disables the coverage threshold reporting.
+   * 
+   * @param enabled
+   *          <code>true</code> to enable the coverage threshold reporting, <code>false</code> to
+   *          disable it.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setCoverageThresholdsEnabled(boolean enabled) throws RemoteException;
+
+  /**
+   * @return the minimum threshold for the coverage.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  int getCoverageMinimumThreshold() throws RemoteException;
+
+  /**
+   * Sets the minimum threshold for the coverage. The threshold must be between 0 and 100 and lower
+   * or equal the recommended threshold.
+   * 
+   * @param threshold
+   *          The minimum threshold for the coverage.
+   * @throws ApiException
+   *           If threshold is less than 0 or greater than 100 or if threshold is bigger than the
+   *           recommended threshold.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+
+  void setCoverageMinimumThreshold(int threshold) throws ApiException, RemoteException;
+
+  /**
+   * @return the maximum threshold for the coverage.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+
+  int getCoverageRecommendedThreshold() throws RemoteException;
+
+  /**
+   * Sets the maximum threshold for the coverage. The threshold must be between 0 and 100 and
+   * greater or equal the minimum threshold.
+   * 
+   * @param threshold
+   *          The maximum threshold for the coverage.
+   * @throws ApiException
+   *           If threshold is less than 0 or greater than 100 or if the threshold is lower than the
+   *           minimum threshold.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setCoverageRecommendedThreshold(int threshold) throws ApiException, RemoteException;
+
+  /**
+   * Returns all project specific variables defined in the preferences.
+   * 
+   * @return the collection of all project specific variables defined in the preferences.
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see TptApi#getVariables()
+   */
+  Set<String> getVariables() throws RemoteException;
+
+  /**
+   * Creates a new variable in the project preferences.
+   * 
+   * @param variable
+   *          the variable name
+   * @param value
+   *          the value of the variable
+   * @param showInReport
+   *          If variable should be shown in the report
+   * @throws ApiException
+   *           if a variable with the same name already exists, the variable name starts with % or
+   *           is empty
+   * @throws RemoteException
+   *           remote communication problem
+   * 
+   * @see TptApi#createVariable(String, String, boolean)
+   */
+  void createVariable(String variable, String value, boolean showInReport)
+      throws ApiException, RemoteException;
+
+  /**
+   * Removes a variable from the project preferences. The call succeeds even if no variable with the
+   * given name exists.
+   * 
+   * @param variable
+   *          the name of the variable to be removed
+   * @throws RemoteException
+   *           remote communication problem
+   * @see TptApi#removeVariable(String)
+   */
+  void removeVariable(String variable) throws RemoteException;
+
+  /**
+   * Return the value of the variable with the given name.
+   * 
+   * @param variable
+   *          the name of the variable
+   * @return the value of the variable
+   * @throws ApiException
+   *           If no variable with the given name exists
+   * @throws RemoteException
+   *           remote communication problem
+   * @see TptApi#getVariableValue(String)
+   */
+  String getVariableValue(String variable) throws ApiException, RemoteException;
+
+  /**
+   * Set the value of the variable with the given name.
+   * 
+   * @param variable
+   *          the name of the variable
+   * @param value
+   *          the new value of the variable
+   * @throws ApiException
+   *           If no variable with the given name exists
+   * @throws RemoteException
+   *           remote communication problem
+   * @see TptApi#setVariableValue(String, String)
+   */
+  void setVariableValue(String variable, String value) throws ApiException, RemoteException;
+
+  /**
+   * Returns if the variable is shown in the report.
+   * 
+   * @param variable
+   *          the name of the variable
+   * @return <code>true</code> if the variable is shown in the report, <code>false</code> otherwise
+   * @throws ApiException
+   *           If no variable with the given name exists
+   * @throws RemoteException
+   *           remote communication problem
+   * @see TptApi#isVariableShowInReport(String)
+   */
+  boolean isVariableShowInReport(String variable) throws ApiException, RemoteException;
+
+  /**
+   * Sets if the variable is shown in the report.
+   * 
+   * @param variable
+   *          the name of the variable
+   * @param showInReport
+   *          <code>true</code> if the variable should be shown in the report, <code>false</code>
+   *          otherwise
+   * @throws ApiException
+   *           If no variable with the given name exists
+   * @throws RemoteException
+   *           remote communication problem
+   * @see TptApi#setVariableShowInReport(String, boolean)
+   */
+  void setVariableShowInReport(String variable, boolean showInReport)
       throws ApiException, RemoteException;
 
 }

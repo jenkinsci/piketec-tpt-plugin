@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -36,7 +36,7 @@ import com.piketec.tpt.api.requirements.polarion.PolarionTestCasesImportSettings
  * For the test cases import from Polarion use {@link PolarionTestCasesImportSettings}.<br>
  * For the test cases import from codeBeamer use {@link CodeBeamerTestCasesImportSettings}.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class TestCasesImportSettings implements Serializable {
 
@@ -136,6 +136,8 @@ public abstract class TestCasesImportSettings implements Serializable {
   private String testSetName = null;
 
   private TestCaseType preferredTestCaseType = TestCaseType.TIME_PARTITION;
+
+  private String statusTypeForChanged = "";
 
   @Deprecated
   private List<String> autoReviewAttributes = null;
@@ -264,6 +266,23 @@ public abstract class TestCasesImportSettings implements Serializable {
    */
   public void setPreferredTestCaseType(TestCaseType preferredTestCaseType) {
     this.preferredTestCaseType = preferredTestCaseType;
+  }
+
+  /**
+   * @return The name of the status type that is set for items that are changed during the import.
+   *         Only status types that aren't stable are used.
+   */
+  public String getStatusTypeForChanged() {
+    return statusTypeForChanged;
+  }
+
+  /**
+   * @param statusType
+   *          The name of the status type that is set for items that are changed during the import.
+   *          Only status types that aren't stable are used.
+   */
+  public void setStatusTypeForChanged(String statusType) {
+    this.statusTypeForChanged = statusType;
   }
 
   /**

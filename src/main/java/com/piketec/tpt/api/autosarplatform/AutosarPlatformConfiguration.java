@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,6 @@ import com.piketec.tpt.api.PlatformConfiguration;
 import com.piketec.tpt.api.Project.SynchronizationMethod;
 import com.piketec.tpt.api.RemoteCollection;
 import com.piketec.tpt.api.RemoteList;
-import com.piketec.tpt.api.TptApi;
 import com.piketec.tpt.api.codecoverage.CTCCoverageSettings;
 import com.piketec.tpt.api.codecoverage.CoverageSettings;
 import com.piketec.tpt.api.codecoverage.GCovCoverageSettings;
@@ -37,9 +36,15 @@ import com.piketec.tpt.api.codecoverage.TPTCoverageSettings;
 /**
  * The TPT API representation of the AUTOSAR platform in TPT
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface AutosarPlatformConfiguration extends PlatformConfiguration {
+
+  /**
+   * String for setting the default compiler in
+   * {@link AutosarPlatformConfiguration#setCompiler(String)}.
+   */
+  public static final String DEFAULT_COMPILER = "<DEFAULT>";
 
   /**
    * Sets the path to the project root folder.
@@ -88,8 +93,8 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
    * Sets the name of the compiler to be used
    * 
    * @param name
-   *          The name of the desired compiler. Use {@link TptApi#DEFAULT_COMPILER} to set the
-   *          default compiler.
+   *          The name of the desired compiler. Use {@link #DEFAULT_COMPILER} to set the default
+   *          compiler.
    * @throws ApiException
    *           if name is empty or null
    * 
@@ -147,7 +152,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public boolean is64Bit() throws RemoteException;
 
   /**
-   * Add an arxm file. This paths must be relative to the configured project root folder for this
+   * Add an arxml file. This paths must be relative to the configured project root folder for this
    * platform (see {@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
    * 
    * @param path
@@ -216,7 +221,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
 
   /**
    * Add a source file. This paths must be relative to the configured project root folder for this
-   * platform (see #{@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
+   * platform (see {@link AutosarPlatformConfiguration#getProjectRootFolderPath()}.
    * 
    * @param path
    *          The new path to Add
@@ -275,7 +280,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setStubHeaderFile(String stubHeaderFile) throws RemoteException;
 
   /**
-   * Get the configured stub header files (sepparated by comma)
+   * Get the configured stub header files (separated by comma)
    * 
    * @return the configured stub header files
    * 
@@ -306,6 +311,26 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public boolean isImportParameterCurveMapTypes() throws RemoteException;
 
   /**
+   * @param importFunctionReturnValues
+   *          <code>true</code> if TPT is supposed to import channels to modify the return values of
+   *          functions returning error codes
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public void setImportFunctionReturnValues(boolean importFunctionReturnValues)
+      throws RemoteException;
+
+  /**
+   * @return <code>true</code> if TPT is supposed to import channels to modify the return values of
+   *         functions returning error codes
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public boolean isImportFunctionReturnValues() throws RemoteException;
+
+  /**
    * @param assumeAllPortElementsExplicitAccess
    *          <code>true</code> to enable the "assume explicit access for all port elements" option,
    *          <code>false</code> to disable it
@@ -326,7 +351,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public boolean isAssumeAllPortElementsExplicitAccess() throws RemoteException;
 
   /**
-   * @return <code>true</code> if using repositry files is enabled, <code>false</code> otherwise.
+   * @return <code>true</code> if using repository files is enabled, <code>false</code> otherwise.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -334,10 +359,10 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public boolean isUseRepository() throws RemoteException;
 
   /**
-   * Configure if arxml and source files from the AAUTOSAR repository files should be used.
+   * Configure if arxml and source files from the AUTOSAR repository files should be used.
    * 
    * @param useRepository
-   *          <code>true</code> to enable using repositry files, <code>false</code> to disable it
+   *          <code>true</code> to enable using repository files, <code>false</code> to disable it
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -403,7 +428,7 @@ public interface AutosarPlatformConfiguration extends PlatformConfiguration {
   public void setRoundScalingResults(boolean useRoundScalingInterface) throws RemoteException;
 
   /**
-   * Add an arxm file from the repository. This paths must be relative to the repository root
+   * Add an arxml file from the repository. This paths must be relative to the repository root
    * folder.
    * 
    * @param path

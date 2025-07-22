@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,7 @@ package com.piketec.tpt.api.cplatform;
 /**
  * Setting to connect a function in the c-code to TPT
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public enum FunctionConnectionType {
 
@@ -48,11 +48,18 @@ public enum FunctionConnectionType {
    */
   SERVER_FUNCTION,
 
+  /**
+   * Stub the function to call a TPT server function. By default, the server function will call the
+   * client-function from the SUT. This behavior however can be changed.
+   */
+  CLIENT_AND_SERVER,
+
   /** Stub the function to connect the arguments and the return value to TPT channels */
   ARGUMENTS_AS_CHANNELS,
+
   /**
-   * "Stub the function returning zeros. Only supported for functions that are not implemented in
-   * the SUT-code.
+   * Stub the function returning zeros. Only supported for functions that are not implemented in the
+   * SUT-code.
    */
   EMPTYSTUB;
 

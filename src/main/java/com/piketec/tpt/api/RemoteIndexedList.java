@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,19 +20,17 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.util.IterableRemoteIndexedList;
-
 /**
  * A list of Objects that supports fast access to elements based on an index.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  * 
  * @param <KEY>
  *          the type of keys of this indexed list
  * @param <E>
  *          the type of elements in this indexed list
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface RemoteIndexedList<KEY, E> extends RemoteList<E> {
 
@@ -42,11 +40,8 @@ public interface RemoteIndexedList<KEY, E> extends RemoteList<E> {
    * @param key
    *          the key whose associated value is to be returned
    * @return the value object for the given key
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public E get(KEY key) throws RemoteException;
+  public E get(KEY key);
 
   /**
    * Returns the key that belongs to the given value object.
@@ -54,11 +49,8 @@ public interface RemoteIndexedList<KEY, E> extends RemoteList<E> {
    * @param obj
    *          the value object whose key is to be returned
    * @return the key that belongs to the given value object
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public KEY getKey(E obj) throws RemoteException;
+  public KEY getKey(E obj);
 
   /**
    * Removes the object with the given key from the list.
@@ -66,11 +58,8 @@ public interface RemoteIndexedList<KEY, E> extends RemoteList<E> {
    * @param key
    *          the key whose associated value is to be removed
    * @return the removed object with the specified key
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public E removeByKey(KEY key) throws RemoteException;
+  public E removeByKey(KEY key);
 
   /**
    * Returns <code>true</code> if this list contains an object with the given key.
@@ -78,23 +67,24 @@ public interface RemoteIndexedList<KEY, E> extends RemoteList<E> {
    * @param key
    *          the key whose presence in this list is to be tested
    * @return <code>true</code> if this list contains an object for the specified key
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public boolean containsKey(KEY key) throws RemoteException;
+  public boolean containsKey(KEY key);
 
   /**
    * Returns a set of the keys contained in this list.
    * 
    * @return set of keys
-   * 
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public RemoteCollection<KEY> keySet() throws RemoteException;
+  public RemoteCollection<KEY> keySet();
 
+  /**
+   * @return returns "this". The method exists for legacy reasons only
+   * 
+   * @deprecated This method is useless after redesign of the API with TPT 2025.09. The collection
+   *             itself is iterable now. Will be removed in TPT 2026.06.
+   */
+  @Deprecated
   @Override
-  IterableRemoteIndexedList<KEY, E> asIterable() throws RemoteException;
+  public RemoteIndexedList<KEY, E> asIterable();
 
 }

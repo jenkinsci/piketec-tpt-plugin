@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,7 +23,7 @@ package com.piketec.tpt.api;
 /**
  * This exception indicates a misuse of the TPT API.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class ApiException extends RuntimeException {
 
@@ -42,6 +42,7 @@ public class ApiException extends RuntimeException {
   }
 
   /**
+   * Only use with inner exceptions that can be searialized <br>
    * Creates a new <code>ApiException</code> with the given cause.
    * 
    * @param cause
@@ -52,5 +53,4 @@ public class ApiException extends RuntimeException {
   public ApiException(Throwable cause) {
     super(cause);
   }
-
 }

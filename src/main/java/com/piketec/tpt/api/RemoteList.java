@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,44 +20,28 @@
  */
 package com.piketec.tpt.api;
 
-import java.rmi.RemoteException;
-
-import com.piketec.tpt.api.util.IterableRemoteList;
+import java.util.List;
 
 /**
- * An ordered collection of (Remote) elements. Changes to this list will be done directly in TPT.
- * 
+ * collection that points directly to a corresponding (remote) list in TPT
+ *
  * @param <E>
- *          the type of elements in this list
+ *          element type
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
-public interface RemoteList<E> extends RemoteCollection<E> {
+public interface RemoteList<E> extends RemoteCollection<E>, List<E> {
 
   /**
-   * Returns the element at position <code>index</code>.
-   * 
-   * @param index
-   *          The position of the element in the list.
-   * @return The element that is at this position.
-   * 
-   * @throws IndexOutOfBoundsException
-   *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  public E get(int index) throws IndexOutOfBoundsException, RemoteException;
-
-  /**
-   * Removes the element at position <code>index</code> from the list.
+   * Removes the element at position <code>index</code> from the list. Same as {@link #remove(int)}.
    * 
    * @param index
    *          The position of the item that should be deleted.
    * 
    * @throws IndexOutOfBoundsException
    *           If the <code>index &lt; 0</code> or <code>index &gt;= getItems().size()</code>
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public void delete(int index) throws IndexOutOfBoundsException, RemoteException;
+  public void delete(int index);
 
   /**
    * Moves an element from the position <code>from</code> to <code>to</code>. All elements in this
@@ -73,32 +57,16 @@ public interface RemoteList<E> extends RemoteCollection<E> {
    * @throws IndexOutOfBoundsException
    *           If <code>to &lt; 0 </code> or <code>from &lt; 0</code> or
    *           <code>to &gt;= getItems().size()</code> or <code>from &gt;= getItems().size()</code>
-   * @throws RemoteException
-   *           remote communication problem
    */
-  public E move(int from, int to) throws IndexOutOfBoundsException, RemoteException;
+  public E move(int from, int to) throws IndexOutOfBoundsException;
 
   /**
-   * Returns the index of the first occurrence of the specified element in this list, or -1 if this
-   * list does not contain the element.More formally, returns the lowest index i such that
-   * Objects.equals(o, get(i)), or -1 if there is no such index.
-   * 
-   * @param element
-   *          element to search for
-   * @return the index of the first occurrence of the specified element in this list, or -1 if this
-   *         list does not contain the element
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * @throws ClassCastException
-   *           if the type of the specified element is incompatible with this list(optional)
-   * @throws NullPointerException
-   *           if the specified element is null and this list does not permit null
-   *           elements(optional)
+   * @return returns "this". The method exists for legacy reasons only
+   * @deprecated This method is useless after redesign of the API with TPT 2025.09. The collection
+   *             itself is iterable now. Will be removed in TPT 2026.06.
    */
-  public int indexOf(E element) throws RemoteException, ClassCastException, NullPointerException;
-
+  @Deprecated
   @Override
-  public IterableRemoteList<E> asIterable() throws RemoteException;
+  public RemoteList<E> asIterable();
 
 }

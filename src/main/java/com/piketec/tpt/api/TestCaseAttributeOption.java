@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,11 +26,21 @@ import java.rmi.RemoteException;
  * For test case attributes, that support a list of options, this class represents a single option
  * in such list.
  * 
- * Note that this is only relevant for test case attriutes of type <code>ENUM_ONE</code> or
+ * Note that this is only relevant for test case attributes of type <code>ENUM_ONE</code> or
  * <code>ENUM_MANY</code>.
  *
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TestCaseAttributeOption extends IdentifiableRemote {
+
+  /**
+   * Get the name of this option
+   * 
+   * @return option name
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getName() throws RemoteException;
 
   /**
    * change option name
@@ -42,12 +52,4 @@ public interface TestCaseAttributeOption extends IdentifiableRemote {
    */
   void setName(String name) throws RemoteException;
 
-  /**
-   * Get the name of this option
-   * 
-   * @return option name
-   * @throws RemoteException
-   *           remote communication problem
-   */
-  String getName() throws RemoteException;
 }

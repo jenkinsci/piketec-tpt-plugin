@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import com.piketec.tpt.api.requirements.TestCasesImportSettings;
 /**
  * The settings for the import of test cases from codeBeamer.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public class CodeBeamerTestCasesImportSettings extends TestCasesImportSettings {
 
@@ -74,6 +74,8 @@ public class CodeBeamerTestCasesImportSettings extends TestCasesImportSettings {
   private boolean importItemUrlAsAttribute = false;
 
   private String urlAttribute = "codeBeamer URL";
+
+  private boolean importStatusTypes = false;
 
   /**
    * The contructor for the import settings of test cases from codeBeamer.
@@ -323,6 +325,25 @@ public class CodeBeamerTestCasesImportSettings extends TestCasesImportSettings {
    */
   public void setUrlAttribute(String urlAttribute) {
     this.urlAttribute = urlAttribute;
+  }
+
+  /**
+   * @return Whether to use the status types set in {@link #getStatusTypeAssignments()} to set test
+   *         case statuses. Note that as a consequence the use of {@link #getStatusTypeForChanged()}
+   *         is suppressed. Default value is <code>false</code>.
+   */
+  public boolean isImportStatusTypes() {
+    return importStatusTypes;
+  }
+
+  /**
+   * @param importStatusTypes
+   *          Whether to use the status types set in {@link #getStatusTypeAssignments()} to set test
+   *          case statuses. Note that as a consequence the use of
+   *          {@link #getStatusTypeForChanged()} is suppressed. Default value is <code>false</code>.
+   */
+  public void setImportStatusTypes(boolean importStatusTypes) {
+    this.importStatusTypes = importStatusTypes;
   }
 
   // ------------------------------------------------------------

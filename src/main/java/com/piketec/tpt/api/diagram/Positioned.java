@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,11 +28,13 @@ import com.piketec.tpt.api.TptRemote;
 /**
  * The class represents an object with a position (x- and y- coordinate) in the diagram like a state
  * or a junction.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Positioned extends TptRemote {
 
   /**
-   * Return the current position of the object as a two-dimensional {@link Point}.
+   * Return the current position of the object as a two-dimensional point.
    * 
    * @return A point representing x-and y- coordinate of this object.
    * 

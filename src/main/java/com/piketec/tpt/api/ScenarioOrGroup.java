@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -33,8 +33,42 @@ import com.piketec.tpt.api.util.UUIDObject;
  * In TPT, it represents both the tree of variants and variant groups as well as the test cases and
  * test case groups. Both can be assigned with a description as well as parameters.
  * </p>
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote, UUIDObject {
+
+  /**
+   * Get the current name of this {@link ScenarioOrGroup}.
+   * 
+   * @return the current name of this {@link ScenarioOrGroup}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link ScenarioOrGroup}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws ApiException
+   *           if <code>newName</code> is not a legal name.
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws ApiException, RemoteException;
+
+  /**
+   * @return Returns the UUID of the {@link ScenarioOrGroup}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Override
+  public String getUUIDString() throws RemoteException;
 
   /**
    * @return Returns the textual description of this <code>ScenarioOrGroup</code> (displayed int the
@@ -46,7 +80,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote, UUIDOb
   public String getDescription() throws RemoteException;
 
   /**
-   * Set the testual description for this <code>ScenarioOrGroup</code> to be displayed in the
+   * Set the textual description for this <code>ScenarioOrGroup</code> to be displayed in the
    * Description view of TPT.
    * 
    * @param description
@@ -218,7 +252,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote, UUIDOb
    * @throws RemoteException
    *           remote communication problem
    * 
-   * @see Project#createStatusType(String)
+   * @see Project#createStatusType(String, com.piketec.tpt.api.Project.StatusKind)
    */
   public void setStatus(String author, String comment, String status)
       throws ApiException, RemoteException;
@@ -269,7 +303,7 @@ public interface ScenarioOrGroup extends NamedObject, IdentifiableRemote, UUIDOb
    * @param targetIndex
    *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
    *          copy at the end.
-   * @return The copy of this and all log messages that occured during copying.
+   * @return The copy of this and all log messages that occurred during copying.
    * @throws ApiException
    *           If targetGroup is <code>null</code> or copying failed.
    * @throws RemoteException

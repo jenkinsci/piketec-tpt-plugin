@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,11 +24,11 @@ package com.piketec.tpt.api.cplatform;
  * The TASMO instrumentation settings usable in the C\C++ platform in TPT
  * 
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  * 
  * @deprecated The instrumentation level is not available as a setting in the C\C++ platform
  *             anymore. To enable coverage measurement use <code>setCoverageToTPT</code> in
- *             <code>CCodePlatformConfiguration</code>. Will be removed in TPT-23.
+ *             <code>CCodePlatformConfiguration</code>. Will be removed in TPT-2026.06.
  */
 @Deprecated
 public enum TasmoCCodeInstrumentationLevel {

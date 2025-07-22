@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,9 +23,16 @@ package com.piketec.tpt.api.constants.assessments;
 /**
  * For further information, please refer to the User Guide or Assessment Manual, section TPT
  * Assessment Type 'report_signalgraphic'.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface SignalGraphicReport extends BasicAssessment, SignalFilter {
 
+  /**
+   * Possible options for the YAxis settings
+   * 
+   * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
+   */
   public interface YAxisOptions {
 
     public static final String FIXED = "FIXED";
@@ -61,7 +68,7 @@ public interface SignalGraphicReport extends BasicAssessment, SignalFilter {
 
   public static final String YAXIS_SCALING = "yaxis-scaling";
 
-  /** Only the value in {@link SignalGraphicReport.YAxisOptions} are possible */
+  /** Only the value in {@link YAxisOptions} are possible */
   public static final String YAXIS_SETTINGS = "yaxis-settings";
 
   public static final String XAXIS_INTERVALL_FROM = "xaxis-intervall-from";

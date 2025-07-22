@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,45 +20,49 @@
  */
 package com.piketec.tpt.api.util;
 
-import java.io.Serializable;
-import java.rmi.RemoteException;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.List;
 
-import com.piketec.tpt.api.ApiException;
+import com.piketec.tpt.api.Testlet;
 
 /**
- * A wrapper for a {@link RemoteIterable} that will catch all {@link RemoteException
- * RemoteExceptions} and rethrows them as {@link ApiException ApiExceptions}.
- * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
- *
- * @param <E>
- *          the type of elements returned by this iterable
- * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
-public class ApiIterable<E> implements Serializable, Iterable<E> {
+public class WalkResultTestlet extends WalkResult<Testlet, Testlet, Testlet> {
 
   private static final long serialVersionUID = 1L;
 
-  private final RemoteIterable<E> remoteIterable;
+  /**
+   * @param testlet
+   *          testlet, to which the {@link #getGroups()} testlets directly belong to
+   * @param subTestlets
+   *          all sub-groups of test sets contained in the current "root" group
+   */
+  public WalkResultTestlet(Testlet testlet, List<Testlet> subTestlets) {
+    super(testlet, subTestlets, Collections.emptyList());
+  }
 
   /**
-   * Creates a new <code>ApiIterable</code>.
-   * 
-   * @param delegate
-   *          The <code>RemoteIterable</code> where the method calls will be delgated to.
+   * testlet, to which the {@link #getGroups()} testlets directly belong to
    */
-  public ApiIterable(RemoteIterable<E> delegate) {
-    this.remoteIterable = delegate;
-  }
-
   @Override
-  public Iterator<E> iterator() {
-    try {
-      return new ApiIterator<>(remoteIterable.remoteIterator());
-    } catch (RemoteException e) {
-      throw new ApiException(e);
-    }
+  public Testlet getRoot() {
+    return super.getRoot();
   }
 
+  /**
+   * always just an empty list by construction
+   */
+  @Override
+  public List<Testlet> getElements() {
+    return super.getElements();
+  }
+
+  /**
+   * all testlets contained in the current "root" testlet
+   */
+  @Override
+  public List<Testlet> getGroups() {
+    return super.getGroups();
+  }
 }

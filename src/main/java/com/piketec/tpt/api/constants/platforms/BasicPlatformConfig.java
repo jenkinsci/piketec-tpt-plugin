@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,8 @@ package com.piketec.tpt.api.constants.platforms;
 
 /**
  * For further information, please refer to the User Guide, section Platform Configuration.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface BasicPlatformConfig {
 
@@ -35,6 +37,19 @@ public interface BasicPlatformConfig {
 
   public static final String MAPPING_NAME = "mappingname";
 
+  /**
+   * Key for boolean flag whether to use for channels the effective interface of a test case. If
+   * <code>true</code>, the number of channels exchanged with the SUT at test runtime is limited to
+   * those channels that are effectively read and/or written.
+   */
   public static final String USE_EFFECTIVE_INTERFACE = "useEffectiveInterface";
+
+  /**
+   * Key for boolean flag whether to use for parameters the effective interface of a test case. If
+   * <code>true</code>, the number of parameters exchanged with the SUT at test runtime is limited
+   * to those parameters that are effectively read and/or written (supported only by {@link Silver}
+   * platform).
+   */
+  public static final String USE_EFFECTIVE_INTERFACE_PARAMETERS = "useEffectiveInterfaceParameters";
 
 }

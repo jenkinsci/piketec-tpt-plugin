@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -29,9 +29,39 @@ import com.piketec.tpt.api.util.UUIDObject;
  * configurations ({@link ExecutionConfigurationGroup}). These objects can build up a tree where
  * both, execution configurations and execution configuration groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionConfigurationOrGroup extends NamedObject, IdentifiableRemote, UUIDObject {
+
+  /**
+   * Get the current name of this {@link ExecutionConfigurationOrGroup}.
+   * 
+   * @return the current name of this {@link ExecutionConfigurationOrGroup}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link ExecutionConfigurationOrGroup}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
+
+  /**
+   * @return Returns the UUID of the {@link ExecutionConfigurationOrGroup}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Override
+  public String getUUIDString() throws RemoteException;
 
   /**
    * Get the parent execution configuration group or <code>null</code> if this object resides on the

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,6 @@ import com.piketec.tpt.api.PlatformConfiguration;
 import com.piketec.tpt.api.Project.SynchronizationMethod;
 import com.piketec.tpt.api.RemoteIndexedList;
 import com.piketec.tpt.api.RemoteList;
-import com.piketec.tpt.api.TptApi;
 import com.piketec.tpt.api.codecoverage.CTCCoverageSettings;
 import com.piketec.tpt.api.codecoverage.CoverageSettings;
 import com.piketec.tpt.api.codecoverage.GCovCoverageSettings;
@@ -38,9 +37,15 @@ import com.piketec.tpt.api.codecoverage.TPTCoverageSettings;
  * The TPT API representation of the C\C++ platform in TPT
  * 
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface CCodePlatformConfiguration extends PlatformConfiguration {
+
+  /**
+   * String for setting the default compiler in
+   * {@link CCodePlatformConfiguration#setCompiler(String)}.
+   */
+  public static final String DEFAULT_COMPILER = "<DEFAULT>";
 
   /**
    * Set the path to the project root folder.
@@ -168,8 +173,8 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * Set the name of the compiler to be used
    * 
    * @param name
-   *          The name of the desired compiler. Use {@link TptApi#DEFAULT_COMPILER} to set the
-   *          default compiler.
+   *          The name of the desired compiler. Use {@link #DEFAULT_COMPILER} to set the default
+   *          compiler.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -177,7 +182,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
   public void setCompiler(String name) throws RemoteException;
 
   /**
-   * @return The name of the currenty used compiler
+   * @return The name of the currently used compiler
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -218,7 +223,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    *             COVERAGE_MEASUREMENT will enable TPT-Coverage and thus enable coverage measurement
    *             or TASMO testcase generation. Setting this to NO_INSTRUMENTATION will disable Tasmo
    *             coverage if it was enabled before.<br>
-   *             Will be removed in TPT-23.
+   *             Will be removed in TPT-2026.06.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -238,7 +243,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    *             From TPT-19 a C\C++ platform can either be instrumented or not. For compatibility
    *             this method returns FULL_INSTRUMENTATION if TPT-Coverage is selected as coverage
    *             tool and <code>null</code> if TPT-Coverage is not enabled.<br>
-   *             Will be removed in TPT-23.
+   *             Will be removed in TPT-2026.06.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -369,7 +374,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * 
    * @param compile
    *          Immediately compile the code after generation
-   * @return A list with warnings that eventually occured, empty list if none occured
+   * @return A list with warnings that eventually occurred, empty list if none occurred
    * @throws RemoteException
    *           remote communication problem
    */
@@ -409,7 +414,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * The interface of the currently set c files is refreshed based on the sources. To access the
    * imported interface afterwards use {@link #getSourcesInterface()}.
    * 
-   * @return A list with warnings that eventually occured, empty list if none occured
+   * @return A list with warnings that eventually occurred, empty list if none occurred
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -461,7 +466,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * 
    * @param syncMethod
    *          Should the objects be synchronized by name or by external name
-   * @return A list with warnings that eventually occured, empty list if none occured
+   * @return A list with warnings that eventually occurred, empty list if none occurred
    * @throws RemoteException
    *           remote communication problem
    */
@@ -657,7 +662,7 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * @param jsonFile
    *          The path to the JSON file to be imported
    * 
-   * @return If warnings occured during the import, empty string if no warnings occured.
+   * @return If warnings occurred during the import, empty string if no warnings occurred.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -674,6 +679,8 @@ public interface CCodePlatformConfiguration extends PlatformConfiguration {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @throws ApiException
+   *           If the found include files are not unique
    */
-  public List<String> refreshIncludePaths() throws RemoteException;
+  public List<String> refreshIncludePaths() throws RemoteException, ApiException;
 }

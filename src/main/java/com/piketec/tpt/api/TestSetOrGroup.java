@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,9 +28,39 @@ import com.piketec.tpt.api.util.UUIDObject;
  * An object representing either a {@link TestSet} or a group of test sets ({@link TestSetGroup}).
  * These objects can build up a tree where both, test sets and test set groups, could be leaf nodes.
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TestSetOrGroup extends IdentifiableRemote, NamedObject, UUIDObject {
+
+  /**
+   * Get the current name of this {@link TestSetOrGroup}.
+   * 
+   * @return the current name of this {@link TestSetOrGroup}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link TestSetOrGroup}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
+
+  /**
+   * @return Returns the UUID of the {@link TestSetOrGroup}.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  @Override
+  public String getUUIDString() throws RemoteException;
 
   /**
    * Get the parent test set group or <code>null</code> if this object resides on the top level
@@ -76,7 +106,7 @@ public interface TestSetOrGroup extends IdentifiableRemote, NamedObject, UUIDObj
    * @param targetIndex
    *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
    *          copy at the end.
-   * @return The copy of this and all log messages that occured during copying.
+   * @return The copy of this and all log messages that occurred during copying.
    * @throws ApiException
    *           If targetGroup is <code>null</code> or copying failed.
    * @throws RemoteException

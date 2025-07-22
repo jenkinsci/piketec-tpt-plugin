@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -36,7 +36,7 @@ import com.piketec.tpt.api.requirements.reqif.ReqIfTestCasesExportSettings;
  * For the test cases export to codeBeamer use {@link CodeBeamerTestCasesExportSettings}.<br>
  * For the test cases export to refIF use {@link ReqIfTestCasesExportSettings}.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class TestCasesExportSettings implements Serializable {
 

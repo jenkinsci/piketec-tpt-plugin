@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,7 +32,7 @@ import com.piketec.tpt.api.TptRemote;
 /**
  * This interface provides access to TASMO test data generation.
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TasmoTestDataGenerationController extends TptRemote {
 
@@ -90,6 +90,19 @@ public interface TasmoTestDataGenerationController extends TptRemote {
   public void exportCoverageGoalsSelectionFile(String file) throws RemoteException, ApiException;
 
   /**
+   * same as {@link #setSelectedCoverageGoalsFromFile(String)}. See this method for details.
+   * 
+   * @param goalsSelectionFile
+   *          see {@link #setSelectedCoverageGoalsFromFile(String)} for details.
+   * @throws ApiException
+   *           see {@link #setSelectedCoverageGoalsFromFile(String)} for details.
+   * @throws RemoteException
+   *           see {@link #setSelectedCoverageGoalsFromFile(String)} for details.
+   */
+  public void setSelectedCoverageGoals(String goalsSelectionFile)
+      throws RemoteException, ApiException;
+
+  /**
    * Sets the selected {@link TasmoCoverageGoal} that should be covered from a given selection File.
    * The selection File can be exported using {@link #exportCoverageGoalsSelectionFile(String)} or
    * using the UI. The {@link TasmoCoverageGoal} selection can only be changed if the generation has
@@ -104,8 +117,10 @@ public interface TasmoTestDataGenerationController extends TptRemote {
    * @throws RemoteException
    *           remote communication problem
    */
-  public void setSelectedCoverageGoals(String goalsSelectionFile)
-      throws RemoteException, ApiException;
+  public default void setSelectedCoverageGoalsFromFile(String goalsSelectionFile)
+      throws RemoteException, ApiException {
+    setSelectedCoverageGoals(goalsSelectionFile);
+  }
 
   /**
    * Gets the current state of the TASMO test data generation.
@@ -261,10 +276,10 @@ public interface TasmoTestDataGenerationController extends TptRemote {
   public void exportCoverageResultsReportByPath(String file) throws RemoteException, ApiException;
 
   /**
-   * Closes and dispose this object. This will close the TASMO UI as well. After this is called all
+   * Closes and disposes this object. This will close the TASMO UI as well. After this is called all
    * further calls to functions of this object will throw an {@link ApiException}.
    * 
-   * Can only be done if the TASMO test data generation has not yet been startet or has already
+   * Can only be done if the TASMO test data generation has not yet been started or has already
    * stopped.
    * 
    * @throws RemoteException

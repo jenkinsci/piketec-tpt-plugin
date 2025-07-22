@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,12 +27,36 @@ import java.util.List;
  * TPT API representation of a requirement set. A Requirement set can be used to filter the test
  * cases in a test set and in the UI to filter the requirements view. Requirement sets are a dynamic
  * collection of {@link Requirement Requirements}. Which requirements are part of a requirement set
- * is defined by a condition that is evaluated when runnig an {@link ExecutionConfiguration}. When
+ * is defined by a condition that is evaluated when running an {@link ExecutionConfiguration}. When
  * it is used in the UI, default values may be assumed for variables used in the condition.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface RequirementSet extends NamedObject, IdentifiableRemote {
+
+  /**
+   * Get the current name of this {@link RequirementSet}.
+   * 
+   * @return the current name of this {@link RequirementSet}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link RequirementSet}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws ApiException
+   *           if <code>newName</code> is not a legal name.
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws ApiException, RemoteException;
 
   /**
    * Get the requirement set condition. The condition defines which requirements are part of this

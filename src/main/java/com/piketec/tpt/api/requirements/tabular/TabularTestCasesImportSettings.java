@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -34,7 +34,7 @@ import com.piketec.tpt.api.requirements.excel.ExcelFileTestCasesImportSettings;
  * For the test cases import from a CSV file use {@link CsvFileTestCasesImportSettings}.<br>
  * For the test cases import from an Excel file use {@link ExcelFileTestCasesImportSettings}.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public abstract class TabularTestCasesImportSettings extends TestCasesImportSettings {
 
@@ -101,8 +101,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
   /**
    * @return The name of the column in the source file that contains the ID. Not relevant if the
    *         {@link #getSyncMethod() synchronization method} is
-   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.SynchronizationMethod#ALL_NEW
-   *         SynchronizationMethod#ALL_NEW}.
+   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.SynchronizationMethod#ALL_NEW}.
    * @see #setSyncMethod(SynchronizationMethod)
    */
   public String getIdColumn() {
@@ -114,8 +113,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    * Sets the name of the column in the source file that contains the ID and the TPT test case
    * attribute that contains the ID to match existing test cases against imported ones.<br>
    * Not relevant if the {@link #getSyncMethod() synchronization method} is
-   * {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.SynchronizationMethod#ALL_NEW
-   * SynchronizationMethod#ALL_NEW}.
+   * {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.SynchronizationMethod#ALL_NEW}.
    * 
    * @param idColumn
    *          The name of the column in the source file that contains the ID.
@@ -155,8 +153,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    *         distinguish imported objects between test cases and test case groups. If no type column
    *         is chosen, objects without children will be imported as test cases, others as groups.
    *         Only relevant if the test case hierarchy creation method is
-   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE
-   *         TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
+   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
    * @see #setHierarchyCreationMethod(TestCaseHierarchyCreationMethod)
    */
   public String getTypeColumn() {
@@ -169,8 +166,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    *          distinguish imported objects between test cases and test case groups. If no type
    *          column is chosen, objects without children will be imported as test cases, others as
    *          groups. Only relevant if the test case hierarchy creation method is
-   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE
-   *          TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
+   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
    * @see #setHierarchyCreationMethod(TestCaseHierarchyCreationMethod)
    */
   public void setTypeColumn(String typeColumn) {
@@ -181,8 +177,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    * @return Optional list with the assignments of the cell values in the type column to the target
    *         types (test case vs. test case group). Only relevant if the test case hierarchy
    *         creation method is
-   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE
-   *         TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.<br>
+   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.<br>
    *         Assignments for not imported cell values will be ignored. Get rid of them by assigning
    *         {@link TargetType#AUTO}.
    */
@@ -195,9 +190,9 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    *          Optional list with the assignments of the cell values in the type column to the target
    *          types (test case vs. test case group). Only relevant if the test case hierarchy
    *          creation method is
-   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE
-   *          TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}. Assignments for not imported cell
-   *          values will be ignored. Get rid of them by assigning {@link TargetType#AUTO}.
+   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
+   *          Assignments for not imported cell values will be ignored. Get rid of them by assigning
+   *          {@link TargetType#AUTO}.
    */
   public void setTypeAssignments(List<TargetTypeAssignment> typeAssignments) {
     this.typeAssignments = typeAssignments;
@@ -206,8 +201,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
   /**
    * @return Optional name of the column in the source file that contains level information. Only
    *         relevant if the test case hierarchy creation method is
-   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE
-   *         TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
+   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
    * @see #setHierarchyCreationMethod(TestCaseHierarchyCreationMethod)
    */
   public String getLevelColumn() {
@@ -218,8 +212,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    * @param levelColumn
    *          Optional name of the column in the source file that contains level information. Only
    *          relevant if the test case hierarchy creation method is
-   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE
-   *          TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
+   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#LEVEL_AND_TYPE}.
    * @see #setHierarchyCreationMethod(TestCaseHierarchyCreationMethod)
    */
   public void setLevelColumn(String levelColumn) {
@@ -229,8 +222,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
   /**
    * @return Optional name of the column in the source file that contains group paths to create the
    *         hierarchy. Only relevant if the test case hierarchy creation method is
-   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#GROUP_PATH_ATTRIBUTE
-   *         TestCaseHierarchyCreationMethod#GROUP_PATH_ATTRIBUTE}.
+   *         {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#GROUP_PATH_ATTRIBUTE}.
    * @see #setHierarchyCreationMethod(TestCaseHierarchyCreationMethod)
    */
   public String getGroupPathColumn() {
@@ -241,8 +233,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
    * @param groupPathColumn
    *          Optional name of the column in the source file that contains group paths to create the
    *          hierarchy. Only relevant if the test case hierarchy creation method is
-   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#GROUP_PATH_ATTRIBUTE
-   *          TestCaseHierarchyCreationMethod#GROUP_PATH_ATTRIBUTE}.
+   *          {@link com.piketec.tpt.api.requirements.TestCasesImportSettings.TestCaseHierarchyCreationMethod#GROUP_PATH_ATTRIBUTE}.
    * @see #setHierarchyCreationMethod(TestCaseHierarchyCreationMethod)
    */
   public void setGroupPathColumn(String groupPathColumn) {
@@ -294,7 +285,7 @@ public abstract class TabularTestCasesImportSettings extends TestCasesImportSett
   /**
    * @param attributeAssignments
    *          Optional list of assigments of column names in the source file to test case attribute
-   *          names. To enable the automatic review of possible changes of an test case attribute
+   *          names. To enable the automatic review of possible changes of a test case attribute
    *          {@link TestCaseAttribute#setAutoReview(boolean) change the auto review flag of
    *          existing test case attributes}.
    * @see TestCaseAttribute#setAutoReview(boolean)

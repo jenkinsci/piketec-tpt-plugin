@@ -80,7 +80,7 @@
 	</dependencies>
 	<properties>
 		<jenkins.version>2.479.3</jenkins.version> <!-- which version of Jenkins is this plugin built against? -->
-		<hpi.compatibleSinceVersion>8.8</hpi.compatibleSinceVersion>
+		<hpi.compatibleSinceVersion>9.5</hpi.compatibleSinceVersion>
 	</properties>
 
 	<!-- build jar file with ~$ mvn clean compile assembly:single -->
@@ -112,8 +112,8 @@
 	</build>
 
 	<organization>
-		<name>PikeTec GmbH</name>
-		<url>https://www.piketec.com/</url>
+		<name>Synopsys Inc.</name>
+		<url>https://www.synopsys.com/</url>
 	</organization>
 
 	<scm>

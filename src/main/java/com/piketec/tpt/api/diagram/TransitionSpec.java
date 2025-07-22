@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,6 +28,8 @@ import com.piketec.tpt.api.ApiException;
  * A {@link TransitionSpec transition specification} defines, when a transition is able to fire
  * ({@link #getCondition()}) and which actions/stimulations have to be performed if the transition
  * fires ({@link #getActions()}).
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TransitionSpec extends TransitionSpecOrGroup {
 

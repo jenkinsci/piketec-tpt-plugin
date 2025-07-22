@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,6 +26,7 @@ import com.piketec.tpt.api.Testlet;
  * A {@link Junction} where multiple transitions could start or end. This node is not a
  * {@link Testlet} and, hence, does not consume time during executions.
  * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Junction extends DiagramNode, Positioned {
 

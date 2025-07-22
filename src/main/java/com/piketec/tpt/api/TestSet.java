@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,14 +27,17 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 /**
  * A <code>TestSet</code> represents a set of {@link Scenario test cases}. Test cases have to be
  * selected explicitly but they can be restricted further dynamically by a {@link #getCondition()
- * test set conditon} or by restricting}them to test cases linked to requirements of a
+ * test set condition} or by restricting}them to test cases linked to requirements of a
  * {@link #getRequirementSet() selected requirement set}.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * 
  */
 public interface TestSet extends TestSetOrGroup {
 
   /**
    * @return The {@link RemoteCollection set} of all {@link Scenario test cases} that are assigned
-   *         to this <code>TestSet</code> and are not suppresed by its test set condition (using
+   *         to this <code>TestSet</code> and are not suppressed by its test set condition (using
    *         default values to evaluate the condition).
    * 
    * @throws RemoteException
@@ -48,7 +51,7 @@ public interface TestSet extends TestSetOrGroup {
 
   /**
    * Get the selected test cases and test case groups without taking the test set condition into
-   * account. If a group is contained in the set all descendent scenarios in this group are
+   * account. If a group is contained in the set all descendant scenarios in this group are
    * contained in the set as well.
    * 
    * Please note that you cannot remove items from this collection if test set {@link #isLocked()}
@@ -86,7 +89,7 @@ public interface TestSet extends TestSetOrGroup {
    * @throws RemoteException
    *           remote communication problem
    * @deprecated Removed in TPT-21. Throws {@link DeprecatedAndRemovedException}. Use
-   *             {@link #addTestCaseOrGroup(ScenarioOrGroup tcg)} which support sceanrio groups.
+   *             {@link #addTestCaseOrGroup(ScenarioOrGroup tcg)} which support scenario groups.
    */
   @Deprecated
   public void addTestCase(Scenario tc) throws ApiException, RemoteException;

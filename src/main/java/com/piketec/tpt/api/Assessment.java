@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,6 +23,7 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 import java.util.Set;
 
+import com.piketec.tpt.api.properties.Property;
 import com.piketec.tpt.api.properties.PropertyMap;
 import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
 
@@ -30,7 +31,7 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * This class represents an assessment. The particular properties of the different assessment types
  * are mapped to generic properties (see {@link PropertyMap}).
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Assessment extends AssessmentOrGroup {
 
@@ -40,7 +41,7 @@ public interface Assessment extends AssessmentOrGroup {
   public static final String CHECK_LOG_ENTRIES_TYPE = "CheckLogEntriesAssessletType";
 
   /**
-   * Type String for Check Log Entries Assesslet
+   * Type String for Condition Tree Assesslet
    */
   public static final String CONDITION_TREE_TYPE = "ConditionTreeAssessletType";
 
@@ -229,7 +230,7 @@ public interface Assessment extends AssessmentOrGroup {
 
   /**
    * Returns a list of variants, for which the assessment is enabled. Returns an empty list, if the
-   * assssement is enabled for all variants.
+   * assessment is enabled for all variants.
    *
    * @return A list of {@link Scenario variants}.
    * 
@@ -244,8 +245,8 @@ public interface Assessment extends AssessmentOrGroup {
 
   /**
    * Returns a list of variants and variant groups, for which the assessment is enabled. Returns an
-   * empty list, if the assssement is enabled for all variants. If a group is contained in the set
-   * all descendent scenarios in this group are contained in the set as well. Removing an element
+   * empty list, if the assessment is enabled for all variants. If a group is contained in the set
+   * all descendant scenarios in this group are contained in the set as well. Removing an element
    * will remove parent elements as well to retain this constraint. Please note that removing a
    * group will only disable the group, but leave all its subelements enabled.
    *
@@ -266,8 +267,8 @@ public interface Assessment extends AssessmentOrGroup {
    * subelements enabled.
    * 
    * @param sog
-   *          The variant / variant group ({@link com.piketec.tpt.api.ScenarioOrGroup
-   *          ScenarioOrGroup}) for which the assesslet should be enabled.
+   *          The variant / variant group ({@link ScenarioOrGroup ScenarioOrGroup}) for which the
+   *          assesslet should be enabled.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -292,7 +293,7 @@ public interface Assessment extends AssessmentOrGroup {
 
   /**
    * Returns a list of test cases and test case groups, for which the assessment is enabled. If a
-   * group is contained in the set all descendent scenarios in this group are contained in the set
+   * group is contained in the set all descendant scenarios in this group are contained in the set
    * as well. Removing an element will remove parent elements as well to retain this constraint.
    * Please note that removing a group will only disable the group, but leave all its subelements
    * enabled.
@@ -315,8 +316,8 @@ public interface Assessment extends AssessmentOrGroup {
    * subelements enabled.
    * 
    * @param sog
-   *          A test case or test case group ({@link com.piketec.tpt.api.ScenarioOrGroup
-   *          ScenarioOrGroup}), the test case should be enabled for.
+   *          A test case or test case group ({ScenarioOrGroup ScenarioOrGroup}), the test case
+   *          should be enabled for.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -331,8 +332,7 @@ public interface Assessment extends AssessmentOrGroup {
    * <code>Assessment</code> is enabled for all platforms and all execution configuration items.
    *
    * @return A list of platform configurations, execution configurations and execution configuration
-   *         items ({@link com.piketec.tpt.api.PlatformOrExecutionItemEnabler
-   *         PlatformOrExecutionItemEnabler})
+   *         items ({PlatformOrExecutionItemEnabler PlatformOrExecutionItemEnabler})
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -341,8 +341,7 @@ public interface Assessment extends AssessmentOrGroup {
       throws RemoteException;
 
   /**
-   * Enables the assessment for a particular {@link com.piketec.tpt.api.PlatformConfiguration
-   * PlatformConfiguration}.
+   * Enables the assessment for a particular {PlatformConfiguration PlatformConfiguration}.
    *
    * @param pc
    *          The {@link PlatformConfiguration}, for which the assessment should be enabled.
@@ -356,7 +355,7 @@ public interface Assessment extends AssessmentOrGroup {
   public void enableForPlatformConfiguration(PlatformConfiguration pc) throws RemoteException;
 
   /**
-   * Enables the assessment for a particular a {@link com.piketec.tpt.api.ExecutionConfigurationItem
+   * Enables the assessment for a particular a {ExecutionConfigurationItem
    * ExecutionConfigurationItem}.
    *
    * @param execItem
@@ -372,8 +371,7 @@ public interface Assessment extends AssessmentOrGroup {
       throws RemoteException;
 
   /**
-   * Enables the assessment for a particular a {@link com.piketec.tpt.api.ExecutionConfiguration
-   * ExecutionConfiguration}.
+   * Enables the assessment for a particular a {ExecutionConfiguration ExecutionConfiguration}.
    *
    * @param ec
    *          The <code>ExecutionConfiguration</code>, the assessment should be enabled for.
@@ -389,14 +387,13 @@ public interface Assessment extends AssessmentOrGroup {
   /**
    * Returns the properties of the assessment as {@link PropertyMap}.
    * <p>
-   * A <code>PropertyMap</code> maps the properties as follows: {@link java.lang.String String}
-   * -&gt; {@link com.piketec.tpt.api.properties.Property Property}. A <code>Property</code> is
-   * either a <code>PropertyMap</code> or a <code>String</code> value.
+   * A <code>PropertyMap</code> maps the properties as follows: {@link String} &rarr;
+   * {@link Property}. A <code>Property</code> is either a <code>PropertyMap</code> or a
+   * <code>String</code> value.
    * </p>
    * The structure of the PropertyMap depends on the type of the assessment.
    * 
-   * @return A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} with the settings for
-   *         the assessments.
+   * @return A {properties.PropertyMap PropertyMap} with the settings for the assessments.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -411,11 +408,10 @@ public interface Assessment extends AssessmentOrGroup {
    * To remove a removable property, e.g. a report section, set it to <code>null</code>.
    * </p>
    * It is <b>strongly recommended</b> to modify the PropertyMap returned by
-   * {@link com.piketec.tpt.api.Assessment#getProperties() getProperties()}
+   * {Assessment#getProperties() getProperties()}
    *
    * @param properties
-   *          A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} containing the
-   *          settings.
+   *          A {properties.PropertyMap PropertyMap} containing the settings.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -480,30 +476,24 @@ public interface Assessment extends AssessmentOrGroup {
    * Returns <code>true</code> if this assessment has been modified since the last status history
    * entry or if it has no revision. Otherwise, returns <code>false</code>.
    *
-   * @return
-   *         <ul>
-   *         <li><code>true</code> if it is modified or new</li>
-   *         <li><code>false</code> if it is not modified</li>
-   *         </ul>
-   * 
+   * @return always <code>false</code> since revision is deprecated.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in Z-2027.03. feature is canceled without substitution.
    */
+  @Deprecated
   public boolean checkForNewRevision() throws RemoteException;
 
   /**
    * Returns <code>true</code> if this assessment is marked as "modified"(=outdated) or has no
    * revision. Otherwise, returns <code>false</code>.
    *
-   * @return
-   *         <ul>
-   *         <li><code>true</code> if it is outdated or new</li>
-   *         <li><code>false</code> if it is up-to-date</li>
-   *         </ul>
-   * 
+   * @return always <code>false</code> since revision is deprecated.
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in Z-2027.03. Feature is canceled without substitution
    */
+  @Deprecated
   public boolean isStatusOutdated() throws RemoteException;
 
   /**

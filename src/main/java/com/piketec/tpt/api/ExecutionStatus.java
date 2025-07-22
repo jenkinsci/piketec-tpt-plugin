@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -30,7 +30,7 @@ import com.piketec.tpt.api.TestCaseExecutionStatus.TestCaseStatus;
  * This object provides an interface to the current state of the test execution which is the
  * information as provided by the "Build Progress" Dialog.
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface ExecutionStatus extends TptRemote {
 
@@ -66,7 +66,7 @@ public interface ExecutionStatus extends TptRemote {
 
   /**
    * Returns a list containing the execution state ({@link TestCaseExecutionStatus}) for each test
-   * case that are part of this test execution.
+   * case that is part of this test execution.
    *
    * @return A list containing the states of the executed test cases or an empty list, if no test
    *         execution have been started so far.
@@ -129,7 +129,7 @@ public interface ExecutionStatus extends TptRemote {
    * @throws RemoteException
    *           remote communication problem
    * @throws ApiException
-   *           If there are no test in the executed test set.
+   *           If there are no test cases in the executed test set.
    */
   public TestCaseStatus getTotalExecutionStatus() throws ApiException, RemoteException;
 
@@ -197,5 +197,24 @@ public interface ExecutionStatus extends TptRemote {
    *           remote communication problem
    */
   public List<String> reclassifyFromFile(File file) throws ApiException, RemoteException;
+
+  /**
+   * Reclassify test results from a file with reclassification information of a former test
+   * execution.<br>
+   * Existing reclassifications of the current test execution are not overridden.
+   * 
+   * @param file
+   *          the XML file with reclassification information
+   * 
+   * @return a list of warnings, e.g., if tests with reclassification information in the given file
+   *         are not present in the current test execution.
+   * 
+   * @throws ApiException
+   *           if the execution is running, the file does not exist or is not a valid XML file with
+   *           reclassification information
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public List<String> reclassifyFromFilePath(String file) throws ApiException, RemoteException;
 
 }

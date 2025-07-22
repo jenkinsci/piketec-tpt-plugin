@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import com.piketec.tpt.api.TptRemote;
 /**
  * An object with UUID.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  *
  */
 public interface UUIDObject extends TptRemote {
@@ -39,4 +39,12 @@ public interface UUIDObject extends TptRemote {
    *           remote communication problem
    */
   public UUID getUUID() throws RemoteException;
+
+  /**
+   * @return Returns the UUID of the object.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public String getUUIDString() throws RemoteException;
+
 }

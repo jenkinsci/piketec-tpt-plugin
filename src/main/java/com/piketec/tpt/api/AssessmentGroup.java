@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,14 +20,26 @@
  */
 package com.piketec.tpt.api;
 
+import java.rmi.RemoteException;
+
 /**
- * A list of assessments and assessment groups {@link AssessmentOrGroup} in a list mapped to a
- * {@link RemoteList}.
+ * A list of assessments and assessment groups {@link AssessmentOrGroup} forms a recursive tree.
  * 
- * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface AssessmentGroup
-    extends RemoteList<AssessmentOrGroup>, AssessmentOrGroup, AssessmentOwner {
+    extends AccessList<AssessmentOrGroup>, AssessmentOrGroup, AssessmentOwner {
+
+  /**
+   * Returns the list all <code>Assessments</code> and <code>AssessmentGroups</code> belonging to
+   * this assessment group (children of "this").
+   * 
+   * @return A list of {@link AssessmentOrGroup} representing the top level assessments and
+   *         assessment groups.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  RemoteList<AssessmentOrGroup> getAssessmentsOrGroups() throws RemoteException;
 
 }

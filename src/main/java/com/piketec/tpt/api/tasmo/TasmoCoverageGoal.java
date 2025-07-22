@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -28,7 +28,7 @@ import com.piketec.tpt.api.IdentifiableRemote;
 /**
  * This class represents a tasmo coverage goal.
  *
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface TasmoCoverageGoal extends IdentifiableRemote {
 
@@ -74,7 +74,7 @@ public interface TasmoCoverageGoal extends IdentifiableRemote {
   public String getContextType() throws ApiException, RemoteException;
 
   /**
-   * Get the formaula for this coverage goal.
+   * Get the formula for this coverage goal.
    * 
    * @return A string representing the formula of this coverage goal.
    * 

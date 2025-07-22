@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,10 +26,10 @@ import java.util.List;
 import com.piketec.tpt.api.IdentifiableRemote;
 
 /**
- * An AUTOSAR runnable that can be scheduling in the AUTOSAR platform in TPT
+ * An AUTOSAR runnable that can be scheduled in the AUTOSAR platform in TPT
  * 
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface RunnableSchedulingItem extends IdentifiableRemote {
 
@@ -76,7 +76,7 @@ public interface RunnableSchedulingItem extends IdentifiableRemote {
   public List<String> getPeriods() throws RemoteException;
 
   /**
-   * Get the periods to be used for this runnable.
+   * Set the periods to be used for this runnable.
    * 
    * @param period
    *          The periods for this runnable

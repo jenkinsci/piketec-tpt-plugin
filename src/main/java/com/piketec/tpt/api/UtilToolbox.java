@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -23,8 +23,10 @@ package com.piketec.tpt.api;
 import java.rmi.RemoteException;
 
 /**
- * the util toolbox is just a library containing a set of auxillary functions for the TPT API. These
- * auxiallaries are not directly related to TPT projects and/or the TPT tool.
+ * The util toolbox is a library containing a set of auxiliary functions for the TPT API. These
+ * auxiliaries are not directly related to TPT projects and/or the TPT tool.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface UtilToolbox extends TptRemote {
 

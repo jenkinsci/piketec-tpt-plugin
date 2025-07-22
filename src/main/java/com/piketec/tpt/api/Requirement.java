@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -40,6 +40,8 @@ import com.piketec.tpt.api.util.DeprecatedAndRemovedException;
  * requirements - will not lead to a "modified" state of the requirement. Only UI actions that lead
  * to a "modified" state will do so via API as well, e.g. setting status to "deleted". Otherwise use
  * {@link #markAsModified()} to set the status to modified explicitly.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Requirement extends IdentifiableRemote {
 
@@ -78,7 +80,7 @@ public interface Requirement extends IdentifiableRemote {
   /**
    * There are three types of status for requirements.
    * 
-   * * @deprecated use {@link #markAsDeleted(boolean)} and {@link #isMarkedAsDeleted()} instead
+   * @deprecated use {@link #markAsDeleted(boolean)} and {@link #isMarkedAsDeleted()} instead
    */
   @Deprecated
   public enum RequirementStatus {
@@ -143,7 +145,7 @@ public interface Requirement extends IdentifiableRemote {
   String getID() throws RemoteException;
 
   /**
-   * A requirement normally belongs to a document. The default docmuent is an empty string.
+   * A requirement normally belongs to a document. The default document is an empty string.
    * 
    * @return The name of the document the requirement belongs to.
    * 
@@ -277,6 +279,29 @@ public interface Requirement extends IdentifiableRemote {
    *           remote communication problem
    */
   void setURI(URI uri) throws RemoteException;
+
+  /**
+   * Gets the URI of the requirement. If a requirement has a URI a clickable link symbol will be
+   * displayed in the UI.
+   * 
+   * @return The URI of the requirement or <code>null</code>.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  String getURIString() throws RemoteException;
+
+  /**
+   * Sets the URI of the requirement. If a requirement has a URI a clickable link symbol will be
+   * displayed in the UI.
+   * 
+   * @param uri
+   *          The new URI or <code>null</code> to remove the link.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setURIString(String uri) throws RemoteException;
 
   /**
    * Returns the attributes and the associated values of the requirement. A requirement can have
@@ -498,6 +523,33 @@ public interface Requirement extends IdentifiableRemote {
   void linkShallNode(GeneralShallNode shallNode) throws ApiException, RemoteException;
 
   /**
+   * Set the status of the requirement.
+   * 
+   * @param author
+   *          The author of the status. <code>Null</code> will be reduced to an empty string.
+   * @param comment
+   *          The comment of the status. <code>Null</code> will be reduced to an empty string.
+   * @param status
+   *          The status type of the status.
+   * @throws ApiException
+   *           If <code>author</code> contains line break or the given <code>status</code> is
+   *           invalid.
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  void setStatus(String author, String comment, String status) throws ApiException, RemoteException;
+
+  /**
+   * Returns a list of all status history entries of the requirement, the newest comes first.
+   * 
+   * @return A list of all {@link Status Statuses}.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<Status> getStatusHistory() throws RemoteException;
+
+  /**
    * Sets the requirement status.
    * 
    * @param status
@@ -530,7 +582,10 @@ public interface Requirement extends IdentifiableRemote {
    *           remote communication problem
    * 
    * @see #markAsReviewed()
+   * @deprecated Will be removed in Z-2027.03. Use {@link #setStatus(String, String, String)}
+   *             instead.
    */
+  @Deprecated
   void markAsModified() throws RemoteException;
 
   /**
@@ -540,7 +595,10 @@ public interface Requirement extends IdentifiableRemote {
    * @throws RemoteException
    *           remote communication problem
    * @see #markAsModified()
+   * @deprecated Will be removed in Z-2027.03. Use {@link #setStatus(String, String, String)}
+   *             instead.
    */
+  @Deprecated
   void markAsReviewed() throws RemoteException;
 
   /**
@@ -573,7 +631,9 @@ public interface Requirement extends IdentifiableRemote {
    * 
    * @throws RemoteException
    *           remote communication problem
+   * @deprecated Will be removed in Z-2027.03. Use {@link #getStatusHistory()} instead.
    */
+  @Deprecated
   boolean isModified() throws RemoteException;
 
   /**

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,6 +20,8 @@
  */
 package com.piketec.tpt.api;
 
+import java.rmi.RemoteException;
+
 /**
  * The object represents a list of {@link Scenario} and <code>ScenarioGroup</code> objects. Together
  * with the sub-groups it represents a tree.
@@ -29,7 +31,20 @@ package com.piketec.tpt.api;
  * </p>
  * 
  * @see Project#getTopLevelTestlet()
+ *
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
-public interface ScenarioGroup extends ScenarioOrGroup, RemoteList<ScenarioOrGroup> {
+public interface ScenarioGroup extends ScenarioOrGroup, AccessList<ScenarioOrGroup> {
+
+  /**
+   * Returns the <u>CONTENTS</u> of the top level {@link ScenarioGroup} of this <code>Testlet</code>
+   * as list of {@link ScenarioOrGroup}.
+   * 
+   * @return The list of {@link ScenarioOrGroup} that are contained in the top level group.
+   * 
+   * @throws RemoteException
+   *           remote communication problem
+   */
+  public RemoteList<ScenarioOrGroup> getScenariosOrGroups() throws RemoteException;
 
 }

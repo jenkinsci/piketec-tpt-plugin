@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -20,54 +20,63 @@
  */
 package com.piketec.tpt.api.util;
 
-import java.rmi.Remote;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 
+import com.piketec.tpt.api.ApiException;
+
 /**
- * A <code>RemoteIterator</code> has the same interface as an {@link Iterator} but since all
- * {@link Remote} objetcs must throw a {@link RemoteException} every method does exactly that. A
- * <code>RemoteIterator</code> can be wrapped in a {@link ApiIterator} to get a conventional
- * <code>Iterator</code>.
+ * A wrapper for a {@link AccessIterator} that will catch all {@link RemoteException
+ * RemoteExceptions} and rethrows them as {@link ApiException ApiExceptions}.
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  * 
  * @param <E>
  *          the type of elements returned by this iterator
  */
-public interface RemoteIterator<E> extends Remote {
+public class RemoteIterator<E> implements Serializable, Iterator<E> {
+
+  private static final long serialVersionUID = 2L;
+
+  private final AccessIterator<E> delegate;
 
   /**
-   * Returns <code>true</code> if the iteration has more elements, <code>false</code> otherwise.
+   * Creates a new <code>ApiIterator</code>.
    * 
-   * @return <code>true</code> if the iteration has more elements, <code>false</code> otherwise.
-   * @throws RemoteException
-   *           remote communication problem
-   * 
-   * @see Iterator#hasNext()
+   * @param delegate
+   *          The <code>RemoteIterator</code> where the method calls will be delgated to.
    */
-  public boolean hasNext() throws RemoteException;
+  public RemoteIterator(AccessIterator<E> delegate) {
+    this.delegate = delegate;
+  }
 
-  /**
-   * Get the next element of the iteration.
-   * 
-   * @return the next element of the iteration.
-   * @throws RemoteException
-   *           remote communication problem
-   * 
-   * @see Iterator#next()
-   */
-  public E next() throws RemoteException;
+  @Override
+  public boolean hasNext() {
+    try {
+      return delegate.hasNext();
+    } catch (RemoteException e) {
+      throw new ApiException(e);
+    }
+  }
 
-  /**
-   * Removes the last element returned by this iterator from the underlying collection (optional
-   * operation).
-   * 
-   * @throws RemoteException
-   *           remote communication problem
-   * 
-   * @see Iterator#remove()
-   */
-  public void remove() throws RemoteException;
+  @Override
+  public E next() {
+    try {
+      return delegate.next();
+    } catch (RemoteException e) {
+      throw new ApiException(e);
+    }
+  }
+
+  @Override
+  public void remove() {
+    try {
+      delegate.remove();
+    } catch (RemoteException e) {
+      throw new ApiException(e);
+    }
+
+  }
 
 }

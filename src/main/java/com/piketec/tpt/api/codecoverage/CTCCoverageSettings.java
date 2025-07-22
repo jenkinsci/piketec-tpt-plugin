@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -27,6 +27,8 @@ import java.rmi.RemoteException;
  * Platform<br>
  * Use <code>PlatformConfiguration.setCoverageToCTC()</code> to get CTC settings, they will be used
  * for instrumentation afterwards
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface CTCCoverageSettings extends CoverageSettings {
 
@@ -144,7 +146,7 @@ public interface CTCCoverageSettings extends CoverageSettings {
   public void setMCDCCoverage(boolean mcdcCoverage) throws RemoteException;
 
   /**
-   * @return If multicondition coverage is currenty measured
+   * @return If multicondition coverage is currently measured
    * 
    * @throws RemoteException
    *           remote communication problem

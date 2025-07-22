@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -24,8 +24,7 @@ import java.rmi.RemoteException;
 
 /**
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
- *
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Back2BackSettings extends IdentifiableRemote {
 
@@ -87,8 +86,8 @@ public interface Back2BackSettings extends IdentifiableRemote {
    * Updates the automatically created rows based on the current settings and available
    * declarations.
    * <ul>
-   * <li>Automatically created rows of removed decalarations will be removed
-   * <li>Automatically created rows of decalarations with no longer wanted variable type are removed
+   * <li>Automatically created rows of removed declarations will be removed
+   * <li>Automatically created rows of declarations with no longer wanted variable type are removed
    * <li>Not yet existing rows for declarations with wanted variable type are created
    * </ul>
    * This method must be called manually for performance reasons.
@@ -411,7 +410,7 @@ public interface Back2BackSettings extends IdentifiableRemote {
 
   /**
    * turn on/off auto-update feature for the specified {@link VariableType}. The method
-   * {@link #updateRows()} must be called to refresh the automatically created rows aferwards.
+   * {@link #updateRows()} must be called to refresh the automatically created rows afterwards.
    * 
    * @param type
    *          variable type to change the settings for

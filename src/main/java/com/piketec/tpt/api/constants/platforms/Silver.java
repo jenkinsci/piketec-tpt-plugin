@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -22,6 +22,8 @@ package com.piketec.tpt.api.constants.platforms;
 
 /**
  * For further information, please refer to the User Guide, Silver Platform.
+ * 
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface Silver extends BasicPlatformConfig {
 
@@ -116,6 +118,12 @@ public interface Silver extends BasicPlatformConfig {
   public static final String COVERAGETOOL = "coveragetool";
 
   /**
+   * Key for boolean flag whether gcov coverage shall use Silver's MinGW installation.
+   * 
+   */
+  public static final String SILVER_GCOV_USE_SILVERS_MINGW = "silverGCovUseSilversMingw";
+
+  /**
    * Key for the path to the GCov data directory of Silver if 'GNU gcov' coverage is used for test
    * execution. If specified, it denotes the directory of the GCov .gcno files from compiling. If
    * not specified, the folder 'gcov_obj' in the working folder of the Silver platform is taken as
@@ -128,6 +136,27 @@ public interface Silver extends BasicPlatformConfig {
    * files are not deleted at platform startup during test execution.
    */
   public static final String SILVER_GCOV_CUMULATE = "silverGCovCumulate";
+
+  /**
+   * Key for boolean flag whether a transient SFU is used for connecting TPT to Silver
+   */
+  public static final String USE_TRANSIENT_SFU = "useTransientSFU";
+
+  /**
+   * Timeout to cancel the Silver execution if the tests run longer. Use a value less than 0 to
+   * ignore the timeout
+   */
+  public static final String SILVER_EXECUTION_TIMEOUT = "silverTimeout";
+
+  /**
+   * Coverage meta file. This file is used to store the coverage meta information.
+   */
+  public static final String COVERAGE_META_FILE = "covMetaFile";
+
+  /**
+   * Key for boolean flag whether TPT output channels should have read/write semantics
+   */
+  public static final String ENABLE_READ_WRITE = "readWrite";
 
   /**
    * Old command line property used before TPT-20. Please use the other properties instead.

@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2014-2024 Synopsys Inc.
+ * Copyright (c) 2014-2025 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -32,7 +32,7 @@ import com.piketec.tpt.api.tasmo.TasmoTestDataGenerationController;
  * The particular properties of the various platforms are mapped to a generic {@link PropertyMap}.
  * </p>
  * 
- * @author Copyright (c) 2014-2024 Synopsys Inc. - MIT License (MIT) - All rights reserved
+ * @author Copyright (c) 2014-2025 Synopsys Inc. - MIT License (MIT) - All rights reserved
  */
 public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionItemEnabler {
 
@@ -247,6 +247,28 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
   public static final String XIL_AT_FUSION_PLATFORM_TYPE = "asamXil";
 
   /**
+   * Get the current name of this {@link PlatformConfiguration}.
+   * 
+   * @return the current name of this {@link PlatformConfiguration}.
+   * 
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public String getName() throws RemoteException;
+
+  /**
+   * Set a new name of this {@link PlatformConfiguration}.
+   * 
+   * @param newName
+   *          the new name
+   * @throws RemoteException
+   *           remote communication error
+   */
+  @Override
+  public void setName(String newName) throws RemoteException;
+
+  /**
    * @return The type name of the platform
    * @throws RemoteException
    *           remote communication problem
@@ -337,12 +359,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * Returns the properties of the platform adapter as {@link PropertyMap}.
    * <p>
    * A PropertyMap maps the properties as follows: {@link String} -&gt; {@link Property}. A
-   * <code>Property</code> is either a <code>ProperyMap</code> or a <code>String</code> value.
+   * <code>Property</code> is either a <code>PropertyMap</code> or a <code>String</code> value.
    * </p>
    * The structure of the PropertyMap depends on the type of the platform adapter.
    * 
-   * @return A {@link com.piketec.tpt.api.properties.PropertyMap PropertyMap} with the settings for
-   *         the platform adapter.
+   * @return A {@link PropertyMap PropertyMap} with the settings for the platform adapter.
    * 
    * @throws RemoteException
    *           remote communication problem
@@ -374,8 +395,8 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * additional parameters to the function.
    * </p>
    * If the function name is unknown or if the <code>PropertyMap</code> does not match the expected
-   * structure, an {@link ApiException} is invoked. Often exception message contains a hint which
-   * functions are available.
+   * structure, an {@link ApiException} is invoked. Often, the exception message contains a hint
+   * which functions are available.
    * 
    * @param functionName
    *          Name of the function to be invoked
@@ -393,6 +414,11 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
 
   /**
    * Initialize the TASMO test case generation with this Platform.
+   * <p>
+   * Note: In order to configure the input specification to be used by TASMO, adjust the values
+   * within the mapping passed here. To do this, create a mapping flavor of type
+   * {@link Mapping#TASMO_INPUT_SPECIFICATION_FLAVOR} and set the values via
+   * {@link Mapping#setMappingFlavorColumnValue}.
    * 
    * @param mapping
    *          The mapping containing the TASMO input specification to be used.
@@ -417,7 +443,7 @@ public interface PlatformConfiguration extends NamedObject, PlatformOrExecutionI
    * @param targetIndex
    *          The index where the copy will be inserted. Use {@link Integer#MAX_VALUE} to append the
    *          copy at the end.
-   * @return The copy of this and all log messages that occured during copying.
+   * @return The copy of this and all log messages that occurred during copying.
    * @throws ApiException
    *           If target is <code>null</code> or copying failed.
    * @throws RemoteException
