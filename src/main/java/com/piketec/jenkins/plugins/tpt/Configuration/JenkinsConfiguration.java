@@ -254,8 +254,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
      *          the TPT file
      * @return An error if the TPT file field is empty
      */
-    // lgtm[jenkins/csrf]
-    // lgtm[jenkins/no-permission-check]
+    // lgtm[jenkins/csrf,jenkins/no-permission-check]
     public FormValidation doCheckTptFile(@QueryParameter File tptFile) {
       if ((tptFile != null) && (tptFile.getName().trim().length() > 0)) {
         return FormValidation.ok();
@@ -269,7 +268,7 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
      *          The name of the execution configuration
      * @return An error
      */
-    // lgtm[jenkins/csrf]
+    // lgtm[jenkins/csrf,jenkins/no-permission-check]
     public static FormValidation doCheckConfiguration(@QueryParameter String configuration) {
       if ((configuration == null) || (configuration.trim().length() == 0)) {
         return FormValidation.error("Enter a configuration name.");
