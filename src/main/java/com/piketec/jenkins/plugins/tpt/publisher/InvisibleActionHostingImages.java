@@ -31,6 +31,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import hudson.FilePath;
 import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.util.HttpResponses;
 
@@ -106,6 +107,7 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
   // lgtm[jenkins/csrf]
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
+    build.checkPermission(Job.READ);
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,
         new FilePath(TPTReportUtils.getImageDir(build)), "TPT Report", "clipboard.png", false);
     if (req.getRestOfPath().equals("")) {

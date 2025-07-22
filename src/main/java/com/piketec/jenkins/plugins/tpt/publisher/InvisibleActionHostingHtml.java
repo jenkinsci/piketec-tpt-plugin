@@ -31,6 +31,7 @@ import org.kohsuke.stapler.StaplerResponse;
 import hudson.FilePath;
 import hudson.model.DirectoryBrowserSupport;
 import hudson.model.InvisibleAction;
+import hudson.model.Job;
 
 /**
  * An invisibale action to show HTML reports
@@ -64,6 +65,10 @@ public abstract class InvisibleActionHostingHtml extends InvisibleAction {
     this.parentPage = parentPage;
   }
 
+  TPTReportPage getParentPage() {
+    return parentPage;
+  }
+
   /**
    * @return The path to the html file
    */
@@ -88,6 +93,7 @@ public abstract class InvisibleActionHostingHtml extends InvisibleAction {
   // lgtm[jenkins/csrf]
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
+    getParentPage().getBuild().checkPermission(Job.READ);
     File pathToHtml = pathToHtml();
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(pathToHtml),
         "TPT Report", "clipboard.png", false);

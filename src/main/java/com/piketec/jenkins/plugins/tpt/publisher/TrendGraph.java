@@ -302,6 +302,7 @@ public class TrendGraph implements Action, StaplerProxy {
   // lgtm[jenkins/csrf]
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException, InterruptedException {
+    project.checkPermission(Job.READ);
     // For every refresh the actual build will be updated. If actual build equals null, nothing to
     // show
     lastSuccessBuild = project.getLastSuccessfulBuild();

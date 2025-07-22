@@ -255,8 +255,8 @@ public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
      * @return An error if the TPT file field is empty
      */
     // lgtm[jenkins/csrf]
-    public static FormValidation doCheckTptFile(@QueryParameter File tptFile) {
-
+    // lgtm[jenkins/no-permission-check]
+    public FormValidation doCheckTptFile(@QueryParameter File tptFile) {
       if ((tptFile != null) && (tptFile.getName().trim().length() > 0)) {
         return FormValidation.ok();
       } else {

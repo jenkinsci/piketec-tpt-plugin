@@ -32,6 +32,7 @@ import org.kohsuke.stapler.StaplerResponse;
 
 import hudson.FilePath;
 import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Job;
 
 /**
  * This class is for the failed test. Objects from this class will be created when parsing the
@@ -226,6 +227,7 @@ public class TPTTestCase extends InvisibleActionHostingHtml {
   // lgtm[jenkins/csrf]
   public void doIndex(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
+    getParentPage().getBuild().checkPermission(Job.READ);
     File pathToHtml = pathToHtml();
     // TODO: This is approach is not working with parallel access
     // we simply write a failedTest.html where the page of the right frame is replaced
