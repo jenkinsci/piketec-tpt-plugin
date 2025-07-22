@@ -223,6 +223,7 @@ public class TPTTestCase extends InvisibleActionHostingHtml {
     this.platform = platform;
   }
 
+  // lgtm[jenkins/csrf]
   public void doIndex(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
     File pathToHtml = pathToHtml();

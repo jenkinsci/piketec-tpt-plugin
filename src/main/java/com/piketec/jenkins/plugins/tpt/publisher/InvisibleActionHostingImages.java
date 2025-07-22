@@ -103,6 +103,7 @@ public class InvisibleActionHostingImages implements Action, StaplerProxy {
    * @throws ServletException
    *           if the response could not be generated
    */
+  // lgtm[jenkins/csrf]
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
     DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this,

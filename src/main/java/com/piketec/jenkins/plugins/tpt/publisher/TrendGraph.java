@@ -299,6 +299,7 @@ public class TrendGraph implements Action, StaplerProxy {
    * @throws InterruptedException
    *           if the job is cancelled
    */
+  // lgtm[jenkins/csrf]
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException, InterruptedException {
     // For every refresh the actual build will be updated. If actual build equals null, nothing to

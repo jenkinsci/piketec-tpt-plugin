@@ -700,6 +700,7 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
      *          The tpt installation paths
      * @return The validation of the form
      */
+    // lgtm[jenkins/csrf]
     public static FormValidation doCheckExePaths(@QueryParameter String exePaths) {
       if ((exePaths == null) || (exePaths.trim().length() == 0)) {
         return FormValidation.error("Enter at least one path to a tpt.exe");
@@ -724,6 +725,7 @@ public class TptPlugin extends Builder implements SimpleBuildStep {
      * 
      * @return items from the combobox list
      */
+    // lgtm[jenkins/csrf]
     public ListBoxModel doFillJUnitLogLevelItems() {
       ListBoxModel items = new ListBoxModel();
       for (LogLevel goal : LogLevel.values()) {

@@ -85,6 +85,7 @@ public abstract class InvisibleActionHostingHtml extends InvisibleAction {
    * @throws ServletException
    *           If the response could not be generated
    */
+  // lgtm[jenkins/csrf]
   public void doDynamic(StaplerRequest req, StaplerResponse rsp)
       throws IOException, ServletException {
     File pathToHtml = pathToHtml();
