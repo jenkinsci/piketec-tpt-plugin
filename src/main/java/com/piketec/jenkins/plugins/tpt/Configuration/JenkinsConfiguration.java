@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -41,7 +41,7 @@ import jenkins.model.Jenkins;
  * Repeatable subelement for the TPT configuration. Mainly a pair of TPT file and execution
  * configuration enriched with some additional information.
  * 
- * @author jkuhnert, PikeTec GmbH
+ * @author jkuhnert, Synopsys Inc.
  */
 public class JenkinsConfiguration implements Describable<JenkinsConfiguration> {
 

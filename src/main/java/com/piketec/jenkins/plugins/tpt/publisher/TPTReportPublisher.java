@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -63,7 +63,7 @@ import jenkins.tasks.SimpleBuildStep;
 /**
  * The post build action to publish the TPT test results in Jenkins
  * 
- * @author FInfantino, PikeTec GmbH
+ * @author FInfantino, Synopsys Inc.
  */
 public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
 
@@ -232,7 +232,7 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
   /**
    * The descriptor for the publisher
    * 
-   * @author FInfantino, PikeTec GmbH
+   * @author FInfantino, Synopsys Inc.
    *
    */
   @Extension
@@ -269,7 +269,7 @@ public class TPTReportPublisher extends Recorder implements SimpleBuildStep {
    * In order to increase the performance and make a HashMap with a "FailedTestKey" instead of
    * looping throug a list.
    * 
-   * @author FInfantino, PikeTec GmbH
+   * @author FInfantino, Synopsys Inc.
    *
    */
   private static class FailedTestKey {

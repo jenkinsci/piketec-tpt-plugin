@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -39,7 +39,7 @@ import hudson.FilePath;
 /**
  * Class for helper methods to collect and tranform TPT test result.
  * 
- * @author jkuhnert, PikeTec GmbH
+ * @author jkuhnert, Synopsys Inc.
  */
 public final class Publish {
 

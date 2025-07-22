@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -47,7 +47,7 @@ import jenkins.tasks.SimpleBuildStep;
  * A Page with a table of all executed TPT files and their configuration on top and a table with all
  * failed test cases.
  * 
- * @author FInfantino, PikeTec GmbH
+ * @author FInfantino, Synopsys Inc.
  */
 public class TPTReportPage implements RunAction2, SimpleBuildStep.LastBuildAction {
 

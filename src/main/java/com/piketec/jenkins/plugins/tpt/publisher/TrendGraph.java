@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -47,7 +47,7 @@ import hudson.util.HttpResponses;
 /**
  * Generates the trend graph on the main page.
  * 
- * @author FInfantino, PikeTec GmbH
+ * @author FInfantino, Synopsys Inc.
  *
  */
 public class TrendGraph implements Action, StaplerProxy {
@@ -441,7 +441,7 @@ public class TrendGraph implements Action, StaplerProxy {
    * Data container to collect numbers of test results of TPT test execuiton for build previous
    * builds.
    * 
-   * @author FInfantino, PikeTec GmbH
+   * @author FInfantino, Synopsys Inc.
    *
    */
   public static class ResultData {

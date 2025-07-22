@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -36,7 +36,7 @@ import hudson.model.Run;
  * Through this class is how the data from a distributing job to a worker job is passed. A way to
  * tell the worker job what testcases should be executed.
  * 
- * @author FInfantino, PikeTec GmbH
+ * @author FInfantino, Synopsys Inc.
  */
 public class WorkLoad {
 

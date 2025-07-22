@@ -23,7 +23,7 @@ import hudson.FilePath;
  * Additonally global assesslet results are only available here.
  * 
  * 
- * @author FInfantino, PikeTec GmbH
+ * @author FInfantino, Synopsys Inc.
  *
  */
 public class TestcaseSummaryParser extends DefaultHandler {

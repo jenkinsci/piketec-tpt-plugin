@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  * 
- * Copyright (c) 2018 PikeTec GmbH
+ * Copyright (c) 2018 Synopsys Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
  * associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -38,7 +38,7 @@ import hudson.model.Job;
  * This class is for the failed test. Objects from this class will be created when parsing the
  * "test_summary.xml". We get a list of failed tests (inconclusive, error or failed).
  * 
- * @author FInfantino, PikeTec GmbH
+ * @author FInfantino, Synopsys Inc.
  *
  */
 public class TPTTestCase extends InvisibleActionHostingHtml {
