@@ -46,8 +46,6 @@ public abstract class TptApiCallable<S> extends MasterToSlaveCallable<S, Interru
 
   private TaskListener listener;
 
-  private String hostName;
-
   private int tptPort;
 
   private String tptBindingName;
@@ -66,12 +64,6 @@ public abstract class TptApiCallable<S> extends MasterToSlaveCallable<S, Interru
     this.exePaths = exePaths.clone();
     this.arguments = arguments;
     this.startUpWaitTime = startUpWaitTime;
-    if (System.getenv("HOSTNAME") != null) {
-      // Environmentvariable that may be used in Docker
-      this.hostName = System.getenv("HOSTNAME");
-    } else {
-      this.hostName = "localhost";
-    }
   }
 
   /**
@@ -91,7 +83,7 @@ public abstract class TptApiCallable<S> extends MasterToSlaveCallable<S, Interru
    */
   protected @Nullable TptApi getApi() throws InterruptedException {
     TptLogger logger = getLogger();
-    logger.info("Try to connect to " + hostName + ":" + tptPort);
+    logger.info("Try to connect to " + getHostName() + ":" + tptPort);
     logger.info("TPT Binding name: " + tptBindingName);
     TptApi api = getApiIfTptIsOpen();
     if (api != null) {
@@ -121,10 +113,15 @@ public abstract class TptApiCallable<S> extends MasterToSlaveCallable<S, Interru
     }
   }
 
+  private String getHostName() {
+    String hostName = System.getenv("HOSTNAME");
+    return hostName == null ? "localhost" : hostName;
+  }
+
   private TptApi connectToTPT() throws RemoteException, NotBoundException, AccessException {
     TptLogger logger = getLogger();
     Registry registry;
-    registry = LocateRegistry.getRegistry(hostName, tptPort);
+    registry = LocateRegistry.getRegistry(getHostName(), tptPort);
     TptApi remoteApi = (TptApi)registry.lookup(tptBindingName);
     try {
       logger.info("Connected to TPT \"" + remoteApi.getTptVersion() + "\"");
